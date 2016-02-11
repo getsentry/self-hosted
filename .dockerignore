@@ -1,0 +1,6 @@
+.git
+.dockerignore
+Makefile
+README.md
+*.pyc
+*.tar
