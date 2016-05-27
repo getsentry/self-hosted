@@ -2,6 +2,11 @@
 
 Official bootstrap for running your own [Sentry](https://getsentry.com/) with [Docker](https://www.docker.com/).
 
+## Requirements
+
+ * Docker 1.10.0+
+ * Compose 1.6.0+ _(optional)_
+
 ## Resources
 
  * [Documentation](https://docs.getsentry.com/on-premise/server/)
