@@ -1,6 +1,9 @@
 .git
+.gitignore
 .dockerignore
 Makefile
 README.md
 *.pyc
 *.tar
+docker-compose.yml
+docker-compose.yml.example
