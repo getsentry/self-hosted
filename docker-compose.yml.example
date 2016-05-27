@@ -8,10 +8,10 @@ services:
     environment:
       # Run `docker-compose run web config generate-secret-key`
       # to get the SENTRY_SECRE_KEY value.
-      # - SENTRY_SECRET_KEY=
-      - SENTRY_MEMCACHED_HOST=memcached
-      - SENTRY_REDIS_HOST=redis
-      - SENTRY_POSTGRES_HOST=postgres
+      # SENTRY_SECRET_KEY: ''
+      SENTRY_MEMCACHED_HOST: memcached
+      SENTRY_REDIS_HOST: redis
+      SENTRY_POSTGRES_HOST: postgres
     volumes:
       - ./data:/var/lib/sentry/files
 
