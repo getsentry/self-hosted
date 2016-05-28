@@ -4,7 +4,6 @@ version: '2'
 services:
   base:
     build: .
-    restart: unless-stopped
     environment:
       # Run `docker-compose run web config generate-secret-key`
       # to get the SENTRY_SECRET_KEY value.
@@ -17,15 +16,12 @@ services:
 
   memcached:
     image: memcached:1.4
-    restart: unless-stopped
 
   redis:
     image: redis:3.0-alpine
-    restart: unless-stopped
 
   postgres:
     image: postgres:9.5
-    restart: unless-stopped
 
   web:
     extends: base
