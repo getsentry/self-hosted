@@ -12,10 +12,10 @@ $(REPOSITORY)_$(TAG).tar: build
 	@echo "$(OK_COLOR)==>$(NO_COLOR) Saving $(REPOSITORY):$(TAG) > $@"
 	@docker save $(REPOSITORY):$(TAG) > $@
 
-push:
+push: build
 	@echo "$(OK_COLOR)==>$(NO_COLOR) Pushing $(REPOSITORY):$(TAG)"
 	@docker push $(REPOSITORY):$(TAG)
 
-all: build $(REPOSITORY)_$(TAG).tar
+all: build push
 
 .PHONY: all build push
