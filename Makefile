@@ -1,5 +1,5 @@
-REPOSITORY=sentry-onpremise
-TAG=latest
+REPOSITORY?=sentry-onpremise
+TAG?=latest
 
 OK_COLOR=\033[32;01m
 NO_COLOR=\033[0m
@@ -12,6 +12,10 @@ $(REPOSITORY)_$(TAG).tar: build
 	@echo "$(OK_COLOR)==>$(NO_COLOR) Saving $(REPOSITORY):$(TAG) > $@"
 	@docker save $(REPOSITORY):$(TAG) > $@
 
+push:
+	@echo "$(OK_COLOR)==>$(NO_COLOR) Pushing $(REPOSITORY):$(TAG)"
+	@docker push $(REPOSITORY):$(TAG)
+
 all: build $(REPOSITORY)_$(TAG).tar
 
-.PHONY: build all
+.PHONY: all build push
