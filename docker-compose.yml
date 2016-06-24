@@ -11,14 +11,18 @@ services:
       SENTRY_MEMCACHED_HOST: memcached
       SENTRY_REDIS_HOST: redis
       SENTRY_POSTGRES_HOST: postgres
+      SENTRY_EMAIL_HOST: smtp
     volumes:
       - ./data:/var/lib/sentry/files
+
+  smtp:
+    image: tianon/exim4
 
   memcached:
     image: memcached:1.4
 
   redis:
-    image: redis:3.0-alpine
+    image: redis:3.2-alpine
 
   postgres:
     image: postgres:9.5
@@ -29,21 +33,24 @@ services:
       - redis
       - postgres
       - memcached
+      - smtp
     ports:
       - '9000:9000'
 
   cron:
     extends: base
-    command: celery beat
+    command: run cron
     links:
       - redis
       - postgres
       - memcached
+      - smtp
 
   worker:
     extends: base
-    command: celery worker
+    command: run worker
     links:
       - redis
       - postgres
       - memcached
+      - smtp
