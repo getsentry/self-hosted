@@ -1,4 +1,5 @@
-# See docs.getsentry.com/on-premise/server for instructions
+# See docs.getsentry.com/on-premise/server/ for full
+# instructions
 
 version: '2'
 services:

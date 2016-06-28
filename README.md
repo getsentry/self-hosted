@@ -9,6 +9,6 @@ Official bootstrap for running your own [Sentry](https://getsentry.com/) with [D
 
 ## Resources
 
- * [Documentation](https://docs.getsentry.com/on-premise/server/)
+ * [Documentation](https://docs.getsentry.com/on-premise/server/installation/docker/)
  * [Bug Tracker](https://github.com/getsentry/onpremise)
  * [IRC](irc://chat.freenode.net/sentry) (chat.freenode.net, #sentry)
