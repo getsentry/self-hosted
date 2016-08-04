@@ -14,7 +14,7 @@ services:
       SENTRY_POSTGRES_HOST: postgres
       SENTRY_EMAIL_HOST: smtp
     volumes:
-      - ./data:/var/lib/sentry/files
+      - ./data/sentry:/var/lib/sentry/files
 
   smtp:
     image: tianon/exim4
