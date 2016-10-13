@@ -7,6 +7,20 @@ Official bootstrap for running your own [Sentry](https://sentry.io/) with [Docke
  * Docker 1.10.0+
  * Compose 1.6.0+ _(optional)_
 
+## Usage
+
+```bash
+# generate secret key
+$ docker-compose run --rm web config generate-secret-key
+$ export SENTRY_SECRET_KEY='your-secret-key'
+
+# init or upgrade
+$ docker-compose run --rm web upgrade
+
+# run in the background
+$ docker-compose up -d
+```
+
 ## Resources
 
  * [Documentation](https://docs.sentry.io/server/installation/docker/)
