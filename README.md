@@ -24,68 +24,11 @@ will get you up and running in no time!
 Note that as long as you have your database bind-mounted, you should
 be fine stopping and removing the containers without worry.
 
-## Backing up postgres
+## Securing Sentry with SSL/TLS
 
-Following with the trend of containers, you could even add something like
-[this](https://github.com/InAnimaTe/docker-postgres-s3-archive) to 
-backup postgres to an AWS S3 bucket:
-
-```
-  postgresqlbackup:
-    image: inanimate/postgres-s3-archive:9.5
-    restart: always
-    links:
-        - postgres:postgres 
-    environment:
-        - "AWS_ACCESS_KEY_ID=PUTACCESSIDHERE"
-        - "AWS_SECRET_ACCESS_KEY=PUTSECRETKEYHERE"
-        - "BUCKET=s3://awesomebackupsbucket/sentry"
-        - "SYMMETRIC_PASSPHRASE=hahacanthaxme"
-        - "NAME_PREFIX=sentry-database-backup"
-        - "PGHOST=postgres"
-        - "PGPORT=5432"
-```
-
-This container runs `pgdump` to take snapshots of your database on a
-certain time frame. You could also use other backup facilities on the 
-host which you're running the containers.
-
-## Reverse Proxying (SSL/TLS)
-
-The absolute easiest way to get SSL/TLS protecting your Sentry server is
-to use [Caddy](https://caddyserver.com/). Caddy will handle automatic
-SSL certificate obtainment and renewal from
-[Let's Encrypt](https://letsencrypt.org/) for you.
-
-Here is an example `Caddyfile` configuration:
-
-```
-sentry.example.net {
-    proxy / web:9000 {
-        transparent
-    }
-    tls {
-        max_certs 1
-    }
-}
-```
-
-The above would work with a caddy entry in `docker-compose.yml` like:
-
-```
-caddy:
-    image: abiosoft/caddy:0.9.3
-    restart: always
-    volumes:
-        - ./Caddyfile:/etc/Caddyfile
-        - ./caddydata:/root/.caddy
-    ports:
-        - "80:80"
-        - "443:443"
-    links:
-        - web
-
-```
+If you'd like to protect your Sentry install with SSL/TLS, there are
+fantastic SSL/TLS proxies like [HAProxy](http://www.haproxy.org/) 
+and [Nginx](https://www.nginx.com/).
 
 ## Resources
 
