@@ -28,7 +28,7 @@ be fine stopping and removing the containers without worry.
 
 If you'd like to protect your Sentry install with SSL/TLS, there are
 fantastic SSL/TLS proxies like [HAProxy](http://www.haproxy.org/) 
-and [Nginx](https://www.nginx.com/).
+and [Nginx](http://nginx.org/).
 
 ## Resources
 
