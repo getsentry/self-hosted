@@ -3,7 +3,7 @@
 
 version: '2'
 services:
-  base:
+  web:
     build: .
     environment:
       # Run `docker-compose run web config generate-secret-key`
@@ -15,6 +15,32 @@ services:
       SENTRY_EMAIL_HOST: smtp
     volumes:
       - ./data/sentry:/var/lib/sentry/files
+    ports:
+      - '9000:9000'
+    links: &sentry_links
+      - redis
+      - postgres
+      - memcached
+      - smtp
+    depends_on: &sentry_depends
+      - redis
+      - postgres
+      - memcached
+      - smtp
+
+  cron:
+    extends: web
+    command: run cron
+    ports: []
+    links: *sentry_links
+    depends_on: *sentry_depends
+
+  worker:
+    extends: web
+    command: run worker
+    ports: []
+    links: *sentry_links
+    depends_on: *sentry_depends
 
   smtp:
     image: tianon/exim4
@@ -29,31 +55,3 @@ services:
     image: postgres:9.5
     volumes:
       - ./data/postgres:/var/lib/postgresql/data
-
-  web:
-    extends: base
-    links:
-      - redis
-      - postgres
-      - memcached
-      - smtp
-    ports:
-      - '9000:9000'
-
-  cron:
-    extends: base
-    command: run cron
-    links:
-      - redis
-      - postgres
-      - memcached
-      - smtp
-
-  worker:
-    extends: base
-    command: run worker
-    links:
-      - redis
-      - postgres
-      - memcached
-      - smtp
