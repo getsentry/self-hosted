@@ -17,12 +17,12 @@ services:
       - ./data/sentry:/var/lib/sentry/files
     ports:
       - '9000:9000'
-    links: &sentry_links
+    links:
       - redis
       - postgres
       - memcached
       - smtp
-    depends_on: &sentry_depends
+    depends_on:
       - redis
       - postgres
       - memcached
@@ -32,15 +32,31 @@ services:
     extends: web
     command: run cron
     ports: []
-    links: *sentry_links
-    depends_on: *sentry_depends
+    links:
+      - redis
+      - postgres
+      - memcached
+      - smtp
+    depends_on:
+      - redis
+      - postgres
+      - memcached
+      - smtp
 
   worker:
     extends: web
     command: run worker
     ports: []
-    links: *sentry_links
-    depends_on: *sentry_depends
+    links:
+      - redis
+      - postgres
+      - memcached
+      - smtp
+    depends_on:
+      - redis
+      - postgres
+      - memcached
+      - smtp
 
   smtp:
     image: tianon/exim4
