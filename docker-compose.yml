@@ -9,12 +9,12 @@ services:
       file: docker-compose-base.yml
     ports:
       - '9000:9000'
-    links:
+    links: &sentry_links
       - redis
       - postgres
       - memcached
       - smtp
-    depends_on:
+    depends_on: &sentry_depends
       - redis
       - postgres
       - memcached
@@ -26,16 +26,8 @@ services:
       file: docker-compose-base.yml
     command: run cron
     ports: []
-    links:
-      - redis
-      - postgres
-      - memcached
-      - smtp
-    depends_on:
-      - redis
-      - postgres
-      - memcached
-      - smtp
+    links: *sentry_links
+    depends_on: *sentry_depends
 
   worker:
     extends:
@@ -43,16 +35,8 @@ services:
       file: docker-compose-base.yml
     command: run worker
     ports: []
-    links:
-      - redis
-      - postgres
-      - memcached
-      - smtp
-    depends_on:
-      - redis
-      - postgres
-      - memcached
-      - smtp
+    links: *sentry_links
+    depends_on: *sentry_depends
 
   smtp:
     image: tianon/exim4
