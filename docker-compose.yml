@@ -2,6 +2,11 @@
 # instructions
 
 version: '2'
+
+volumes:
+  sentry-data:
+  postgres-data:
+
 services:
   base:
     build: .
@@ -14,7 +19,7 @@ services:
       SENTRY_POSTGRES_HOST: postgres
       SENTRY_EMAIL_HOST: smtp
     volumes:
-      - ./data/sentry:/var/lib/sentry/files
+      - sentry-data:/var/lib/sentry/files
 
   smtp:
     image: tianon/exim4
@@ -28,7 +33,7 @@ services:
   postgres:
     image: postgres:9.5
     volumes:
-      - ./data/postgres:/var/lib/postgresql/data
+      - postgres-data:/var/lib/postgresql/data
 
   web:
     extends: base
