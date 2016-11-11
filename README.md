@@ -9,8 +9,10 @@ Official bootstrap for running your own [Sentry](https://sentry.io/) with [Docke
 
 ## Up and Running
 
-Assuming you've just cloned this repository, the following steps 
+Assuming you've just cloned this repository, the following steps
 will get you up and running in no time!
+
+There may need to be modifications to the included `docker-compose.yml` file to accommodate your needs or your environment. These instructions are a guideline for what you should generally do.
 
 1. `mkdir -p data/{sentry,postgres}` - Make our local database and sentry config directories.
     This directory is bind-mounted with postgres so you don't lose state!
@@ -27,7 +29,7 @@ be fine stopping and removing the containers without worry.
 ## Securing Sentry with SSL/TLS
 
 If you'd like to protect your Sentry install with SSL/TLS, there are
-fantastic SSL/TLS proxies like [HAProxy](http://www.haproxy.org/) 
+fantastic SSL/TLS proxies like [HAProxy](http://www.haproxy.org/)
 and [Nginx](http://nginx.org/).
 
 ## Resources
