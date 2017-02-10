@@ -1,0 +1,24 @@
+sentry-web:
+  image: "socialcode/sentry-onpremise:$VERSION"
+  environment:
+    - SC_ENV=${SC_ENV}
+    - VERSION=${VERSION}
+  env_file:
+    - ${SC_ENV}.env
+  volumes:
+    - ./data/sentry:/var/lib/sentry/files
+    - /secrets:/secrets:ro
+  links:
+    - memcached
+    - smtp
+  ports:
+    - '9000:9000'
+  mem_limit: 1048576000
+  cpu_shares: 100
+
+smtp:
+  image: tianon/exim4
+
+memcached:
+  image: memcached:1.4
+
