@@ -1,0 +1,16 @@
+{
+  "desiredCount": 2,
+  "role": "SocialCode_ECS_ELB",
+  "deploymentConfiguration": {
+    "maximumPercent": 200,
+    "minimumHealthyPercent": 50
+  },
+  "loadBalancers": [
+    {
+      "loadBalancerName": "sentry--safezone-alpha",
+      "containerName": "sentry-web",
+      "containerPort": 9000
+    }
+  ]
+}
+
