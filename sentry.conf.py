@@ -310,7 +310,7 @@ if 'BITBUCKET_CONSUMER_KEY' in os.environ:
     BITBUCKET_CONSUMER_SECRET = env('BITBUCKET_CONSUMER_SECRET')
 
 # SSO setup for Github Enterprise, GITHUB_BASE_DOMAIN will be something like github.eng.your-org.com 
-# GITHUB_API_DOMAIN will be github.eng.your-org.com /api/v3
+# GITHUB_API_DOMAIN will be github.eng.your-org.com/api/v3
 # Note, the callback url for your access token created from github enterprise will be http://your_sentry_url/auth/sso
 if 'GITHUB_BASE_DOMAIN' in os.environ:
     GITHUB_BASE_DOMAIN=env('GITHUB_BASE_DOMAIN')
