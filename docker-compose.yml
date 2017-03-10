@@ -18,9 +18,14 @@ services:
       SENTRY_REDIS_HOST: redis
       SENTRY_POSTGRES_HOST: postgres
       SENTRY_EMAIL_HOST: smtp
+      # uncomment below line and use export to set set environment variables for enable github or github enterprise SSO
+      # GITHUB_APP_ID: ${GITHUB_APP_ID}
+      # GITHUB_API_SECRET: ${GITHUB_API_SECRET}
+      # GITHUB_ACCESS_URL: ${GITHUB_ACCESS_URL}
+      # GITHUB_BASE_DOMAIN: ${GITHUB_BASE_DOMAIN}
+      # GITHUB_API_DOMAIN: ${GITHUB_API_DOMAIN}
     volumes:
       - ./data/sentry:/var/lib/sentry/files
-
   smtp:
     image: tianon/exim4
 
