@@ -26,6 +26,7 @@ services:
       # GITHUB_API_DOMAIN: ${GITHUB_API_DOMAIN}
     volumes:
       - ./data/sentry:/var/lib/sentry/files
+      
   smtp:
     image: tianon/exim4
 
