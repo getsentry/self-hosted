@@ -88,6 +88,8 @@ SENTRY_USE_BIG_INTS = True
 # and thus various UI optimizations should be enabled.
 SENTRY_SINGLE_ORGANIZATION = Bool(env('SENTRY_SINGLE_ORGANIZATION', True))
 
+SENTRY_ALLOW_PUBLIC_PROJECTS = Bool(env('SENTRY_ALLOW_PUBLIC_PROJECTS', True))
+
 #########
 # Redis #
 #########
