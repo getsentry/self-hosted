@@ -1,4 +1,4 @@
-REPOSITORY?=sentry-onpremise
+REPOSITORY?=lulibrary/sentry-onpremise
 TAG?=latest
 
 OK_COLOR=\033[32;01m
