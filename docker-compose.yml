@@ -9,6 +9,7 @@
 version: '2'
 services:
   base:
+    restart: unless-stopped
     build: .
     environment:
       # Run `docker-compose run web config generate-secret-key`
@@ -22,20 +23,25 @@ services:
       - ./data/sentry:/var/lib/sentry/files
 
   smtp:
+    restart: unless-stopped
     image: tianon/exim4
 
   memcached:
+    restart: unless-stopped
     image: memcached:1.4
 
   redis:
+    restart: unless-stopped
     image: redis:3.2-alpine
 
   postgres:
+    restart: unless-stopped
     image: postgres:9.5
     volumes:
       - ./data/postgres:/var/lib/postgresql/data
 
   web:
+    restart: unless-stopped
     extends: base
     links:
       - redis
@@ -46,6 +52,7 @@ services:
       - '9000:9000'
 
   cron:
+    restart: unless-stopped
     extends: base
     command: run cron
     links:
@@ -55,6 +62,7 @@ services:
       - smtp
 
   worker:
+    restart: unless-stopped
     extends: base
     command: run worker
     links:
