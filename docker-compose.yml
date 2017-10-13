@@ -41,6 +41,7 @@ services:
       - ./data/postgres:/var/lib/postgresql/data
 
   nginx:
+    restart: unless-stopped
     build:
       context: ./nginx
     depends_on:
@@ -56,8 +57,6 @@ services:
       - postgres
       - memcached
       - smtp
-    ports:
-      - '9000:9000'
 
   cron:
     restart: unless-stopped
