@@ -40,6 +40,14 @@ services:
     volumes:
       - ./data/postgres:/var/lib/postgresql/data
 
+  nginx:
+    build:
+      context: ./nginx
+    depends_on:
+      - web
+    ports:
+      - "0.0.0.0:80:80"
+
   web:
     restart: unless-stopped
     extends: base
