@@ -40,6 +40,15 @@ services:
     volumes:
       - ./data/postgres:/var/lib/postgresql/data
 
+  nginx:
+    restart: unless-stopped
+    build:
+      context: ./nginx
+    depends_on:
+      - web
+    ports:
+      - "0.0.0.0:80:80"
+
   web:
     restart: unless-stopped
     extends: base
@@ -48,8 +57,6 @@ services:
       - postgres
       - memcached
       - smtp
-    ports:
-      - '9000:9000'
 
   cron:
     restart: unless-stopped
