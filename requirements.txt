@@ -1,1 +1,2 @@
 # Add plugins here
+django-sslify==0.2.7

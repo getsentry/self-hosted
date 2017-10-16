@@ -304,3 +304,20 @@ if 'GITHUB_APP_ID' in os.environ:
 if 'BITBUCKET_CONSUMER_KEY' in os.environ:
     BITBUCKET_CONSUMER_KEY = env('BITBUCKET_CONSUMER_KEY')
     BITBUCKET_CONSUMER_SECRET = env('BITBUCKET_CONSUMER_SECRET')
+
+## Custom hint modifications
+
+# Use 3 web workers
+SENTRY_WEB_OPTIONS = {
+    'workers': 3,  # the number of web workers
+}
+
+# Force ssl when using ssl
+if env('SENTRY_USE_SSL', False):
+    MIDDLEWARE_CLASSES = (
+        'sslify.middleware.SSLifyMiddleware',
+    ) + MIDDLEWARE_CLASSES
+
+# Restrict registration of new users
+SENTRY_FEATURES['auth:register'] = False
+SENTRY_PUBLIC = False

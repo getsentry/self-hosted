@@ -38,3 +38,45 @@ and [Nginx](http://nginx.org/).
  * [Bug Tracker](https://github.com/getsentry/onpremise)
  * [Forums](https://forum.sentry.io/c/on-premise)
  * [IRC](irc://chat.freenode.net/sentry) (chat.freenode.net, #sentry)
+
+## On Aptible
+
+### Setup
+
+- Create a new pg db, ex: `hint-sentry-pg-v8.20`
+- Create a new redis db, ex: `hint-sentry-redis-v8.20`
+- Create a new app, ex: `hint-sentry-v8.20`
+- Follow the steps to ##Deploy
+- Set the required env variables:
+  For version 8.20 those are:
+  - SENTRY_DB_NAME
+  - SENTRY_DB_PASSWORD
+  - SENTRY_DB_USER
+  - SENTRY_EMAIL_HOST, suggested value: `smtp.mailgun.org`
+  - SENTRY_EMAIL_PASSWORD
+  - SENTRY_EMAIL_USER, suggested value: `postmaster@mailsentry.hint.com`
+  - SENTRY_POSTGRES_HOST
+  - SENTRY_POSTGRES_PORT
+  - SENTRY_REDIS_HOST
+  - SENTRY_REDIS_PASSWORD
+  - SENTRY_REDIS_PORT
+  - SENTRY_SECRET_KEY
+  - SENTRY_SERVER_EMAIL, suggested value: `sentry@hint.com`
+  - SENTRY_SINGLE_ORGANIZATION, suggested value: `true`
+  - SENTRY_URL_PREFIX
+  - SENTRY_USE_SSL, suggested value: `true`
+- Login to the Aptible app via ssh and execute: `sentry upgrade`
+
+### Deploy
+
+- Clone this repository
+- Add the Aptible's remote, ex: `git remove add aptible git@beta.aptible.com:hint-production/hint-sentry-v8.20.git`
+- Push the code to the Aptible's remote
+
+### Upgrade
+
+- Update this repo against upstream (`getsentry/onpremise`), if any conflicts where to happen it would only
+be on this README.
+- Add any new required env variables
+- Follow the steps to ##Deploy
+- Login to the Aptible app via ssh and execute: `sentry upgrade`
