@@ -12,9 +12,12 @@ services:
     restart: unless-stopped
     build: .
     environment:
+      # TODO: Move all host-depend environments to file .env
       # Run `docker-compose run web config generate-secret-key`
       # to get the SENTRY_SECRET_KEY value.
       # SENTRY_SECRET_KEY: ''
+      # To enable ssl connections
+      # SENTRY_URL_PREFIX: 'https://'
       SENTRY_MEMCACHED_HOST: memcached
       SENTRY_REDIS_HOST: redis
       SENTRY_POSTGRES_HOST: postgres
@@ -40,6 +43,18 @@ services:
     volumes:
       - ./data/postgres:/var/lib/postgresql/data
 
+  nginx:
+    restart: unless-stopped
+    build:
+      context: ./nginx
+    depends_on:
+      - web
+    ports:
+      - "0.0.0.0:80:80"
+      - "0.0.0.0:443:443"
+    volumes:
+      - /etc/letsencrypt:/etc/letsencrypt
+
   web:
     restart: unless-stopped
     extends: base
@@ -48,8 +63,6 @@ services:
       - postgres
       - memcached
       - smtp
-    ports:
-      - '9000:9000'
 
   cron:
     restart: unless-stopped

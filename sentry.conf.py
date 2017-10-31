@@ -71,6 +71,7 @@ if postgres:
         },
     }
 
+SENTRY_URL_PREFIX = env('SENTRY_URL_PREFIX')
 # You should not change this setting after your database has been created
 # unless you have altered all schemas first
 SENTRY_USE_BIG_INTS = True
