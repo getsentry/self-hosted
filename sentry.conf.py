@@ -17,7 +17,12 @@
 #  SENTRY_REDIS_DB
 #  SENTRY_MEMCACHED_HOST
 #  SENTRY_MEMCACHED_PORT
+#  SENTRY_FILESTORE_BACKEND
 #  SENTRY_FILESTORE_DIR
+#  SENTRY_FILESTORE_BUCKET_NAME
+#  SENTRY_FILESTORE_ACCESS_KEY
+#  SENTRY_FILESTORE_SECRET_KEY
+#  SENTRY_FILESTORE_SIGNATURE
 #  SENTRY_SERVER_EMAIL
 #  SENTRY_EMAIL_HOST
 #  SENTRY_EMAIL_PORT
@@ -223,10 +228,24 @@ SENTRY_DIGESTS = 'sentry.digests.backends.redis.RedisBackend'
 # Uploaded media uses these `filestore` settings. The available
 # backends are either `filesystem` or `s3`.
 
-SENTRY_OPTIONS['filestore.backend'] = 'filesystem'
-SENTRY_OPTIONS['filestore.options'] = {
-    'location': env('SENTRY_FILESTORE_DIR'),
-}
+filestore_backend = env('SENTRY_FILESTORE_BACKEND', 'FILESYSTEM')
+
+if filestore_backend == 'FILESYSTEM':
+    SENTRY_OPTIONS['filestore.backend'] = 'filesystem'
+    SENTRY_OPTIONS['filestore.options'] = {
+        'location': env('SENTRY_FILESTORE_DIR')
+    }
+elif filestore_backend == 'S3':
+    SENTRY_OPTIONS['filestore.backend'] = 's3'
+    SENTRY_OPTIONS['filestore.options'] = {
+        'access_key': env('SENTRY_FILESTORE_ACCESS_KEY'),
+        'bucket_name': env('SENTRY_FILESTORE_BUCKET_NAME'),
+        'secret_key': env('SENTRY_FILESTORE_SECRET_KEY'),
+        # https://github.com/getsentry/sentry/issues/6598
+        'signature_version': env('SENTRY_FILESTORE_SIGNATURE')
+    }
+else:
+  raise Exception('Error: SENTRY_FILESTORE_BACKEND only supports `S3` or `FILESYSTEM`')
 
 ##############
 # Web Server #
