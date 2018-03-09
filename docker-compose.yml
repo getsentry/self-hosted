@@ -43,7 +43,7 @@ services:
   web:
     restart: unless-stopped
     extends: base
-    links:
+    depends_on:
       - redis
       - postgres
       - memcached
@@ -55,7 +55,7 @@ services:
     restart: unless-stopped
     extends: base
     command: run cron
-    links:
+    depends_on:
       - redis
       - postgres
       - memcached
@@ -65,7 +65,7 @@ services:
     restart: unless-stopped
     extends: base
     command: run worker
-    links:
+    depends_on:
       - redis
       - postgres
       - memcached
