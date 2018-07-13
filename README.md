@@ -35,7 +35,7 @@ and [Nginx](http://nginx.org/).
 
 ## Updating Sentry
 
-Updating Sentry using Compose is relativally simple. Just use the following steps to update. Make sure that you have the latest version set in your Dockerfile. Or use the latest version of this repository.
+Updating Sentry using Compose is relatively simple. Just use the following steps to update. Make sure that you have the latest version set in your Dockerfile. Or use the latest version of this repository.
 
 Use the following steps after updating this repository or your Dockerfile:
 ```sh
