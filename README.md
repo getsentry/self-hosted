@@ -16,12 +16,13 @@ There may need to be modifications to the included `docker-compose.yml` file to 
 
 1. `mkdir -p data/{sentry,postgres}` - Make our local database and sentry config directories.
     This directory is bind-mounted with postgres so you don't lose state!
-2. `docker-compose run --rm web config generate-secret-key` - Generate a secret key.
+2. `docker-compose build` - Build and tag the Docker services
+3. `docker-compose run --rm web config generate-secret-key` - Generate a secret key.
     Add it to `docker-compose.yml` in `base` as `SENTRY_SECRET_KEY`.
-3. `docker-compose run --rm web upgrade` - Build the database.
+4. `docker-compose run --rm web upgrade` - Build the database.
     Use the interactive prompts to create a user account.
-4. `docker-compose up -d` - Lift all services (detached/background mode).
-5. Access your instance at `localhost:9000`!
+5. `docker-compose up -d` - Lift all services (detached/background mode).
+6. Access your instance at `localhost:9000`!
 
 Note that as long as you have your database bind-mounted, you should
 be fine stopping and removing the containers without worry.
@@ -31,6 +32,17 @@ be fine stopping and removing the containers without worry.
 If you'd like to protect your Sentry install with SSL/TLS, there are
 fantastic SSL/TLS proxies like [HAProxy](http://www.haproxy.org/)
 and [Nginx](http://nginx.org/).
+
+## Updating Sentry
+
+Updating Sentry using Compose is relativally simple. Just use the following steps to update. Make sure that you have the latest version set in your Dockerfile. Or use the latest version of this repository.
+
+Use the following steps after updating this repository or your Dockerfile:
+```sh
+docker-compose build # Build the services again after updating
+docker-compose run --rm web upgrade # Run new migrations
+docker-compose up -d # Recreate the services
+```
 
 ## Resources
 
