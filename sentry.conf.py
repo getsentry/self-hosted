@@ -61,10 +61,7 @@ if postgres:
                 or ''
             ),
             'HOST': postgres,
-            'PORT': (
-                env('SENTRY_POSTGRES_PORT')
-                or ''
-            ),
+            'PORT': env('SENTRY_POSTGRES_PORT'),
             'OPTIONS': {
                 'autocommit': True,
             },
@@ -97,9 +94,9 @@ redis = env('SENTRY_REDIS_HOST') or (env('REDIS_PORT_6379_TCP_ADDR') and 'redis'
 if not redis:
     raise Exception('Error: REDIS_PORT_6379_TCP_ADDR (or SENTRY_REDIS_HOST) is undefined, did you forget to `--link` a redis container?')
 
-redis_password = env('SENTRY_REDIS_PASSWORD') or ''
-redis_port = env('SENTRY_REDIS_PORT') or '6379'
-redis_db = env('SENTRY_REDIS_DB') or '0'
+redis_password = env('SENTRY_REDIS_PASSWORD')
+redis_port = env('SENTRY_REDIS_PORT', '6379')
+redis_db = env('SENTRY_REDIS_DB', '0')
 
 SENTRY_OPTIONS.update({
     'redis.clusters': {
@@ -126,8 +123,7 @@ SENTRY_OPTIONS.update({
 memcached = env('SENTRY_MEMCACHED_HOST') or (env('MEMCACHED_PORT_11211_TCP_ADDR') and 'memcached')
 if memcached:
     memcached_port = (
-        env('SENTRY_MEMCACHED_PORT')
-        or '11211'
+        env('SENTRY_MEMCACHED_PORT', '11211')
     )
     CACHES = {
         'default': {
@@ -256,19 +252,19 @@ email = env('SENTRY_EMAIL_HOST') or (env('SMTP_PORT_25_TCP_ADDR') and 'smtp')
 if email:
     SENTRY_OPTIONS['mail.backend'] = 'smtp'
     SENTRY_OPTIONS['mail.host'] = email
-    SENTRY_OPTIONS['mail.password'] = env('SENTRY_EMAIL_PASSWORD') or ''
-    SENTRY_OPTIONS['mail.username'] = env('SENTRY_EMAIL_USER') or ''
-    SENTRY_OPTIONS['mail.port'] = int(env('SENTRY_EMAIL_PORT') or 25)
+    SENTRY_OPTIONS['mail.password'] = env('SENTRY_EMAIL_PASSWORD')
+    SENTRY_OPTIONS['mail.username'] = env('SENTRY_EMAIL_USER')
+    SENTRY_OPTIONS['mail.port'] = int(env('SENTRY_EMAIL_PORT', '25'))
     SENTRY_OPTIONS['mail.use-tls'] = env('SENTRY_EMAIL_USE_TLS', False)
 else:
     SENTRY_OPTIONS['mail.backend'] = 'dummy'
 
 # The email address to send on behalf of
-SENTRY_OPTIONS['mail.from'] = env('SENTRY_SERVER_EMAIL') or 'root@localhost'
+SENTRY_OPTIONS['mail.from'] = env('SENTRY_SERVER_EMAIL', 'root@localhost')
 
 # If you're using mailgun for inbound mail, set your API key and configure a
 # route to forward to /api/hooks/mailgun/inbound/
-SENTRY_OPTIONS['mail.mailgun-api-key'] = env('SENTRY_MAILGUN_API_KEY') or ''
+SENTRY_OPTIONS['mail.mailgun-api-key'] = env('SENTRY_MAILGUN_API_KEY')
 
 # If you specify a MAILGUN_API_KEY, you definitely want EMAIL_REPLIES
 if SENTRY_OPTIONS['mail.mailgun-api-key']:
@@ -277,7 +273,7 @@ else:
     SENTRY_OPTIONS['mail.enable-replies'] = env('SENTRY_ENABLE_EMAIL_REPLIES', False)
 
 if SENTRY_OPTIONS['mail.enable-replies']:
-    SENTRY_OPTIONS['mail.reply-hostname'] = env('SENTRY_SMTP_HOSTNAME') or ''
+    SENTRY_OPTIONS['mail.reply-hostname'] = env('SENTRY_SMTP_HOSTNAME')
 
 # If this value ever becomes compromised, it's important to regenerate your
 # SENTRY_SECRET_KEY. Changing this value will result in all current sessions
