@@ -20,7 +20,7 @@ There may need to be modifications to the included `docker-compose.yml` file to 
 3. `docker-compose run --rm web upgrade` - Build the database.
     Use the interactive prompts to create a user account.
 4. `docker-compose up -d` - Lift all services (detached/background mode).
-5. Access your instance at `0.0.0.0:9000`!
+5. Access your instance at `http://127.0.0.1:9000`!
 
 Note that as long as you have your database bind-mounted, you should
 be fine stopping and removing the containers without worry.
