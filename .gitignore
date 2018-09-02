@@ -65,5 +65,8 @@ target/
 # pyenv
 .python-version
 
+# env config
+.env
+
 *.tar
 data/
