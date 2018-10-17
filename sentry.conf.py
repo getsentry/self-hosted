@@ -40,6 +40,7 @@ import os.path
 
 CONF_ROOT = os.path.dirname(__file__)
 
+SENTRY_FEATURES['auth:register'] = Bool(env('SENTRY_AUTH_REGISTER', True))
 postgres = env('SENTRY_POSTGRES_HOST') or (env('POSTGRES_PORT_5432_TCP_ADDR') and 'postgres')
 if postgres:
     DATABASES = {
@@ -60,7 +61,10 @@ if postgres:
                 or env('POSTGRES_ENV_POSTGRES_PASSWORD')
                 or ''
             ),
-            'HOST': postgres,
+            'HOST': (
+               env('SENTRY_POSTGRES_HOST')
+               or 'postgres'
+            ),
             'PORT': (
                 env('SENTRY_POSTGRES_PORT')
                 or ''
