@@ -33,7 +33,7 @@ services:
 
   memcached:
     restart: unless-stopped
-    image: memcached:1.4
+    image: memcached:1.4-alpine
 
   redis:
     restart: unless-stopped
@@ -41,7 +41,7 @@ services:
 
   postgres:
     restart: unless-stopped
-    image: postgres:9.5
+    image: postgres:9.5-alpine
     volumes:
       - sentry-postgres:/var/lib/postgresql/data
 
