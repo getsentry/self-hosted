@@ -33,7 +33,7 @@ services:
 
   memcached:
     restart: unless-stopped
-    image: memcached:1.4
+    image: memcached:1.5-alpine
 
   redis:
     restart: unless-stopped
