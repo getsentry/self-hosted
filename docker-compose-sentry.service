@@ -1,10 +1,12 @@
+# Systemd service file
+
 [Unit]
 Description=Sentry OnPremise: Docker Compose Application Service
 Requires=docker.service
 After=docker.service
 
 [Service]
-WorkingDirectory=/home/smappi/sentry-onpremise
+WorkingDirectory=<PATH TO THIS REPOSITORY WORKDIR>
 ExecStart=/usr/bin/docker-compose up
 ExecStop=/usr/bin/docker-compose down
 TimeoutStartSec=0
