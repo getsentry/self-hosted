@@ -46,7 +46,7 @@ phases:
       - echo "Waiting for task to stop..."
       - aws ecs wait tasks-stopped --tasks $TASK_ID --cluster $HT_SENTRY_ECS_CLUSTER
       - |
-        if [ "x$HT_CREATE_SUPERUSER" == "xyes" ]; then
+        if expr "x$HT_CREATE_SUPERUSER" : "xyes" > /dev/null; then
             echo "Creating Superuser"
             RUNTASK=$(aws ecs run-task --launch-type FARGATE --cluster $HT_SENTRY_ECS_CLUSTER --task-definition $HT_SENTRY_CREATEUSER_TASK --network-configuration "awsvpcConfiguration={subnets=[$HT_RUN_TASK_SUBNETS],securityGroups=[$HT_RUN_TASK_SGS],assignPublicIp=\"DISABLED\"}")
             TASK_ID=$( echo "$RUNTASK" | jq -r '.tasks[0].taskArn' )
