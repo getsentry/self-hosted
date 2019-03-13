@@ -14,7 +14,7 @@ phases:
 
   pre_build:
     commands:
-      - pip install awscli --upgrade --user
+      - pip3 install awscli --upgrade --user
       - echo `aws --version`
       - echo "Logging in to Amazon ECR..."
       - $(aws ecr get-login --region $HT_REGION --no-include-email)
