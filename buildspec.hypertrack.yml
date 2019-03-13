@@ -1,0 +1,60 @@
+version: 0.2
+
+phases:
+  install:
+    run-as: root
+    commands:
+      - echo "Running install step on `date`"
+      - echo "Installing WGET"
+      - apt-get update -qq
+      - apt-get install -y -qq wget
+      - echo "Installing JQ"
+      - wget -nv https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64 -O /usr/local/bin/jq
+      - chmod +x /usr/local/bin/jq
+
+  pre_build:
+    commands:
+      - pip install awscli --upgrade --user
+      - echo `aws --version`
+      - echo "Logging in to Amazon ECR..."
+      - $(aws ecr get-login --region $HT_REGION --no-include-email)
+      - IMAGE_TAG=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
+      - echo "Entered the pre_build phase..."
+
+  build:
+    commands:
+      - echo "Build started on `date`"
+      - echo "Building the Docker image..."
+      - docker build --file Dockerfile.hypertrack --rm -t $HT_REPOSITORY_URI:latest .
+      - docker tag $REPOSITORY_URI:latest $HT_REPOSITORY_URI:$IMAGE_TAG
+
+  post_build:
+    commands:
+      - echo "Build completed on `date`"
+      - echo "Pushing the Docker images..."
+      - docker push $HT_REPOSITORY_URI:latest
+      - docker push $HT_REPOSITORY_URI:$IMAGE_TAG
+      - echo "Writing image definitions file..."
+      - printf '[{"name":"web","imageUri":"%s"}]' $HT_REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
+      - echo "Upgrading db-migrate task definitions"
+      - RUNTASK=$(aws ecs run-task --launch-type FARGATE --cluster $HT_SENTRY_ECS_CLUSTER --task-definition $HT_SENTRY_DBMIGRATE_TASK --network-configuration "awsvpcConfiguration={subnets=[$HT_RUN_TASK_SUBNETS],securityGroups=[$HT_RUN_TASK_SGS],assignPublicIp=\"DISABLED\"}")
+      - TASK_ID=$( echo "$RUNTASK" | jq -r '.tasks[0].taskArn' )
+      - echo "Started new Task - $TASK_ID"
+      - echo "Waiting for dbmigrate task to be running..."
+      - aws ecs wait tasks-running --tasks $TASK_ID --cluster $HT_SENTRY_ECS_CLUSTER
+      - echo "Dbmigrate task is running"
+      - echo "Waiting for task to stop..."
+      - aws ecs wait tasks-stopped --tasks $TASK_ID --cluster $HT_SENTRY_ECS_CLUSTER
+      - |
+        if [[ "x$HT_CREATE_SUPERUSER" == "xyes" ]]; then
+            echo "Creating Superuser"
+            RUNTASK=$(aws ecs run-task --launch-type FARGATE --cluster $HT_SENTRY_ECS_CLUSTER --task-definition $HT_SENTRY_CREATEUSER_TASK --network-configuration "awsvpcConfiguration={subnets=[$HT_RUN_TASK_SUBNETS],securityGroups=[$HT_RUN_TASK_SGS],assignPublicIp=\"DISABLED\"}")
+            TASK_ID=$( echo "$RUNTASK" | jq -r '.tasks[0].taskArn' )
+            aws ecs wait tasks-running --tasks $TASK_ID --cluster $HT_SENTRY_ECS_CLUSTER && aws ecs wait tasks-stopped --tasks $TASK_ID --cluster $HT_SENTRY_ECS_CLUSTER
+        else
+            echo "We dont create a superuser right now"
+        fi
+      - echo "Post Build step is done."
+
+artifacts:
+  files: imagedefinitions.json
