@@ -61,4 +61,5 @@ phases:
       - echo "Post Build step is done."
 
 artifacts:
-  files: imagedefinitions.json
+  files:
+    - '*_imagedefinitions.json'
