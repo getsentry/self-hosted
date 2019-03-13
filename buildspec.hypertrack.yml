@@ -34,8 +34,12 @@ phases:
       - echo "Pushing the Docker images..."
       - docker push $HT_REPOSITORY_URI:latest
       - docker push $HT_REPOSITORY_URI:$IMAGE_TAG
-      - echo "Writing image definitions file..."
-      - printf '[{"name":"web","imageUri":"%s"}]' $HT_REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
+      - echo "Writing image definitions files..."
+      - printf '[{"name":"$HT_CONTAINER_CREATEUSER","imageUri":"%s"}]' $HT_REPOSITORY_URI:$IMAGE_TAG > createuser_imagedefinitions.json
+      - printf '[{"name":"$HT_CONTAINER_CRON","imageUri":"%s"}]' $HT_REPOSITORY_URI:$IMAGE_TAG > cron_imagedefinitions.json
+      - printf '[{"name":"$HT_CONTAINER_DBMIGRATE","imageUri":"%s"}]' $HT_REPOSITORY_URI:$IMAGE_TAG > dbmigrate_imagedefinitions.json
+      - printf '[{"name":"$HT_CONTAINER_WEB","imageUri":"%s"}]' $HT_REPOSITORY_URI:$IMAGE_TAG > web_imagedefinitions.json
+      - printf '[{"name":"$HT_CONTAINER_WORKER","imageUri":"%s"}]' $HT_REPOSITORY_URI:$IMAGE_TAG > worker_imagedefinitions.json
       - echo "Upgrading db-migrate task definitions"
       - RUNTASK=$(aws ecs run-task --launch-type FARGATE --cluster $HT_SENTRY_ECS_CLUSTER --task-definition $HT_SENTRY_DBMIGRATE_TASK --network-configuration "awsvpcConfiguration={subnets=[$HT_RUN_TASK_SUBNETS],securityGroups=[$HT_RUN_TASK_SGS],assignPublicIp=\"DISABLED\"}")
       - TASK_ID=$( echo "$RUNTASK" | jq -r '.tasks[0].taskArn' )
