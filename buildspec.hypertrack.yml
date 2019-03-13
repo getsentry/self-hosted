@@ -26,7 +26,7 @@ phases:
       - echo "Build started on `date`"
       - echo "Building the Docker image..."
       - docker build --file Dockerfile.hypertrack --rm -t $HT_REPOSITORY_URI:latest .
-      - docker tag $REPOSITORY_URI:latest $HT_REPOSITORY_URI:$IMAGE_TAG
+      - docker tag $HT_REPOSITORY_URI:latest $HT_REPOSITORY_URI:$IMAGE_TAG
 
   post_build:
     commands:
