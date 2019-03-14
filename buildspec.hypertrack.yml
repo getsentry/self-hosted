@@ -14,7 +14,7 @@ phases:
 
   pre_build:
     commands:
-      - echo "Starting pre-build phase on `date` ..."
+      - echo "Starting pre-build phase on `date`"
       - pip3 install awscli --upgrade --user
       - echo `aws --version`
       - echo "Logging in to Amazon ECR..."
