@@ -28,10 +28,11 @@ phases:
       - echo "Building the Docker image..."
       - docker build --file Dockerfile.hypertrack --rm -t $HT_REPOSITORY_URI:latest .
       - docker tag $HT_REPOSITORY_URI:latest $HT_REPOSITORY_URI:$IMAGE_TAG
+      - echo "Build completed on `date`"
 
   post_build:
     commands:
-      - echo "Build completed on `date`"
+      - echo "Starting Post Build phase"      
       - echo "Pushing the Docker images..."
       - docker push $HT_REPOSITORY_URI:latest
       - docker push $HT_REPOSITORY_URI:$IMAGE_TAG
