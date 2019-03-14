@@ -20,7 +20,7 @@ phases:
       - echo "Logging in to Amazon ECR..."
       - $(aws ecr get-login --region $HT_REGION --no-include-email)
       - IMAGE_TAG=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
-      - echo "Entered the pre_build phase..."
+      - echo "    pre_build phase is done..."
 
   build:
     commands:
