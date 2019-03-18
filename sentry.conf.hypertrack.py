@@ -38,6 +38,8 @@
 #  SLACK_VERIFICATION_TOKEN
 #  GITHUB_APP_ID
 #  GITHUB_API_SECRET
+#  GOOGLE_CLIENT_ID
+#  GOOGLE_CLIENT_SECRET
 #  BITBUCKET_CONSUMER_KEY
 #  BITBUCKET_CONSUMER_SECRET
 from sentry.conf.server import *  # NOQA
@@ -312,6 +314,14 @@ if slack:
     SENTRY_OPTIONS['slack.client-secret'] = env('SLACK_CLIENT_SECRET')
     SENTRY_OPTIONS['slack.verification-token'] = env('SLACK_VERIFICATION_TOKEN') or ''
 
+#####################
+#    GMAIL SSO      #
+#####################
+gmail_sso = env('GOOGLE_CLIENT_ID') and env('GOOGLE_CLIENT_SECRET')
+if gmail_sso:
+    GOOGLE_CLIENT_ID = env('GOOGLE_CLIENT_ID')
+    GOOGLE_CLIENT_SECRET = env('GOOGLE_CLIENT_SECRET')
+
 # If this value ever becomes compromised, it's important to regenerate your
 # SENTRY_SECRET_KEY. Changing this value will result in all current sessions
 # being invalidated.
@@ -329,10 +339,14 @@ if 'SENTRY_RUNNING_UWSGI' not in os.environ and len(secret_key) < 32:
 
 SENTRY_OPTIONS['system.secret-key'] = secret_key
 
+#####################
+#  GITHUB  SSO      #
+#####################
 if 'GITHUB_APP_ID' in os.environ:
     GITHUB_EXTENDED_PERMISSIONS = ['repo']
     GITHUB_APP_ID = env('GITHUB_APP_ID')
     GITHUB_API_SECRET = env('GITHUB_API_SECRET')
+    GITHUB_REQUIRE_VERIFIED_EMAIL = env('GITHUB_REQUIRE_VERIFIED_EMAIL', True)
 
 if 'BITBUCKET_CONSUMER_KEY' in os.environ:
     BITBUCKET_CONSUMER_KEY = env('BITBUCKET_CONSUMER_KEY')

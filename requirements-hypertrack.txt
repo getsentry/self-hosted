@@ -1,0 +1,3 @@
+# Add plugins here
+sentry-auth-google
+https://github.com/getsentry/sentry-auth-github/archive/master.zip
