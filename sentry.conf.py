@@ -29,6 +29,9 @@
 #  SENTRY_MAILGUN_API_KEY
 #  SENTRY_SINGLE_ORGANIZATION
 #  SENTRY_SECRET_KEY
+#  SLACK_CLIENT_ID
+#  SLACK_CLIENT_SECRET
+#  SLACK_VERIFICATION_TOKEN
 #  GITHUB_APP_ID
 #  GITHUB_API_SECRET
 #  BITBUCKET_CONSUMER_KEY
@@ -278,6 +281,15 @@ else:
 
 if SENTRY_OPTIONS['mail.enable-replies']:
     SENTRY_OPTIONS['mail.reply-hostname'] = env('SENTRY_SMTP_HOSTNAME') or ''
+
+#####################
+# SLACK INTEGRATION #
+#####################
+slack = env('SLACK_CLIENT_ID') and env('SLACK_CLIENT_SECRET')
+if slack:
+    SENTRY_OPTIONS['slack.client-id'] = env('SLACK_CLIENT_ID')
+    SENTRY_OPTIONS['slack.client-secret'] = env('SLACK_CLIENT_SECRET')
+    SENTRY_OPTIONS['slack.verification-token'] = env('SLACK_VERIFICATION_TOKEN') or ''
 
 # If this value ever becomes compromised, it's important to regenerate your
 # SENTRY_SECRET_KEY. Changing this value will result in all current sessions
