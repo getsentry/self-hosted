@@ -11,7 +11,7 @@ Official bootstrap for running your own [Sentry](https://sentry.io/) with [Docke
  
  * 1GHz CPU
  * 3GB Ram
- * 5GB Hard drive
+
 
 
 ## Up and Running
