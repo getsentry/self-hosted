@@ -6,6 +6,13 @@ Official bootstrap for running your own [Sentry](https://sentry.io/) with [Docke
 
  * Docker 1.10.0+
  * Compose 1.6.0+ _(optional)_
+ 
+ ## Minimum Hardware Requirements:
+ 
+ * 1GHz CPU
+ * 3GB Ram
+ * 5GB Hard drive
+
 
 ## Up and Running
 
