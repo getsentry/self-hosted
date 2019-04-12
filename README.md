@@ -9,10 +9,7 @@ Official bootstrap for running your own [Sentry](https://sentry.io/) with [Docke
  
  ## Minimum Hardware Requirements:
  
- * 1GHz CPU
- * 3GB Ram
-
-
+ * You need at least 3GB Ram
 
 ## Up and Running
 
