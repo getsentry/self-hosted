@@ -40,6 +40,7 @@ from sentry.conf.server import *  # NOQA
 
 import os
 import os.path
+import six
 
 CONF_ROOT = os.path.dirname(__file__)
 
@@ -250,46 +251,54 @@ SENTRY_WEB_OPTIONS = {
     # 'workers': 3,  # the number of web workers
 }
 
-###############
-# Mail Server #
-###############
 
 
-email = env('SENTRY_EMAIL_HOST') or (env('SMTP_PORT_25_TCP_ADDR') and 'smtp')
-if email:
-    SENTRY_OPTIONS['mail.backend'] = 'smtp'
-    SENTRY_OPTIONS['mail.host'] = email
-    SENTRY_OPTIONS['mail.password'] = env('SENTRY_EMAIL_PASSWORD') or ''
-    SENTRY_OPTIONS['mail.username'] = env('SENTRY_EMAIL_USER') or ''
-    SENTRY_OPTIONS['mail.port'] = int(env('SENTRY_EMAIL_PORT') or 25)
-    SENTRY_OPTIONS['mail.use-tls'] = env('SENTRY_EMAIL_USE_TLS', False)
-else:
-    SENTRY_OPTIONS['mail.backend'] = 'dummy'
+##########
+# Docker #
+##########
 
-# The email address to send on behalf of
-SENTRY_OPTIONS['mail.from'] = env('SENTRY_SERVER_EMAIL') or 'root@localhost'
+# Docker's environment configuration needs to happen
+# prior to anything that might rely on these values to
+# enable more "smart" configuration.
 
-# If you're using mailgun for inbound mail, set your API key and configure a
-# route to forward to /api/hooks/mailgun/inbound/
-SENTRY_OPTIONS['mail.mailgun-api-key'] = env('SENTRY_MAILGUN_API_KEY') or ''
+ENV_CONFIG_MAPPING = {
+    'SENTRY_EMAIL_PASSWORD': 'mail.password',
+    'SENTRY_EMAIL_USER': 'mail.username',
+    'SENTRY_EMAIL_PORT': ('mail.port', int),
+    'SENTRY_EMAIL_USE_TLS': ('mail.use-tls', bool),
+    'SENTRY_EMAIL_HOST': 'mail.host',
+    'SENTRY_SERVER_EMAIL': 'mail.from',
+    'SENTRY_ENABLE_EMAIL_REPLIES': 'mail.enable-replies',
+    'SENTRY_SMTP_HOSTNAME': 'mail.reply-hostname',
 
-# If you specify a MAILGUN_API_KEY, you definitely want EMAIL_REPLIES
-if SENTRY_OPTIONS['mail.mailgun-api-key']:
-    SENTRY_OPTIONS['mail.enable-replies'] = True
-else:
-    SENTRY_OPTIONS['mail.enable-replies'] = env('SENTRY_ENABLE_EMAIL_REPLIES', False)
+    # If you're using mailgun for inbound mail, set your API key and configure a
+    # route to forward to /api/hooks/mailgun/inbound/
+    'SENTRY_MAILGUN_API_KEY': 'mail.mailgun-api-key',
 
-if SENTRY_OPTIONS['mail.enable-replies']:
-    SENTRY_OPTIONS['mail.reply-hostname'] = env('SENTRY_SMTP_HOSTNAME') or ''
+    'SLACK_CLIENT_ID': 'slack.client-id',
+    'SLACK_CLIENT_SECRET': 'slack.client-secret',
+    'SLACK_VERIFICATION_TOKEN': 'slack.verification-token',
 
-#####################
-# SLACK INTEGRATION #
-#####################
-slack = env('SLACK_CLIENT_ID') and env('SLACK_CLIENT_SECRET')
-if slack:
-    SENTRY_OPTIONS['slack.client-id'] = env('SLACK_CLIENT_ID')
-    SENTRY_OPTIONS['slack.client-secret'] = env('SLACK_CLIENT_SECRET')
-    SENTRY_OPTIONS['slack.verification-token'] = env('SLACK_VERIFICATION_TOKEN') or ''
+    'SECRET_KEY': 'system.secret-key',
+}
+
+
+def bind_env_config(config=SENTRY_OPTIONS, mapping=ENV_CONFIG_MAPPING):
+    """
+    Automatically bind SENTRY_OPTIONS from a set of environment variables.
+    """
+    for env_var, item in six.iteritems(mapping):
+        value = env(env_var)
+        if value is None:
+            continue
+        if isinstance(item, tuple):
+            opt_key, type_ = item
+            # only coerce the value if its not falsey (e.g. '')
+            if value:
+                value = type_(value)
+        else:
+            opt_key = item
+        config[opt_key] = value
 
 # If this value ever becomes compromised, it's important to regenerate your
 # SENTRY_SECRET_KEY. Changing this value will result in all current sessions
@@ -306,7 +315,13 @@ if 'SENTRY_RUNNING_UWSGI' not in os.environ and len(secret_key) < 32:
     print('!!     Regenerate with `generate-secret-key`.       !!')
     print('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
 
-SENTRY_OPTIONS['system.secret-key'] = secret_key
+# Grab the easy configuration first - these are all fixed
+# key=value with no logic behind them
+bind_env_config()
+
+# If you specify a MAILGUN_API_KEY, you definitely want EMAIL_REPLIES
+if SENTRY_OPTIONS.get('mail.mailgun-api-key'):
+    SENTRY_OPTIONS.setdefault('mail.enable-replies', True)
 
 if 'GITHUB_APP_ID' in os.environ:
     GITHUB_EXTENDED_PERMISSIONS = ['repo']
