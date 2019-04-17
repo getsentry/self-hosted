@@ -29,11 +29,23 @@
 #  SENTRY_MAILGUN_API_KEY
 #  SENTRY_SINGLE_ORGANIZATION
 #  SENTRY_SECRET_KEY
+#  (slack integration)
 #  SLACK_CLIENT_ID
 #  SLACK_CLIENT_SECRET
 #  SLACK_VERIFICATION_TOKEN
+#  (github plugin, sso)
 #  GITHUB_APP_ID
 #  GITHUB_API_SECRET
+#  (github integration)
+#  GITHUB_APP_ID
+#  GITHUB_CLIENT_ID
+#  GITHUB_CLIENT_SECRET
+#  GITHUB_WEBHOOK_SECRET
+#  GITHUB_PRIVATE_KEY
+#  (azure devops integration)
+#  VSTS_CLIENT_ID
+#  VSTS_CLIENT_SECRET
+#  (bitbucket plugin)
 #  BITBUCKET_CONSUMER_KEY
 #  BITBUCKET_CONSUMER_SECRET
 from sentry.conf.server import *  # NOQA
@@ -278,6 +290,15 @@ ENV_CONFIG_MAPPING = {
     'SLACK_CLIENT_ID': 'slack.client-id',
     'SLACK_CLIENT_SECRET': 'slack.client-secret',
     'SLACK_VERIFICATION_TOKEN': 'slack.verification-token',
+
+    'GITHUB_APP_ID': 'github-app.id',
+    'GITHUB_CLIENT_ID': 'github-app.client-id',
+    'GITHUB_CLIENT_SECRET': 'github-app.client-secret',
+    'GITHUB_WEBHOOK_SECRET': 'github-app.webhook-secret',
+    'GITHUB_PRIVATE_KEY': 'github-app.private-key',
+
+    'VSTS_CLIENT_ID': 'vsts.client-id',
+    'VSTS_CLIENT_SECRET': 'vsts.client-secret',
 
     'SECRET_KEY': 'system.secret-key',
 }
