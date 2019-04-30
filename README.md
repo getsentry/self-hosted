@@ -23,7 +23,7 @@ There may need to be modifications to the included `docker-compose.yml` file to 
 2. `cp -n .env.example .env` - create env config file
 3. `docker-compose build` - Build and tag the Docker services
 4. `docker-compose run --rm web config generate-secret-key` - Generate a secret key.
-    Add it to `.env` as `SENTRY_SECRET_KEY`.
+    Add it to `config.yml` as `system.secret-key` and 
 5. `docker-compose run --rm web upgrade` - Build the database.
     Use the interactive prompts to create a user account.
 6. `docker-compose up -d` - Lift all services (detached/background mode).

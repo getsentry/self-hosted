@@ -3,6 +3,8 @@
 # to enforce defaults or to ensure they cannot be changed via the UI. For more
 # information see the Sentry documentation.
 
+system.secret-key: ''
+
 ###############
 # Mail Server #
 ###############
