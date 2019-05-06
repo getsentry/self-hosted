@@ -30,21 +30,21 @@
 #  SENTRY_SINGLE_ORGANIZATION
 #  SENTRY_SECRET_KEY
 #  (slack integration)
-#  SLACK_CLIENT_ID
-#  SLACK_CLIENT_SECRET
-#  SLACK_VERIFICATION_TOKEN
+#  SENTRY_SLACK_CLIENT_ID
+#  SENTRY_SLACK_CLIENT_SECRET
+#  SENTRY_SLACK_VERIFICATION_TOKEN
 #  (github plugin, sso)
 #  GITHUB_APP_ID
 #  GITHUB_API_SECRET
 #  (github integration)
-#  GITHUB_APP_ID
-#  GITHUB_CLIENT_ID
-#  GITHUB_CLIENT_SECRET
-#  GITHUB_WEBHOOK_SECRET
-#  GITHUB_PRIVATE_KEY
+#  SENTRY_GITHUB_APP_ID
+#  SENTRY_GITHUB_APP_CLIENT_ID
+#  SENTRY_GITHUB_APP_CLIENT_SECRET
+#  SENTRY_GITHUB_APP_WEBHOOK_SECRET
+#  SENTRY_GITHUB_APP_PRIVATE_KEY
 #  (azure devops integration)
-#  VSTS_CLIENT_ID
-#  VSTS_CLIENT_SECRET
+#  SENTRY_VSTS_CLIENT_ID
+#  SENTRY_VSTS_CLIENT_SECRET
 #  (bitbucket plugin)
 #  BITBUCKET_CONSUMER_KEY
 #  BITBUCKET_CONSUMER_SECRET
@@ -289,18 +289,18 @@ ENV_CONFIG_MAPPING = {
     # route to forward to /api/hooks/mailgun/inbound/
     'SENTRY_MAILGUN_API_KEY': 'mail.mailgun-api-key',
 
-    'SLACK_CLIENT_ID': 'slack.client-id',
-    'SLACK_CLIENT_SECRET': 'slack.client-secret',
-    'SLACK_VERIFICATION_TOKEN': 'slack.verification-token',
+    'SENTRY_SLACK_CLIENT_ID': 'slack.client-id',
+    'SENTRY_SLACK_CLIENT_SECRET': 'slack.client-secret',
+    'SENTRY_SLACK_VERIFICATION_TOKEN': 'slack.verification-token',
 
-    'GITHUB_APP_ID': 'github-app.id',
-    'GITHUB_CLIENT_ID': 'github-app.client-id',
-    'GITHUB_CLIENT_SECRET': 'github-app.client-secret',
-    'GITHUB_WEBHOOK_SECRET': 'github-app.webhook-secret',
-    'GITHUB_PRIVATE_KEY': 'github-app.private-key',
+    'SENTRY_GITHUB_APP_ID': ('github-app.id', Int),
+    'SENTRY_GITHUB_APP_CLIENT_ID': 'github-app.client-id',
+    'SENTRY_GITHUB_APP_CLIENT_SECRET': 'github-app.client-secret',
+    'SENTRY_GITHUB_APP_WEBHOOK_SECRET': 'github-app.webhook-secret',
+    'SENTRY_GITHUB_APP_PRIVATE_KEY': 'github-app.private-key',
 
-    'VSTS_CLIENT_ID': 'vsts.client-id',
-    'VSTS_CLIENT_SECRET': 'vsts.client-secret',
+    'SENTRY_VSTS_CLIENT_ID': 'vsts.client-id',
+    'SENTRY_VSTS_CLIENT_SECRET': 'vsts.client-secret',
 }
 
 
@@ -309,16 +309,22 @@ def bind_env_config(config=SENTRY_OPTIONS, mapping=ENV_CONFIG_MAPPING):
     Automatically bind SENTRY_OPTIONS from a set of environment variables.
     """
     for env_var, item in six.iteritems(mapping):
-        try:
-            value = os.environ[env_var]
-        except KeyError:
+        # HACK: we need to check both in `os.environ` and `env._cache`.
+        # This is very much an implementation detail leaking out
+        # due to assumptions about how `env` would be used previously.
+        # `env` will pop values out of `os.environ` when they are seen,
+        # so checking against `os.environ` only means it's likely
+        # they won't exist if `env()` has been called on the variable
+        # before at any point. So we're choosing to check both, but this
+        # behavior is different since we're trying to only conditionally
+        # apply variables, instead of setting them always.
+        if env_var not in os.environ and env_var not in env._cache:
             continue
         if isinstance(item, tuple):
             opt_key, type_ = item
-            value = type_(value)
         else:
-            opt_key = item
-        config[opt_key] = value
+            opt_key, type_ = item, None
+        config[opt_key] = env(env_var, type=type_)
 
 # If this value ever becomes compromised, it's important to regenerate your
 # SENTRY_SECRET_KEY. Changing this value will result in all current sessions
