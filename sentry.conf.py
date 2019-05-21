@@ -281,7 +281,7 @@ ENV_CONFIG_MAPPING = {
     'SENTRY_EMAIL_USE_TLS': ('mail.use-tls', Bool),
     'SENTRY_EMAIL_HOST': 'mail.host',
     'SENTRY_SERVER_EMAIL': 'mail.from',
-    'SENTRY_ENABLE_EMAIL_REPLIES': 'mail.enable-replies',
+    'SENTRY_ENABLE_EMAIL_REPLIES': ('mail.enable-replies', Bool),
     'SENTRY_SMTP_HOSTNAME': 'mail.reply-hostname',
     'SENTRY_SECRET_KEY': 'system.secret-key',
 
