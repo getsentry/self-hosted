@@ -5,7 +5,7 @@ Official bootstrap for running your own [Sentry](https://sentry.io/) with [Docke
 ## Requirements
 
  * Docker 1.10.0+
- * Compose 1.6.0+ _(optional)_
+ * Compose 1.17.0+ _(optional)_
  
  ## Minimum Hardware Requirements:
  
