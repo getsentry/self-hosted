@@ -83,9 +83,6 @@ if postgres:
                 env('SENTRY_POSTGRES_PORT')
                 or ''
             ),
-            'OPTIONS': {
-                'autocommit': True,
-            },
         },
     }
 
