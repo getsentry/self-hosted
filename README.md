@@ -46,5 +46,10 @@ sudo SENTRY_IMAGE=us.gcr.io/sentryio/sentry:83b1380 ./install.sh
 
 Where you replace `83b1380` with the sha you want to use.
 
-[build-status-image]: https://github.com/getsentry/onpremise/workflows/test/badge.svg
-[build-status-url]: https://git.io/JUYkh
+## Resources
+
+ * [Documentation](https://docs.sentry.io/server/installation/docker/)
+ * [Bug Tracker](https://github.com/getsentry/onpremise)
+ * [Forums](https://forum.sentry.io/c/on-premise)
+ * [IRC](irc://chat.freenode.net/sentry) (chat.freenode.net, #sentry)
+ * [Docker Image](https://hub.docker.com/_/sentry/)
