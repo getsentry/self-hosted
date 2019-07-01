@@ -7,3 +7,6 @@ README.md
 *.tar
 docker-compose.yml
 data/
+.travis.yml
+install.sh
+test.sh
