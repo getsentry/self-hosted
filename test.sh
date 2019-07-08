@@ -5,9 +5,9 @@ TEST_USER='test@sentry.io'
 TEST_PASS='test123TEST'
 COOKIE_FILE=$(mktemp)
 declare -a TEST_STRINGS=(
-    '"isAuthenticated":true,'
-    '"username":"test@sentry.io",'
-    '"isSuperuser":true,'
+    '"isAuthenticated":true'
+    '"username":"test@sentry.io"'
+    '"isSuperuser":true'
 )
 
 INITIAL_AUTH_REDIRECT=$(curl -sL -o /dev/null http://localhost:9000 -w %{url_effective})
@@ -28,6 +28,6 @@ TEST_RESULT=0
 for i in "${TEST_STRINGS[@]}"
 do
    echo "Testing '$i'..."
-   echo "$LOGIN_RESPONSE" | grep "$i" >& /dev/null
+   echo "$LOGIN_RESPONSE" | grep "$i[,}]" >& /dev/null
    echo "Pass."
 done
