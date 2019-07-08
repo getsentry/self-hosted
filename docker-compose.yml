@@ -10,7 +10,10 @@ version: '3.4'
 
 x-defaults: &defaults
   restart: unless-stopped
-  build: .
+  build:
+    context: .
+    args:
+      IMAGE: ${IMAGE}
   depends_on:
     - redis
     - postgres

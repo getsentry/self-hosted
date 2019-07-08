@@ -1,6 +1,10 @@
 language: bash
 services: docker
 
+env:
+  - IMAGE=sentry:9.1
+  - IMAGE=getsentry/sentry:git
+
 script:
   - ./install.sh
   - docker-compose run --rm web createuser --superuser --email test@sentry.io --password test123TEST
