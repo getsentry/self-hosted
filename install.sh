@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -e
 
-MIN_DOCKER_VERSION='1.10.0'
+MIN_DOCKER_VERSION='17.05.0'
 MIN_COMPOSE_VERSION='1.17.0'
 MIN_RAM=3072 # MB
 ENV_FILE='.env'
