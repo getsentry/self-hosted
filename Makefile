@@ -5,15 +5,15 @@ OK_COLOR=\033[32;01m
 NO_COLOR=\033[0m
 
 build:
-	@echo -e "$(OK_COLOR)==>$(NO_COLOR) Building $(REPOSITORY):$(TAG)"
-	@docker build --pull --rm -t $(REPOSITORY):$(TAG) .
+	@printf "$(OK_COLOR)==>$(NO_COLOR) Building $(REPOSITORY):$(TAG)"
+	@docker build --pull --rm -t $(REPOSITORY):$(TAG) . --build-arg IMAGE=sentry:9.1
 
 $(REPOSITORY)_$(TAG).tar: build
-	@echo -e "$(OK_COLOR)==>$(NO_COLOR) Saving $(REPOSITORY):$(TAG) > $@"
+	@printf "$(OK_COLOR)==>$(NO_COLOR) Saving $(REPOSITORY):$(TAG) > $@"
 	@docker save $(REPOSITORY):$(TAG) > $@
 
 push: build
-	@echo -e "$(OK_COLOR)==>$(NO_COLOR) Pushing $(REPOSITORY):$(TAG)"
+	@printf "$(OK_COLOR)==>$(NO_COLOR) Pushing $(REPOSITORY):$(TAG)"
 	@docker push $(REPOSITORY):$(TAG)
 
 all: build push
