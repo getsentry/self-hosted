@@ -221,7 +221,15 @@ SENTRY_QUOTAS = 'sentry.quotas.redis.RedisQuota'
 # The TSDB is used for building charts as well as making things like per-rate
 # alerts possible.
 
-SENTRY_TSDB = 'sentry.tsdb.redis.RedisTSDB'
+SENTRY_TSDB = 'sentry.tsdb.redissnuba.RedisSnubaTSDB'
+
+#########
+# SNUBA #
+#########
+
+SENTRY_SEARCH = 'sentry.search.snuba.SnubaSearchBackend'
+SENTRY_TAGSTORE = 'sentry.tagstore.snuba.SnubaCompatibilityTagStorage'
+SENTRY_EVENTSTREAM = 'sentry.eventstream.snuba.SnubaEventStream'
 
 ###########
 # Digests #
@@ -343,6 +351,17 @@ if 'SENTRY_RUNNING_UWSGI' not in os.environ and len(secret_key) < 32:
 # Grab the easy configuration first - these are all fixed
 # key=value with no logic behind them
 bind_env_config()
+
+SENTRY_FEATURES.update({
+    'organizations:global-views': True,
+    'organizations:discover': True,
+    'organizations:event-attachments': True,
+    'organizations:symbol-sources': True,
+    'organizations:grouping-info': True,
+    'organizations:org-saved-searches': True,
+
+    'projects:kafka-ingest': True,
+})
 
 # If you specify a MAILGUN_API_KEY, you definitely want EMAIL_REPLIES
 if SENTRY_OPTIONS.get('mail.mailgun-api-key'):

@@ -1,69 +1,126 @@
-# NOTE: This docker-compose.yml is meant to be just an example of how
-# you could accomplish this on your own. It is not intended to work in
-# all use-cases and must be adapted to fit your needs. This is merely
-# a guideline.
-
-# See docs.getsentry.com/on-premise/server/ for full
-# instructions
-
 version: '3.4'
-
-x-defaults: &defaults
+x-defaults:
   restart: unless-stopped
-  build:
+  build: &ref_0
     context: .
     args:
-      IMAGE: ${IMAGE}
-  depends_on:
+      IMAGE: '${IMAGE}'
+  depends_on: &ref_1
     - redis
     - postgres
     - memcached
     - smtp
+    - snuba
+    - symbolicator
   env_file: .env
-  environment:
+  environment: &ref_2
     SENTRY_MEMCACHED_HOST: memcached
     SENTRY_REDIS_HOST: redis
     SENTRY_POSTGRES_HOST: postgres
     SENTRY_EMAIL_HOST: smtp
-  volumes:
-    - sentry-data:/var/lib/sentry/files
-
-
+    SNUBA: 'http://snuba:1218'
+  volumes: &ref_3
+    - 'sentry-data:/var/lib/sentry/files'
 services:
   smtp:
     restart: unless-stopped
     image: tianon/exim4
-
   memcached:
     restart: unless-stopped
-    image: memcached:1.5-alpine
-
+    image: 'memcached:1.5-alpine'
   redis:
     restart: unless-stopped
-    image: redis:3.2-alpine
-
+    image: 'redis:5.0-alpine'
+    command: redis-server --appendonly yes
+    volumes:
+      - 'sentry-redis:/data'
   postgres:
     restart: unless-stopped
-    image: postgres:9.5
+    image: 'postgres:9.6-alpine'
     volumes:
-      - sentry-postgres:/var/lib/postgresql/data
-
+      - 'sentry-postgres:/var/lib/postgresql/data'
+  zookeeper:
+    image: 'confluentinc/cp-zookeeper:5.1.2'
+    environment:
+      ZOOKEEPER_CLIENT_PORT: '2181'
+    volumes:
+      - 'sentry-zookeeper:/var/lib/zookeeper'
+  kafka:
+    depends_on:
+      - zookeeper
+    image: 'confluentinc/cp-kafka:5.1.2'
+    environment:
+      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
+      KAFKA_LISTENERS: 'INTERNAL://0.0.0.0:9093,EXTERNAL://0.0.0.0:9092'
+      KAFKA_ADVERTISED_LISTENERS: 'INTERNAL://kafka:9093,EXTERNAL://kafka:9092:9092}'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: 'INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT'
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: '1'
+    volumes:
+      - 'sentry-kafka:/var/lib/kafka'
+  clickhouse:
+    image: 'yandex/clickhouse-server:19.3'
+    ulimits:
+      nofile:
+        soft: 262144
+        hard: 262144
+    volumes:
+      - 'sentry-clickhouse:/var/lib/clickhouse'
+  snuba:
+    depends_on:
+      - redis
+      - clickhouse
+      - kafka
+    restart: unless-stopped
+    image: 'getsentry/snuba:latest'
+    environment:
+      PYTHONUNBUFFERED: '1'
+      SNUBA_SETTINGS: docker
+      DEBUG: '1'
+      CLICKHOUSE_TABLE: dev
+      CLICKHOUSE_SERVER: 'clickhouse:9000'
+      DEFAULT_BROKERS: 'kafka:9093'
+      REDIS_HOST: redis
+      REDIS_PORT: '6379'
+      REDIS_DB: '1'
+  symbolicator:
+    image: 'us.gcr.io/sentryio/symbolicator:latest'
+    command: run
   web:
-    <<: *defaults
+    restart: unless-stopped
+    build: *ref_0
+    depends_on: *ref_1
+    env_file: .env
+    environment: *ref_2
+    volumes: *ref_3
     ports:
-      - '9000:9000'
-
+      - '9000:9000/tcp'
   cron:
-    <<: *defaults
+    restart: unless-stopped
+    build: *ref_0
+    depends_on: *ref_1
+    env_file: .env
+    environment: *ref_2
+    volumes: *ref_3
     command: run cron
-
   worker:
-    <<: *defaults
+    restart: unless-stopped
+    build: *ref_0
+    depends_on: *ref_1
+    env_file: .env
+    environment: *ref_2
+    volumes: *ref_3
     command: run worker
-
-
 volumes:
-    sentry-data:
-      external: true
-    sentry-postgres:
-      external: true
+  sentry-data:
+    external: true
+  sentry-postgres:
+    external: true
+  sentry-redis:
+    external: true
+  sentry-zookeeper:
+    external: true
+  sentry-kafka:
+    external: true
+  sentry-clickhouse:
+    external: true
