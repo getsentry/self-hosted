@@ -2,7 +2,7 @@ language: bash
 services: docker
 
 env:
-  - IMAGE=sentry:9.1
+  - IMAGE=sentry:9.1.2
   - IMAGE=getsentry/sentry:git
 
 script:
