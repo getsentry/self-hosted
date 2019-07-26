@@ -4,7 +4,7 @@ x-defaults:
   build: &ref_0
     context: .
     args:
-      IMAGE: '${IMAGE}'
+      SENTRY_IMAGE: ${SENTRY_IMAGE}
   depends_on: &ref_1
     - redis
     - postgres
