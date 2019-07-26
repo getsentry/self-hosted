@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -e
 
+LATEST_STABLE_SENTRY_IMAGE='sentry:9.1.2'
+
 MIN_DOCKER_VERSION='17.05.0'
 MIN_COMPOSE_VERSION='1.17.0'
 MIN_RAM=3072 # MB
@@ -53,6 +55,12 @@ if [ -f "$ENV_FILE" ]; then
 else
   echo "Creating $ENV_FILE..."
   cp -n .env.example "$ENV_FILE"
+fi
+
+if [ -z $SENTRY_IMAGE ]; then
+  echo ""
+  echo "\$SENTRY_IMAGE not set, using latest stable: $LATEST_STABLE_SENTRY_IMAGE";
+  export SENTRY_IMAGE=$LATEST_STABLE_SENTRY_IMAGE
 fi
 
 echo ""
