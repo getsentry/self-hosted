@@ -184,6 +184,9 @@ if rabbitmq:
 else:
     BROKER_URL = 'redis://:' + redis_password + '@' + redis + ':' + redis_port + '/' + redis_db
 
+kafka_host=env('SENTRY_KAFKA_HOST')
+if kafka_host:
+    KAFKA_CLUSTERS['default']['bootstrap.servers'] = kafka_host
 
 ###############
 # Rate Limits #
