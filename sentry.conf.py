@@ -58,32 +58,25 @@ import six
 
 CONF_ROOT = os.path.dirname(__file__)
 
-postgres = env('SENTRY_POSTGRES_HOST') or (env('POSTGRES_PORT_5432_TCP_ADDR') and 'postgres')
+postgres = env('SENTRY_POSTGRES_HOST') or (
+    env('POSTGRES_PORT_5432_TCP_ADDR') and 'postgres'
+)
 if postgres:
     DATABASES = {
         'default': {
             'ENGINE': 'sentry.db.postgres',
             'NAME': (
-                env('SENTRY_DB_NAME')
-                or env('POSTGRES_ENV_POSTGRES_USER')
-                or 'postgres'
+                env('SENTRY_DB_NAME') or env('POSTGRES_ENV_POSTGRES_USER') or 'postgres'
             ),
             'USER': (
-                env('SENTRY_DB_USER')
-                or env('POSTGRES_ENV_POSTGRES_USER')
-                or 'postgres'
+                env('SENTRY_DB_USER') or env('POSTGRES_ENV_POSTGRES_USER') or 'postgres'
             ),
             'PASSWORD': (
-                env('SENTRY_DB_PASSWORD')
-                or env('POSTGRES_ENV_POSTGRES_PASSWORD')
-                or ''
+                env('SENTRY_DB_PASSWORD') or env('POSTGRES_ENV_POSTGRES_PASSWORD') or ''
             ),
             'HOST': postgres,
-            'PORT': (
-                env('SENTRY_POSTGRES_PORT')
-                or ''
-            ),
-        },
+            'PORT': (env('SENTRY_POSTGRES_PORT') or ''),
+        }
     }
 
 # You should not change this setting after your database has been created
@@ -110,26 +103,30 @@ SENTRY_SINGLE_ORGANIZATION = env('SENTRY_SINGLE_ORGANIZATION', True)
 
 redis = env('SENTRY_REDIS_HOST') or (env('REDIS_PORT_6379_TCP_ADDR') and 'redis')
 if not redis:
-    raise Exception('Error: REDIS_PORT_6379_TCP_ADDR (or SENTRY_REDIS_HOST) is undefined, did you forget to `--link` a redis container?')
+    raise Exception(
+        'Error: REDIS_PORT_6379_TCP_ADDR (or SENTRY_REDIS_HOST) is undefined, did you forget to `--link` a redis container?'
+    )
 
 redis_password = env('SENTRY_REDIS_PASSWORD') or ''
 redis_port = env('SENTRY_REDIS_PORT') or '6379'
 redis_db = env('SENTRY_REDIS_DB') or '0'
 
-SENTRY_OPTIONS.update({
-    'redis.clusters': {
-        'default': {
-            'hosts': {
-                0: {
-                    'host': redis,
-                    'password': redis_password,
-                    'port': redis_port,
-                    'db': redis_db,
-                },
-            },
-        },
-    },
-})
+SENTRY_OPTIONS.update(
+    {
+        'redis.clusters': {
+            'default': {
+                'hosts': {
+                    0: {
+                        'host': redis,
+                        'password': redis_password,
+                        'port': redis_port,
+                        'db': redis_db,
+                    }
+                }
+            }
+        }
+    }
+)
 
 #########
 # Cache #
@@ -138,12 +135,11 @@ SENTRY_OPTIONS.update({
 # Sentry currently utilizes two separate mechanisms. While CACHES is not a
 # requirement, it will optimize several high throughput patterns.
 
-memcached = env('SENTRY_MEMCACHED_HOST') or (env('MEMCACHED_PORT_11211_TCP_ADDR') and 'memcached')
+memcached = env('SENTRY_MEMCACHED_HOST') or (
+    env('MEMCACHED_PORT_11211_TCP_ADDR') and 'memcached'
+)
 if memcached:
-    memcached_port = (
-        env('SENTRY_MEMCACHED_PORT')
-        or '11211'
-    )
+    memcached_port = env('SENTRY_MEMCACHED_PORT') or '11211'
     CACHES = {
         'default': {
             'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
@@ -163,30 +159,54 @@ SENTRY_CACHE = 'sentry.cache.redis.RedisCache'
 # information on configuring your queue broker and workers. Sentry relies
 # on a Python framework called Celery to manage queues.
 
-rabbitmq = env('SENTRY_RABBITMQ_HOST') or (env('RABBITMQ_PORT_5672_TCP_ADDR') and 'rabbitmq')
+rabbitmq = env('SENTRY_RABBITMQ_HOST') or (
+    env('RABBITMQ_PORT_5672_TCP_ADDR') and 'rabbitmq'
+)
 
 if rabbitmq:
     BROKER_URL = (
-        'amqp://' + (
+        'amqp://'
+        + (
             env('SENTRY_RABBITMQ_USERNAME')
             or env('RABBITMQ_ENV_RABBITMQ_DEFAULT_USER')
             or 'guest'
-        ) + ':' + (
+        )
+        + ':'
+        + (
             env('SENTRY_RABBITMQ_PASSWORD')
             or env('RABBITMQ_ENV_RABBITMQ_DEFAULT_PASS')
             or 'guest'
-        ) + '@' + rabbitmq + '/' + (
+        )
+        + '@'
+        + rabbitmq
+        + '/'
+        + (
             env('SENTRY_RABBITMQ_VHOST')
             or env('RABBITMQ_ENV_RABBITMQ_DEFAULT_VHOST')
             or '/'
         )
     )
 else:
-    BROKER_URL = 'redis://:' + redis_password + '@' + redis + ':' + redis_port + '/' + redis_db
+    BROKER_URL = (
+        'redis://:' + redis_password + '@' + redis + ':' + redis_port + '/' + redis_db
+    )
 
-kafka_host=env('SENTRY_KAFKA_HOST')
-if kafka_host:
-    KAFKA_CLUSTERS['default']['bootstrap.servers'] = kafka_host
+kafka_host = env("SENTRY_KAFKA_HOST")
+if not kafka_host:
+    raise Exception(
+        "Error: SENTRY_KAFKA_HOST is undefined, you need Kafka to work reliably."
+    )
+
+DEFAULT_KAFKA_OPTIONS = {
+    "bootstrap.servers": kafka_host,
+    "message.max.bytes": 50000000,
+    "socket.timeout.ms": 1000,
+}
+
+SENTRY_EVENTSTREAM = "sentry.eventstream.kafka.KafkaEventStream"
+SENTRY_EVENTSTREAM_OPTIONS = {"producer_configuration": DEFAULT_KAFKA_OPTIONS}
+
+KAFKA_CLUSTERS["default"] = DEFAULT_KAFKA_OPTIONS
 
 ###############
 # Rate Limits #
@@ -231,8 +251,10 @@ SENTRY_TSDB = 'sentry.tsdb.redissnuba.RedisSnubaTSDB'
 #########
 
 SENTRY_SEARCH = 'sentry.search.snuba.SnubaSearchBackend'
+SENTRY_SEARCH_OPTIONS = {}
+
 SENTRY_TAGSTORE = 'sentry.tagstore.snuba.SnubaCompatibilityTagStorage'
-SENTRY_EVENTSTREAM = 'sentry.eventstream.snuba.SnubaEventStream'
+SENTRY_TAGSTORE_OPTIONS = {}
 
 ###########
 # Digests #
@@ -250,9 +272,7 @@ SENTRY_DIGESTS = 'sentry.digests.backends.redis.RedisBackend'
 # backends are either `filesystem` or `s3`.
 
 SENTRY_OPTIONS['filestore.backend'] = 'filesystem'
-SENTRY_OPTIONS['filestore.options'] = {
-    'location': env('SENTRY_FILESTORE_DIR'),
-}
+SENTRY_OPTIONS['filestore.options'] = {'location': env('SENTRY_FILESTORE_DIR')}
 
 ##############
 # Web Server #
@@ -274,7 +294,6 @@ SENTRY_WEB_OPTIONS = {
 }
 
 
-
 ##########
 # Docker #
 ##########
@@ -294,21 +313,17 @@ ENV_CONFIG_MAPPING = {
     'SENTRY_EMAIL_LIST_NAMESPACE': 'mail.list-namespace',
     'SENTRY_SMTP_HOSTNAME': 'mail.reply-hostname',
     'SENTRY_SECRET_KEY': 'system.secret-key',
-
     # If you're using mailgun for inbound mail, set your API key and configure a
     # route to forward to /api/hooks/mailgun/inbound/
     'SENTRY_MAILGUN_API_KEY': 'mail.mailgun-api-key',
-
     'SENTRY_SLACK_CLIENT_ID': 'slack.client-id',
     'SENTRY_SLACK_CLIENT_SECRET': 'slack.client-secret',
     'SENTRY_SLACK_VERIFICATION_TOKEN': 'slack.verification-token',
-
     'SENTRY_GITHUB_APP_ID': ('github-app.id', Int),
     'SENTRY_GITHUB_APP_CLIENT_ID': 'github-app.client-id',
     'SENTRY_GITHUB_APP_CLIENT_SECRET': 'github-app.client-secret',
     'SENTRY_GITHUB_APP_WEBHOOK_SECRET': 'github-app.webhook-secret',
     'SENTRY_GITHUB_APP_PRIVATE_KEY': 'github-app.private-key',
-
     'SENTRY_VSTS_CLIENT_ID': 'vsts.client-id',
     'SENTRY_VSTS_CLIENT_SECRET': 'vsts.client-secret',
 }
@@ -336,12 +351,15 @@ def bind_env_config(config=SENTRY_OPTIONS, mapping=ENV_CONFIG_MAPPING):
             opt_key, type_ = item, None
         config[opt_key] = env(env_var, type=type_)
 
+
 # If this value ever becomes compromised, it's important to regenerate your
 # SENTRY_SECRET_KEY. Changing this value will result in all current sessions
 # being invalidated.
 secret_key = env('SENTRY_SECRET_KEY')
 if not secret_key:
-    raise Exception('Error: SENTRY_SECRET_KEY is undefined, run `generate-secret-key` and set to -e SENTRY_SECRET_KEY')
+    raise Exception(
+        'Error: SENTRY_SECRET_KEY is undefined, run `generate-secret-key` and set to -e SENTRY_SECRET_KEY'
+    )
 
 if 'SENTRY_RUNNING_UWSGI' not in os.environ and len(secret_key) < 32:
     print('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
@@ -355,16 +373,17 @@ if 'SENTRY_RUNNING_UWSGI' not in os.environ and len(secret_key) < 32:
 # key=value with no logic behind them
 bind_env_config()
 
-SENTRY_FEATURES.update({
-    'organizations:global-views': True,
-    'organizations:discover': True,
-    'organizations:event-attachments': True,
-    'organizations:symbol-sources': True,
-    'organizations:grouping-info': True,
-    'organizations:org-saved-searches': True,
-
-    'projects:kafka-ingest': True,
-})
+SENTRY_FEATURES.update(
+    {
+        'organizations:global-views': True,
+        'organizations:discover': True,
+        'organizations:event-attachments': True,
+        'organizations:symbol-sources': True,
+        'organizations:grouping-info': True,
+        'organizations:org-saved-searches': True,
+        'projects:kafka-ingest': True,
+    }
+)
 
 # If you specify a MAILGUN_API_KEY, you definitely want EMAIL_REPLIES
 if SENTRY_OPTIONS.get('mail.mailgun-api-key'):
