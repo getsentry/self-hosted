@@ -373,17 +373,35 @@ if 'SENTRY_RUNNING_UWSGI' not in os.environ and len(secret_key) < 32:
 # key=value with no logic behind them
 bind_env_config()
 
-SENTRY_FEATURES.update(
-    {
-        'organizations:global-views': True,
-        'organizations:discover': True,
-        'organizations:event-attachments': True,
-        'organizations:symbol-sources': True,
-        'organizations:grouping-info': True,
-        'organizations:org-saved-searches': True,
-        'projects:kafka-ingest': True,
-    }
-)
+############
+# Features #
+############
+
+SENTRY_FEATURES['projects:sample-events'] = False
+
+for feature in (
+    'organizations:discover',
+    'organizations:events',
+    'organizations:global-views',
+    'organizations:integrations-issue-basic',
+    'organizations:integrations-issue-sync',
+    'organizations:invite-members',
+    'organizations:new-issue-ui',
+    'organizations:repos',
+    'organizations:require-2fa',
+    'organizations:sentry10',
+    'organizations:sso-basic',
+    'organizations:sso-rippling',
+    'organizations:sso-saml2',
+    'organizations:suggested-commits',
+    'projects:custom-inbound-filters',
+    'projects:data-forwarding',
+    'projects:discard-groups',
+    'projects:plugins',
+    'projects:rate-limits',
+    'projects:servicehooks',
+):
+    SENTRY_FEATURES[feature] = True
 
 # If you specify a MAILGUN_API_KEY, you definitely want EMAIL_REPLIES
 if SENTRY_OPTIONS.get('mail.mailgun-api-key'):
