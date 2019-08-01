@@ -78,13 +78,10 @@ services:
     environment:
       PYTHONUNBUFFERED: '1'
       SNUBA_SETTINGS: docker
-      DEBUG: '1'
-      CLICKHOUSE_TABLE: dev
-      CLICKHOUSE_SERVER: 'clickhouse:9000'
+      CLICKHOUSE_TABLE: sentry_local
+      CLICKHOUSE_HOST: clickhouse
       DEFAULT_BROKERS: 'kafka:9093'
       REDIS_HOST: redis
-      REDIS_PORT: '6379'
-      REDIS_DB: '1'
   symbolicator:
     image: 'us.gcr.io/sentryio/symbolicator:latest'
     command: run
