@@ -264,9 +264,7 @@ SENTRY_WEB_OPTIONS = {
     # This is need to prevent https://git.io/fj7Lw
     'uwsgi-socket': None,
     'http-keepalive': True,
-    'add-header': 'Connection: Keep-Alive',
     'memory-report': False,
-    'static-gzip-all': True,
     # 'workers': 3,  # the number of web workers
 }
 
