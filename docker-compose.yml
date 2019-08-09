@@ -13,7 +13,7 @@ x-defaults: &defaults
   build:
     context: .
     args:
-      SENTRY_IMAGE: ${SENTRY_IMAGE}
+      SENTRY_IMAGE: ${SENTRY_IMAGE:?err}
   depends_on:
     - redis
     - postgres
