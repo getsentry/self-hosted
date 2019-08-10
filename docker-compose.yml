@@ -1,11 +1,11 @@
 version: '3.4'
-x-defaults:
+x-sentry-defaults: &sentry_defaults
   restart: unless-stopped
-  build: &onpremise_build
+  build:
     context: .
     args:
       SENTRY_IMAGE: ${SENTRY_IMAGE}
-  depends_on: &sentry_dependencies
+  depends_on:
     - redis
     - postgres
     - memcached
@@ -14,15 +14,16 @@ x-defaults:
     - symbolicator
     - kafka
   env_file: .env
-  environment: &sentry_env
+  environment:
     SENTRY_MEMCACHED_HOST: memcached
     SENTRY_REDIS_HOST: redis
     SENTRY_POSTGRES_HOST: postgres
     SENTRY_EMAIL_HOST: smtp
     SNUBA: 'http://snuba:1218'
     SENTRY_KAFKA_HOST: 'kafka:9092'
-  volumes: &sentry_volumes
+  volumes:
     - 'sentry-data:/var/lib/sentry/files'
+
 services:
   smtp:
     restart: unless-stopped
@@ -86,29 +87,14 @@ services:
     image: 'us.gcr.io/sentryio/symbolicator:latest'
     command: run
   web:
-    restart: unless-stopped
-    build: *onpremise_build
-    depends_on: *sentry_dependencies
-    env_file: .env
-    environment: *sentry_env
-    volumes: *sentry_volumes
+    << : *sentry_defaults
     ports:
       - '9000:9000/tcp'
   cron:
-    restart: unless-stopped
-    build: *onpremise_build
-    depends_on: *sentry_dependencies
-    env_file: .env
-    environment: *sentry_env
-    volumes: *sentry_volumes
+    << : *sentry_defaults
     command: run cron
   worker:
-    restart: unless-stopped
-    build: *onpremise_build
-    depends_on: *sentry_dependencies
-    env_file: .env
-    environment: *sentry_env
-    volumes: *sentry_volumes
+    << : *sentry_defaults
     command: run worker
 volumes:
   sentry-data:
