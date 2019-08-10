@@ -95,6 +95,10 @@ else
   docker-compose run --rm web upgrade
 fi
 
+echo "Boostrapping Snuba..."
+docker-compose run --rm snuba-api bootstrap --force
+echo ""
+
 cleanup
 
 echo ""

@@ -10,7 +10,9 @@ x-sentry-defaults: &sentry_defaults
     - postgres
     - memcached
     - smtp
-    - snuba
+    - snuba-api
+    - snuba-consumer
+    - snuba-replacer
     - symbolicator
     - kafka
   env_file: .env
@@ -19,11 +21,31 @@ x-sentry-defaults: &sentry_defaults
     SENTRY_REDIS_HOST: redis
     SENTRY_POSTGRES_HOST: postgres
     SENTRY_EMAIL_HOST: smtp
-    SNUBA: 'http://snuba:1218'
+    SNUBA: 'http://snuba-api:1218'
     SENTRY_KAFKA_HOST: 'kafka:9092'
   volumes:
     - 'sentry-data:/var/lib/sentry/files'
-
+x-snuba-defaults: &snuba_defaults
+  depends_on:
+    - redis
+    - clickhouse
+    - kafka
+  restart: unless-stopped
+  image: 'getsentry/snuba:latest'
+  environment:
+    SNUBA_SETTINGS: docker
+    CLICKHOUSE_HOST: clickhouse
+    DEFAULT_BROKERS: 'kafka:9093'
+    REDIS_HOST: redis
+    # TODO: Remove these after getsentry/snuba#353
+    UWSGI_MAX_REQUESTS: '10000'
+    UWSGI_DISABLE_LOGGING: 'true'
+    UWSGI_ENABLE_THREADS: 'true'
+    UWSGI_DIE_ON_TERM: 'true'
+    UWSGI_NEED_APP: 'true'
+    UWSGI_IGNORE_SIGPIPE: 'true'
+    UWSGI_IGNORE_WRITE_ERRORS: 'true'
+    UWSGI_DISABLE_WRITE_EXCEPTION:  'true'
 services:
   smtp:
     restart: unless-stopped
@@ -54,7 +76,7 @@ services:
     image: 'confluentinc/cp-kafka:5.1.2'
     environment:
       KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
-      KAFKA_LISTENERS: 'INTERNAL://kafka:9093,EXTERNAL://kafka:9092'
+      KAFKA_LISTENERS: 'INTERNAL://0.0.0.0:9093,EXTERNAL://0.0.0.0:9092'
       KAFKA_ADVERTISED_LISTENERS: 'INTERNAL://kafka:9093,EXTERNAL://kafka:9092'
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: 'INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT'
       KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
@@ -62,26 +84,21 @@ services:
     volumes:
       - 'sentry-kafka:/var/lib/kafka'
   clickhouse:
-    image: 'yandex/clickhouse-server:19.3'
+    image: 'yandex/clickhouse-server:19.4'
     ulimits:
       nofile:
         soft: 262144
         hard: 262144
     volumes:
       - 'sentry-clickhouse:/var/lib/clickhouse'
-  snuba:
-    depends_on:
-      - redis
-      - clickhouse
-      - kafka
-    restart: unless-stopped
-    image: 'getsentry/snuba:latest'
-    environment:
-      SNUBA_SETTINGS: docker
-      CLICKHOUSE_TABLE: sentry_local
-      CLICKHOUSE_HOST: clickhouse
-      DEFAULT_BROKERS: 'kafka:9093'
-      REDIS_HOST: redis
+  snuba-api:
+    << : *snuba_defaults
+  snuba-consumer:
+    << : *snuba_defaults
+    command: consumer --auto-offset-reset=latest --max-batch-time-ms 750
+  snuba-replacer:
+    << : *snuba_defaults
+    command: replacer --auto-offset-reset=latest --max-batch-size 3
   symbolicator:
     image: 'us.gcr.io/sentryio/symbolicator:latest'
     command: run
