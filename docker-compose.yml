@@ -77,7 +77,6 @@ services:
     restart: unless-stopped
     image: 'getsentry/snuba:latest'
     environment:
-      PYTHONUNBUFFERED: '1'
       SNUBA_SETTINGS: docker
       CLICKHOUSE_TABLE: sentry_local
       CLICKHOUSE_HOST: clickhouse
