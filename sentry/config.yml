@@ -61,3 +61,8 @@
 #   access_key: 'AKIXXXXXX'
 #   secret_key: 'XXXXXXX'
 #   bucket_name: 's3-bucket-name'
+
+system.internal-url-prefix: 'http://web:9000'
+symbolicator.enabled: true
+symbolicator.options:
+  url: "http://symbolicator:3021"

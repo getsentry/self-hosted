@@ -2,7 +2,7 @@ version: '3.4'
 x-sentry-defaults: &sentry_defaults
   restart: unless-stopped
   build:
-    context: .
+    context: ./sentry
     args:
       SENTRY_IMAGE: ${SENTRY_IMAGE}
   depends_on:
@@ -18,7 +18,6 @@ x-sentry-defaults: &sentry_defaults
   env_file: .env
   environment:
     SENTRY_MEMCACHED_HOST: memcached
-    SENTRY_REDIS_HOST: redis
     SENTRY_POSTGRES_HOST: postgres
     SENTRY_EMAIL_HOST: smtp
     SNUBA: 'http://snuba-api:1218'
@@ -100,8 +99,9 @@ services:
     << : *snuba_defaults
     command: replacer --auto-offset-reset=latest --max-batch-size 3
   symbolicator:
-    image: 'us.gcr.io/sentryio/symbolicator:latest'
-    command: run
+    build:
+      context: ./symbolicator
+    command: run -c /etc/symbolicator/config.yml
   web:
     << : *sentry_defaults
     ports:

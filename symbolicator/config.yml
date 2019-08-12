@@ -1,0 +1,6 @@
+cache_dir: "/data"
+bind: "0.0.0.0:3021"
+logging:
+  level: "info"
+  format: "pretty"
+  enable_backtraces: true
