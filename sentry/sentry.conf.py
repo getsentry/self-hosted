@@ -91,6 +91,35 @@ SENTRY_USE_BIG_INTS = True
 SENTRY_SINGLE_ORGANIZATION = env('SENTRY_SINGLE_ORGANIZATION', True)
 
 #########
+# Redis #
+#########
+
+# Generic Redis configuration used as defaults for various things including:
+# Buffers, Quotas, TSDB
+
+redis = 'redis'
+redis_password = ''
+redis_port ='6379'
+redis_db = '0'
+
+SENTRY_OPTIONS.update(
+    {
+        'redis.clusters': {
+            'default': {
+                'hosts': {
+                    0: {
+                        'host': redis,
+                        'password': redis_password,
+                        'port': redis_port,
+                        'db': redis_db,
+                    }
+                }
+            }
+        }
+    }
+)
+
+#########
 # Cache #
 #########
 
