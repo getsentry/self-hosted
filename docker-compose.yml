@@ -25,11 +25,11 @@ x-sentry-defaults: &sentry_defaults
   volumes:
     - 'sentry-data:/var/lib/sentry/files'
 x-snuba-defaults: &snuba_defaults
+  restart: unless-stopped
   depends_on:
     - redis
     - clickhouse
     - kafka
-  restart: unless-stopped
   image: 'getsentry/snuba:latest'
   environment:
     SNUBA_SETTINGS: docker
@@ -64,12 +64,14 @@ services:
     volumes:
       - 'sentry-postgres:/var/lib/postgresql/data'
   zookeeper:
+    restart: unless-stopped
     image: 'confluentinc/cp-zookeeper:5.1.2'
     environment:
       ZOOKEEPER_CLIENT_PORT: '2181'
     volumes:
       - 'sentry-zookeeper:/var/lib/zookeeper'
   kafka:
+    restart: unless-stopped
     depends_on:
       - zookeeper
     image: 'confluentinc/cp-kafka:5.1.2'
@@ -83,6 +85,7 @@ services:
     volumes:
       - 'sentry-kafka:/var/lib/kafka'
   clickhouse:
+    restart: unless-stopped
     image: 'yandex/clickhouse-server:19.4'
     ulimits:
       nofile:
@@ -99,6 +102,7 @@ services:
     << : *snuba_defaults
     command: replacer --auto-offset-reset=latest --max-batch-size 3
   symbolicator:
+    restart: unless-stopped
     image: us.gcr.io/sentryio/symbolicator:latest
     command: run
   web:
