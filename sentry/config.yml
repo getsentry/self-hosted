@@ -38,12 +38,13 @@
 # The ``redis.clusters`` setting is used, unsurprisingly, to configure Redis
 # clusters. These clusters can be then referred to by name when configuring
 # backends such as the cache, digests, or TSDB backend.
-# redis.clusters:
-#   default:
-#     hosts:
-#       0:
-#         host: 127.0.0.1
-#         port: 6379
+redis.clusters:
+  default:
+    hosts:
+      - host: 'redis'
+        password: ''
+        port: '6379'
+        db: '0'
 
 ################
 # File storage #
@@ -65,4 +66,4 @@
 system.internal-url-prefix: 'http://web:9000'
 symbolicator.enabled: true
 symbolicator.options:
-  url: "http://symbolicator:3021"
+  url: 'http://symbolicator:3021'

@@ -11,10 +11,6 @@
 #  SENTRY_RABBITMQ_USERNAME
 #  SENTRY_RABBITMQ_PASSWORD
 #  SENTRY_RABBITMQ_VHOST
-#  SENTRY_REDIS_HOST
-#  SENTRY_REDIS_PASSWORD
-#  SENTRY_REDIS_PORT
-#  SENTRY_REDIS_DB
 #  SENTRY_MEMCACHED_HOST
 #  SENTRY_MEMCACHED_PORT
 #  SENTRY_FILESTORE_DIR
@@ -93,40 +89,6 @@ SENTRY_USE_BIG_INTS = True
 # Instruct Sentry that this install intends to be run by a single organization
 # and thus various UI optimizations should be enabled.
 SENTRY_SINGLE_ORGANIZATION = env('SENTRY_SINGLE_ORGANIZATION', True)
-
-#########
-# Redis #
-#########
-
-# Generic Redis configuration used as defaults for various things including:
-# Buffers, Quotas, TSDB
-
-redis = env('SENTRY_REDIS_HOST') or (env('REDIS_PORT_6379_TCP_ADDR') and 'redis')
-if not redis:
-    raise Exception(
-        'Error: REDIS_PORT_6379_TCP_ADDR (or SENTRY_REDIS_HOST) is undefined, did you forget to `--link` a redis container?'
-    )
-
-redis_password = env('SENTRY_REDIS_PASSWORD') or ''
-redis_port = env('SENTRY_REDIS_PORT') or '6379'
-redis_db = env('SENTRY_REDIS_DB') or '0'
-
-SENTRY_OPTIONS.update(
-    {
-        'redis.clusters': {
-            'default': {
-                'hosts': {
-                    0: {
-                        'host': redis,
-                        'password': redis_password,
-                        'port': redis_port,
-                        'db': redis_db,
-                    }
-                }
-            }
-        }
-    }
-)
 
 #########
 # Cache #
