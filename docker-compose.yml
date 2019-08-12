@@ -99,9 +99,8 @@ services:
     << : *snuba_defaults
     command: replacer --auto-offset-reset=latest --max-batch-size 3
   symbolicator:
-    build:
-      context: ./symbolicator
-    command: run -c /etc/symbolicator/config.yml
+    image: us.gcr.io/sentryio/symbolicator:latest
+    command: run
   web:
     << : *sentry_defaults
     ports:
