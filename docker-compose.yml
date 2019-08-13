@@ -1,6 +1,8 @@
 version: '3.4'
+x-restart-policy: &restart_policy
+  restart: always
 x-sentry-defaults: &sentry_defaults
-  restart: unless-stopped
+  << : *restart_policy
   build:
     context: ./sentry
     args:
@@ -25,7 +27,7 @@ x-sentry-defaults: &sentry_defaults
   volumes:
     - 'sentry-data:/var/lib/sentry/files'
 x-snuba-defaults: &snuba_defaults
-  restart: unless-stopped
+  << : *restart_policy
   depends_on:
     - redis
     - clickhouse
@@ -47,31 +49,31 @@ x-snuba-defaults: &snuba_defaults
     UWSGI_DISABLE_WRITE_EXCEPTION:  'true'
 services:
   smtp:
-    restart: unless-stopped
+    << : *restart_policy
     image: tianon/exim4
   memcached:
-    restart: unless-stopped
+    << : *restart_policy
     image: 'memcached:1.5-alpine'
   redis:
-    restart: unless-stopped
+    << : *restart_policy
     image: 'redis:5.0-alpine'
     command: redis-server --appendonly yes
     volumes:
       - 'sentry-redis:/data'
   postgres:
-    restart: unless-stopped
+    << : *restart_policy
     image: 'postgres:9.6'
     volumes:
       - 'sentry-postgres:/var/lib/postgresql/data'
   zookeeper:
-    restart: unless-stopped
+    << : *restart_policy
     image: 'confluentinc/cp-zookeeper:5.1.2'
     environment:
       ZOOKEEPER_CLIENT_PORT: '2181'
     volumes:
       - 'sentry-zookeeper:/var/lib/zookeeper'
   kafka:
-    restart: unless-stopped
+    << : *restart_policy
     depends_on:
       - zookeeper
     image: 'confluentinc/cp-kafka:5.1.2'
@@ -85,7 +87,7 @@ services:
     volumes:
       - 'sentry-kafka:/var/lib/kafka'
   clickhouse:
-    restart: unless-stopped
+    << : *restart_policy
     image: 'yandex/clickhouse-server:19.4'
     ulimits:
       nofile:
@@ -102,7 +104,7 @@ services:
     << : *snuba_defaults
     command: replacer --auto-offset-reset=latest --max-batch-size 3
   symbolicator:
-    restart: unless-stopped
+    << : *restart_policy
     image: us.gcr.io/sentryio/symbolicator:latest
     command: run
   web:
