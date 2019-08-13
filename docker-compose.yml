@@ -1,6 +1,6 @@
 version: '3.4'
 x-restart-policy: &restart_policy
-  restart: always
+  restart: unless-stopped
 x-sentry-defaults: &sentry_defaults
   << : *restart_policy
   build:
