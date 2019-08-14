@@ -52,6 +52,7 @@ echo "Created $(docker volume create --name=sentry-redis)."
 echo "Created $(docker volume create --name=sentry-zookeeper)."
 echo "Created $(docker volume create --name=sentry-kafka)."
 echo "Created $(docker volume create --name=sentry-clickhouse)."
+echo "Created $(docker volume create --name=sentry-symbolicator)."
 echo ""
 
 if [ -f "$ENV_FILE" ]; then

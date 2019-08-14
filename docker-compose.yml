@@ -106,6 +106,8 @@ services:
   symbolicator:
     << : *restart_policy
     image: us.gcr.io/sentryio/symbolicator:latest
+    volumes:
+      - 'sentry-symbolicator:/data'
     command: run
   web:
     << : *sentry_defaults
@@ -129,4 +131,6 @@ volumes:
   sentry-kafka:
     external: true
   sentry-clickhouse:
+    external: true
+  sentry-symbolicator:
     external: true
