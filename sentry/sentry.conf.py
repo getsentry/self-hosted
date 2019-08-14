@@ -381,6 +381,7 @@ for feature in (
     'organizations:sso-rippling',
     'organizations:sso-saml2',
     'organizations:suggested-commits',
+    'organizations:symbol-sources',
     'projects:custom-inbound-filters',
     'projects:data-forwarding',
     'projects:discard-groups',
