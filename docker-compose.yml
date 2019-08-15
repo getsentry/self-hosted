@@ -7,6 +7,7 @@ x-sentry-defaults: &sentry_defaults
     context: ./sentry
     args:
       SENTRY_IMAGE: ${SENTRY_IMAGE}
+  image: ${SENTRY_IMAGE}-onpremise-local
   depends_on:
     - redis
     - postgres
