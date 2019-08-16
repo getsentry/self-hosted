@@ -4,7 +4,10 @@ set -e
 MIN_DOCKER_VERSION='17.05.0'
 MIN_COMPOSE_VERSION='1.19.0'
 MIN_RAM=3072 # MB
-ENV_FILE='.env'
+
+SENTRY_CONFIG_PY='sentry/sentry.conf.py'
+SENTRY_CONFIG_YML='sentry/config.yml'
+SENTRY_EXTRA_REQUIREMENTS='sentry/requirements.txt'
 
 DID_CLEAN_UP=0
 # the cleanup function will be the exit point
@@ -27,6 +30,16 @@ RAM_AVAILABLE_IN_DOCKER=$(docker run --rm busybox free -m 2>/dev/null | awk '/Me
 # Function below is inspired by https://stackoverflow.com/a/29394504/90297
 function ver { printf "%03d%03d%03d%03d" $(echo "$1" | sed 's/^0*\([0-9]\+\)\.0*\([0-9]\+\)\.0*\([0-9]\+\).*/\1 \2 \3/' | head -n 3 ); }
 
+# Thanks to https://stackoverflow.com/a/25123013/90297 for the quick `sed` pattern
+function ensure_file_from_example {
+  if [ -f "$1" ]; then
+    echo "$1 already exists, skipped creation."
+  else
+    echo "Creating $1..."
+    cp -n $(echo "$1" | sed 's/\.[^.]*$/.example&/') "$1"
+  fi
+}
+
 if [ $(ver $DOCKER_VERSION) -lt $(ver $MIN_DOCKER_VERSION) ]; then
     echo "FAIL: Expected minimum Docker version to be $MIN_DOCKER_VERSION but found $DOCKER_VERSION"
     exit -1
@@ -43,6 +56,11 @@ if [ "$RAM_AVAILABLE_IN_DOCKER" -lt "$MIN_RAM" ]; then
 fi
 
 echo ""
+ensure_file_from_example $SENTRY_CONFIG_PY
+ensure_file_from_example $SENTRY_CONFIG_YML
+ensure_file_from_example $SENTRY_EXTRA_REQUIREMENTS
+
+echo ""
 echo "Creating volumes for persistent storage..."
 echo "Created $(docker volume create --name=sentry-data)."
 echo "Created $(docker volume create --name=sentry-postgres)."
@@ -51,34 +69,20 @@ echo "Created $(docker volume create --name=sentry-zookeeper)."
 echo "Created $(docker volume create --name=sentry-kafka)."
 echo "Created $(docker volume create --name=sentry-clickhouse)."
 echo "Created $(docker volume create --name=sentry-symbolicator)."
-echo ""
-
-if [ -f "$ENV_FILE" ]; then
-  echo "$ENV_FILE already exists, skipped creation."
-else
-  echo "Creating $ENV_FILE..."
-  cp -n .env.example "$ENV_FILE"
-fi
-
-if [ -z $SENTRY_IMAGE ]; then
-  echo ""
-  echo "\$SENTRY_IMAGE not set, using latest stable: $LATEST_STABLE_SENTRY_IMAGE";
-  export SENTRY_IMAGE=$LATEST_STABLE_SENTRY_IMAGE
-fi
-
-echo ""
-echo "Building and tagging Docker images..."
-echo ""
-docker-compose build
-echo ""
-echo "Docker images built."
 
 echo ""
 echo "Generating secret key..."
 # This is to escape the secret key to be used in sed below
-SECRET_KEY=$(docker-compose run --rm web config generate-secret-key 2> /dev/null | tail -n1 | sed -e 's/[\/&]/\\&/g')
-sed -i -e 's/^SENTRY_SECRET_KEY=.*$/SENTRY_SECRET_KEY='"$SECRET_KEY"'/' $ENV_FILE
-echo "Secret key written to $ENV_FILE"
+SECRET_KEY=$(head /dev/urandom | tr -dc "a-z0-9@#%^&*(-_=+)" | head -c 50 | sed -e 's/[\/&]/\\&/g')
+sed -i -e 's/^system.secret-key:.*$/system.secret-key: '"'$SECRET_KEY'"'/' sentry/config.yml
+echo "Secret key written to sentry/config.yml"
+
+echo ""
+echo "Building and tagging Docker images..."
+echo ""
+docker-compose build --force-rm
+echo ""
+echo "Docker images built."
 
 echo ""
 echo "Setting up database..."

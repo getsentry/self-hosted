@@ -8,7 +8,7 @@
 ###############
 
 # mail.backend: 'smtp'  # Use dummy if you want to disable email entirely
-# mail.host: 'localhost'
+mail.host: 'smtp'
 # mail.port: 25
 # mail.username: ''
 # mail.password: ''
@@ -17,13 +17,14 @@
 # mail.from: 'root@localhost'
 
 # If you'd like to configure email replies, enable this.
-# mail.enable-replies: false
+# mail.enable-replies: true
 
 # When email-replies are enabled, this value is used in the Reply-To header
 # mail.reply-hostname: ''
 
 # If you're using mailgun for inbound mail, set your API key and configure a
 # route to forward to /api/hooks/mailgun/inbound/
+# Also don't forget to set `mail.enable-replies: true` above.
 # mail.mailgun-api-key: ''
 
 ###################
@@ -33,7 +34,7 @@
 # If this file ever becomes compromised, it's important to regenerate your a new key
 # Changing this value will result in all current sessions being invalidated.
 # A new key can be generated with `$ sentry config generate-secret-key`
-# system.secret-key: 'changeme'
+system.secret-key: '!!changeme!!'
 
 # The ``redis.clusters`` setting is used, unsurprisingly, to configure Redis
 # clusters. These clusters can be then referred to by name when configuring

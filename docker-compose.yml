@@ -16,13 +16,8 @@ x-sentry-defaults: &sentry_defaults
     - snuba-replacer
     - symbolicator
     - kafka
-  env_file: .env
   environment:
-    SENTRY_MEMCACHED_HOST: memcached
-    SENTRY_POSTGRES_HOST: postgres
-    SENTRY_EMAIL_HOST: smtp
     SNUBA: 'http://snuba-api:1218'
-    SENTRY_KAFKA_HOST: 'kafka:9092'
   volumes:
     - 'sentry-data:/var/lib/sentry/files'
 x-snuba-defaults: &snuba_defaults

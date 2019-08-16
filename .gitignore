@@ -68,9 +68,11 @@ target/
 # https://docs.docker.com/compose/extends/
 docker-compose.override.yml
 
-# env config
-.env
-
 *.tar
 data/
 .vscode/tags
+
+# custom Sentry config
+sentry/sentry.conf.py
+sentry/config.yml
+sentry/requirements.txt
