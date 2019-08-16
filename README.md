@@ -1,6 +1,8 @@
-# Sentry On-Premise [![Build Status][build-status-image]][build-status-url]
+# Sentry 10 On-Premise BETA [![Build Status][build-status-image]][build-status-url]
 
 Official bootstrap for running your own [Sentry](https://sentry.io/) with [Docker](https://www.docker.com/).
+
+**NOTE:** If you are not installing Sentry from scratch, visit [On-Premise Stable for Sentry 9.1.2](https://github.com/getsentry/onpremise/tree/stable) as this version is not fully backward compatible.
 
 ## Requirements
 
