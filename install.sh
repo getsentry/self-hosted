@@ -106,7 +106,7 @@ cleanup
 
 echo ""
 echo "----------------"
-echo "You're all done! Run the following command get Sentry running:"
+echo "You're all done! Run the following command to get Sentry running:"
 echo ""
 echo "  docker-compose up -d"
 echo ""

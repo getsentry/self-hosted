@@ -155,7 +155,7 @@ SENTRY_WEB_PORT = 9000
 SENTRY_WEB_OPTIONS = {
     "http": "%s:%s" % (SENTRY_WEB_HOST, SENTRY_WEB_PORT),
     "protocol": "uwsgi",
-    # This is need to prevent https://git.io/fj7Lw
+    # This is needed to prevent https://git.io/fj7Lw
     "uwsgi-socket": None,
     "http-keepalive": True,
     "memory-report": False,
@@ -163,7 +163,7 @@ SENTRY_WEB_OPTIONS = {
 }
 
 ###########
-# SSJ/TLS #
+# SSL/TLS #
 ###########
 
 # If you're using a reverse SSL proxy, you should enable the X-Forwarded-Proto
@@ -211,7 +211,7 @@ SENTRY_FEATURES.update(
 )
 
 ######################
-# GitHub Integsation #
+# GitHub Integration #
 #####################
 
 # GITHUB_APP_ID = 'YOUR_GITHUB_APP_ID'
@@ -219,7 +219,7 @@ SENTRY_FEATURES.update(
 # GITHUB_EXTENDED_PERMISSIONS = ['repo']
 
 #########################
-# Bitbucket Integsation #
+# Bitbucket Integration #
 ########################
 
 # BITBUCKET_CONSUMER_KEY = 'YOUR_BITBUCKET_CONSUMER_KEY'
