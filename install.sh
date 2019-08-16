@@ -74,8 +74,8 @@ echo ""
 echo "Generating secret key..."
 # This is to escape the secret key to be used in sed below
 SECRET_KEY=$(head /dev/urandom | tr -dc "a-z0-9@#%^&*(-_=+)" | head -c 50 | sed -e 's/[\/&]/\\&/g')
-sed -i -e 's/^system.secret-key:.*$/system.secret-key: '"'$SECRET_KEY'"'/' sentry/config.yml
-echo "Secret key written to sentry/config.yml"
+sed -i -e 's/^system.secret-key:.*$/system.secret-key: '"'$SECRET_KEY'"'/' $SENTRY_CONFIG_YML
+echo "Secret key written to $SENTRY_CONFIG_YML"
 
 echo ""
 echo "Building and tagging Docker images..."
