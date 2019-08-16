@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 set -e
 
-TEST_USER='test@sentry.io'
+TEST_USER='test@example.com'
 TEST_PASS='test123TEST'
 COOKIE_FILE=$(mktemp)
 declare -a TEST_STRINGS=(
     '"isAuthenticated":true'
-    '"username":"test@sentry.io"'
+    '"username":"test@example.com"'
     '"isSuperuser":true'
 )
 

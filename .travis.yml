@@ -1,13 +1,9 @@
 language: bash
 services: docker
 
-env:
-  - SENTRY_IMAGE=sentry:9.1.2
-  - SENTRY_IMAGE=getsentry/sentry:git
-
 script:
   - ./install.sh
-  - docker-compose run --rm web createuser --superuser --email test@sentry.io --password test123TEST
+  - docker-compose run --rm web createuser --superuser --email test@example.com --password test123TEST
   - docker-compose up -d
   - timeout 60 bash -c 'until $(curl -Isf -o /dev/null http://localhost:9000); do printf '.'; sleep 0.5; done'
   - ./test.sh
