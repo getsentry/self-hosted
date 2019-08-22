@@ -101,7 +101,10 @@ services:
     << : *snuba_defaults
     image: snuba-cleanup-onpremise-local
     build:
-      context: ./snuba-cron
+      context: ./cron
+      args:
+        BASE_IMAGE: 'getsentry/snuba:latest'
+    command: '"*/5 * * * * gosu snuba snuba cleanup --dry-run False"'
   symbolicator:
     << : *restart_policy
     image: us.gcr.io/sentryio/symbolicator:latest
