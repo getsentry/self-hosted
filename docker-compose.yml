@@ -97,6 +97,11 @@ services:
   snuba-replacer:
     << : *snuba_defaults
     command: replacer --auto-offset-reset=latest --max-batch-size 3
+  snuba-cleanup:
+    << : *snuba_defaults
+    image: snuba-cleanup-onpremise-local
+    build:
+      context: ./snuba-cron
   symbolicator:
     << : *restart_policy
     image: us.gcr.io/sentryio/symbolicator:latest
