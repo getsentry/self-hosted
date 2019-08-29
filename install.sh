@@ -99,7 +99,7 @@ else
 fi
 
 echo "Boostrapping Snuba..."
-docker-compose run --rm snuba-api bootstrap --force
+docker-compose run --rm snuba-api bootstrap --force || true
 echo ""
 
 cleanup
