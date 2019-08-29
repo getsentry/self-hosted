@@ -32,15 +32,6 @@ x-snuba-defaults: &snuba_defaults
     CLICKHOUSE_HOST: clickhouse
     DEFAULT_BROKERS: 'kafka:9093'
     REDIS_HOST: redis
-    # TODO: Remove these after getsentry/snuba#353
-    UWSGI_MAX_REQUESTS: '10000'
-    UWSGI_DISABLE_LOGGING: 'true'
-    UWSGI_ENABLE_THREADS: 'true'
-    UWSGI_DIE_ON_TERM: 'true'
-    UWSGI_NEED_APP: 'true'
-    UWSGI_IGNORE_SIGPIPE: 'true'
-    UWSGI_IGNORE_WRITE_ERRORS: 'true'
-    UWSGI_DISABLE_WRITE_EXCEPTION:  'true'
 services:
   smtp:
     << : *restart_policy
