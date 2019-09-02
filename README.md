@@ -25,7 +25,13 @@ The recommended way to customize your configuration is using the files below, in
  * `sentry.conf.py`
  * `.env` w/ environment variables
 
+We currently support a very minimal set of environment variables to promote other means of configuration.
+
 If you have any issues or questions, our [Community Forum](https://forum.sentry.io/c/on-premise) is at your service!
+
+## Event Retention
+
+Sentry comes with a cleanup cron job that prunes events older than `90 days` by default. If you want to change that, you can change the `SENTRY_EVENT_RETENTION_DAYS` environment variable in `.env` or simply override it in your environment. If you do not want the cleanup cron, you can remove the `sentry-cleanup` service from the `docker-compose.yml`file.
 
 ## Securing Sentry with SSL/TLS
 
