@@ -111,6 +111,13 @@ services:
     volumes:
       - 'sentry-symbolicator:/data'
     command: run
+  symbolicator-cleanup:
+    image: symbolicator-cleanup-onpremise-local
+    build:
+      context: ./cron
+      args:
+        BASE_IMAGE: 'us.gcr.io/sentryio/symbolicator:latest'
+    command: '"55 23 * * * gosu symbolicator symbolicator cleanup"'
   web:
     << : *sentry_defaults
     ports:
