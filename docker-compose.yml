@@ -51,7 +51,6 @@ services:
   redis:
     << : *restart_policy
     image: 'redis:5.0-alpine'
-    command: redis-server --appendonly yes
     volumes:
       - 'sentry-redis:/data'
   postgres:
