@@ -45,6 +45,15 @@ services:
     volumes:
       - sentry-postgres:/var/lib/postgresql/data
 
+  nginx:
+    image: nginx:latest
+    volumes:
+      - ./docker/production/conf.d:/etc/nginx/conf.d
+    restart: always
+    ports:
+      - "443:443"
+      - "80:80"
+
   web:
     <<: *defaults
     ports:
