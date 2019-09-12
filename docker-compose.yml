@@ -63,6 +63,8 @@ services:
     image: 'confluentinc/cp-zookeeper:5.1.2'
     environment:
       ZOOKEEPER_CLIENT_PORT: '2181'
+      ZOOKEEPER_LOG4J_ROOT_LOGLEVEL: 'ERROR'
+      ZOOKEEPER_TOOLS_LOG4J_LOGLEVEL: 'ERROR'
     volumes:
       - 'sentry-zookeeper:/var/lib/zookeeper'
   kafka:
@@ -77,6 +79,9 @@ services:
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: 'INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT'
       KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: '1'
+      KAFKA_LOG4J_LOGGERS: 'kafka.cluster=WARN,kafka.controller=WARN,kafka.coordinator=WARN,kafka.log=WARN,kafka.server=WARN,kafka.zookeeper=WARN,state.change.logger=WARN'
+      KAFKA_LOG4J_ROOT_LOGLEVEL: 'ERROR'
+      KAFKA_TOOLS_LOG4J_LOGLEVEL: 'ERROR'
     volumes:
       - 'sentry-kafka:/var/lib/kafka'
   clickhouse:
