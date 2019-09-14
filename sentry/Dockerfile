@@ -1,1 +1,1 @@
-FROM ${SENTRY_IMAGE:-getsentry/sentry:git}-onbuild
+FROM ${SENTRY_IMAGE:-getsentry/sentry:latest}-onbuild
