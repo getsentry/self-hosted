@@ -3,7 +3,7 @@ services: docker
 
 env:
   - SENTRY_IMAGE=sentry:9.1.2
-  - SENTRY_IMAGE=getsentry/sentry:git
+  - SENTRY_IMAGE=getsentry/sentry:latest
 
 script:
   - ./install.sh

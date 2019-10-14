@@ -12,8 +12,6 @@ x-defaults: &defaults
   restart: unless-stopped
   build:
     context: .
-    args:
-      SENTRY_IMAGE: ${SENTRY_IMAGE}
   depends_on:
     - redis
     - postgres
