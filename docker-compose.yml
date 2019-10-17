@@ -5,6 +5,8 @@ x-sentry-defaults: &sentry_defaults
   << : *restart_policy
   build:
     context: ./sentry
+    args:
+      - SENTRY_IMAGE
   image: sentry-onpremise-local
   depends_on:
     - redis
