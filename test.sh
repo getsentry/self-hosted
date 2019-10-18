@@ -23,7 +23,7 @@ CSRF_TOKEN=$(curl $SENTRY_TEST_HOST -sL -c "$COOKIE_FILE" | awk -F "'" '
       print $4 "=" $6;
       exit;
     }')
-LOGIN_RESPONSE=$(curl -sL -F 'op=login' -F "username=$TEST_USER" -F "password=$TEST_PASS" -F "$CSRF_TOKEN" $SENTRY_TEST_HOST/auth/login/ -H 'Referer: $SENTRY_TEST_HOST/auth/login/' -b "$COOKIE_FILE" -c "$COOKIE_FILE")
+LOGIN_RESPONSE=$(curl -sL -F 'op=login' -F "username=$TEST_USER" -F "password=$TEST_PASS" -F "$CSRF_TOKEN" "$SENTRY_TEST_HOST/auth/login/" -H "Referer: $SENTRY_TEST_HOST/auth/login/" -b "$COOKIE_FILE" -c "$COOKIE_FILE")
 
 TEST_RESULT=0
 for i in "${TEST_STRINGS[@]}"
