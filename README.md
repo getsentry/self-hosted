@@ -29,7 +29,7 @@ If you have any issues or questions, our [Community Forum](https://forum.sentry.
 
 If you'd like to protect your Sentry install with SSL/TLS, there are
 fantastic SSL/TLS proxies like [HAProxy](http://www.haproxy.org/)
-and [Nginx](http://nginx.org/). You'll likely to add this service to your `docker-compose.yml` file.
+and [Nginx](http://nginx.org/). You'll likely want to add this service to your `docker-compose.yml` file.
 
 ## Updating Sentry
 
