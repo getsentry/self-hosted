@@ -37,7 +37,7 @@ Sentry comes with a cleanup cron job that prunes events older than `90 days` by 
 
 If you'd like to protect your Sentry install with SSL/TLS, there are
 fantastic SSL/TLS proxies like [HAProxy](http://www.haproxy.org/)
-and [Nginx](http://nginx.org/). You'll likely to add this service to your `docker-compose.yml` file.
+and [Nginx](http://nginx.org/). You'll likely want to add this service to your `docker-compose.yml` file.
 
 ## Updating Sentry
 
