@@ -24,8 +24,8 @@ DOCKER_VERSION=$(docker version --format '{{.Server.Version}}')
 COMPOSE_VERSION=$(docker-compose --version | sed 's/docker-compose version \(.\{1,\}\),.*/\1/')
 RAM_AVAILABLE_IN_DOCKER=$(docker run --rm busybox free -m 2>/dev/null | awk '/Mem/ {print $2}');
 
-# Function below is inspired by https://stackoverflow.com/a/29394504/90297
-function ver { printf "%03d%03d%03d%03d" $(echo "$1" | sed 's/^0*\([0-9]\+\)\.0*\([0-9]\+\)\.0*\([0-9]\+\).*/\1 \2 \3/' | head -n 3 ); }
+# Compare dot-separated strings - function below is inspired by https://stackoverflow.com/a/37939589/808368
+function ver () { echo "$@" | awk -F. '{ printf("%d%03d%03d", $1,$2,$3); }'; }
 
 if [ $(ver $DOCKER_VERSION) -lt $(ver $MIN_DOCKER_VERSION) ]; then
     echo "FAIL: Expected minimum Docker version to be $MIN_DOCKER_VERSION but found $DOCKER_VERSION"
