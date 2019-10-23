@@ -80,6 +80,8 @@ echo "Secret key written to $SENTRY_CONFIG_YML"
 echo ""
 echo "Building and tagging Docker images..."
 echo ""
+# Build the sentry onpremise image first as it is needed for the cron image
+docker-compose build --force-rm --pull web
 docker-compose build --force-rm
 echo ""
 echo "Docker images built."
