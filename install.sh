@@ -101,7 +101,10 @@ else
 fi
 
 echo "Boostrapping Snuba..."
-docker-compose run --rm snuba-api bootstrap --force || true
+docker-compose up -d kafka redis clickhouse
+until $(docker-compose run --rm clickhouse clickhouse-client -h clickhouse --query="SHOW TABLES;" | grep -q sentry_local); do
+  docker-compose run --rm snuba-api bootstrap --force || true;
+done;
 echo ""
 
 cleanup
