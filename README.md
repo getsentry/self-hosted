@@ -11,13 +11,13 @@ Official bootstrap for running your own [Sentry](https://sentry.io/) with [Docke
 
 ## Minimum Hardware Requirements:
 
- * You need at least 3GB RAM
+ * You need at least 2400MB RAM
 
 ## Setup
 
 To get started with all the defaults, simply clone the repo and run `./install.sh` in your local check-out.
 
-There may need to be modifications to the included `docker-compose.yml` file to accommodate your needs or your environment (such as adding GitHub credentials). If you want to perform these, do them before you run the install script.
+There may need to be modifications to the included example config files (`sentry/config.example.yml` and `sentry/sentry.conf.example.py`) to accommodate your needs or your environment (such as adding GitHub credentials). If you want to perform these, do them before you run the install script and copy them without the `.example` extensions in the name (such as `sentry/sentry.conf.py`) before running the `install.sh` script.
 
 The recommended way to customize your configuration is using the files below, in that order:
 

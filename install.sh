@@ -3,7 +3,7 @@ set -e
 
 MIN_DOCKER_VERSION='17.05.0'
 MIN_COMPOSE_VERSION='1.19.0'
-MIN_RAM=3072 # MB
+MIN_RAM=2400 # MB
 
 SENTRY_CONFIG_PY='sentry/sentry.conf.py'
 SENTRY_CONFIG_YML='sentry/config.yml'
