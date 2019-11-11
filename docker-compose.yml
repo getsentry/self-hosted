@@ -1,67 +1,159 @@
-# NOTE: This docker-compose.yml is meant to be just an example of how
-# you could accomplish this on your own. It is not intended to work in
-# all use-cases and must be adapted to fit your needs. This is merely
-# a guideline.
-
-# See docs.getsentry.com/on-premise/server/ for full
-# instructions
-
 version: '3.4'
-
-x-defaults: &defaults
+x-restart-policy: &restart_policy
   restart: unless-stopped
+x-sentry-defaults: &sentry_defaults
+  << : *restart_policy
   build:
-    context: .
+    context: ./sentry
+    args:
+      - SENTRY_IMAGE
+  image: sentry-onpremise-local
   depends_on:
     - redis
     - postgres
     - memcached
     - smtp
-  env_file: .env
+    - snuba-api
+    - snuba-consumer
+    - snuba-replacer
+    - symbolicator
+    - kafka
   environment:
-    SENTRY_MEMCACHED_HOST: memcached
-    SENTRY_REDIS_HOST: redis
-    SENTRY_POSTGRES_HOST: postgres
-    SENTRY_EMAIL_HOST: smtp
+    SNUBA: 'http://snuba-api:1218'
   volumes:
-    - sentry-data:/var/lib/sentry/files
-
-
+    - 'sentry-data:/var/lib/sentry/files'
+x-snuba-defaults: &snuba_defaults
+  << : *restart_policy
+  depends_on:
+    - redis
+    - clickhouse
+    - kafka
+  image: 'getsentry/snuba:latest'
+  environment:
+    SNUBA_SETTINGS: docker
+    CLICKHOUSE_HOST: clickhouse
+    DEFAULT_BROKERS: 'kafka:9093'
+    REDIS_HOST: redis
+    # TODO: Remove these after getsentry/snuba#353
+    UWSGI_MAX_REQUESTS: '10000'
+    UWSGI_DISABLE_LOGGING: 'true'
+    UWSGI_ENABLE_THREADS: 'true'
+    UWSGI_DIE_ON_TERM: 'true'
+    UWSGI_NEED_APP: 'true'
+    UWSGI_IGNORE_SIGPIPE: 'true'
+    UWSGI_IGNORE_WRITE_ERRORS: 'true'
+    UWSGI_DISABLE_WRITE_EXCEPTION:  'true'
 services:
   smtp:
-    restart: unless-stopped
+    << : *restart_policy
     image: tianon/exim4
-
   memcached:
-    restart: unless-stopped
-    image: memcached:1.5-alpine
-
+    << : *restart_policy
+    image: 'memcached:1.5-alpine'
   redis:
-    restart: unless-stopped
-    image: redis:3.2-alpine
-
-  postgres:
-    restart: unless-stopped
-    image: postgres:9.5
+    << : *restart_policy
+    image: 'redis:5.0-alpine'
     volumes:
-      - sentry-postgres:/var/lib/postgresql/data
-
+      - 'sentry-redis:/data'
+  postgres:
+    << : *restart_policy
+    image: 'postgres:9.6'
+    volumes:
+      - 'sentry-postgres:/var/lib/postgresql/data'
+  zookeeper:
+    << : *restart_policy
+    image: 'confluentinc/cp-zookeeper:5.1.2'
+    environment:
+      ZOOKEEPER_CLIENT_PORT: '2181'
+      ZOOKEEPER_LOG4J_ROOT_LOGLEVEL: 'ERROR'
+      ZOOKEEPER_TOOLS_LOG4J_LOGLEVEL: 'ERROR'
+    volumes:
+      - 'sentry-zookeeper:/var/lib/zookeeper'
+  kafka:
+    << : *restart_policy
+    depends_on:
+      - zookeeper
+    image: 'confluentinc/cp-kafka:5.1.2'
+    environment:
+      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
+      KAFKA_LISTENERS: 'INTERNAL://0.0.0.0:9093,EXTERNAL://0.0.0.0:9092'
+      KAFKA_ADVERTISED_LISTENERS: 'INTERNAL://kafka:9093,EXTERNAL://kafka:9092'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: 'INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT'
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: '1'
+      KAFKA_LOG4J_LOGGERS: 'kafka.cluster=WARN,kafka.controller=WARN,kafka.coordinator=WARN,kafka.log=WARN,kafka.server=WARN,kafka.zookeeper=WARN,state.change.logger=WARN'
+      KAFKA_LOG4J_ROOT_LOGLEVEL: 'ERROR'
+      KAFKA_TOOLS_LOG4J_LOGLEVEL: 'ERROR'
+    volumes:
+      - 'sentry-kafka:/var/lib/kafka'
+  clickhouse:
+    << : *restart_policy
+    image: 'yandex/clickhouse-server:19.4'
+    ulimits:
+      nofile:
+        soft: 262144
+        hard: 262144
+    volumes:
+      - 'sentry-clickhouse:/var/lib/clickhouse'
+  snuba-api:
+    << : *snuba_defaults
+  snuba-consumer:
+    << : *snuba_defaults
+    command: consumer --auto-offset-reset=latest --max-batch-time-ms 750
+  snuba-replacer:
+    << : *snuba_defaults
+    command: replacer --auto-offset-reset=latest --max-batch-size 3
+  snuba-cleanup:
+    << : *snuba_defaults
+    image: snuba-cleanup-onpremise-local
+    build:
+      context: ./cron
+      args:
+        BASE_IMAGE: 'getsentry/snuba:latest'
+    command: '"*/5 * * * * gosu snuba snuba cleanup --dry-run False"'
+  symbolicator:
+    << : *restart_policy
+    image: us.gcr.io/sentryio/symbolicator:latest
+    volumes:
+      - 'sentry-symbolicator:/data'
+    command: run
+  symbolicator-cleanup:
+    image: symbolicator-cleanup-onpremise-local
+    build:
+      context: ./cron
+      args:
+        BASE_IMAGE: 'us.gcr.io/sentryio/symbolicator:latest'
+    command: '"55 23 * * * gosu symbolicator symbolicator cleanup"'
   web:
-    <<: *defaults
+    << : *sentry_defaults
     ports:
-      - '9000:9000'
-
+      - '9000:9000/tcp'
   cron:
-    <<: *defaults
+    << : *sentry_defaults
     command: run cron
-
   worker:
-    <<: *defaults
+    << : *sentry_defaults
     command: run worker
-
-
+  sentry-cleanup:
+    << : *sentry_defaults
+    image: sentry-cleanup-onpremise-local
+    build:
+      context: ./cron
+      args:
+        BASE_IMAGE: 'sentry-onpremise-local'
+    command: '"0 0 * * * gosu sentry sentry cleanup --days $SENTRY_EVENT_RETENTION_DAYS"'
 volumes:
-    sentry-data:
-      external: true
-    sentry-postgres:
-      external: true
+  sentry-data:
+    external: true
+  sentry-postgres:
+    external: true
+  sentry-redis:
+    external: true
+  sentry-zookeeper:
+    external: true
+  sentry-kafka:
+    external: true
+  sentry-clickhouse:
+    external: true
+  sentry-symbolicator:
+    external: true
