@@ -103,7 +103,10 @@ fi
 echo "Boostrapping Snuba..."
 docker-compose up -d kafka redis clickhouse
 until $(docker-compose run --rm clickhouse clickhouse-client -h clickhouse --query="SHOW TABLES;" | grep -q sentry_local); do
+  # `bootstrap` is for fresh installs, and `migrate` is for existing installs
+  # Running them both for both cases is harmless so we blindly run them
   docker-compose run --rm snuba-api bootstrap --force || true;
+  docker-compose run --rm snuba-api migrate || true;
 done;
 echo ""
 
