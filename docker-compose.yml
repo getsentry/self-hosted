@@ -113,7 +113,7 @@ services:
     command: '"*/5 * * * * gosu snuba snuba cleanup --dry-run False"'
   symbolicator:
     << : *restart_policy
-    image: us.gcr.io/sentryio/symbolicator:latest
+    image: 'getsentry/symbolicator:latest'
     volumes:
       - 'sentry-symbolicator:/data'
     command: run
@@ -122,7 +122,7 @@ services:
     build:
       context: ./cron
       args:
-        BASE_IMAGE: 'us.gcr.io/sentryio/symbolicator:latest'
+        BASE_IMAGE: 'getsentry/symbolicator:latest'
     command: '"55 23 * * * gosu symbolicator symbolicator cleanup"'
   web:
     << : *sentry_defaults
