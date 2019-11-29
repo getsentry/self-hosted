@@ -55,6 +55,40 @@ if [ "$RAM_AVAILABLE_IN_DOCKER" -lt "$MIN_RAM" ]; then
     exit -1
 fi
 
+echo ""
+echo "Creating volumes for persistent storage..."
+echo "Created $(docker volume create --name=sentry-data)."
+echo "Created $(docker volume create --name=sentry-postgres)."
+echo "Created $(docker volume create --name=sentry-redis)."
+echo "Created $(docker volume create --name=sentry-zookeeper)."
+echo "Created $(docker volume create --name=sentry-kafka)."
+echo "Created $(docker volume create --name=sentry-clickhouse)."
+echo "Created $(docker volume create --name=sentry-symbolicator)."
+
+# Ensure nothing is working while we install/update
+docker-compose down
+
+echo ""
+ensure_file_from_example $SENTRY_CONFIG_PY
+ensure_file_from_example $SENTRY_CONFIG_YML
+ensure_file_from_example $SENTRY_EXTRA_REQUIREMENTS
+
+echo ""
+echo "Generating secret key..."
+# This is to escape the secret key to be used in sed below
+SECRET_KEY=$(head /dev/urandom | tr -dc "a-z0-9@#%^&*(-_=+)" | head -c 50 | sed -e 's/[\/&]/\\&/g')
+sed -i -e 's/^system.secret-key:.*$/system.secret-key: '"'$SECRET_KEY'"'/' $SENTRY_CONFIG_YML
+echo "Secret key written to $SENTRY_CONFIG_YML"
+
+echo ""
+echo "Building and tagging Docker images..."
+echo ""
+# Build the sentry onpremise image first as it is needed for the cron image
+docker-compose build --force-rm web
+docker-compose build --force-rm
+echo ""
+echo "Docker images built."
+
 # Very naively check whether there's an existing sentry-postgres volume and the PG version in it
 if [[ $(docker volume ls -q --filter name=sentry-postgres) && $(docker run --rm -v sentry-postgres:/db busybox cat /db/PG_VERSION 2>/dev/null) == "9.5" ]]; then
     # If this is Postgres 9.5 data, start upgrading it to 9.6 in a new volume
@@ -74,37 +108,6 @@ if [[ $(docker volume ls -q --filter name=sentry-postgres) && $(docker run --rm 
     # Finally, remove the new old volume as we are all in sentry-postgres now
     docker volume rm sentry-postgres-new
 fi
-
-echo ""
-ensure_file_from_example $SENTRY_CONFIG_PY
-ensure_file_from_example $SENTRY_CONFIG_YML
-ensure_file_from_example $SENTRY_EXTRA_REQUIREMENTS
-
-echo ""
-echo "Creating volumes for persistent storage..."
-echo "Created $(docker volume create --name=sentry-data)."
-echo "Created $(docker volume create --name=sentry-postgres)."
-echo "Created $(docker volume create --name=sentry-redis)."
-echo "Created $(docker volume create --name=sentry-zookeeper)."
-echo "Created $(docker volume create --name=sentry-kafka)."
-echo "Created $(docker volume create --name=sentry-clickhouse)."
-echo "Created $(docker volume create --name=sentry-symbolicator)."
-
-echo ""
-echo "Generating secret key..."
-# This is to escape the secret key to be used in sed below
-SECRET_KEY=$(head /dev/urandom | tr -dc "a-z0-9@#%^&*(-_=+)" | head -c 50 | sed -e 's/[\/&]/\\&/g')
-sed -i -e 's/^system.secret-key:.*$/system.secret-key: '"'$SECRET_KEY'"'/' $SENTRY_CONFIG_YML
-echo "Secret key written to $SENTRY_CONFIG_YML"
-
-echo ""
-echo "Building and tagging Docker images..."
-echo ""
-# Build the sentry onpremise image first as it is needed for the cron image
-docker-compose build --force-rm web
-docker-compose build --force-rm
-echo ""
-echo "Docker images built."
 
 echo ""
 echo "Setting up database..."
@@ -128,6 +131,13 @@ until $(docker-compose run --rm clickhouse clickhouse-client -h clickhouse --que
   docker-compose run --rm snuba-api bootstrap --force || true;
   docker-compose run --rm snuba-api migrate || true;
 done;
+echo ""
+
+set -o allexport
+source .env
+set +o allexport
+echo "Migrating old events for the last $SENTRY_EVENT_RETENTION_DAYS days..."
+docker-compose run --rm web django backfill_eventstream --no-input --last-days $SENTRY_EVENT_RETENTION_DAYS
 echo ""
 
 cleanup
