@@ -32,6 +32,7 @@ x-snuba-defaults: &snuba_defaults
   environment:
     SNUBA_SETTINGS: docker
     CLICKHOUSE_HOST: clickhouse
+    DEFAULT_BROKERS: 'kafka:9092'
     REDIS_HOST: redis
     # TODO: Remove these after getsentry/snuba#353
     UWSGI_MAX_REQUESTS: '10000'
