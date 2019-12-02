@@ -76,10 +76,7 @@ services:
     image: 'confluentinc/cp-kafka:5.1.2'
     environment:
       KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
-      KAFKA_LISTENERS: 'EVERYONE://kafka:9092'
-      KAFKA_ADVERTISED_LISTENERS: 'EVERYONE://kafka:9092'
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: 'EVERYONE:PLAINTEXT'
-      KAFKA_INTER_BROKER_LISTENER_NAME: EVERYONE
+      KAFKA_ADVERTISED_LISTENERS: 'PLAINTEXT://kafka:9092'
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: '1'
       KAFKA_LOG4J_LOGGERS: 'kafka.cluster=WARN,kafka.controller=WARN,kafka.coordinator=WARN,kafka.log=WARN,kafka.server=WARN,kafka.zookeeper=WARN,state.change.logger=WARN'
       KAFKA_LOG4J_ROOT_LOGLEVEL: 'ERROR'
