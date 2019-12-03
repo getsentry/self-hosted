@@ -47,6 +47,9 @@ services:
   smtp:
     << : *restart_policy
     image: tianon/exim4
+    volumes:
+      - 'sentry-smtp:/var/spool/exim4'
+      - 'sentry-smtp-log:/var/log/exim4'
   memcached:
     << : *restart_policy
     image: 'memcached:1.5-alpine'
@@ -69,7 +72,9 @@ services:
       ZOOKEEPER_LOG4J_ROOT_LOGLEVEL: 'WARN'
       ZOOKEEPER_TOOLS_LOG4J_LOGLEVEL: 'WARN'
     volumes:
-      - 'sentry-zookeeper:/var/lib/zookeeper'
+      - 'sentry-zookeeper:/var/lib/zookeeper/data'
+      - 'sentry-zookeeper-log:/var/lib/zookeeper/log'
+      - 'sentry-secrets:/etc/zookeeper/secrets'
   kafka:
     << : *restart_policy
     depends_on:
@@ -84,7 +89,9 @@ services:
       KAFKA_LOG4J_ROOT_LOGLEVEL: 'WARN'
       KAFKA_TOOLS_LOG4J_LOGLEVEL: 'WARN'
     volumes:
-      - 'sentry-kafka:/var/lib/kafka'
+      - 'sentry-kafka:/var/lib/kafka/data'
+      - 'sentry-kafka-log:/var/lib/kafka/log'
+      - 'sentry-secrets:/etc/kafka/secrets'
   clickhouse:
     << : *restart_policy
     image: 'yandex/clickhouse-server:19.4'
@@ -123,6 +130,8 @@ services:
       args:
         BASE_IMAGE: 'getsentry/symbolicator:latest'
     command: '"55 23 * * * gosu symbolicator symbolicator cleanup"'
+    volumes:
+      - 'sentry-symbolicator:/data'
   web:
     << : *sentry_defaults
     ports:
@@ -156,3 +165,8 @@ volumes:
     external: true
   sentry-symbolicator:
     external: true
+  sentry-secrets:
+  sentry-smtp:
+  sentry-zookeeper-log:
+  sentry-kafka-log:
+  sentry-smtp-log:
