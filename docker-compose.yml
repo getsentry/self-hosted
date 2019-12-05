@@ -22,6 +22,8 @@ x-sentry-defaults: &sentry_defaults
     SNUBA: 'http://snuba-api:1218'
   volumes:
     - 'sentry-data:/var/lib/sentry/files'
+  tmpfs:
+    - '/tmp'
 x-snuba-defaults: &snuba_defaults
   << : *restart_policy
   depends_on:
