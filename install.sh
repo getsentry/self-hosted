@@ -16,7 +16,7 @@ cleanup () {
     return 0;
   fi
   echo "Cleaning up..."
-  docker-compose down &> /dev/null
+  docker-compose stop &> /dev/null
   DID_CLEAN_UP=1
 }
 trap cleanup ERR INT TERM
@@ -66,7 +66,7 @@ echo "Created $(docker volume create --name=sentry-clickhouse)."
 echo "Created $(docker volume create --name=sentry-symbolicator)."
 
 # Ensure nothing is working while we install/update
-docker-compose down
+docker-compose stop
 
 echo ""
 ensure_file_from_example $SENTRY_CONFIG_PY
