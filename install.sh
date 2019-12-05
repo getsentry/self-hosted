@@ -130,6 +130,10 @@ until $(docker-compose run --rm clickhouse clickhouse-client -h clickhouse --que
 done;
 echo ""
 
+echo "Migrating file storage..."
+docker run --rm -it -v sentry-data:/data alpine ash -c \
+  "mkdir -p /tmp/files; mv /data/* /tmp/files/; mv /tmp/files /data/files"
+
 cleanup
 
 echo ""
