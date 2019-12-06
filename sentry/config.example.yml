@@ -55,7 +55,9 @@ system.secret-key: '!!changeme!!'
 
 filestore.backend: 'filesystem'
 filestore.options:
-  location: '/var/lib/sentry/files'
+  location: '/data/files'
+dsym.cache-path: '/data/dsym-cache'
+releasefile.cache-path: '/data/releasefile-cache'
 
 # filestore.backend: 's3'
 # filestore.options:

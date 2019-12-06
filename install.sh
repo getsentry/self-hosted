@@ -56,6 +56,11 @@ if [ "$RAM_AVAILABLE_IN_DOCKER" -lt "$MIN_RAM" ]; then
 fi
 
 echo ""
+ensure_file_from_example $SENTRY_CONFIG_PY
+ensure_file_from_example $SENTRY_CONFIG_YML
+ensure_file_from_example $SENTRY_EXTRA_REQUIREMENTS
+
+echo ""
 echo "Creating volumes for persistent storage..."
 echo "Created $(docker volume create --name=sentry-data)."
 echo "Created $(docker volume create --name=sentry-postgres)."
@@ -103,7 +108,7 @@ if [[ $(docker volume ls -q --filter name=sentry-postgres) && $(docker run --rm 
     # There's no rename volume in Docker so copy the contents from old to new name
     # Also append the `host all all all trust` line as `tianon/postgres-upgrade:9.5-to-9.6`
     # doesn't do that automatically.
-    docker run --rm -it -v sentry-postgres-new:/from -v sentry-postgres:/to alpine ash -c \
+    docker run --rm -v sentry-postgres-new:/from -v sentry-postgres:/to alpine ash -c \
      "cd /from ; cp -av . /to ; echo 'host all all all trust' >> /to/pg_hba.conf"
     # Finally, remove the new old volume as we are all in sentry-postgres now
     docker volume rm sentry-postgres-new
@@ -122,6 +127,10 @@ if [ $CI ]; then
 else
   docker-compose run --rm web upgrade
 fi
+
+echo "Migrating file storage..."
+docker run --rm -v sentry-data:/data alpine ash -c \
+  "mkdir -p /tmp/files; mv /data/* /tmp/files/; mv /tmp/files /data/files"
 
 echo "Boostrapping Snuba..."
 docker-compose up -d kafka redis clickhouse
