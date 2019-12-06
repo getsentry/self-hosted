@@ -55,10 +55,8 @@ if [ "$RAM_AVAILABLE_IN_DOCKER" -lt "$MIN_RAM" ]; then
     exit -1
 fi
 
-echo ""
-ensure_file_from_example $SENTRY_CONFIG_PY
-ensure_file_from_example $SENTRY_CONFIG_YML
-ensure_file_from_example $SENTRY_EXTRA_REQUIREMENTS
+# Ensure nothing is working while we install/update
+docker-compose stop
 
 echo ""
 echo "Creating volumes for persistent storage..."
@@ -69,9 +67,6 @@ echo "Created $(docker volume create --name=sentry-zookeeper)."
 echo "Created $(docker volume create --name=sentry-kafka)."
 echo "Created $(docker volume create --name=sentry-clickhouse)."
 echo "Created $(docker volume create --name=sentry-symbolicator)."
-
-# Ensure nothing is working while we install/update
-docker-compose stop
 
 echo ""
 ensure_file_from_example $SENTRY_CONFIG_PY
