@@ -130,9 +130,12 @@ until $(docker-compose run --rm clickhouse clickhouse-client -h clickhouse --que
 done;
 echo ""
 
-echo "Migrating file storage..."
-docker run --rm -v sentry-data:/data alpine ash -c \
-  "mkdir -p /tmp/files; mv /data/* /tmp/files/; mv /tmp/files /data/files"
+SENTRY_DATA_NEEDS_MIGRATION=$(docker run --rm -v sentry-data:/data alpine ash -c "[ ! -d '/data/files' ] && ls -A1x /data | wc -l")
+if [ "$SENTRY_DATA_NEEDS_MIGRATION" ]; then
+  echo "Migrating file storage..."
+  docker run --rm -v sentry-data:/data alpine ash -c \
+    "mkdir -p /tmp/files; mv /data/* /tmp/files/; mv /tmp/files /data/files"
+fi
 
 cleanup
 
