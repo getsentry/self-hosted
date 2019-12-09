@@ -2,7 +2,7 @@
 
 Official bootstrap for running your own [Sentry](https://sentry.io/) with [Docker](https://www.docker.com/).
 
-**NOTE:** If you are not installing Sentry from scratch, visit [On-Premise Stable for Sentry 9.1.2](https://github.com/getsentry/onpremise/tree/stable) as this version is not fully backward compatible.
+**NOTE:** If you are not installing Sentry from scratch, our recommendation is to visit [On-Premise Stable for Sentry 9.1.2](https://github.com/getsentry/onpremise/tree/stable) as this version is may not be fully backward compatible. If you still want to try it out make sure you are on 9.1.2 first, back up your old Docker volumes just in case, and remember that if you haven't set up Redis persistency yourself some of your data (like your stats) may be lost during the upgrade.
 
 ## Requirements
 
