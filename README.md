@@ -41,7 +41,7 @@ and [Nginx](http://nginx.org/). You'll likely want to add this service to your `
 
 ## Updating Sentry
 
-The included `install.sh` script is meant to be idempotent and bringing you to the latest version when possible. What this means is you can run `install.sh` to upgrade to the latest version available.
+The included `install.sh` script is meant to be idempotent and to bring you to the latest version. What this means is you can and should run `install.sh` to upgrade to the latest version available.
 
 ## Resources
 
