@@ -84,6 +84,7 @@ echo ""
 echo "Building and tagging Docker images..."
 echo ""
 # Build the sentry onpremise image first as it is needed for the cron image
+docker-compose pull --ignore-pull-failures
 docker-compose build --force-rm web
 docker-compose build --force-rm
 echo ""
@@ -123,7 +124,7 @@ else
   docker-compose run --rm web upgrade
 fi
 
-SENTRY_DATA_NEEDS_MIGRATION=$(docker run --rm -v sentry-data:/data alpine ash -c "[ ! -d '/data/files' ] && ls -A1x /data | wc -l")
+SENTRY_DATA_NEEDS_MIGRATION=$(docker run --rm -v sentry-data:/data alpine ash -c "[ ! -d '/data/files' ] && ls -A1x /data | wc -l || true")
 if [ "$SENTRY_DATA_NEEDS_MIGRATION" ]; then
   echo "Migrating file storage..."
   docker run --rm -v sentry-data:/data alpine ash -c \

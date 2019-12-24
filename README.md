@@ -41,14 +41,7 @@ and [Nginx](http://nginx.org/). You'll likely want to add this service to your `
 
 ## Updating Sentry
 
-Updating Sentry using Compose is relatively simple. Just use the following steps to update. Make sure that you have the latest version set in your Dockerfile. Or use the latest version of this repository.
-
-Use the following steps after updating this repository or your Dockerfile:
-```sh
-docker-compose build --pull # Build the services again after updating, and make sure we're up to date on patch version
-docker-compose run --rm web upgrade # Run new migrations
-docker-compose up -d # Recreate the services
-```
+The included `install.sh` script is meant to be idempotent and bringing you to the latest version when possible. What this means is you can run `install.sh` to upgrade to the latest version available.
 
 ## Resources
 
