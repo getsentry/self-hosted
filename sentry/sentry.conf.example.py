@@ -178,7 +178,6 @@ SENTRY_WEB_OPTIONS = {
 # Features #
 ############
 
-SENTRY_FEATURES["projects:sample-events"] = False
 SENTRY_FEATURES.update(
     {
         feature: True
@@ -186,22 +185,21 @@ SENTRY_FEATURES.update(
             "organizations:discover",
             "organizations:events",
             "organizations:global-views",
+            "organizations:grouping-info",
+            "organizations:set-grouping-config",
+            "organizations:incidents",
             "organizations:integrations-issue-basic",
             "organizations:integrations-issue-sync",
+            "organizations:integrations-event-hooks",
             "organizations:invite-members",
-            "organizations:new-issue-ui",
-            "organizations:repos",
-            "organizations:require-2fa",
-            "organizations:sentry10",
-            "organizations:sso-basic",
+            "organizations:org-saved-searches",
             "organizations:sso-rippling",
-            "organizations:sso-saml2",
-            "organizations:suggested-commits",
+            "organizations:repos",
+            "projects:similarity-indexing",
+            "projects:similarity-view",
             "projects:custom-inbound-filters",
-            "projects:data-forwarding",
             "projects:discard-groups",
             "projects:plugins",
-            "projects:rate-limits",
             "projects:servicehooks",
         )
     }
