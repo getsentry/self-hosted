@@ -25,7 +25,7 @@ The recommended way to customize your configuration is using the files below, in
  * `sentry.conf.py`
  * `.env` w/ environment variables
 
-We currently support a very minimal set of environment variables to promote other means of configuration.
+We currently support a very minimal set of environment variables to promote other means of configuration. To configure the port on which the Sentry web-interface is available you can change the `SENTRY_WEB_PORT` environment variable.
 
 If you have any issues or questions, our [Community Forum](https://forum.sentry.io/c/on-premise) is at your service!
 

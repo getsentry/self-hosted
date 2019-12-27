@@ -135,7 +135,7 @@ services:
   web:
     << : *sentry_defaults
     ports:
-      - '9000:9000/tcp'
+      - '${SENTRY_WEB_PORT:-9000}:9000/tcp'
   cron:
     << : *sentry_defaults
     command: run cron
