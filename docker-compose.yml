@@ -142,6 +142,9 @@ services:
   worker:
     << : *sentry_defaults
     command: run worker
+  post-process-forwarder:
+    << : *sentry_defaults
+    command: run post-process-forwarder --commit-batch-size 3
   sentry-cleanup:
     << : *sentry_defaults
     image: sentry-cleanup-onpremise-local
