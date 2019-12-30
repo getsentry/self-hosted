@@ -55,8 +55,8 @@ if [ "$RAM_AVAILABLE_IN_DOCKER" -lt "$MIN_RAM" ]; then
     exit -1
 fi
 
-# Ensure nothing is working while we install/update
-docker-compose stop
+# Clean up old stuff and ensure nothing is working while we install/update
+docker-compose down --rmi local --remove-orphans
 
 echo ""
 echo "Creating volumes for persistent storage..."
@@ -84,6 +84,8 @@ echo ""
 echo "Building and tagging Docker images..."
 echo ""
 # Build the sentry onpremise image first as it is needed for the cron image
+docker-compose pull --ignore-pull-failures
+docker pull ${SENTRY_IMAGE:-getsentry/sentry:latest}
 docker-compose build --force-rm web
 docker-compose build --force-rm
 echo ""
@@ -91,6 +93,7 @@ echo "Docker images built."
 
 # Very naively check whether there's an existing sentry-postgres volume and the PG version in it
 if [[ $(docker volume ls -q --filter name=sentry-postgres) && $(docker run --rm -v sentry-postgres:/db busybox cat /db/PG_VERSION 2>/dev/null) == "9.5" ]]; then
+    docker volume rm sentry-postgres-new || true
     # If this is Postgres 9.5 data, start upgrading it to 9.6 in a new volume
     docker run --rm \
     -v sentry-postgres:/var/lib/postgresql/9.5/data \
@@ -123,10 +126,11 @@ else
   docker-compose run --rm web upgrade
 fi
 
-SENTRY_DATA_NEEDS_MIGRATION=$(docker run --rm -v sentry-data:/data alpine ash -c "[ ! -d '/data/files' ] && ls -A1x /data | wc -l")
+SENTRY_DATA_NEEDS_MIGRATION=$(docker run --rm -v sentry-data:/data alpine ash -c "[ ! -d '/data/files' ] && ls -A1x /data | wc -l || true")
 if [ "$SENTRY_DATA_NEEDS_MIGRATION" ]; then
   echo "Migrating file storage..."
-  docker run --rm -v sentry-data:/data alpine ash -c \
+  # Use the web (Sentry) image so the file owners are kept as sentry:sentry
+  docker-compose run --rm --entrypoint /bin/bash web -c \
     "mkdir -p /tmp/files; mv /data/* /tmp/files/; mv /tmp/files /data/files"
 fi
 
