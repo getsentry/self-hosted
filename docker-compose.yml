@@ -144,7 +144,8 @@ services:
     command: run worker
   post-process-forwarder:
     << : *sentry_defaults
-    command: run post-process-forwarder --commit-batch-size 3
+    # Increase `--commit-batch-size 1` below to deal with high-load environments.
+    command: run post-process-forwarder --commit-batch-size 1
   sentry-cleanup:
     << : *sentry_defaults
     image: sentry-cleanup-onpremise-local
