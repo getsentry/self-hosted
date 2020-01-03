@@ -27,7 +27,7 @@ The recommended way to customize your configuration is using the files below, in
 
 We currently support a very minimal set of environment variables to promote other means of configuration.
 
-If you have any issues or questions, our [Community Forum](https://forum.sentry.io/c/on-premise) is at your service!
+If you have any issues or questions, our [Community Forum](https://forum.sentry.io/c/on-premise) is at your service! Everytime you run the install script, it will generate a log file, `sentry_install_log-<ISO_TIMESTAMP>.txt` with the output. Sharing these logs would help people diagnose any issues you might be having.
 
 ## Event Retention
 
@@ -41,7 +41,7 @@ and [Nginx](http://nginx.org/). You'll likely want to add this service to your `
 
 ## Updating Sentry
 
-The included `install.sh` script is meant to be idempotent and to bring you to the latest version. What this means is you can and should run `install.sh` to upgrade to the latest version available.
+The included `install.sh` script is meant to be idempotent and to bring you to the latest version. What this means is you can and should run `install.sh` to upgrade to the latest version available. Remember that the output of the script will be stored in a log file, `sentry_install_log-<ISO_TIMESTAMP>.txt`, which you may share for diagnosis if anything goes wrong.
 
 ## Resources
 
