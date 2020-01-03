@@ -51,7 +51,7 @@ services:
   web:
     <<: *defaults
     ports:
-      - '9000:9000'
+      - '${SENTRY_WEB_EXPOSED_PORT:-9000}:9000'
 
   cron:
     <<: *defaults
