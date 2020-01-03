@@ -101,7 +101,7 @@ $dc build --force-rm
 echo ""
 echo "Docker images built."
 
-echo "Boostrapping Snuba..."
+echo "Bootstrapping Snuba..."
 $dc up -d kafka redis clickhouse
 until $($dcr clickhouse clickhouse-client -h clickhouse --query="SHOW TABLES;" | grep -q sentry_local); do
   # `bootstrap` is for fresh installs, and `migrate` is for existing installs
