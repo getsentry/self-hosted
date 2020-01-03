@@ -101,6 +101,16 @@ $dc build --force-rm
 echo ""
 echo "Docker images built."
 
+echo "Boostrapping Snuba..."
+$dc up -d kafka redis clickhouse
+until $($dcr clickhouse clickhouse-client -h clickhouse --query="SHOW TABLES;" | grep -q sentry_local); do
+  # `bootstrap` is for fresh installs, and `migrate` is for existing installs
+  # Running them both for both cases is harmless so we blindly run them
+  $dcr snuba-api bootstrap --force || true;
+  $dcr snuba-api migrate || true;
+done;
+echo ""
+
 # Very naively check whether there's an existing sentry-postgres volume and the PG version in it
 if [[ $(docker volume ls -q --filter name=sentry-postgres) && $(docker run --rm -v sentry-postgres:/db busybox cat /db/PG_VERSION 2>/dev/null) == "9.5" ]]; then
     docker volume rm sentry-postgres-new || true
@@ -144,16 +154,6 @@ if [ "$SENTRY_DATA_NEEDS_MIGRATION" ]; then
   $dcr --entrypoint /bin/bash web -c \
     "mkdir -p /tmp/files; mv /data/* /tmp/files/; mv /tmp/files /data/files"
 fi
-
-echo "Boostrapping Snuba..."
-$dc up -d kafka redis clickhouse
-until $($dcr clickhouse clickhouse-client -h clickhouse --query="SHOW TABLES;" | grep -q sentry_local); do
-  # `bootstrap` is for fresh installs, and `migrate` is for existing installs
-  # Running them both for both cases is harmless so we blindly run them
-  $dcr snuba-api bootstrap --force || true;
-  $dcr snuba-api migrate || true;
-done;
-echo ""
 
 set -o allexport
 source .env
