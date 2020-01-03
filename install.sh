@@ -155,13 +155,6 @@ if [ "$SENTRY_DATA_NEEDS_MIGRATION" ]; then
     "mkdir -p /tmp/files; mv /data/* /tmp/files/; mv /tmp/files /data/files"
 fi
 
-set -o allexport
-source .env
-set +o allexport
-echo "Migrating old events for the last $SENTRY_EVENT_RETENTION_DAYS days..."
-$dcr web django backfill_eventstream --no-input --last-days $SENTRY_EVENT_RETENTION_DAYS
-echo ""
-
 cleanup
 
 echo ""
