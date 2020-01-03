@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 set -e
 
+dc="docker-compose --no-ansi"
+dcr="$dc run --rm"
+
 # Thanks to https://unix.stackexchange.com/a/145654/108960
 log_file="sentry_install_log-`date +'%Y-%m-%d_%H-%M-%S'`.txt"
 exec &> >(tee -a "$log_file")
@@ -20,7 +23,7 @@ cleanup () {
     return 0;
   fi
   echo "Cleaning up..."
-  docker-compose stop &> /dev/null
+  $dc stop &> /dev/null
   DID_CLEAN_UP=1
 }
 trap cleanup ERR INT TERM
@@ -28,7 +31,7 @@ trap cleanup ERR INT TERM
 echo "Checking minimum requirements..."
 
 DOCKER_VERSION=$(docker version --format '{{.Server.Version}}')
-COMPOSE_VERSION=$(docker-compose --version | sed 's/docker-compose version \(.\{1,\}\),.*/\1/')
+COMPOSE_VERSION=$($dc --version | sed 's/docker-compose version \(.\{1,\}\),.*/\1/')
 RAM_AVAILABLE_IN_DOCKER=$(docker run --rm busybox free -m 2>/dev/null | awk '/Mem/ {print $2}');
 
 # Compare dot-separated strings - function below is inspired by https://stackoverflow.com/a/37939589/808368
@@ -60,7 +63,10 @@ if [ "$RAM_AVAILABLE_IN_DOCKER" -lt "$MIN_RAM" ]; then
 fi
 
 # Clean up old stuff and ensure nothing is working while we install/update
-docker-compose down --rmi local --remove-orphans
+# This is for older versions of on-premise:
+$dc -p onpremise down --rmi local --remove-orphans
+# This is for newer versions
+$dc down --rmi local --remove-orphans
 
 echo ""
 echo "Creating volumes for persistent storage..."
@@ -88,10 +94,10 @@ echo ""
 echo "Building and tagging Docker images..."
 echo ""
 # Build the sentry onpremise image first as it is needed for the cron image
-docker-compose pull --ignore-pull-failures
+$dc pull --ignore-pull-failures
 docker pull ${SENTRY_IMAGE:-getsentry/sentry:latest}
-docker-compose build --force-rm web
-docker-compose build --force-rm
+$dc build --force-rm web
+$dc build --force-rm
 echo ""
 echo "Docker images built."
 
@@ -119,7 +125,7 @@ fi
 echo ""
 echo "Setting up database..."
 if [ $CI ]; then
-  docker-compose run --rm web upgrade --noinput
+  $dcr web upgrade --noinput
   echo ""
   echo "Did not prompt for user creation due to non-interactive shell."
   echo "Run the following command to create one yourself (recommended):"
@@ -127,24 +133,25 @@ if [ $CI ]; then
   echo "  docker-compose run --rm web createuser"
   echo ""
 else
-  docker-compose run --rm web upgrade
+  $dcr web upgrade
 fi
+
 
 SENTRY_DATA_NEEDS_MIGRATION=$(docker run --rm -v sentry-data:/data alpine ash -c "[ ! -d '/data/files' ] && ls -A1x /data | wc -l || true")
 if [ "$SENTRY_DATA_NEEDS_MIGRATION" ]; then
   echo "Migrating file storage..."
   # Use the web (Sentry) image so the file owners are kept as sentry:sentry
-  docker-compose run --rm --entrypoint /bin/bash web -c \
+  $dcr --entrypoint /bin/bash web -c \
     "mkdir -p /tmp/files; mv /data/* /tmp/files/; mv /tmp/files /data/files"
 fi
 
 echo "Boostrapping Snuba..."
-docker-compose up -d kafka redis clickhouse
-until $(docker-compose run --rm clickhouse clickhouse-client -h clickhouse --query="SHOW TABLES;" | grep -q sentry_local); do
+$dc up -d kafka redis clickhouse
+until $($dcr clickhouse clickhouse-client -h clickhouse --query="SHOW TABLES;" | grep -q sentry_local); do
   # `bootstrap` is for fresh installs, and `migrate` is for existing installs
   # Running them both for both cases is harmless so we blindly run them
-  docker-compose run --rm snuba-api bootstrap --force || true;
-  docker-compose run --rm snuba-api migrate || true;
+  $dcr snuba-api bootstrap --force || true;
+  $dcr snuba-api migrate || true;
 done;
 echo ""
 
@@ -152,7 +159,7 @@ set -o allexport
 source .env
 set +o allexport
 echo "Migrating old events for the last $SENTRY_EVENT_RETENTION_DAYS days..."
-docker-compose run --rm web django backfill_eventstream --no-input --last-days $SENTRY_EVENT_RETENTION_DAYS
+$dcr web django backfill_eventstream --no-input --last-days $SENTRY_EVENT_RETENTION_DAYS
 echo ""
 
 cleanup
