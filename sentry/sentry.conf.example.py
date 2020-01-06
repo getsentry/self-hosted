@@ -134,7 +134,7 @@ SENTRY_TSDB = "sentry.tsdb.redissnuba.RedisSnubaTSDB"
 # SNUBA #
 #########
 
-SENTRY_SEARCH = "sentry.search.snuba.SnubaSearchBackend"
+SENTRY_SEARCH = "sentry.search.snuba.EventsDatasetSnubaSearchBackend"
 SENTRY_SEARCH_OPTIONS = {}
 SENTRY_TAGSTORE_OPTIONS = {}
 
