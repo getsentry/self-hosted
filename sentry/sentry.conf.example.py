@@ -209,13 +209,24 @@ SENTRY_FEATURES.update(
     }
 )
 
+# Hacky stuff
+class SentryOptionsMapper(object):
+    def __init__(self, option_name):
+        self._option_name = option_name
+
+    def __get__(self, instance, owner):
+        if not hasattr(self, '_option_val'):
+            from django.conf import settings
+            self._option_val = settings.SENTRY_OPTIONS.get(self._option_name)
+        return self._option_val
+
 ######################
 # GitHub Integration #
-#####################
+######################
 
-# GITHUB_APP_ID = 'YOUR_GITHUB_APP_ID'
-# GITHUB_API_SECRET = 'YOUR_GITHUB_API_SECRET'
-# GITHUB_EXTENDED_PERMISSIONS = ['repo']
+GITHUB_APP_ID = SentryOptionsMapper('github-app.client-id')
+GITHUB_API_SECRET = SentryOptionsMapper('github-app.client-secret')
+GITHUB_EXTENDED_PERMISSIONS = ['repo']
 
 #########################
 # Bitbucket Integration #
