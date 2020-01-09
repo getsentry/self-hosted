@@ -151,7 +151,8 @@ SENTRY_DATA_NEEDS_MIGRATION=$(docker run --rm -v sentry-data:/data alpine ash -c
 if [ "$SENTRY_DATA_NEEDS_MIGRATION" ]; then
   echo "Migrating file storage..."
   # Use the web (Sentry) image so the file owners are kept as sentry:sentry
-  $dcr --entrypoint /bin/bash web -c \
+  # The `\"` escape pattern is to make this compatible w/ Git Bash on Windows. See #329.
+  $dcr --entrypoint \"/bin/bash\" web -c \
     "mkdir -p /tmp/files; mv /data/* /tmp/files/; mv /tmp/files /data/files"
 fi
 
