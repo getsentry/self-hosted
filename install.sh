@@ -99,7 +99,7 @@ echo ""
 $dc pull --ignore-pull-failures
 docker pull ${SENTRY_IMAGE:-getsentry/sentry:latest}
 $dc build --force-rm web
-$dc build --force-rm
+$dc build --force-rm --parallel
 echo ""
 echo "Docker images built."
 
