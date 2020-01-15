@@ -99,7 +99,7 @@ echo ""
 $dc pull --ignore-pull-failures
 docker pull ${SENTRY_IMAGE:-getsentry/sentry:latest}
 $dc build --force-rm web
-$dc build --force-rm
+$dc build --force-rm --parallel
 echo ""
 echo "Docker images built."
 
@@ -155,7 +155,7 @@ if [ "$SENTRY_DATA_NEEDS_MIGRATION" ]; then
   # Use the web (Sentry) image so the file owners are kept as sentry:sentry
   # The `\"` escape pattern is to make this compatible w/ Git Bash on Windows. See #329.
   $dcr --entrypoint \"/bin/bash\" web -c \
-    "mkdir -p /tmp/files; mv /data/* /tmp/files/; mv /tmp/files /data/files"
+    "mkdir -p /tmp/files; mv /data/* /tmp/files/; mv /tmp/files /data/files; chown -R sentry:sentry /data"
 fi
 
 cleanup
