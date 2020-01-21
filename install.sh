@@ -104,13 +104,10 @@ echo ""
 echo "Docker images built."
 
 echo "Bootstrapping Snuba..."
-$dc up -d kafka redis clickhouse
-until $($dcr clickhouse clickhouse-client -h clickhouse --query="SHOW TABLES;" | grep -q sentry_local); do
-  # `bootstrap` is for fresh installs, and `migrate` is for existing installs
-  # Running them both for both cases is harmless so we blindly run them
-  $dcr snuba-api bootstrap --force || true;
-  $dcr snuba-api migrate || true;
-done;
+# `bootstrap` is for fresh installs, and `migrate` is for existing installs
+# Running them both for both cases is harmless so we blindly run them
+$dcr snuba-api bootstrap --force
+$dcr snuba-api migrate
 echo ""
 
 # Very naively check whether there's an existing sentry-postgres volume and the PG version in it
