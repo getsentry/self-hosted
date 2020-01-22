@@ -62,6 +62,13 @@ if [ "$RAM_AVAILABLE_IN_DOCKER" -lt "$MIN_RAM" ]; then
     exit -1
 fi
 
+#SSE4.2 required by Clickhouse (https://clickhouse.yandex/docs/en/operations/requirements/) 
+SSE_42_COMPAT="$(grep -c "sse4_2" /proc/cpuinfo)"
+if (($SSE_42_COMPAT == 0)); then
+    echo "FAIL: The CPU your machine is running on does not handle SSE 4.2 instructions, and thus cannot use Sentry 10"
+    exit -1
+fi
+
 # Clean up old stuff and ensure nothing is working while we install/update
 # This is for older versions of on-premise:
 $dc -p onpremise down --rmi local --remove-orphans
