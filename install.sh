@@ -9,7 +9,7 @@ log_file="sentry_install_log-`date +'%Y-%m-%d_%H-%M-%S'`.txt"
 exec &> >(tee -a "$log_file")
 
 MIN_DOCKER_VERSION='17.05.0'
-MIN_COMPOSE_VERSION='1.19.0'
+MIN_COMPOSE_VERSION='1.23.0'
 MIN_RAM=2400 # MB
 
 SENTRY_CONFIG_PY='sentry/sentry.conf.py'
@@ -104,13 +104,10 @@ echo ""
 echo "Docker images built."
 
 echo "Bootstrapping Snuba..."
-$dc up -d kafka redis clickhouse
-until $($dcr clickhouse clickhouse-client -h clickhouse --query="SHOW TABLES;" | grep -q sentry_local); do
-  # `bootstrap` is for fresh installs, and `migrate` is for existing installs
-  # Running them both for both cases is harmless so we blindly run them
-  $dcr snuba-api bootstrap --force || true;
-  $dcr snuba-api migrate || true;
-done;
+# `bootstrap` is for fresh installs, and `migrate` is for existing installs
+# Running them both for both cases is harmless so we blindly run them
+$dcr snuba-api bootstrap --force
+$dcr snuba-api migrate
 echo ""
 
 # Very naively check whether there's an existing sentry-postgres volume and the PG version in it
