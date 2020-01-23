@@ -43,10 +43,10 @@ The included `install.sh` script is meant to be idempotent and to bring you to t
 
 ## Resources
 
- * [Documentation](https://docs.sentry.io/server/installation/docker/)
+ * [Documentation](https://docs.sentry.io/server/)
  * [Bug Tracker](https://github.com/getsentry/onpremise/issues)
  * [Forums](https://forum.sentry.io/c/on-premise)
- * [IRC](irc://chat.freenode.net/sentry) (chat.freenode.net, #sentry)
+ * [Discord](https://discord.gg/mg5V76F) (Sentry Community, #sentry-server)
 
 
 [build-status-image]: https://api.travis-ci.com/getsentry/onpremise.svg?branch=master

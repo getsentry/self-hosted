@@ -9,7 +9,7 @@ log_file="sentry_install_log-`date +'%Y-%m-%d_%H-%M-%S'`.txt"
 exec &> >(tee -a "$log_file")
 
 MIN_DOCKER_VERSION='17.05.0'
-MIN_COMPOSE_VERSION='1.19.0'
+MIN_COMPOSE_VERSION='1.23.0'
 MIN_RAM=2400 # MB
 
 SENTRY_CONFIG_PY='sentry/sentry.conf.py'
@@ -86,7 +86,9 @@ ensure_file_from_example $SENTRY_EXTRA_REQUIREMENTS
 echo ""
 echo "Generating secret key..."
 # This is to escape the secret key to be used in sed below
-SECRET_KEY=$(head /dev/urandom | tr -dc "a-z0-9@#%^&*(-_=+)" | head -c 50 | sed -e 's/[\/&]/\\&/g')
+# Note the need to set LC_ALL=C due to BSD tr and sed always trying to decode
+# whatever is passed to them. Kudos to https://stackoverflow.com/a/23584470/90297
+SECRET_KEY=$(export LC_ALL=C; head /dev/urandom | tr -dc "a-z0-9@#%^&*(-_=+)" | head -c 50 | sed -e 's/[\/&]/\\&/g')
 sed -i -e 's/^system.secret-key:.*$/system.secret-key: '"'$SECRET_KEY'"'/' $SENTRY_CONFIG_YML
 echo "Secret key written to $SENTRY_CONFIG_YML"
 
@@ -97,18 +99,15 @@ echo ""
 $dc pull --ignore-pull-failures
 docker pull ${SENTRY_IMAGE:-getsentry/sentry:latest}
 $dc build --force-rm web
-$dc build --force-rm
+$dc build --force-rm --parallel
 echo ""
 echo "Docker images built."
 
 echo "Bootstrapping Snuba..."
-$dc up -d kafka redis clickhouse
-until $($dcr clickhouse clickhouse-client -h clickhouse --query="SHOW TABLES;" | grep -q sentry_local); do
-  # `bootstrap` is for fresh installs, and `migrate` is for existing installs
-  # Running them both for both cases is harmless so we blindly run them
-  $dcr snuba-api bootstrap --force || true;
-  $dcr snuba-api migrate || true;
-done;
+# `bootstrap` is for fresh installs, and `migrate` is for existing installs
+# Running them both for both cases is harmless so we blindly run them
+$dcr snuba-api bootstrap --force
+$dcr snuba-api migrate
 echo ""
 
 # Very naively check whether there's an existing sentry-postgres volume and the PG version in it
@@ -151,8 +150,9 @@ SENTRY_DATA_NEEDS_MIGRATION=$(docker run --rm -v sentry-data:/data alpine ash -c
 if [ "$SENTRY_DATA_NEEDS_MIGRATION" ]; then
   echo "Migrating file storage..."
   # Use the web (Sentry) image so the file owners are kept as sentry:sentry
-  $dcr --entrypoint /bin/bash web -c \
-    "mkdir -p /tmp/files; mv /data/* /tmp/files/; mv /tmp/files /data/files"
+  # The `\"` escape pattern is to make this compatible w/ Git Bash on Windows. See #329.
+  $dcr --entrypoint \"/bin/bash\" web -c \
+    "mkdir -p /tmp/files; mv /data/* /tmp/files/; mv /tmp/files /data/files; chown -R sentry:sentry /data"
 fi
 
 cleanup
