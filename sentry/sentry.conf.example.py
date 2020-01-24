@@ -211,11 +211,9 @@ SENTRY_FEATURES.update(
 
 ######################
 # GitHub Integration #
-#####################
+######################
 
-# GITHUB_APP_ID = 'YOUR_GITHUB_APP_ID'
-# GITHUB_API_SECRET = 'YOUR_GITHUB_API_SECRET'
-# GITHUB_EXTENDED_PERMISSIONS = ['repo']
+GITHUB_EXTENDED_PERMISSIONS = ['repo']
 
 #########################
 # Bitbucket Integration #
