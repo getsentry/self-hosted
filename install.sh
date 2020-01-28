@@ -65,7 +65,7 @@ fi
 #SSE4.2 required by Clickhouse (https://clickhouse.yandex/docs/en/operations/requirements/) 
 SSE_42_COMPAT="$(grep -c "sse4_2" /proc/cpuinfo)"
 if (($SSE_42_COMPAT == 0)); then
-    echo "FAIL: The CPU your machine is running on does not handle SSE 4.2 instructions, and thus cannot use Sentry 10"
+    echo "FAIL: The CPU your machine is running on does not support the SSE 4.2 instruction set, which is required for one of the services Sentry uses (Clickhouse). See https://git.io/JvLDt for more info."
     exit -1
 fi
 
