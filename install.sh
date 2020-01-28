@@ -63,8 +63,8 @@ if [ "$RAM_AVAILABLE_IN_DOCKER" -lt "$MIN_RAM" ]; then
 fi
 
 #SSE4.2 required by Clickhouse (https://clickhouse.yandex/docs/en/operations/requirements/) 
-SSE_42_COMPAT="$(grep -c "sse4_2" /proc/cpuinfo)"
-if (($SSE_42_COMPAT == 0)); then
+SUPPORTS_SSE42=$(docker run --rm busybox grep -c sse4_2 /proc/cpuinfo);
+if (($SUPPORTS_SSE42 == 0)); then
     echo "FAIL: The CPU your machine is running on does not support the SSE 4.2 instruction set, which is required for one of the services Sentry uses (Clickhouse). See https://git.io/JvLDt for more info."
     exit -1
 fi
