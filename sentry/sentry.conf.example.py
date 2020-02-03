@@ -158,6 +158,7 @@ SENTRY_WEB_OPTIONS = {
     # This is needed to prevent https://git.io/fj7Lw
     "uwsgi-socket": None,
     "http-keepalive": True,
+    "http-chunked-input": True,
     "memory-report": False,
     # 'workers': 3,  # the number of web workers
 }
