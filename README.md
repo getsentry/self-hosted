@@ -29,10 +29,16 @@ If you have any issues or questions, our [Community Forum](https://forum.sentry.
 
 ## Versioning
 
-We continously push the Docker image for each commit made into [Sentry](https://github.com/getsentry/sentry), and other services such as [Snuba](https://github.com/getsentry/snuba) or [Symbolicator](https://github.com/getsentry/symbolicator) to [our Docker Hub](https://hub.docker.com/u/getsentry) and tag the latest version on master as `:lastest`. This is also usually what we have on sentry.io and what the install script uses. You can use a custom Sentry image, such as a modified version that you have built on your own, or simply a specific commit (or pull request) by setting the `SENTRY_IMAGE` environment variable to that image name before running `./install.sh`:
+We continously push the Docker image for each commit made into [Sentry](https://github.com/getsentry/sentry), and other services such as [Snuba](https://github.com/getsentry/snuba) or [Symbolicator](https://github.com/getsentry/symbolicator) to [our Docker Hub](https://hub.docker.com/u/getsentry) and tag the latest version on master as `:lastest`. This is also usually what we have on sentry.io and what the install script uses. You can use a custom Sentry image, such as a modified version that you have built on your own, or simply a specific commit hash by setting the `SENTRY_IMAGE` environment variable to that image name before running `./install.sh`:
 
 ```shell
 SENTRY_IMAGE=getsentry/sentry:10 ./install.sh
+```
+
+or
+
+```shell
+SENTRY_IMAGE=getsentry/sentry:83b1380 ./install.sh
 ```
 
 If you want to use different or specific images for other services, you may create a `docker-compose.overrides.yaml` file in the repo and override the `image` field for the corresponding services.
