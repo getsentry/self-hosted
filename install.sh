@@ -90,8 +90,8 @@ ensure_file_from_example $SENTRY_CONFIG_PY
 ensure_file_from_example $SENTRY_CONFIG_YML
 ensure_file_from_example $SENTRY_EXTRA_REQUIREMENTS
 
-echo ""
 if grep -xq "system.secret-key: '!!changeme!!'" $SENTRY_CONFIG_YML ; then
+    echo ""
     echo "Generating secret key..."
     # This is to escape the secret key to be used in sed below
     # Note the need to set LC_ALL=C due to BSD tr and sed always trying to decode
