@@ -19,9 +19,11 @@ x-sentry-defaults: &sentry_defaults
     - symbolicator
     - kafka
   environment:
+    SENTRY_CONF: '/etc/sentry'
     SNUBA: 'http://snuba-api:1218'
   volumes:
     - 'sentry-data:/data'
+    - './sentry:/etc/sentry'
 x-snuba-defaults: &snuba_defaults
   << : *restart_policy
   depends_on:
