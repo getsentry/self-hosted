@@ -35,6 +35,7 @@ x-snuba-defaults: &snuba_defaults
     DEFAULT_BROKERS: 'kafka:9092'
     REDIS_HOST: redis
     UWSGI_MAX_REQUESTS: '10000'
+    UWSGI_DISABLE_LOGGING: 'true'
 services:
   smtp:
     << : *restart_policy
