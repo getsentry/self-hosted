@@ -126,6 +126,7 @@ services:
       - 'sentry-symbolicator:/data'
     command: run
   symbolicator-cleanup:
+    << : *restart_policy
     image: symbolicator-cleanup-onpremise-local
     build:
       context: ./cron
