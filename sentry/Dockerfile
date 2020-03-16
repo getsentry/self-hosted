@@ -4,4 +4,4 @@ FROM ${SENTRY_IMAGE:-getsentry/sentry:latest}
 COPY . /usr/src/sentry
 
 # Hook for installing additional plugins
-RUN if [ -s requirements.txt ]; then pip install -r requirements.txt; fi
+RUN if [ -s /usr/src/sentry/requirements.txt ]; then pip install -r /usr/src/sentry/requirements.txt; fi
