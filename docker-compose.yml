@@ -98,6 +98,7 @@ services:
         hard: 262144
     volumes:
       - 'sentry-clickhouse:/var/lib/clickhouse'
+      - 'sentry-clickhouse-log:/var/log/clickhouse-server'
   snuba-api:
     << : *snuba_defaults
   snuba-consumer:
@@ -172,3 +173,4 @@ volumes:
   sentry-zookeeper-log:
   sentry-kafka-log:
   sentry-smtp-log:
+  sentry-clickhouse-log:
