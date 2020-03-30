@@ -99,6 +99,8 @@ services:
     volumes:
       - 'sentry-clickhouse:/var/lib/clickhouse'
       - 'sentry-clickhouse-log:/var/log/clickhouse-server'
+      - type: tmpfs
+        target: '/var/lib/clickhouse/tmp'
   snuba-api:
     << : *snuba_defaults
   snuba-consumer:
