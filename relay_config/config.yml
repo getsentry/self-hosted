@@ -1,0 +1,16 @@
+---
+relay:
+  upstream: "http://web:9000/"
+  host: 0.0.0.0
+  port: 3000
+logging:
+  level: TRACE
+  enable_backtraces: false
+processing:
+  enabled: true
+  kafka_config:
+    # Original kafka configuration was 9093 but it seems that the
+    # compose configures kafka to listen at 9092 ?
+    # - {name: "bootstrap.servers", value: "kafka:9093"}
+    - {name: "bootstrap.servers", value: "kafka:9092"}
+  redis: redis://redis:6379
