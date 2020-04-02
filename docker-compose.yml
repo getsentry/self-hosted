@@ -14,7 +14,8 @@ x-sentry-defaults: &sentry_defaults
     - memcached
     - smtp
     - snuba-api
-    - snuba-consumer
+    - snuba-events-consumer
+    - snuba-outcomes-consumer
     - snuba-replacer
     - symbolicator
     - kafka
