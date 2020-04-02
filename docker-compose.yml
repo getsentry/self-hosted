@@ -101,9 +101,12 @@ services:
       - 'sentry-clickhouse-log:/var/log/clickhouse-server'
   snuba-api:
     << : *snuba_defaults
-  snuba-consumer:
+  snuba-events-consumer:
     << : *snuba_defaults
-    command: consumer --auto-offset-reset=latest --max-batch-time-ms 750
+    command: consumer --dataset events --auto-offset-reset=latest --max-batch-time-ms 750
+  snuba-outcomes-consumer:
+    << : *snuba_defaults
+    command: consumer --dataset outcomes --auto-offset-reset=latest --max-batch-time-ms 750
   snuba-replacer:
     << : *snuba_defaults
     command: replacer --auto-offset-reset=latest --max-batch-size 3
