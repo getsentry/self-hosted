@@ -14,7 +14,7 @@ x-sentry-defaults: &sentry_defaults
     - memcached
     - smtp
     - snuba-api
-    - snuba-events-consumer
+    - snuba-consumer
     - snuba-outcomes-consumer
     - snuba-replacer
     - symbolicator
@@ -102,9 +102,11 @@ services:
       - 'sentry-clickhouse-log:/var/log/clickhouse-server'
   snuba-api:
     << : *snuba_defaults
-  snuba-events-consumer:
+  # Kafka consumer responsible for feeding events into Clickhouse
+  snuba-consumer:
     << : *snuba_defaults
     command: consumer --dataset events --auto-offset-reset=latest --max-batch-time-ms 750
+  # Kafka consumer responsible for feeding outcomes into Clickhouse
   snuba-outcomes-consumer:
     << : *snuba_defaults
     command: consumer --dataset outcomes --auto-offset-reset=latest --max-batch-time-ms 750
