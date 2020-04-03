@@ -153,21 +153,20 @@ services:
       args:
         BASE_IMAGE: 'sentry-onpremise-local'
     command: '"0 0 * * * gosu sentry sentry cleanup --days $SENTRY_EVENT_RETENTION_DAYS"'
-  reverse_proxy:
+  nginx:
     ports:
       - '9000:80/tcp'
     image: "nginx:1.16.1"
     volumes:
       - type: bind
-        source: ./reverse_proxy_config/nginx.conf
-        target: /etc/nginx/nginx.conf
+        read_only: true
+        source: ./nginx
+        target: /etc/nginx
     depends_on:
       - web
       - relay
   relay:
     image: "us.gcr.io/sentryio/relay:latest"
-    ports:
-      - '3000:3000/tcp'
     command: 'run --config /etc/relay'
     volumes:
       - type: bind
@@ -176,7 +175,6 @@ services:
     depends_on:
       - kafka
       - redis
-      - web
 volumes:
   sentry-data:
     external: true
