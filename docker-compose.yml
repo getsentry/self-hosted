@@ -54,6 +54,7 @@ services:
     image: 'redis:5.0-alpine'
     volumes:
       - 'sentry-redis:/data'
+    command: redis-server --save "" --maxmemory ${REDIS_MAXMEMORY} --maxmemory-policy allkeys-lru
   postgres:
     << : *restart_policy
     image: 'postgres:9.6'

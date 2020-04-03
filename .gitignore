@@ -72,6 +72,7 @@ docker-compose.override.yml
 *.tar
 data/
 .vscode/tags
+.idea
 
 # custom Sentry config
 sentry/sentry.conf.py
