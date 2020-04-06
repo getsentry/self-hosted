@@ -16,6 +16,8 @@ SENTRY_CONFIG_PY='sentry/sentry.conf.py'
 SENTRY_CONFIG_YML='sentry/config.yml'
 SENTRY_EXTRA_REQUIREMENTS='sentry/requirements.txt'
 
+RELAY_CREDENTIALS='relay_config/credentials.json'
+
 DID_CLEAN_UP=0
 # the cleanup function will be the exit point
 cleanup () {
@@ -163,6 +165,15 @@ if [ "$SENTRY_DATA_NEEDS_MIGRATION" ]; then
   $dcr --entrypoint \"/bin/bash\" web -c \
     "mkdir -p /tmp/files; mv /data/* /tmp/files/; mv /tmp/files /data/files; chown -R sentry:sentry /data"
 fi
+
+echo ""
+echo "Generating Relay credentials..."
+
+$dcr relay --config /etc/relay credentials generate --overwrite
+CREDENTIALS=$(sed -n 's/^.*"public_key":[[:space:]]"\([a-zA-Z0-9_-]*\)".*$/\1/p' $RELAY_CREDENTIALS)
+sed -i .bkp "s/<RELAY_KEY_HERE>/$CREDENTIALS/g" $SENTRY_CONFIG_PY
+# on Mac you must specify a backup file so we need to delete it here
+rm "${SENTRY_CONFIG_PY}.bkp"
 
 cleanup
 
