@@ -14,6 +14,7 @@ script:
   - ./install.sh
   - docker-compose run --rm web createuser --superuser --email test@example.com --password test123TEST
   - docker-compose up -d
+  - sudo chown -R 10001:10001 ./relay_config
   - ls -al
   - ls -al relay_config
   - docker container ls
