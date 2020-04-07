@@ -171,7 +171,7 @@ echo "Generating Relay credentials..."
 
 $dcr --user="$UID" relay --config /etc/relay credentials generate --overwrite
 CREDENTIALS=$(sed -n 's/^.*"public_key":[[:space:]]"\([a-zA-Z0-9_-]*\)".*$/\1/p' $RELAY_CREDENTIALS)
-sed -i .bkp "s/<RELAY_KEY_HERE>/$CREDENTIALS/g" $SENTRY_CONFIG_PY
+sed -i.bkp "s/<RELAY_KEY_HERE>/$CREDENTIALS/g" $SENTRY_CONFIG_PY
 # on Mac you must specify a backup file so we need to delete it here
 rm "${SENTRY_CONFIG_PY}.bkp"
 
