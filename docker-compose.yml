@@ -169,8 +169,8 @@ services:
     image: "us.gcr.io/sentryio/relay:latest"
     command: 'run --config /etc/relay'
     volumes:
-      - type: bind
-        source: ./relay_config
+      - type: volume
+        source: sentry-relay
         target: /etc/relay
     depends_on:
       - kafka
@@ -195,3 +195,5 @@ volumes:
   sentry-zookeeper-log:
   sentry-kafka-log:
   sentry-smtp-log:
+  sentry-relay:
+    external: true

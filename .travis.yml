@@ -14,12 +14,9 @@ script:
   - ./install.sh
   - docker-compose run --rm web createuser --superuser --email test@example.com --password test123TEST
   - docker-compose up -d
-  - sudo chmod -R a=rw ./relay_config
-  - ls -al
-  - ls -al relay_config
   - docker container ls
   - docker logs sentry_onpremise_web_1
   - docker logs sentry_onpremise_nginx_1
   - docker logs sentry_onpremise_relay_1
-  - timeout 200 bash -c 'until $(curl -Isf -o /dev/null http://localhost:9000); do printf '.'; sleep 0.5; done'
+  - timeout 60 bash -c 'until $(curl -Isf -o /dev/null http://localhost:9000); do printf '.'; sleep 0.5; done'
   - ./test.sh
