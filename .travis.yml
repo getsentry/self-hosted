@@ -14,6 +14,8 @@ script:
   - ./install.sh
   - docker-compose run --rm web createuser --superuser --email test@example.com --password test123TEST
   - docker-compose up -d
+  - ls -al
+  - ls -al relay_config
   - docker container ls
   - docker logs sentry_onpremise_web_1
   - docker logs sentry_onpremise_nginx_1
