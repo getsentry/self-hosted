@@ -14,6 +14,8 @@ MIN_RAM=2400 # MB
 
 SENTRY_CONFIG_PY='sentry/sentry.conf.py'
 SENTRY_CONFIG_YML='sentry/config.yml'
+RELAY_CONFIG_YML='relay/config.yml'
+RELAY_CREDENTIALS_JSON='relay/credentials.json'
 SENTRY_EXTRA_REQUIREMENTS='sentry/requirements.txt'
 
 DID_CLEAN_UP=0
@@ -84,12 +86,11 @@ echo "Created $(docker volume create --name=sentry-zookeeper)."
 echo "Created $(docker volume create --name=sentry-kafka)."
 echo "Created $(docker volume create --name=sentry-clickhouse)."
 echo "Created $(docker volume create --name=sentry-symbolicator)."
-echo "Created $(docker volume create --name=sentry-relay)."
 
-# copy config data into the relay volume
-docker run -v sentry-relay:/data --name copy-helper busybox true
-docker cp ./relay/config.yml  copy-helper:/data
-docker rm copy-helper
+## copy config data into the relay volume
+#docker run -v sentry-relay:/data --name copy-helper busybox chmod -R 777 /data
+#docker cp ./relay/config.yml  copy-helper:/data
+#docker rm copy-helper
 
 echo ""
 ensure_file_from_example $SENTRY_CONFIG_PY
@@ -172,18 +173,24 @@ fi
 
 echo ""
 echo "Generating Relay credentials..."
-#generate relay credentials
-$dcr --user root relay --config /etc/relay credentials generate --overwrite
-#copy credential file localy, from the relay volume, in order to extract the public key
-docker cp sentry_onpremise_relay_1:/etc/relay/credentials.json ./credentials.json
 
-#some test
+if [ ! -f "$RELAY_CREDENTIALS_JSON" ]; then
+    #generate relay credentials
+    $dcr --user $(id -u) relay --config /etc/relay credentials generate --overwrite
+    CREDENTIALS=$(sed -n 's/^.*"public_key":[[:space:]]"\([a-zA-Z0-9_-]*\)".*$/\1/p' "$RELAY_CREDENTIALS_JSON")
+    CREDENTIALS="SENTRY_RELAY_WHITELIST_PK = [\"$CREDENTIALS\"]"
 
+    if grep -xq SENTRY_RELAY_WHITELIST_PK "$SENTRY_CONFIG_PY"; then
+        echo "FAIL: SENTRY_RELAY_WHITELIST_PK already exists in $SENTRY_CONFIG_PY, please replace with:"
+        echo ""
+        echo "  $CREDENTIALS"
+        echo ""
+        exit 1
+    fi
 
-CREDENTIALS=$(sed -n 's/^.*"public_key":[[:space:]]"\([a-zA-Z0-9_-]*\)".*$/\1/p' ./credentials.json)
-sed -i.bkp "s/<RELAY_KEY_HERE>/$CREDENTIALS/g" $SENTRY_CONFIG_PY
-# on Mac you must specify a backup file so we need to delete it here
-rm "${SENTRY_CONFIG_PY}.bkp"
+     echo "" >> "$SENTRY_CONFIG_PY"
+     echo "$CREDENTIALS" >> "$SENTRY_CONFIG_PY"
+fi
 
 cleanup
 
