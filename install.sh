@@ -188,6 +188,8 @@ if [ ! -f "$RELAY_CREDENTIALS_JSON" ]; then
 
      echo "" >> "$SENTRY_CONFIG_PY"
      echo "$CREDENTIALS" >> "$SENTRY_CONFIG_PY"
+
+     tail -n 5 "$SENTRY_CONFIG_PY"
 else
      echo ""
      echo "Relay credentials exist will NOT generate new ones."
