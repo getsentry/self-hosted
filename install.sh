@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -e
+set -evim
 
 dc="docker-compose --no-ansi"
 dcr="$dc run --rm"
@@ -177,6 +177,7 @@ echo "Generating Relay credentials..."
 if [ ! -f "$RELAY_CREDENTIALS_JSON" ]; then
     #generate relay credentials
     $dcr --user $(id -u) relay --config /etc/relay credentials generate --overwrite
+    chmod a+r $(RELAY_CREDENTIALS_JSON)
     CREDENTIALS=$(sed -n 's/^.*"public_key":[[:space:]]"\([a-zA-Z0-9_-]*\)".*$/\1/p' "$RELAY_CREDENTIALS_JSON")
     CREDENTIALS="SENTRY_RELAY_WHITELIST_PK = [\"$CREDENTIALS\"]"
 
