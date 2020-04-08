@@ -138,7 +138,7 @@ services:
   worker:
     << : *sentry_defaults
     command: run worker
-  event-consumer:
+  ingest-consumer:
     << : *sentry_defaults
     command: run ingest-consumer --all-consumer-types
   post-process-forwarder:

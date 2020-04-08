@@ -221,9 +221,3 @@ GITHUB_EXTENDED_PERMISSIONS = ['repo']
 # BITBUCKET_CONSUMER_KEY = 'YOUR_BITBUCKET_CONSUMER_KEY'
 # BITBUCKET_CONSUMER_SECRET = 'YOUR_BITBUCKET_CONSUMER_SECRET'
 
-
-# Known internal Relays (<RELAY_KEY_HERE> will be replaced at install time with the generated Relay key)
-SENTRY_RELAY_WHITELIST_PK = [
-    # a list of public keys with Relays that are allowed to
-    "<RELAY_KEY_HERE>"
-]

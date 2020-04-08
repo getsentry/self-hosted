@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -evim
+set -e
 
 dc="docker-compose --no-ansi"
 dcr="$dc run --rm"
@@ -87,11 +87,6 @@ echo "Created $(docker volume create --name=sentry-kafka)."
 echo "Created $(docker volume create --name=sentry-clickhouse)."
 echo "Created $(docker volume create --name=sentry-symbolicator)."
 
-## copy config data into the relay volume
-#docker run -v sentry-relay:/data --name copy-helper busybox chmod -R 777 /data
-#docker cp ./relay/config.yml  copy-helper:/data
-#docker rm copy-helper
-
 echo ""
 ensure_file_from_example $SENTRY_CONFIG_PY
 ensure_file_from_example $SENTRY_CONFIG_YML
@@ -171,13 +166,15 @@ if [ "$SENTRY_DATA_NEEDS_MIGRATION" ]; then
     "mkdir -p /tmp/files; mv /data/* /tmp/files/; mv /tmp/files /data/files; chown -R sentry:sentry /data"
 fi
 
-echo ""
-echo "Generating Relay credentials..."
 
 if [ ! -f "$RELAY_CREDENTIALS_JSON" ]; then
-    #generate relay credentials
+    echo ""
+    echo "Generating Relay credentials..."
+
     $dcr --user $(id -u) relay --config /etc/relay credentials generate --overwrite
-    chmod a+r $(RELAY_CREDENTIALS_JSON)
+    chmod a+r $RELAY_CREDENTIALS_JSON
+    # display the contents of the relay directory (for debug purposes)
+    ls -al ./relay
     CREDENTIALS=$(sed -n 's/^.*"public_key":[[:space:]]"\([a-zA-Z0-9_-]*\)".*$/\1/p' "$RELAY_CREDENTIALS_JSON")
     CREDENTIALS="SENTRY_RELAY_WHITELIST_PK = [\"$CREDENTIALS\"]"
 
@@ -191,6 +188,9 @@ if [ ! -f "$RELAY_CREDENTIALS_JSON" ]; then
 
      echo "" >> "$SENTRY_CONFIG_PY"
      echo "$CREDENTIALS" >> "$SENTRY_CONFIG_PY"
+else
+     echo ""
+     echo "Relay credentials exist will NOT generate new ones."
 fi
 
 cleanup
