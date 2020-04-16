@@ -105,16 +105,16 @@ services:
   # Kafka consumer responsible for feeding events into Clickhouse
   snuba-consumer:
     << : *snuba_defaults
-    command: consumer --dataset events --auto-offset-reset=latest --max-batch-time-ms 750
+    command: consumer --storage events --auto-offset-reset=latest --max-batch-time-ms 750
   # Kafka consumer responsible for feeding outcomes into Clickhouse
   # Use --auto-offset-reset=earliest to recover up to 7 days of TSDB data
   # since we did not do a proper migration
   snuba-outcomes-consumer:
     << : *snuba_defaults
-    command: consumer --dataset outcomes --auto-offset-reset=earliest --max-batch-time-ms 750
+    command: consumer --storage outcomes_raw --auto-offset-reset=earliest --max-batch-time-ms 750
   snuba-replacer:
     << : *snuba_defaults
-    command: replacer --auto-offset-reset=latest --max-batch-size 3
+    command: replacer --storage events --auto-offset-reset=latest --max-batch-size 3
   snuba-cleanup:
     << : *snuba_defaults
     image: snuba-cleanup-onpremise-local
