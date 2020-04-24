@@ -175,7 +175,7 @@ if [ ! -f "$RELAY_CREDENTIALS_JSON" ]; then
     chmod a+r $RELAY_CREDENTIALS_JSON
     # display the contents of the relay directory (for debug purposes)
     ls -al ./relay
-    CREDENTIALS=$(sed -n 's/^.*"public_key":[[:space:]]"\([a-zA-Z0-9_-]*\)".*$/\1/p' "$RELAY_CREDENTIALS_JSON")
+    CREDENTIALS=$(sed -n 's/^.*"public_key"[[:space:]]*:[[:space:]]*"\([a-zA-Z0-9_-]\{1,\}\)".*$/\1/p' "$RELAY_CREDENTIALS_JSON")
     CREDENTIALS="SENTRY_RELAY_WHITELIST_PK = [\"$CREDENTIALS\"]"
 
     if grep -xq SENTRY_RELAY_WHITELIST_PK "$SENTRY_CONFIG_PY"; then
