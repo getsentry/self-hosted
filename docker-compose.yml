@@ -165,7 +165,7 @@ services:
   nginx:
     ports:
       - '9000:80/tcp'
-    image: "nginx:1.16.1"
+    image: "nginx:1.16"
     volumes:
       - type: bind
         read_only: true
