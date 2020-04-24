@@ -19,17 +19,31 @@ RELAY_CONFIG_YML='relay/config.yml'
 RELAY_CREDENTIALS_JSON='relay/credentials.json'
 SENTRY_EXTRA_REQUIREMENTS='sentry/requirements.txt'
 
+# Courtesy of https://stackoverflow.com/a/2183063/90297
+trap_with_arg() {
+    func="$1" ; shift
+    for sig ; do
+        trap "$func $sig" "$sig"
+    done
+}
+
 DID_CLEAN_UP=0
 # the cleanup function will be the exit point
 cleanup () {
   if [ "$DID_CLEAN_UP" -eq 1 ]; then
     return 0;
   fi
-  echo "Cleaning up..."
-  $dc stop &> /dev/null
   DID_CLEAN_UP=1
+
+  if [ "$1" != "EXIT" ]; then
+    echo "An error occurred, caught SIG$1";
+    echo "Cleaning up..."
+  fi
+
+  $dc stop &> /dev/null
 }
-trap cleanup ERR INT TERM
+trap_with_arg cleanup ERR INT TERM EXIT
+
 
 echo "Checking minimum requirements..."
 
@@ -245,9 +259,6 @@ if [ ! -f "$RELAY_CREDENTIALS_JSON" ]; then
   $dcr --no-deps -v $(pwd)/$RELAY_CONFIG_YML:/tmp/config.yml relay --config /tmp credentials generate --stdout > "$RELAY_CREDENTIALS_JSON"
   echo "Relay credentials written to $RELAY_CREDENTIALS_JSON"
 fi
-
-
-cleanup
 
 echo ""
 echo "----------------"
