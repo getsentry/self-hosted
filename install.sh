@@ -179,10 +179,10 @@ if [ ! -f "$RELAY_CREDENTIALS_JSON" ]; then
     CREDENTIALS="SENTRY_RELAY_WHITELIST_PK = [\"$CREDENTIALS\"]"
 
     if grep -xq SENTRY_RELAY_WHITELIST_PK "$SENTRY_CONFIG_PY"; then
-        echo "FAIL: SENTRY_RELAY_WHITELIST_PK already exists in $SENTRY_CONFIG_PY, please replace with:"
-        echo ""
-        echo "  $CREDENTIALS"
-        echo ""
+        >&2 echo "FAIL: SENTRY_RELAY_WHITELIST_PK already exists in $SENTRY_CONFIG_PY, please replace with:"
+        >&2 echo ""
+        >&2 echo "  $CREDENTIALS"
+        >&2 echo ""
         exit 1
     fi
 
