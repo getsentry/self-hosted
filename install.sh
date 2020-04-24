@@ -173,8 +173,6 @@ if [ ! -f "$RELAY_CREDENTIALS_JSON" ]; then
 
     $dcr --user $(id -u) relay --config /etc/relay credentials generate --overwrite
     chmod a+r $RELAY_CREDENTIALS_JSON
-    # display the contents of the relay directory (for debug purposes)
-    ls -al ./relay
     CREDENTIALS=$(sed -n 's/^.*"public_key"[[:space:]]*:[[:space:]]*"\([a-zA-Z0-9_-]\{1,\}\)".*$/\1/p' "$RELAY_CREDENTIALS_JSON")
     CREDENTIALS="SENTRY_RELAY_WHITELIST_PK = [\"$CREDENTIALS\"]"
 
@@ -188,8 +186,6 @@ if [ ! -f "$RELAY_CREDENTIALS_JSON" ]; then
 
      echo "" >> "$SENTRY_CONFIG_PY"
      echo "$CREDENTIALS" >> "$SENTRY_CONFIG_PY"
-
-     tail -n 5 "$SENTRY_CONFIG_PY"
 else
      echo ""
      echo "Relay credentials exist will NOT generate new ones."
