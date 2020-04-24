@@ -14,6 +14,8 @@ MIN_RAM=2400 # MB
 
 SENTRY_CONFIG_PY='sentry/sentry.conf.py'
 SENTRY_CONFIG_YML='sentry/config.yml'
+RELAY_CONFIG_YML='relay/config.yml'
+RELAY_CREDENTIALS_JSON='relay/credentials.json'
 SENTRY_EXTRA_REQUIREMENTS='sentry/requirements.txt'
 
 DID_CLEAN_UP=0
@@ -169,6 +171,28 @@ if [ "$SENTRY_DATA_NEEDS_MIGRATION" ]; then
   # The `\"` escape pattern is to make this compatible w/ Git Bash on Windows. See #329.
   $dcr --entrypoint \"/bin/bash\" web -c \
     "mkdir -p /tmp/files; mv /data/* /tmp/files/; mv /tmp/files /data/files; chown -R sentry:sentry /data"
+fi
+
+
+if [ ! -f "$RELAY_CREDENTIALS_JSON" ]; then
+    echo ""
+    echo "Generating Relay credentials..."
+
+    $dcr --user $(id -u) relay --config /etc/relay credentials generate --overwrite
+    chmod a+r $RELAY_CREDENTIALS_JSON
+    CREDENTIALS=$(sed -n 's/^.*"public_key"[[:space:]]*:[[:space:]]*"\([a-zA-Z0-9_-]\{1,\}\)".*$/\1/p' "$RELAY_CREDENTIALS_JSON")
+    CREDENTIALS="SENTRY_RELAY_WHITELIST_PK = [\"$CREDENTIALS\"]"
+
+    if grep -xq SENTRY_RELAY_WHITELIST_PK "$SENTRY_CONFIG_PY"; then
+        >&2 echo "FAIL: SENTRY_RELAY_WHITELIST_PK already exists in $SENTRY_CONFIG_PY, please replace with:"
+        >&2 echo ""
+        >&2 echo "  $CREDENTIALS"
+        >&2 echo ""
+        exit 1
+    fi
+
+     echo "" >> "$SENTRY_CONFIG_PY"
+     echo "$CREDENTIALS" >> "$SENTRY_CONFIG_PY"
 fi
 
 cleanup

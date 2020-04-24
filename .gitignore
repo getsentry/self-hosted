@@ -77,3 +77,4 @@ data/
 sentry/sentry.conf.py
 sentry/config.yml
 sentry/requirements.txt
+relay/credentials.json
