@@ -163,6 +163,7 @@ services:
         BASE_IMAGE: 'sentry-onpremise-local'
     command: '"0 0 * * * gosu sentry sentry cleanup --days $SENTRY_EVENT_RETENTION_DAYS"'
   nginx:
+    << : *restart_policy
     ports:
       - '9000:80/tcp'
     image: "nginx:1.16"
@@ -175,6 +176,7 @@ services:
       - web
       - relay
   relay:
+    << : *restart_policy
     image: "us.gcr.io/sentryio/relay:latest"
     command: 'run --config /etc/relay'
     volumes:
