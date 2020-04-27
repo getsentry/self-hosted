@@ -180,8 +180,9 @@ if [ ! -f "$RELAY_CREDENTIALS_JSON" ]; then
 
     # We need the ugly hack below as `relay generate credentials` tries to read the config and the credentials
     # even with the `--stdout` and `--overwrite` flags and then errors out when the credentials file exists but
-    # not valid JSON.
-    $dcr --no-deps --entrypoint /bin/bash relay -c "cp /work/.relay/config.yml /tmp/config.yml && /bin/relay --config /tmp credentials generate > /dev/null && cat /tmp/credentials.json" > "$RELAY_CREDENTIALS_JSON"
+    # not valid JSON. We hit this case as we redirect output to the same config folder, creating an empty
+    # credentials file before relay runs.
+    $dcr --no-deps -v $(pwd)/$RELAY_CONFIG_YML:/tmp/config.yml relay --config /tmp credentials generate --stdout > "$RELAY_CREDENTIALS_JSON"
     CREDENTIALS=$(sed -n 's/^.*"public_key"[[:space:]]*:[[:space:]]*"\([a-zA-Z0-9_-]\{1,\}\)".*$/\1/p' "$RELAY_CREDENTIALS_JSON")
     if [ -z "$CREDENTIALS" ]; then
       >&2 echo "FAIL: Cannot read credentials back from $RELAY_CREDENTIALS_JSON."
