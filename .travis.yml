@@ -16,3 +16,7 @@ script:
   - docker-compose up -d
   - timeout 60 bash -c 'until $(curl -Isf -o /dev/null http://localhost:9000); do printf '.'; sleep 0.5; done'
   - ./test.sh
+
+after_failure:
+  - docker-compose ps
+  - docker-compose logs
