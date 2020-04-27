@@ -181,6 +181,7 @@ services:
     command: 'run --config /etc/relay'
     volumes:
       - type: bind
+        read_only: true
         source: ./relay
         target: /etc/relay
     depends_on:

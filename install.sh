@@ -64,7 +64,7 @@ if [ "$RAM_AVAILABLE_IN_DOCKER" -lt "$MIN_RAM" ]; then
     exit 1
 fi
 
-#SSE4.2 required by Clickhouse (https://clickhouse.yandex/docs/en/operations/requirements/) 
+#SSE4.2 required by Clickhouse (https://clickhouse.yandex/docs/en/operations/requirements/)
 SUPPORTS_SSE42=$(docker run --rm busybox grep -c sse4_2 /proc/cpuinfo || :);
 if (($SUPPORTS_SSE42 == 0)); then
     echo "FAIL: The CPU your machine is running on does not support the SSE 4.2 instruction set, which is required for one of the services Sentry uses (Clickhouse). See https://git.io/JvLDt for more info."
@@ -178,9 +178,18 @@ if [ ! -f "$RELAY_CREDENTIALS_JSON" ]; then
     echo ""
     echo "Generating Relay credentials..."
 
-    $dcr --user $(id -u) relay --config /etc/relay credentials generate --overwrite
-    chmod a+r $RELAY_CREDENTIALS_JSON
+    # We need the ugly hack below as `relay generate credentials` tries to read the config and the credentials
+    # even with the `--stdout` and `--overwrite` flags and then errors out when the credentials file exists but
+    # not valid JSON.
+    $dcr --no-deps --entrypoint /bin/bash relay -c "mkdir /work/.relay && cp /etc/relay/config.yml /work/.relay/config.yml && /bin/relay credentials generate > /dev/null && cat /work/.relay/config.yml" > "$RELAY_CREDENTIALS_JSON"
     CREDENTIALS=$(sed -n 's/^.*"public_key"[[:space:]]*:[[:space:]]*"\([a-zA-Z0-9_-]\{1,\}\)".*$/\1/p' "$RELAY_CREDENTIALS_JSON")
+    if [ -z "$CREDENTIALS" ]; then
+      >&2 echo "FAIL: Cannot read credentials back from $RELAY_CREDENTIALS_JSON."
+      >&2 echo "      Please ensure this file is readable and contains valid credentials."
+      >&2 echo ""
+      exit 1
+    fi
+
     CREDENTIALS="SENTRY_RELAY_WHITELIST_PK = [\"$CREDENTIALS\"]"
 
     if grep -xq SENTRY_RELAY_WHITELIST_PK "$SENTRY_CONFIG_PY"; then
