@@ -181,13 +181,15 @@ if [ ! -f "$RELAY_CREDENTIALS_JSON" ]; then
     # We need the ugly hack below as `relay generate credentials` tries to read the config and the credentials
     # even with the `--stdout` and `--overwrite` flags and then errors out when the credentials file exists but
     # not valid JSON.
-    $dcr --no-deps --entrypoint /bin/bash relay -c "mkdir /work/.relay && cp /etc/relay/config.yml /work/.relay/config.yml && /bin/relay credentials generate > /dev/null && cat /work/.relay/config.yml" > "$RELAY_CREDENTIALS_JSON"
+    $dcr --no-deps --entrypoint /bin/bash relay -c "cp /work/.relay/config.yml /tmp/config.yml && /bin/relay --config /tmp credentials generate > /dev/null && cat /tmp/credentials.json" > "$RELAY_CREDENTIALS_JSON"
     CREDENTIALS=$(sed -n 's/^.*"public_key"[[:space:]]*:[[:space:]]*"\([a-zA-Z0-9_-]\{1,\}\)".*$/\1/p' "$RELAY_CREDENTIALS_JSON")
     if [ -z "$CREDENTIALS" ]; then
       >&2 echo "FAIL: Cannot read credentials back from $RELAY_CREDENTIALS_JSON."
       >&2 echo "      Please ensure this file is readable and contains valid credentials."
       >&2 echo ""
       exit 1
+    else
+      echo "Relay credentials written to $RELAY_CREDENTIALS_JSON"
     fi
 
     CREDENTIALS="SENTRY_RELAY_WHITELIST_PK = [\"$CREDENTIALS\"]"
@@ -200,8 +202,10 @@ if [ ! -f "$RELAY_CREDENTIALS_JSON" ]; then
         exit 1
     fi
 
-     echo "" >> "$SENTRY_CONFIG_PY"
-     echo "$CREDENTIALS" >> "$SENTRY_CONFIG_PY"
+    echo "" >> "$SENTRY_CONFIG_PY"
+    echo "$CREDENTIALS" >> "$SENTRY_CONFIG_PY"
+    echo "Relay public key written to $SENTRY_CONFIG_PY"
+    echo ""
 fi
 
 cleanup
