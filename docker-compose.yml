@@ -178,11 +178,11 @@ services:
   relay:
     << : *restart_policy
     image: "us.gcr.io/sentryio/relay:latest"
-    command: 'run --config /etc/relay'
     volumes:
       - type: bind
+        read_only: true
         source: ./relay
-        target: /etc/relay
+        target: /work/.relay
     depends_on:
       - kafka
       - redis
