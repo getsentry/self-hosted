@@ -105,16 +105,16 @@ services:
   # Kafka consumer responsible for feeding events into Clickhouse
   snuba-consumer:
     << : *snuba_defaults
-    command: consumer --dataset events --auto-offset-reset=latest --max-batch-time-ms 750
+    command: consumer --storage events --auto-offset-reset=latest --max-batch-time-ms 750
   # Kafka consumer responsible for feeding outcomes into Clickhouse
   # Use --auto-offset-reset=earliest to recover up to 7 days of TSDB data
   # since we did not do a proper migration
   snuba-outcomes-consumer:
     << : *snuba_defaults
-    command: consumer --dataset outcomes --auto-offset-reset=earliest --max-batch-time-ms 750
+    command: consumer --storage outcomes_raw --auto-offset-reset=earliest --max-batch-time-ms 750
   snuba-replacer:
     << : *snuba_defaults
-    command: replacer --auto-offset-reset=latest --max-batch-size 3
+    command: replacer --storage events --auto-offset-reset=latest --max-batch-size 3
   snuba-cleanup:
     << : *snuba_defaults
     image: snuba-cleanup-onpremise-local
@@ -141,14 +141,15 @@ services:
       - 'sentry-symbolicator:/data'
   web:
     << : *sentry_defaults
-    ports:
-      - '9000:9000/tcp'
   cron:
     << : *sentry_defaults
     command: run cron
   worker:
     << : *sentry_defaults
     command: run worker
+  ingest-consumer:
+    << : *sentry_defaults
+    command: run ingest-consumer --all-consumer-types
   post-process-forwarder:
     << : *sentry_defaults
     # Increase `--commit-batch-size 1` below to deal with high-load environments.
@@ -161,6 +162,30 @@ services:
       args:
         BASE_IMAGE: 'sentry-onpremise-local'
     command: '"0 0 * * * gosu sentry sentry cleanup --days $SENTRY_EVENT_RETENTION_DAYS"'
+  nginx:
+    << : *restart_policy
+    ports:
+      - '9000:80/tcp'
+    image: "nginx:1.16"
+    volumes:
+      - type: bind
+        read_only: true
+        source: ./nginx
+        target: /etc/nginx
+    depends_on:
+      - web
+      - relay
+  relay:
+    << : *restart_policy
+    image: "us.gcr.io/sentryio/relay:latest"
+    volumes:
+      - type: bind
+        read_only: true
+        source: ./relay
+        target: /work/.relay
+    depends_on:
+      - kafka
+      - redis
 volumes:
   sentry-data:
     external: true

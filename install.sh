@@ -14,6 +14,8 @@ MIN_RAM=2400 # MB
 
 SENTRY_CONFIG_PY='sentry/sentry.conf.py'
 SENTRY_CONFIG_YML='sentry/config.yml'
+RELAY_CONFIG_YML='relay/config.yml'
+RELAY_CREDENTIALS_JSON='relay/credentials.json'
 SENTRY_EXTRA_REQUIREMENTS='sentry/requirements.txt'
 
 DID_CLEAN_UP=0
@@ -62,7 +64,7 @@ if [ "$RAM_AVAILABLE_IN_DOCKER" -lt "$MIN_RAM" ]; then
     exit 1
 fi
 
-#SSE4.2 required by Clickhouse (https://clickhouse.yandex/docs/en/operations/requirements/) 
+#SSE4.2 required by Clickhouse (https://clickhouse.yandex/docs/en/operations/requirements/)
 SUPPORTS_SSE42=$(docker run --rm busybox grep -c sse4_2 /proc/cpuinfo || :);
 if (($SUPPORTS_SSE42 == 0)); then
     echo "FAIL: The CPU your machine is running on does not support the SSE 4.2 instruction set, which is required for one of the services Sentry uses (Clickhouse). See https://git.io/JvLDt for more info."
@@ -118,11 +120,18 @@ if grep -xq "system.secret-key: '!!changeme!!'" $SENTRY_CONFIG_YML ; then
 fi
 
 echo ""
+echo "Fetching and updating Docker images..."
+echo ""
+# We tag locally built images with an '-onpremise-local' suffix. docker-compose pull tries to pull these too and
+# shows a 404 error on the console which is confusing and unnecessary. To overcome this, we add the stderr>stdout
+# redirection below and pass it through grep, ignoring all lines having this '-onpremise-local' suffix.
+$dc pull -q --ignore-pull-failures 2>&1 | grep -v -- -onpremise-local || true
+docker pull ${SENTRY_IMAGE:-getsentry/sentry:latest}
+
+echo ""
 echo "Building and tagging Docker images..."
 echo ""
 # Build the sentry onpremise image first as it is needed for the cron image
-$dc pull --ignore-pull-failures
-docker pull ${SENTRY_IMAGE:-getsentry/sentry:latest}
 $dc build --force-rm web
 $dc build --force-rm --parallel
 echo ""
@@ -178,6 +187,42 @@ if [ "$SENTRY_DATA_NEEDS_MIGRATION" ]; then
   # The `\"` escape pattern is to make this compatible w/ Git Bash on Windows. See #329.
   $dcr --entrypoint \"/bin/bash\" web -c \
     "mkdir -p /tmp/files; mv /data/* /tmp/files/; mv /tmp/files /data/files; chown -R sentry:sentry /data"
+fi
+
+
+if [ ! -f "$RELAY_CREDENTIALS_JSON" ]; then
+    echo ""
+    echo "Generating Relay credentials..."
+
+    # We need the ugly hack below as `relay generate credentials` tries to read the config and the credentials
+    # even with the `--stdout` and `--overwrite` flags and then errors out when the credentials file exists but
+    # not valid JSON. We hit this case as we redirect output to the same config folder, creating an empty
+    # credentials file before relay runs.
+    $dcr --no-deps -v $(pwd)/$RELAY_CONFIG_YML:/tmp/config.yml relay --config /tmp credentials generate --stdout > "$RELAY_CREDENTIALS_JSON"
+    CREDENTIALS=$(sed -n 's/^.*"public_key"[[:space:]]*:[[:space:]]*"\([a-zA-Z0-9_-]\{1,\}\)".*$/\1/p' "$RELAY_CREDENTIALS_JSON")
+    if [ -z "$CREDENTIALS" ]; then
+      >&2 echo "FAIL: Cannot read credentials back from $RELAY_CREDENTIALS_JSON."
+      >&2 echo "      Please ensure this file is readable and contains valid credentials."
+      >&2 echo ""
+      exit 1
+    else
+      echo "Relay credentials written to $RELAY_CREDENTIALS_JSON"
+    fi
+
+    CREDENTIALS="SENTRY_RELAY_WHITELIST_PK = [\"$CREDENTIALS\"]"
+
+    if grep -xq SENTRY_RELAY_WHITELIST_PK "$SENTRY_CONFIG_PY"; then
+        >&2 echo "FAIL: SENTRY_RELAY_WHITELIST_PK already exists in $SENTRY_CONFIG_PY, please replace with:"
+        >&2 echo ""
+        >&2 echo "  $CREDENTIALS"
+        >&2 echo ""
+        exit 1
+    fi
+
+    echo "" >> "$SENTRY_CONFIG_PY"
+    echo "$CREDENTIALS" >> "$SENTRY_CONFIG_PY"
+    echo "Relay public key written to $SENTRY_CONFIG_PY"
+    echo ""
 fi
 
 cleanup
