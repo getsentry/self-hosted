@@ -76,15 +76,23 @@ if (
     [ -f "$SENTRY_CONFIG_PY" ] &&
     ! grep -xq 'SENTRY_TSDB = "sentry.tsdb.redissnuba.RedisSnubaTSDB"' "$SENTRY_CONFIG_PY"
 ); then
-    echo "FAIL: Your Sentry configuration uses a legacy data store for time-series data. Remove the options SENTRY_TSDB and SENTRY_TSDB_OPTIONS from $SENTRY_CONFIG_PY and add:"
-    echo ""
-    echo "  SENTRY_TSDB = \"sentry.tsdb.redissnuba.RedisSnubaTSDB\""
-    echo ""
-    echo "  # Automatic switchover 90 days after $(date). Can be removed afterwards."
-    echo "  SENTRY_TSDB_OPTIONS = {\"switchover_timestamp\": $(date +%s) + (90 * 24 * 3600)}"
-    echo ""
-    echo "Then rerun this script."
-    exit 1
+    tsdb_settings="  SENTRY_TSDB = \"sentry.tsdb.redissnuba.RedisSnubaTSDB\"
+
+# Automatic switchover 90 days after $(date). Can be removed afterwards.
+SENTRY_TSDB_OPTIONS = {\"switchover_timestamp\": $(date +%s) + (90 * 24 * 3600)}"
+
+    if ! grep -xq 'SENTRY_TSDB_OPTIONS = ' "$SENTRY_CONFIG_PY"; then
+        cp "$SENTRY_CONFIG_PY" "$SENTRY_CONFIG_PY.bak"
+        sed -i -e "s/^SENTRY_TSDB = .*$/$tsdb_settings/g" "$SENTRY_CONFIG_PY"
+        echo "Migrated TSDB to Snuba. Old configuration file backed up to $SENTRY_CONFIG_PY.bak"
+    else
+        echo "FAIL: Your Sentry configuration uses a legacy data store for time-series data. Remove the options SENTRY_TSDB and SENTRY_TSDB_OPTIONS from $SENTRY_CONFIG_PY and add:"
+        echo ""
+        echo "$tsdb_settings"
+        echo ""
+        echo "Then rerun this script."
+        exit 1
+    fi
 fi
 
 # Clean up old stuff and ensure nothing is working while we install/update
