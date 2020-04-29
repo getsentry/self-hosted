@@ -71,21 +71,34 @@ if (($SUPPORTS_SSE42 == 0)); then
     exit 1
 fi
 
-# TSDB migration. Force everybody to migrate asap.
-if (
-    [ -f "$SENTRY_CONFIG_PY" ] &&
-    ! grep -xq 'SENTRY_TSDB = "sentry.tsdb.redissnuba.RedisSnubaTSDB"' "$SENTRY_CONFIG_PY"
-); then
-    tsdb_settings="  SENTRY_TSDB = \"sentry.tsdb.redissnuba.RedisSnubaTSDB\"
+replace_tsdb() {
+    if (
+        [ -f "$SENTRY_CONFIG_PY" ] &&
+        ! grep -xq 'SENTRY_TSDB = "sentry.tsdb.redissnuba.RedisSnubaTSDB"' "$SENTRY_CONFIG_PY"
+    ); then
+        tsdb_settings="SENTRY_TSDB = \"sentry.tsdb.redissnuba.RedisSnubaTSDB\"
 
 # Automatic switchover 90 days after $(date). Can be removed afterwards.
 SENTRY_TSDB_OPTIONS = {\"switchover_timestamp\": $(date +%s) + (90 * 24 * 3600)}"
 
-    if ! grep -xq 'SENTRY_TSDB_OPTIONS = ' "$SENTRY_CONFIG_PY"; then
-        cp "$SENTRY_CONFIG_PY" "$SENTRY_CONFIG_PY.bak"
-        sed -i -e "s/^SENTRY_TSDB = .*$/$tsdb_settings/g" "$SENTRY_CONFIG_PY"
-        echo "Migrated TSDB to Snuba. Old configuration file backed up to $SENTRY_CONFIG_PY.bak"
-    else
+        if grep -q 'SENTRY_TSDB_OPTIONS = ' "$SENTRY_CONFIG_PY"; then
+            echo "Not attempting automatic TSDB migration due to presence of SENTRY_TSDB_OPTIONS"
+        else
+            echo "Attempting to automatically migrate to new TSDB"
+            # Escape newlines for sed
+            tsdb_settings="${tsdb_settings//$'\n'/\\n}"
+            cp "$SENTRY_CONFIG_PY" "$SENTRY_CONFIG_PY.bak"
+            sed -i -e "s/^SENTRY_TSDB = .*$/${tsdb_settings}/g" "$SENTRY_CONFIG_PY" || true
+
+            if grep -xq 'SENTRY_TSDB = "sentry.tsdb.redissnuba.RedisSnubaTSDB"' "$SENTRY_CONFIG_PY"; then
+                echo "Migrated TSDB to Snuba. Old configuration file backed up to $SENTRY_CONFIG_PY.bak"
+                return
+            fi
+
+            echo "Failed to automatically migrate TSDB. Reverting."
+            mv "$SENTRY_CONFIG_PY.bak" "$SENTRY_CONFIG_PY"
+        fi
+
         echo "FAIL: Your Sentry configuration uses a legacy data store for time-series data. Remove the options SENTRY_TSDB and SENTRY_TSDB_OPTIONS from $SENTRY_CONFIG_PY and add:"
         echo ""
         echo "$tsdb_settings"
@@ -93,7 +106,9 @@ SENTRY_TSDB_OPTIONS = {\"switchover_timestamp\": $(date +%s) + (90 * 24 * 3600)}
         echo "Then rerun this script."
         exit 1
     fi
-fi
+}
+
+replace_tsdb
 
 # Clean up old stuff and ensure nothing is working while we install/update
 # This is for older versions of on-premise:

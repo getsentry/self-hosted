@@ -75,6 +75,7 @@ data/
 
 # custom Sentry config
 sentry/sentry.conf.py
+sentry/*.bak
 sentry/config.yml
 sentry/requirements.txt
 relay/credentials.json
