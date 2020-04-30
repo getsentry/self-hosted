@@ -95,8 +95,9 @@ SENTRY_TSDB_OPTIONS = {\"switchover_timestamp\": $(date +%s) + (90 * 24 * 3600)}
                 return
             fi
 
-            echo "Failed to automatically migrate TSDB. Reverting."
+            echo "Failed to automatically migrate TSDB. Reverting..."
             mv "$SENTRY_CONFIG_PY.bak" "$SENTRY_CONFIG_PY"
+            echo "$SENTRY_CONFIG_PY restored from backup."
         fi
 
         echo "FAIL: Your Sentry configuration uses a legacy data store for time-series data. Remove the options SENTRY_TSDB and SENTRY_TSDB_OPTIONS from $SENTRY_CONFIG_PY and add:"
