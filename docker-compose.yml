@@ -177,7 +177,7 @@ services:
       - relay
   relay:
     << : *restart_policy
-    image: "us.gcr.io/sentryio/relay:latest"
+    image: "getsentry/relay:latest"
     volumes:
       - type: bind
         read_only: true
