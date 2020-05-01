@@ -63,7 +63,7 @@ services:
       - 'sentry-postgres:/var/lib/postgresql/data'
   zookeeper:
     << : *restart_policy
-    image: 'confluentinc/cp-zookeeper:5.1.2'
+    image: 'confluentinc/cp-zookeeper:5.5.0'
     environment:
       ZOOKEEPER_CLIENT_PORT: '2181'
       CONFLUENT_SUPPORT_METRICS_ENABLE: 'false'
@@ -77,7 +77,7 @@ services:
     << : *restart_policy
     depends_on:
       - zookeeper
-    image: 'confluentinc/cp-kafka:5.1.2'
+    image: 'confluentinc/cp-kafka:5.5.0'
     environment:
       KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
       KAFKA_ADVERTISED_LISTENERS: 'PLAINTEXT://kafka:9092'
