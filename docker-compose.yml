@@ -97,7 +97,7 @@ services:
       - 'sentry-secrets:/etc/kafka/secrets'
   clickhouse:
     << : *restart_policy
-    image: 'yandex/clickhouse-server:19.11'
+    image: 'yandex/clickhouse-server:19.17'
     ulimits:
       nofile:
         soft: 262144
