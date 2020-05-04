@@ -175,38 +175,29 @@ fi
 
 
 if [ ! -f "$RELAY_CREDENTIALS_JSON" ]; then
-    echo ""
-    echo "Generating Relay credentials..."
+  echo ""
+  echo "Generating Relay credentials..."
 
-    # We need the ugly hack below as `relay generate credentials` tries to read the config and the credentials
-    # even with the `--stdout` and `--overwrite` flags and then errors out when the credentials file exists but
-    # not valid JSON. We hit this case as we redirect output to the same config folder, creating an empty
-    # credentials file before relay runs.
-    $dcr --no-deps -v $(pwd)/$RELAY_CONFIG_YML:/tmp/config.yml relay --config /tmp credentials generate --stdout > "$RELAY_CREDENTIALS_JSON"
-    CREDENTIALS=$(sed -n 's/^.*"public_key"[[:space:]]*:[[:space:]]*"\([a-zA-Z0-9_-]\{1,\}\)".*$/\1/p' "$RELAY_CREDENTIALS_JSON")
-    if [ -z "$CREDENTIALS" ]; then
-      >&2 echo "FAIL: Cannot read credentials back from $RELAY_CREDENTIALS_JSON."
-      >&2 echo "      Please ensure this file is readable and contains valid credentials."
-      >&2 echo ""
-      exit 1
-    else
-      echo "Relay credentials written to $RELAY_CREDENTIALS_JSON"
-    fi
+  # We need the ugly hack below as `relay generate credentials` tries to read the config and the credentials
+  # even with the `--stdout` and `--overwrite` flags and then errors out when the credentials file exists but
+  # not valid JSON. We hit this case as we redirect output to the same config folder, creating an empty
+  # credentials file before relay runs.
+  $dcr --no-deps -v $(pwd)/$RELAY_CONFIG_YML:/tmp/config.yml relay --config /tmp credentials generate --stdout > "$RELAY_CREDENTIALS_JSON"
+  echo "Relay credentials written to $RELAY_CREDENTIALS_JSON"
+fi
 
-    CREDENTIALS="SENTRY_RELAY_WHITELIST_PK = [\"$CREDENTIALS\"]"
+RELAY_CREDENTIALS=$(sed -n 's/^.*"public_key"[[:space:]]*:[[:space:]]*"\([a-zA-Z0-9_-]\{1,\}\)".*$/\1/p' "$RELAY_CREDENTIALS_JSON")
+if [ -z "$RELAY_CREDENTIALS" ]; then
+  >&2 echo "FAIL: Cannot read credentials back from $RELAY_CREDENTIALS_JSON."
+  >&2 echo "      Please ensure this file is readable and contains valid credentials."
+  >&2 echo ""
+  exit 1
+fi
 
-    if grep -xq SENTRY_RELAY_WHITELIST_PK "$SENTRY_CONFIG_PY"; then
-        >&2 echo "FAIL: SENTRY_RELAY_WHITELIST_PK already exists in $SENTRY_CONFIG_PY, please replace with:"
-        >&2 echo ""
-        >&2 echo "  $CREDENTIALS"
-        >&2 echo ""
-        exit 1
-    fi
-
-    echo "" >> "$SENTRY_CONFIG_PY"
-    echo "$CREDENTIALS" >> "$SENTRY_CONFIG_PY"
-    echo "Relay public key written to $SENTRY_CONFIG_PY"
-    echo ""
+if ! grep -q "\"$RELAY_CREDENTIALS\"" "$SENTRY_CONFIG_PY"; then
+  echo "SENTRY_RELAY_WHITELIST_PK = (SENTRY_RELAY_WHITELIST_PK or []) + ([\"$RELAY_CREDENTIALS\"])" >> "$SENTRY_CONFIG_PY"
+  echo "Relay public key written to $SENTRY_CONFIG_PY"
+  echo ""
 fi
 
 cleanup
