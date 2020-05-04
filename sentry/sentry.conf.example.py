@@ -29,7 +29,9 @@ SENTRY_USE_BIG_INTS = True
 # and thus various UI optimizations should be enabled.
 SENTRY_SINGLE_ORGANIZATION = True
 
-SENTRY_OPTIONS["system.event-retention-days"] = int(env('SENTRY_EVENT_RETENTION_DAYS', '90'))
+SENTRY_OPTIONS["system.event-retention-days"] = int(
+    env('SENTRY_EVENT_RETENTION_DAYS', '90')
+)
 
 #########
 # Redis #
@@ -153,12 +155,6 @@ SENTRY_DIGESTS = "sentry.digests.backends.redis.RedisBackend"
 SENTRY_WEB_HOST = "0.0.0.0"
 SENTRY_WEB_PORT = 9000
 SENTRY_WEB_OPTIONS = {
-    "http": "%s:%s" % (SENTRY_WEB_HOST, SENTRY_WEB_PORT),
-    "protocol": "uwsgi",
-    # This is needed to prevent https://git.io/fj7Lw
-    "uwsgi-socket": None,
-    "http-keepalive": True,
-    "http-chunked-input": True,
     "memory-report": False,
     # 'workers': 3,  # the number of web workers
 }
@@ -220,4 +216,3 @@ GITHUB_EXTENDED_PERMISSIONS = ['repo']
 
 # BITBUCKET_CONSUMER_KEY = 'YOUR_BITBUCKET_CONSUMER_KEY'
 # BITBUCKET_CONSUMER_SECRET = 'YOUR_BITBUCKET_CONSUMER_SECRET'
-
