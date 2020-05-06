@@ -31,7 +31,7 @@ mail.host: 'smtp'
 # System Settings #
 ###################
 
-# If this file ever becomes compromised, it's important to regenerate your a new key
+# If this file ever becomes compromised, it's important to generate a new key.
 # Changing this value will result in all current sessions being invalidated.
 # A new key can be generated with `$ sentry config generate-secret-key`
 system.secret-key: '!!changeme!!'
