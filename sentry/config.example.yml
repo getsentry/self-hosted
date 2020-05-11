@@ -31,7 +31,7 @@ mail.host: 'smtp'
 # System Settings #
 ###################
 
-# If this file ever becomes compromised, it's important to regenerate your a new key
+# If this file ever becomes compromised, it's important to generate a new key.
 # Changing this value will result in all current sessions being invalidated.
 # A new key can be generated with `$ sentry config generate-secret-key`
 system.secret-key: '!!changeme!!'
@@ -89,3 +89,13 @@ transaction-events.force-disable-internal-project: true
 #   privatekeyprivatekeyprivatekeyprivatekey
 #   privatekeyprivatekeyprivatekeyprivatekey
 #   -----END RSA PRIVATE KEY-----
+
+#####################
+# Slack Integration #
+#####################
+
+# Refer to https://forum.sentry.io/t/how-to-configure-slack-in-your-on-prem-sentry/3463 for setup instructions.
+
+# slack.client-id: <'client id'>
+# slack.client-secret: <client secret>
+# slack.verification-token: <verification token>
