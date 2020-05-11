@@ -140,6 +140,7 @@ SENTRY_TSDB_OPTIONS = {\"switchover_timestamp\": $(date +%s) + (90 * 24 * 3600)}
         echo ""
         echo "$tsdb_settings"
         echo ""
+        echo "For more information please refer to https://github.com/getsentry/onpremise/pull/430"
     fi
 }
 
