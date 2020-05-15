@@ -1,8 +1,10 @@
 version: '3.4'
-x-restart-policy: &restart_policy
+x-common-config: &common_config
   restart: unless-stopped
+  sysctls:
+    - net.ipv6.conf.all.disable_ipv6=1
 x-sentry-defaults: &sentry_defaults
-  << : *restart_policy
+  << : *common_config
   build:
     context: ./sentry
     args:
@@ -25,8 +27,11 @@ x-sentry-defaults: &sentry_defaults
   volumes:
     - 'sentry-data:/data'
     - './sentry:/etc/sentry'
+  sysctls:
+    - net.ipv6.conf.all.disable_ipv6=1
+
 x-snuba-defaults: &snuba_defaults
-  << : *restart_policy
+  << : *common_config
   depends_on:
     - redis
     - clickhouse
@@ -39,30 +44,34 @@ x-snuba-defaults: &snuba_defaults
     REDIS_HOST: redis
     UWSGI_MAX_REQUESTS: '10000'
     UWSGI_DISABLE_LOGGING: 'true'
+  sysctls:
+    - net.ipv6.conf.all.disable_ipv6=1
 services:
   smtp:
-    << : *restart_policy
+    << : *common_config
     image: tianon/exim4
     volumes:
       - 'sentry-smtp:/var/spool/exim4'
       - 'sentry-smtp-log:/var/log/exim4'
+    sysctls:
+    - net.ipv6.conf.all.disable_ipv6=1
   memcached:
-    << : *restart_policy
+    << : *common_config
     image: 'memcached:1.5-alpine'
   redis:
-    << : *restart_policy
+    << : *common_config
     image: 'redis:5.0-alpine'
     volumes:
       - 'sentry-redis:/data'
   postgres:
-    << : *restart_policy
+    << : *common_config
     image: 'postgres:9.6'
     environment:
       POSTGRES_HOST_AUTH_METHOD: 'trust'
     volumes:
       - 'sentry-postgres:/var/lib/postgresql/data'
   zookeeper:
-    << : *restart_policy
+    << : *common_config
     image: 'confluentinc/cp-zookeeper:5.5.0'
     environment:
       ZOOKEEPER_CLIENT_PORT: '2181'
@@ -74,7 +83,7 @@ services:
       - 'sentry-zookeeper-log:/var/lib/zookeeper/log'
       - 'sentry-secrets:/etc/zookeeper/secrets'
   kafka:
-    << : *restart_policy
+    << : *common_config
     depends_on:
       - zookeeper
     image: 'confluentinc/cp-kafka:5.5.0'
@@ -91,7 +100,7 @@ services:
       - 'sentry-kafka-log:/var/lib/kafka/log'
       - 'sentry-secrets:/etc/kafka/secrets'
   clickhouse:
-    << : *restart_policy
+    << : *common_config
     image: 'yandex/clickhouse-server:19.17'
     ulimits:
       nofile:
@@ -124,13 +133,13 @@ services:
         BASE_IMAGE: 'getsentry/snuba:latest'
     command: '"*/5 * * * * gosu snuba snuba cleanup --dry-run False"'
   symbolicator:
-    << : *restart_policy
+    << : *common_config
     image: 'getsentry/symbolicator:latest'
     volumes:
       - 'sentry-symbolicator:/data'
     command: run
   symbolicator-cleanup:
-    << : *restart_policy
+    << : *common_config
     image: symbolicator-cleanup-onpremise-local
     build:
       context: ./cron
@@ -163,7 +172,7 @@ services:
         BASE_IMAGE: 'sentry-onpremise-local'
     command: '"0 0 * * * gosu sentry sentry cleanup --days $SENTRY_EVENT_RETENTION_DAYS"'
   nginx:
-    << : *restart_policy
+    << : *common_config
     ports:
       - '9000:80/tcp'
     image: "nginx:1.16"
@@ -176,7 +185,7 @@ services:
       - web
       - relay
   relay:
-    << : *restart_policy
+    << : *common_config
     image: "getsentry/relay:latest"
     volumes:
       - type: bind
