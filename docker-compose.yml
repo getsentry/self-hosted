@@ -27,8 +27,6 @@ x-sentry-defaults: &sentry_defaults
   volumes:
     - 'sentry-data:/data'
     - './sentry:/etc/sentry'
-  sysctls:
-    - net.ipv6.conf.all.disable_ipv6=1
 
 x-snuba-defaults: &snuba_defaults
   << : *common_config
@@ -44,8 +42,6 @@ x-snuba-defaults: &snuba_defaults
     REDIS_HOST: redis
     UWSGI_MAX_REQUESTS: '10000'
     UWSGI_DISABLE_LOGGING: 'true'
-  sysctls:
-    - net.ipv6.conf.all.disable_ipv6=1
 services:
   smtp:
     << : *common_config
@@ -53,8 +49,6 @@ services:
     volumes:
       - 'sentry-smtp:/var/spool/exim4'
       - 'sentry-smtp-log:/var/log/exim4'
-    sysctls:
-    - net.ipv6.conf.all.disable_ipv6=1
   memcached:
     << : *common_config
     image: 'memcached:1.5-alpine'
