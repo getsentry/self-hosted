@@ -82,6 +82,8 @@ services:
       KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
       KAFKA_ADVERTISED_LISTENERS: 'PLAINTEXT://kafka:9092'
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: '1'
+      KAFKA_MESSAGE_MAX_BYTES: '50000000' #50MB or bust
+      KAFKA_MAX_REQUEST_SIZE: '50000000' #50MB on requests apparently too
       CONFLUENT_SUPPORT_METRICS_ENABLE: 'false'
       KAFKA_LOG4J_LOGGERS: 'kafka.cluster=WARN,kafka.controller=WARN,kafka.coordinator=WARN,kafka.log=WARN,kafka.server=WARN,kafka.zookeeper=WARN,state.change.logger=WARN'
       KAFKA_LOG4J_ROOT_LOGLEVEL: 'WARN'
