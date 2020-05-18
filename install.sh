@@ -164,11 +164,8 @@ $dc build --force-rm --parallel
 echo ""
 echo "Docker images built."
 
-echo "Bootstrapping Snuba..."
-# `bootstrap` is for fresh installs, and `migrate` is for existing installs
-# Running them both for both cases is harmless so we blindly run them
+echo "Bootstrapping and migrating Snuba..."
 $dcr snuba-api bootstrap --force
-$dcr snuba-api migrate
 echo ""
 
 # Very naively check whether there's an existing sentry-postgres volume and the PG version in it
