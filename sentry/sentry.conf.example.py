@@ -158,12 +158,11 @@ SENTRY_WEB_OPTIONS = {
     # These ase for proper HTTP/1.1 support from uWSGI
     # Without these it doesn't do keep-alives causing
     # issues with Relay's direct requests.
-    "http": "%s:%s" % (SENTRY_WEB_HOST, SENTRY_WEB_PORT),
-    "protocol": "uwsgi",
-    # This is needed to prevent https://git.io/fj7Lw
-    "uwsgi-socket": None,
     "http-keepalive": True,
     "http-chunked-input": True,
+    # the number of web workers
+    'workers': 3,
+    # Turn off memory reporting
     "memory-report": False,
     # Some stuff so uwsgi will cycle workers sensibly
     'max-requests': 100000,
@@ -180,7 +179,6 @@ SENTRY_WEB_OPTIONS = {
     'ignore-sigpipe': True,
     'ignore-write-errors': True,
     'disable-write-exception': True,
-    # 'workers': 3,  # the number of web workers
 }
 
 ###########
