@@ -155,8 +155,30 @@ SENTRY_DIGESTS = "sentry.digests.backends.redis.RedisBackend"
 SENTRY_WEB_HOST = "0.0.0.0"
 SENTRY_WEB_PORT = 9000
 SENTRY_WEB_OPTIONS = {
+    # These ase for proper HTTP/1.1 support from uWSGI
+    # Without these it doesn't do keep-alives causing
+    # issues with Relay's direct requests.
+    "http-keepalive": True,
+    "http-chunked-input": True,
+    # the number of web workers
+    'workers': 3,
+    # Turn off memory reporting
     "memory-report": False,
-    # 'workers': 3,  # the number of web workers
+    # Some stuff so uwsgi will cycle workers sensibly
+    'max-requests': 100000,
+    'max-requests-delta': 500,
+    'max-worker-lifetime': 86400,
+    # Duplicate options from sentry default just so we don't get
+    # bit by sentry changing a default value that we depend on.
+    'thunder-lock': True,
+    'log-x-forwarded-for': False,
+    'buffer-size': 32768,
+    'limit-post': 209715200,
+    'disable-logging': True,
+    'reload-on-rss': 600,
+    'ignore-sigpipe': True,
+    'ignore-write-errors': True,
+    'disable-write-exception': True,
 }
 
 ###########
