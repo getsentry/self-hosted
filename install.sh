@@ -218,6 +218,8 @@ if [ ! -f "$RELAY_CREDENTIALS_JSON" ]; then
   echo ""
   echo "Generating Relay credentials..."
 
+  touch "$RELAY_CREDENTIALS_JSON"
+
   # We need the ugly hack below as `relay generate credentials` tries to read the config and the credentials
   # even with the `--stdout` and `--overwrite` flags and then errors out when the credentials file exists but
   # not valid JSON. We hit this case as we redirect output to the same config folder, creating an empty

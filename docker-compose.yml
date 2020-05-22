@@ -22,9 +22,19 @@ x-sentry-defaults: &sentry_defaults
   environment:
     SENTRY_CONF: '/etc/sentry'
     SNUBA: 'http://snuba-api:1218'
+  configs:
+    - source: sentry-py
+      target: '/etc/sentry/sentry.conf.py'
+      uid: '999'
+      gid: '999'
+      mode: 0440
+    - source: sentry-yml
+      target: '/etc/sentry/config.yml'
+      uid: '999'
+      gid: '999'
+      mode: 0440
   volumes:
     - 'sentry-data:/data'
-    - './sentry:/etc/sentry'
 x-snuba-defaults: &snuba_defaults
   << : *restart_policy
   depends_on:
@@ -168,18 +178,30 @@ services:
     << : *restart_policy
     ports:
       - '9000:80/tcp'
-    image: "nginx:1.16"
-    volumes:
-      - type: bind
-        read_only: true
-        source: ./nginx
-        target: /etc/nginx
+    image: 'nginx:1.16'
+    configs:
+    - source: nginx
+      target: '/etc/nginx/nginx.conf'
+      uid: '101'
+      gid: '101'
+      mode: 0440
     depends_on:
       - web
       - relay
   relay:
     << : *restart_policy
-    image: "getsentry/relay:latest"
+    image: 'getsentry/relay:latest'
+    configs:
+    - source: relay-conf
+      target: '/work/.relay/config.yml'
+      uid: '10001'
+      gid: '10001'
+      mode: 0440
+    - source: relay-creds
+      target: /work/.relay/credentials.json
+      uid: '10001'
+      gid: '10001'
+      mode: 0440
     volumes:
       - type: bind
         read_only: true
@@ -188,6 +210,17 @@ services:
     depends_on:
       - kafka
       - redis
+configs:
+  sentry-py:
+    file: ./sentry/sentry.conf.py
+  sentry-yml:
+    file: ./sentry/config.yml
+  relay-conf:
+    file: ./relay/config.yml
+  relay-creds:
+    file: ./relay/credentials.json
+  nginx:
+    file: ./nginx/nginx.conf
 volumes:
   sentry-data:
     external: true
