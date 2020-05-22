@@ -43,6 +43,8 @@ services:
   postgres:
     restart: unless-stopped
     image: postgres:9.5
+    environment:
+      POSTGRES_HOST_AUTH_METHOD: 'trust'
     volumes:
       - sentry-postgres:/var/lib/postgresql/data
 
