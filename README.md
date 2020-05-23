@@ -37,7 +37,7 @@ We continously push the Docker image for each commit made into [Sentry](https://
 SENTRY_IMAGE=getsentry/sentry:83b1380 ./install.sh
 ```
 
-Note that this may not work for all commit SHAs as this repository evolves with Sentry and its sattelite projects. It is highly recommended checking out a version of this repository that is close to the timestamp of the Sentry commit you are installing.
+Note that this may not work for all commit SHAs as this repository evolves with Sentry and its satellite projects. It is highly recommended to check out a version of this repository that is close to the timestamp of the Sentry commit you are installing.
 
 ## Event Retention
 
