@@ -126,7 +126,7 @@ services:
     build:
       context: ./cron
       args:
-        BASE_IMAGE: 'getsentry/snuba:latest'
+        BASE_IMAGE: 'getsentry/snuba:$SENTRY_VERSION'
     command: '"*/5 * * * * gosu snuba snuba cleanup --dry-run False"'
   symbolicator:
     << : *restart_policy
