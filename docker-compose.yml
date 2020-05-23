@@ -130,7 +130,7 @@ services:
     command: '"*/5 * * * * gosu snuba snuba cleanup --dry-run False"'
   symbolicator:
     << : *restart_policy
-    image: 'getsentry/symbolicator:latest'
+    image: 'getsentry/symbolicator:8ac8f400fb7416c6c46fad856cdba2bc70c27c6c'
     volumes:
       - 'sentry-symbolicator:/data'
     command: run
@@ -140,7 +140,7 @@ services:
     build:
       context: ./cron
       args:
-        BASE_IMAGE: 'getsentry/symbolicator:latest'
+        BASE_IMAGE: 'getsentry/symbolicator:8ac8f400fb7416c6c46fad856cdba2bc70c27c6c'
     command: '"55 23 * * * gosu symbolicator symbolicator cleanup"'
     volumes:
       - 'sentry-symbolicator:/data'
