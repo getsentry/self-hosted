@@ -7,6 +7,7 @@ x-sentry-defaults: &sentry_defaults
     context: ./sentry
     args:
       - SENTRY_IMAGE
+      - SENTRY_VERSION
   image: sentry-onpremise-local
   depends_on:
     - redis
@@ -29,7 +30,7 @@ x-snuba-defaults: &snuba_defaults
     - redis
     - clickhouse
     - kafka
-  image: 'getsentry/snuba:latest'
+  image: 'getsentry/snuba:$SENTRY_VERSION'
   environment:
     SNUBA_SETTINGS: docker
     CLICKHOUSE_HOST: clickhouse
