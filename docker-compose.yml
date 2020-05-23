@@ -168,7 +168,7 @@ services:
   nginx:
     << : *restart_policy
     ports:
-      - '9000:80/tcp'
+      - '$SENTRY_ONPREMISE_PORT:80/tcp'
     image: "nginx:1.16"
     volumes:
       - type: bind
