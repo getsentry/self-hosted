@@ -153,7 +153,12 @@ echo ""
 # shows a 404 error on the console which is confusing and unnecessary. To overcome this, we add the stderr>stdout
 # redirection below and pass it through grep, ignoring all lines having this '-onpremise-local' suffix.
 $dc pull -q --ignore-pull-failures 2>&1 | grep -v -- -onpremise-local || true
-docker pull ${SENTRY_IMAGE:-getsentry/sentry:latest}
+
+if [ -z "$SENTRY_IMAGE" ]; then
+  docker pull getsentry/sentry:${SENTRY_VERSION:-latest}
+else
+  echo "SENTRY_IMAGE is explicitly set, skipped pulling."
+fi
 
 echo ""
 echo "Building and tagging Docker images..."
