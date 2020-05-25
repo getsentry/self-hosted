@@ -157,7 +157,8 @@ $dc pull -q --ignore-pull-failures 2>&1 | grep -v -- -onpremise-local || true
 if [ -z "$SENTRY_IMAGE" ]; then
   docker pull getsentry/sentry:${SENTRY_VERSION:-latest}
 else
-  echo "SENTRY_IMAGE is explicitly set, skipped pulling."
+  # We may not have the set image on the repo (local images) so allow fails
+  docker pull $SENTRY_IMAGE || true;
 fi
 
 echo ""
