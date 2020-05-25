@@ -1,0 +1,41 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.19.0 (f63a961c)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: smtp
+  name: smtp
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert
+        kompose.version: 1.19.0 (f63a961c)
+      creationTimestamp: null
+      labels:
+        io.kompose.service: smtp
+    spec:
+      containers:
+      - image: tianon/exim4
+        name: smtp
+        resources: {}
+        volumeMounts:
+        - mountPath: /var/spool/exim4
+          name: sentry-smtp
+        - mountPath: /var/log/exim4
+          name: sentry-smtp-log
+      restartPolicy: Always
+      volumes:
+      - name: sentry-smtp
+        persistentVolumeClaim:
+          claimName: sentry-smtp
+      - name: sentry-smtp-log
+        persistentVolumeClaim:
+          claimName: sentry-smtp-log
+status: {}

@@ -1,0 +1,36 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.19.0 (f63a961c)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: redis
+  name: redis
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert
+        kompose.version: 1.19.0 (f63a961c)
+      creationTimestamp: null
+      labels:
+        io.kompose.service: redis
+    spec:
+      containers:
+      - image: redis:5.0-alpine
+        name: redis
+        resources: {}
+        volumeMounts:
+        - mountPath: /data
+          name: sentry-redis
+      restartPolicy: Always
+      volumes:
+      - name: sentry-redis
+        persistentVolumeClaim:
+          claimName: sentry-redis
+status: {}

@@ -1,0 +1,43 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.19.0 (f63a961c)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: snuba-cleanup
+  name: snuba-cleanup
+spec:
+  replicas: 1
+  strategy: {}
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert
+        kompose.version: 1.19.0 (f63a961c)
+      creationTimestamp: null
+      labels:
+        io.kompose.service: snuba-cleanup
+    spec:
+      containers:
+      - args:
+        - '*/5 * * * * gosu snuba snuba cleanup --dry-run False'
+        env:
+        - name: CLICKHOUSE_HOST
+          value: clickhouse
+        - name: DEFAULT_BROKERS
+          value: kafka:9092
+        - name: REDIS_HOST
+          value: redis
+        - name: SNUBA_SETTINGS
+          value: docker
+        - name: UWSGI_DISABLE_LOGGING
+          value: "true"
+        - name: UWSGI_MAX_REQUESTS
+          value: "10000"
+        image: snuba-cleanup-onpremise-local
+        name: snuba-cleanup
+        resources: {}
+      restartPolicy: Always
+status: {}

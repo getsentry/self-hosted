@@ -1,0 +1,55 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.19.0 (f63a961c)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: zookeeper
+  name: zookeeper
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert
+        kompose.version: 1.19.0 (f63a961c)
+      creationTimestamp: null
+      labels:
+        io.kompose.service: zookeeper
+    spec:
+      containers:
+      - env:
+        - name: CONFLUENT_SUPPORT_METRICS_ENABLE
+          value: "false"
+        - name: ZOOKEEPER_CLIENT_PORT
+          value: "2181"
+        - name: ZOOKEEPER_LOG4J_ROOT_LOGLEVEL
+          value: WARN
+        - name: ZOOKEEPER_TOOLS_LOG4J_LOGLEVEL
+          value: WARN
+        image: confluentinc/cp-zookeeper:5.5.0
+        name: zookeeper
+        resources: {}
+        volumeMounts:
+        - mountPath: /var/lib/zookeeper/data
+          name: sentry-zookeeper
+        - mountPath: /var/lib/zookeeper/log
+          name: sentry-zookeeper-log
+        - mountPath: /etc/zookeeper/secrets
+          name: sentry-secrets
+      restartPolicy: Always
+      volumes:
+      - name: sentry-zookeeper
+        persistentVolumeClaim:
+          claimName: sentry-zookeeper
+      - name: sentry-zookeeper-log
+        persistentVolumeClaim:
+          claimName: sentry-zookeeper-log
+      - name: sentry-secrets
+        persistentVolumeClaim:
+          claimName: sentry-secrets
+status: {}

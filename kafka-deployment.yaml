@@ -1,0 +1,65 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.19.0 (f63a961c)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: kafka
+  name: kafka
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert
+        kompose.version: 1.19.0 (f63a961c)
+      creationTimestamp: null
+      labels:
+        io.kompose.service: kafka
+    spec:
+      containers:
+      - env:
+        - name: CONFLUENT_SUPPORT_METRICS_ENABLE
+          value: "false"
+        - name: KAFKA_ADVERTISED_LISTENERS
+          value: PLAINTEXT://kafka:9092
+        - name: KAFKA_LOG4J_LOGGERS
+          value: kafka.cluster=WARN,kafka.controller=WARN,kafka.coordinator=WARN,kafka.log=WARN,kafka.server=WARN,kafka.zookeeper=WARN,state.change.logger=WARN
+        - name: KAFKA_LOG4J_ROOT_LOGLEVEL
+          value: WARN
+        - name: KAFKA_MAX_REQUEST_SIZE
+          value: "50000000"
+        - name: KAFKA_MESSAGE_MAX_BYTES
+          value: "50000000"
+        - name: KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR
+          value: "1"
+        - name: KAFKA_TOOLS_LOG4J_LOGLEVEL
+          value: WARN
+        - name: KAFKA_ZOOKEEPER_CONNECT
+          value: zookeeper:2181
+        image: confluentinc/cp-kafka:5.5.0
+        name: kafka
+        resources: {}
+        volumeMounts:
+        - mountPath: /var/lib/kafka/data
+          name: sentry-kafka
+        - mountPath: /var/lib/kafka/log
+          name: sentry-kafka-log
+        - mountPath: /etc/kafka/secrets
+          name: sentry-secrets
+      restartPolicy: Always
+      volumes:
+      - name: sentry-kafka
+        persistentVolumeClaim:
+          claimName: sentry-kafka
+      - name: sentry-kafka-log
+        persistentVolumeClaim:
+          claimName: sentry-kafka-log
+      - name: sentry-secrets
+        persistentVolumeClaim:
+          claimName: sentry-secrets
+status: {}

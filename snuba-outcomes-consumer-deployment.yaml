@@ -1,0 +1,48 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.19.0 (f63a961c)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: snuba-outcomes-consumer
+  name: snuba-outcomes-consumer
+spec:
+  replicas: 1
+  strategy: {}
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert
+        kompose.version: 1.19.0 (f63a961c)
+      creationTimestamp: null
+      labels:
+        io.kompose.service: snuba-outcomes-consumer
+    spec:
+      containers:
+      - args:
+        - consumer
+        - --storage
+        - outcomes_raw
+        - --auto-offset-reset=earliest
+        - --max-batch-time-ms
+        - "750"
+        env:
+        - name: CLICKHOUSE_HOST
+          value: clickhouse
+        - name: DEFAULT_BROKERS
+          value: kafka:9092
+        - name: REDIS_HOST
+          value: redis
+        - name: SNUBA_SETTINGS
+          value: docker
+        - name: UWSGI_DISABLE_LOGGING
+          value: "true"
+        - name: UWSGI_MAX_REQUESTS
+          value: "10000"
+        image: 'getsentry/snuba:'
+        name: snuba-outcomes-consumer
+        resources: {}
+      restartPolicy: Always
+status: {}

@@ -1,0 +1,49 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.19.0 (f63a961c)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: cron
+  name: cron
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert
+        kompose.version: 1.19.0 (f63a961c)
+      creationTimestamp: null
+      labels:
+        io.kompose.service: cron
+    spec:
+      containers:
+      - args:
+        - run
+        - cron
+        env:
+        - name: SENTRY_CONF
+          value: /etc/sentry
+        - name: SNUBA
+          value: http://snuba-api:1218
+        image: sentry-onpremise-local
+        name: cron
+        resources: {}
+        volumeMounts:
+        - mountPath: /data
+          name: sentry-data
+        - mountPath: /etc/sentry
+          name: cron-claim1
+      restartPolicy: Always
+      volumes:
+      - name: sentry-data
+        persistentVolumeClaim:
+          claimName: sentry-data
+      - name: cron-claim1
+        persistentVolumeClaim:
+          claimName: cron-claim1
+status: {}

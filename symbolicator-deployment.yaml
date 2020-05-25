@@ -1,0 +1,38 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.19.0 (f63a961c)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: symbolicator
+  name: symbolicator
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert
+        kompose.version: 1.19.0 (f63a961c)
+      creationTimestamp: null
+      labels:
+        io.kompose.service: symbolicator
+    spec:
+      containers:
+      - args:
+        - run
+        image: getsentry/symbolicator:latest
+        name: symbolicator
+        resources: {}
+        volumeMounts:
+        - mountPath: /data
+          name: sentry-symbolicator
+      restartPolicy: Always
+      volumes:
+      - name: sentry-symbolicator
+        persistentVolumeClaim:
+          claimName: sentry-symbolicator
+status: {}

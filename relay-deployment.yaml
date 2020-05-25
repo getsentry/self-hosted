@@ -1,0 +1,38 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.19.0 (f63a961c)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: relay
+  name: relay
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert
+        kompose.version: 1.19.0 (f63a961c)
+      creationTimestamp: null
+      labels:
+        io.kompose.service: relay
+    spec:
+      containers:
+      - image: 'getsentry/relay:'
+        name: relay
+        resources: {}
+        volumeMounts:
+        - mountPath: /work/.relay
+          name: relay-claim0
+          readOnly: true
+      restartPolicy: Always
+      volumes:
+      - name: relay-claim0
+        persistentVolumeClaim:
+          claimName: relay-claim0
+          readOnly: true
+status: {}

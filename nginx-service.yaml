@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.19.0 (f63a961c)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: nginx
+  name: nginx
+spec:
+  ports:
+  - name: "9000"
+    port: 9000
+    targetPort: 80
+  selector:
+    io.kompose.service: nginx
+status:
+  loadBalancer: {}
