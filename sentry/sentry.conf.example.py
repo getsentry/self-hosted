@@ -206,9 +206,6 @@ SENTRY_FEATURES.update(
         for feature in (
             "organizations:discover",
             "organizations:events",
-            "organizations:discover-basic",
-            "organizations:discover-query",
-            "organizations:events-v2",
             "organizations:global-views",
             "organizations:integrations-issue-basic",
             "organizations:integrations-issue-sync",
