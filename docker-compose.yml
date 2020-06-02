@@ -116,7 +116,7 @@ services:
   snuba-outcomes-consumer:
     << : *snuba_defaults
     command: consumer --storage outcomes_raw --auto-offset-reset=earliest --max-batch-time-ms 750
-  # Kafka consumer responsible for feeding session events into Clickhouse
+  # Kafka consumer responsible for feeding session data into Clickhouse
   snuba-sessions-consumer:
     << : *snuba_defaults
     command: consumer --storage sessions_raw --auto-offset-reset=latest --max-batch-time-ms 750
