@@ -176,7 +176,7 @@ ZOOKEEPER_SNAPSHOT_FILE_COUNT=$($dcr zookeeper bash -c 'ls 2>/dev/null -Ubad1 --
 # This is a workaround for a ZK upgrade bug: https://issues.apache.org/jira/browse/ZOOKEEPER-3056
 if [ "$ZOOKEEPER_LOG_FILE_COUNT" -gt "0" ] && [ "$ZOOKEEPER_SNAPSHOT_FILE_COUNT" -eq "0" ]; then
   $dcr -v $(pwd)/zookeeper:/temp zookeeper bash -c 'cp /temp/snapshot.0 /var/lib/zookeeper/data/version-2/snapshot.0'
-  $dc run -e ZOOKEEPER_SNAPSHOT_TRUST_EMPTY=true zookeeper
+  $dc run -d -e ZOOKEEPER_SNAPSHOT_TRUST_EMPTY=true zookeeper
 fi
 
 
