@@ -17,6 +17,7 @@ x-sentry-defaults: &sentry_defaults
     - snuba-api
     - snuba-consumer
     - snuba-outcomes-consumer
+    - snuba-sessions-consumer
     - snuba-replacer
     - symbolicator
     - kafka
@@ -115,6 +116,10 @@ services:
   snuba-outcomes-consumer:
     << : *snuba_defaults
     command: consumer --storage outcomes_raw --auto-offset-reset=earliest --max-batch-time-ms 750
+  # Kafka consumer responsible for feeding session events into Clickhouse
+  snuba-sessions-consumer:
+    << : *snuba_defaults
+    command: consumer --storage sessions_raw --auto-offset-reset=latest --max-batch-time-ms 750
   snuba-replacer:
     << : *snuba_defaults
     command: replacer --storage events --auto-offset-reset=latest --max-batch-size 3
