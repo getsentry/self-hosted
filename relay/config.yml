@@ -9,4 +9,5 @@ processing:
   enabled: true
   kafka_config:
     - {name: "bootstrap.servers", value: "kafka:9092"}
+    - {name: "message.max.bytes", value: 50000000} #50MB or bust
   redis: redis://redis:6379
