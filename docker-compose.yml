@@ -170,16 +170,16 @@ services:
       args:
         BASE_IMAGE: 'sentry-onpremise-local'
     command: '"0 0 * * * gosu sentry sentry cleanup --days $SENTRY_EVENT_RETENTION_DAYS"'
-  nginx:
+  frontend:
     << : *restart_policy
     ports:
       - '9000:80/tcp'
-    image: "nginx:1.16"
-    volumes:
-      - type: bind
-        read_only: true
-        source: ./nginx
-        target: /etc/nginx
+    image: 'us.gcr.io/sentryio/frontend:latest'
+    environment:
+      UPSTREAM_WEB: web:9000
+      UPSTREAM_RELAY: relay:3000
+      FORCE_DNS_RESOLVE: 'true'
+      CACHE_STATIC: 'true'
     depends_on:
       - web
       - relay
