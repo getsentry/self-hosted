@@ -251,7 +251,7 @@ if [ -z "$RELAY_CREDENTIALS" ]; then
 fi
 
 if ! grep -q "\"$RELAY_CREDENTIALS\"" "$SENTRY_CONFIG_PY"; then
-  echo "SENTRY_RELAY_WHITELIST_PK = (SENTRY_RELAY_WHITELIST_PK or []) + ([\"$RELAY_CREDENTIALS\"])" >> "$SENTRY_CONFIG_PY"
+  echo "SENTRY_TRUSTED_RELAY_PKS = (SENTRY_TRUSTED_RELAY_PKS or []) + ([\"$RELAY_CREDENTIALS\"])" >> "$SENTRY_CONFIG_PY"
   echo "Relay public key written to $SENTRY_CONFIG_PY"
   echo ""
 fi
