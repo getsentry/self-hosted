@@ -7,7 +7,7 @@ jobs:
     name: "Release a new version"
     steps:
         - uses: actions/checkout@v2
-        - uses: getsentry/craft-action
+        - uses: getsentry/craft-action@master
           with:
             action: prepare
             version: ${{ github.event.client_payload.version }}
