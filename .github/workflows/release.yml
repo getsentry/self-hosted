@@ -1,0 +1,14 @@
+on:
+  repository_dispatch:
+    types: [release]
+jobs:
+  release:
+  runs-on: ubuntu-latest
+  name: "Release a new version"
+  steps:
+    - uses: actions/checkout@v2
+    - uses: getsentry/craft-action
+      with:
+        action: prepare
+        version: ${{ github.event.client_payload.version }}
+        dry_run: ${{ github.event.client_payload.dry_run }}
