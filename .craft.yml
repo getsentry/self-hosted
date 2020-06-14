@@ -1,0 +1,11 @@
+minVersion: "0.10.0"
+github:
+  owner: getsentry
+  repo: onpremise
+changelogPolicy: none
+artifactProvider:
+  name: none
+statusProvider:
+  name: github
+targets:
+  - name: github
