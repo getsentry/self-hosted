@@ -1,14 +1,24 @@
 on:
   repository_dispatch:
     types: [release]
+  schedule:
+    - cron:  '0 0 15 * *'
 jobs:
   release:
     runs-on: ubuntu-latest
     name: "Release a new version"
     steps:
+        - id: calver
+          if: ${{ !github.event.client_payload.version }}
+          run: echo "::set-output name=version::$(date +'%y.%-m.0')"
         - uses: actions/checkout@v2
         - uses: getsentry/craft-action@master
           with:
             action: prepare
-            version: ${{ github.event.client_payload.version }}
+            version: ${{ github.event.client_payload.version || steps.calver.outputs.version }}
+            dry_run: ${{ github.event.client_payload.dry_run }}
+        - uses: getsentry/craft-action@master
+          with:
+            action: publish
+            version: ${{ github.event.client_payload.version || steps.calver.outputs.version }}
             dry_run: ${{ github.event.client_payload.dry_run }}
