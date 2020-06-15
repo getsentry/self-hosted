@@ -19,9 +19,13 @@ jobs:
           with:
             action: prepare
             version: ${{ github.event.client_payload.version || steps.calver.outputs.version }}
-            dry_run: ${{ github.event.client_payload.dry_run }}
+          env:
+            DRY_RUN: ${{ github.event.client_payload.dry_run }}
         - uses: getsentry/craft@master
           with:
             action: publish
             version: ${{ github.event.client_payload.version || steps.calver.outputs.version }}
-            dry_run: ${{ github.event.client_payload.dry_run }}
+            keep_branch: true
+            no_merge: true
+          env:
+            DRY_RUN: ${{ github.event.client_payload.dry_run }}
