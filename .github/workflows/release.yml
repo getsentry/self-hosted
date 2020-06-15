@@ -2,7 +2,10 @@ on:
   repository_dispatch:
     types: [release]
   schedule:
-    - cron:  '0 0 15 * *'
+    # We want the release to be at 10 or 11am Pacific Time
+    # We also make this an hour after all others such as Sentry,
+    # Snuba, and Relay to make sure their releases finish.
+    - cron:  '0 18 15 * *'
 jobs:
   release:
     runs-on: ubuntu-latest
