@@ -15,12 +15,12 @@ jobs:
           if: ${{ !github.event.client_payload.version }}
           run: echo "::set-output name=version::$(date +'%y.%-m.0')"
         - uses: actions/checkout@v2
-        - uses: getsentry/craft-action@master
+        - uses: getsentry/craft@master
           with:
             action: prepare
             version: ${{ github.event.client_payload.version || steps.calver.outputs.version }}
             dry_run: ${{ github.event.client_payload.dry_run }}
-        - uses: getsentry/craft-action@master
+        - uses: getsentry/craft@master
           with:
             action: publish
             version: ${{ github.event.client_payload.version || steps.calver.outputs.version }}
