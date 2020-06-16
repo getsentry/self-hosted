@@ -1,14 +1,31 @@
 on:
   repository_dispatch:
     types: [release]
+  schedule:
+    # We want the release to be at 10 or 11am Pacific Time
+    # We also make this an hour after all others such as Sentry,
+    # Snuba, and Relay to make sure their releases finish.
+    - cron:  '0 18 15 * *'
 jobs:
   release:
     runs-on: ubuntu-latest
     name: "Release a new version"
     steps:
+        - id: calver
+          if: ${{ !github.event.client_payload.version }}
+          run: echo "::set-output name=version::$(date +'%y.%-m.0')"
         - uses: actions/checkout@v2
-        - uses: getsentry/craft-action@master
+        - uses: getsentry/craft@master
           with:
             action: prepare
-            version: ${{ github.event.client_payload.version }}
-            dry_run: ${{ github.event.client_payload.dry_run }}
+            version: ${{ github.event.client_payload.version || steps.calver.outputs.version }}
+          env:
+            DRY_RUN: ${{ github.event.client_payload.dry_run }}
+        - uses: getsentry/craft@master
+          with:
+            action: publish
+            version: ${{ github.event.client_payload.version || steps.calver.outputs.version }}
+            keep_branch: true
+            no_merge: true
+          env:
+            DRY_RUN: ${{ github.event.client_payload.dry_run }}
