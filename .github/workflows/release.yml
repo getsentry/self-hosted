@@ -17,6 +17,7 @@ jobs:
           run: echo "::set-output name=version::$(date +'%y.%-m.0')"
         - uses: actions/checkout@v2
         - uses: getsentry/craft@master
+          if: ${{ !github.event.client_payload.skip_prepare }}
           with:
             action: prepare
             version: ${{ github.event.client_payload.version || steps.calver.outputs.version }}
