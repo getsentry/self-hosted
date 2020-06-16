@@ -8,5 +8,8 @@ artifactProvider:
   name: none
 statusProvider:
   name: github
+  config:
+    contexts:
+      - 'continuous-integration/travis-ci/push'
 targets:
   - name: github
