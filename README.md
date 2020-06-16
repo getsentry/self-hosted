@@ -1,4 +1,4 @@
-# Sentry 10 On-Premise [![Build Status][build-status-image]][build-status-url]
+# Sentry 20.6.0 On-Premise [![Build Status][build-status-image]][build-status-url]
 
 Official bootstrap for running your own [Sentry](https://sentry.io/) with [Docker](https://www.docker.com/).
 
