@@ -29,8 +29,8 @@ jobs:
           with:
             action: publish
             version: ${{ github.event.client_payload.version || steps.calver.outputs.version }}
-            keep_branch: true
-            no_merge: true
+            keep_branch: '--keep-branch'
+            no_merge: '--no-merge'
           env:
             DRY_RUN: ${{ github.event.client_payload.dry_run }}
             GIT_COMMITTER_NAME: getsentry-bot
