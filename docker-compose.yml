@@ -133,7 +133,7 @@ services:
     command: '"*/5 * * * * gosu snuba snuba cleanup --dry-run False"'
   symbolicator:
     << : *restart_policy
-    image: 'getsentry/symbolicator:latest'
+    image: 'getsentry/symbolicator:$SYMBOLICATOR_VERSION'
     volumes:
       - 'sentry-symbolicator:/data'
     command: run
@@ -143,7 +143,7 @@ services:
     build:
       context: ./cron
       args:
-        BASE_IMAGE: 'getsentry/symbolicator:latest'
+        BASE_IMAGE: 'getsentry/symbolicator:$SYMBOLICATOR_VERSION'
     command: '"55 23 * * * gosu symbolicator symbolicator cleanup"'
     volumes:
       - 'sentry-symbolicator:/data'
@@ -174,7 +174,7 @@ services:
     << : *restart_policy
     ports:
       - '9000:80/tcp'
-    image: "nginx:1.16"
+    image: 'nginx:1.16'
     volumes:
       - type: bind
         read_only: true
@@ -185,7 +185,7 @@ services:
       - relay
   relay:
     << : *restart_policy
-    image: "getsentry/relay:$SENTRY_VERSION"
+    image: 'getsentry/relay:$SENTRY_VERSION'
     volumes:
       - type: bind
         read_only: true
