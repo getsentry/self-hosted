@@ -21,6 +21,9 @@ jobs:
             version: ${{ github.event.client_payload.version || steps.calver.outputs.version }}
           env:
             DRY_RUN: ${{ github.event.client_payload.dry_run }}
+            GIT_COMMITTER_NAME: getsentry-bot
+            GIT_AUTHOR_NAME: getsentry-bot
+            EMAIL: bot@getsentry.com
         - uses: getsentry/craft@master
           with:
             action: publish
@@ -29,3 +32,6 @@ jobs:
             no_merge: true
           env:
             DRY_RUN: ${{ github.event.client_payload.dry_run }}
+            GIT_COMMITTER_NAME: getsentry-bot
+            GIT_AUTHOR_NAME: getsentry-bot
+            EMAIL: bot@getsentry.com
