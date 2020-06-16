@@ -1,3 +1,4 @@
+name: release
 on:
   repository_dispatch:
     types: [release]
