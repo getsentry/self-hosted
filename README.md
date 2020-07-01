@@ -57,6 +57,7 @@ Uncomment the following in `docker-compose.yml` nginx directive
  #  - '443'
  ports:
  #  - '443:443'
+   - '$SENTRY_ONPREMISE_PORT:80/tcp'
 ```
 
 And uncomment the following in your sentry.config.py
