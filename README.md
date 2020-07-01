@@ -49,6 +49,47 @@ If you'd like to protect your Sentry install with SSL/TLS, there are
 fantastic SSL/TLS proxies like [HAProxy](http://www.haproxy.org/)
 and [Nginx](http://nginx.org/). You'll likely want to add this service to your `docker-compose.yml` file.
 
+OR do the following things to enable auto redirect to https behind a reverse proxy
+
+Uncomment the following in `docker-compose.yml` nginx directive
+```
+ #expose:
+ #  - '443'
+ ports:
+ #  - '443:443'
+```
+
+And uncomment the following in your sentry.config.py
+```
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+SOCIAL_AUTH_REDIRECT_IS_HTTPS = True
+SENTRY_USE_SSL = True
+```
+
+And uncomment the following `#`s in your nginx config, and simply replace the contents of the `cert.crt` and `cert.key` in the ssl folder found inside the nginx folder
+```
+## comment me and uncomment below me to support ssl
+proxy_set_header Host $host;
+#proxy_set_header Host $http_host;
+```
+```
+#server {
+#    listen 80;
+#    return 301 https://$host$request_uri;
+#}
+
+server {
+    #listen 443 ssl;
+    #ssl_certificate /etc/nginx/ssl/cert.crt;
+    #ssl_certificate_key /etc/nginx/ssl/cert.key;
+    ## uncomment the above and comment the next line for SSL support, with auto ssl redirect
+    listen 80;
+```
+
+NOTE: if you noticed some things not using the appropriate URL i.e favicons in <HEAD> then your url-prefix is probably wrong, please double check this at sentry.DOMAIN.com/manage/settings/  
+
 ## Updating Sentry
 
 _You need to be on at least Sentry 9.1.2 to be able to upgrade automatically to the latest version. If you are not, upgrade to 9.1.2 first by checking out the [9.1.2 tag](https://github.com/getsentry/onpremise/tree/9.1.2) on this repo._
