@@ -45,49 +45,14 @@ Sentry comes with a cleanup cron job that prunes events older than `90 days` by 
 
 ## Securing Sentry with SSL/TLS
 
-If you'd like to protect your Sentry install with SSL/TLS, there are
-fantastic SSL/TLS proxies like [HAProxy](http://www.haproxy.org/)
-and [Nginx](http://nginx.org/). You'll likely want to add this service to your `docker-compose.yml` file.
+If you'd like to protect your Sentry install with SSL/TLS and enforce https simply apply the changes found below
 
-OR do the following things to enable auto redirect to https behind a reverse proxy
+* Generate a ssl crt and key for example you can use letsencrypt (see [Letsencrypt Guide](https://www.linode.com/docs/security/ssl/install-lets-encrypt-to-create-ssl-certificates/))
+Once generated simply replace the contents of the `cert.crt` and `cert.key` in the ssl folder found inside the nginx folder
 
-Uncomment the following in `docker-compose.yml` nginx directive
-```
- #expose:
- #  - '443'
- ports:
- #  - '443:443'
-   - '$SENTRY_ONPREMISE_PORT:80/tcp'
-```
-
-And uncomment the following in your sentry.config.py
-```
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True
-SOCIAL_AUTH_REDIRECT_IS_HTTPS = True
-SENTRY_USE_SSL = True
-```
-
-And uncomment the following `#`s in your nginx config, and simply replace the contents of the `cert.crt` and `cert.key` in the ssl folder found inside the nginx folder
-```
-## comment me and uncomment below me to support ssl
-proxy_set_header Host $host;
-#proxy_set_header Host $http_host;
-```
-```
-#server {
-#    listen 80;
-#    return 301 https://$host$request_uri;
-#}
-
-server {
-    #listen 443 ssl;
-    #ssl_certificate /etc/nginx/ssl/cert.crt;
-    #ssl_certificate_key /etc/nginx/ssl/cert.key;
-    ## uncomment the above and comment the next line for SSL support, with auto ssl redirect
-    listen 80;
-```
+* Uncomment the lines in `docker-compose.yml` from NGINX_SSL_START to NGINX_SSL_END
+* Set `SENTRY_USE_SSL=True` in the `.env` to apply the sentry.config.py ssl settings
+* Uncomment the lines in `nginx\nginx.conf` from NGINX_SSL_START to NGINX_SSL_END, and comment out the lines from NGINX_NON_SSL_START to NGINX_NON_SSL_END
 
 NOTE: if you noticed some things not using the appropriate URL i.e favicons in <HEAD> then your url-prefix is probably wrong, please double check this at sentry.DOMAIN.com/manage/settings/  
 
