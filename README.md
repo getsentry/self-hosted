@@ -52,9 +52,9 @@ Once generated simply replace the contents of the `cert.crt` and `cert.key` in t
 
 * Uncomment the lines in `docker-compose.yml` from NGINX_SSL_START to NGINX_SSL_END
 * Set `SENTRY_USE_SSL=True` in the `.env` to apply the sentry.config.py ssl settings
-* Uncomment the lines in `nginx\nginx.conf` from NGINX_SSL_START to NGINX_SSL_END, and comment out the lines from NGINX_NON_SSL_START to NGINX_NON_SSL_END
+* Uncomment the lines in `nginx/nginx.conf` from NGINX_SSL_START to NGINX_SSL_END, and comment out the lines from NGINX_NON_SSL_START to NGINX_NON_SSL_END
 
-NOTE: if you noticed some things not using the appropriate URL i.e favicons in <HEAD> then your url-prefix is probably wrong, please double check this at sentry.DOMAIN.com/manage/settings/  
+NOTE: If you notice things like not using the correct URLs in `<HEAD>` (such as favicons etc.), then your `system.url-prefix` setting is probably wrong. Please double check this at `https://your-sentry-domain.com/manage/settings/` or set it in your `config.yml` file.
 
 ## Updating Sentry
 
