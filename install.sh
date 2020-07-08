@@ -14,7 +14,7 @@ MIN_RAM=2400 # MB
 
 SENTRY_CONFIG_PY='sentry/sentry.conf.py'
 SENTRY_CONFIG_YML='sentry/config.yml'
-RELAY_CONFIG_YML='symbolicator/config.yml'
+SYMBOLICATOR_CONFIG_YML='symbolicator/config.yml'
 RELAY_CONFIG_YML='relay/config.yml'
 RELAY_CREDENTIALS_JSON='relay/credentials.json'
 SENTRY_EXTRA_REQUIREMENTS='sentry/requirements.txt'
@@ -96,7 +96,7 @@ echo ""
 ensure_file_from_example $SENTRY_CONFIG_PY
 ensure_file_from_example $SENTRY_CONFIG_YML
 ensure_file_from_example $SENTRY_EXTRA_REQUIREMENTS
-ensure_file_from_example $RELAY_CONFIG_YML
+ensure_file_from_example $SYMBOLICATOR_CONFIG_YML
 
 if grep -xq "system.secret-key: '!!changeme!!'" $SENTRY_CONFIG_YML ; then
     echo ""
