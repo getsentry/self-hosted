@@ -6,4 +6,4 @@ logging:
   enable_backtraces: true
 metrics:
   statsd: null
-sentry_dsn: null # TODO: Automatically fill this with an
+sentry_dsn: null # TODO: Automatically fill this with the internal project DSN
