@@ -6,4 +6,4 @@ logging:
   enable_backtraces: true
 metrics:
   statsd: null
-sentry_dsn: null # Set ME!
+sentry_dsn: null # TODO: Automatically fill this with an
