@@ -1,0 +1,8 @@
+# See: https://getsentry.github.io/symbolicator/#configuration
+cache_dir: "/data"
+bind: "0.0.0.0:3021"
+logging:
+  level: "warn"
+metrics:
+  statsd: null
+sentry_dsn: null # TODO: Automatically fill this with the internal project DSN
