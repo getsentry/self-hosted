@@ -1,2 +1,9 @@
 # See: https://getsentry.github.io/symbolicator/#configuration
-{}
+cache_dir: "/data"
+bind: "0.0.0.0:3021"
+logging:
+  level: "warn"
+  enable_backtraces: true
+metrics:
+  statsd: null
+sentry_dsn: null # Set ME!
