@@ -99,3 +99,5 @@ transaction-events.force-disable-internal-project: true
 # slack.client-id: <'client id'>
 # slack.client-secret: <client secret>
 # slack.verification-token: <verification token>
+## only uncomment legacy-app if you made your slack bot after july 2020
+# slack.legacy-app: False
