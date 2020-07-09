@@ -3,6 +3,35 @@
 
 from sentry.conf.server import *  # NOQA
 
+
+# Generously adapted from pynetlinux: https://git.io/JJmga
+def get_internal_network():
+    import ctypes
+    import fcntl
+    import math
+    import socket
+    import struct
+
+    iface = 'eth0'
+    sockfd = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    ifreq = struct.pack('16sH14s', iface, socket.AF_INET, b'\x00' * 14)
+
+    try:
+        ip = struct.unpack(
+            "!I", struct.unpack('16sH2x4s8x', fcntl.ioctl(sockfd, 0x8915, ifreq))[2]
+        )[0]
+        netmask = socket.ntohl(
+            struct.unpack('16sH2xI8x', fcntl.ioctl(sockfd, 0x891B, ifreq))[2]
+        )
+    except IOError:
+        return ()
+    base = socket.inet_ntoa(struct.pack("!I", ip & netmask))
+    netmask_bits = 32 - int(round(math.log(ctypes.c_uint32(~netmask).value + 1, 2), 1))
+    return ('{0:s}/{1:d}'.format(base, netmask_bits),)
+
+
+INTERNAL_IPS = get_internal_network()
+
 DATABASES = {
     "default": {
         "ENGINE": "sentry.db.postgres",
