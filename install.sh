@@ -97,6 +97,7 @@ ensure_file_from_example $SENTRY_CONFIG_PY
 ensure_file_from_example $SENTRY_CONFIG_YML
 ensure_file_from_example $SENTRY_EXTRA_REQUIREMENTS
 ensure_file_from_example $SYMBOLICATOR_CONFIG_YML
+ensure_file_from_example $RELAY_CONFIG_YML
 
 if grep -xq "system.secret-key: '!!changeme!!'" $SENTRY_CONFIG_YML ; then
     echo ""
@@ -245,19 +246,6 @@ if [ ! -f "$RELAY_CREDENTIALS_JSON" ]; then
   echo "Relay credentials written to $RELAY_CREDENTIALS_JSON"
 fi
 
-RELAY_CREDENTIALS=$(sed -n 's/^.*"public_key"[[:space:]]*:[[:space:]]*"\([a-zA-Z0-9_-]\{1,\}\)".*$/\1/p' "$RELAY_CREDENTIALS_JSON")
-if [ -z "$RELAY_CREDENTIALS" ]; then
-  >&2 echo "FAIL: Cannot read credentials back from $RELAY_CREDENTIALS_JSON."
-  >&2 echo "      Please ensure this file is readable and contains valid credentials."
-  >&2 echo ""
-  exit 1
-fi
-
-if ! grep -q "\"$RELAY_CREDENTIALS\"" "$SENTRY_CONFIG_PY"; then
-  echo "SENTRY_RELAY_WHITELIST_PK = (SENTRY_RELAY_WHITELIST_PK or []) + ([\"$RELAY_CREDENTIALS\"])" >> "$SENTRY_CONFIG_PY"
-  echo "Relay public key written to $SENTRY_CONFIG_PY"
-  echo ""
-fi
 
 cleanup
 
