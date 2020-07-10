@@ -185,13 +185,13 @@ SENTRY_DIGESTS = "sentry.digests.backends.redis.RedisBackend"
 SENTRY_WEB_HOST = "0.0.0.0"
 SENTRY_WEB_PORT = 9000
 SENTRY_WEB_OPTIONS = {
-    # These ase for proper HTTP/1.1 support from uWSGI
-    # Without these it doesn't do keep-alives causing
-    # issues with Relay's direct requests.
     "http-keepalive": True,
+    "so-keepalive": True,
+    "http-auto-chunked": True,
     "http-chunked-input": True,
     # the number of web workers
     'workers': 3,
+    'threads': 4,
     # Turn off memory reporting
     "memory-report": False,
     # Some stuff so uwsgi will cycle workers sensibly
@@ -203,6 +203,8 @@ SENTRY_WEB_OPTIONS = {
     'thunder-lock': True,
     'log-x-forwarded-for': False,
     'buffer-size': 32768,
+    # Relay cannot authenticate without the following
+    'post-buffering': 32768,
     'limit-post': 209715200,
     'disable-logging': True,
     'reload-on-rss': 600,
