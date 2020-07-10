@@ -31,6 +31,7 @@ def get_internal_network():
 
 
 INTERNAL_IPS = get_internal_network()
+INTERNAL_SYSTEM_IPS = INTERNAL_IPS
 
 DATABASES = {
     "default": {
