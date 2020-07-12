@@ -185,15 +185,14 @@ SENTRY_DIGESTS = "sentry.digests.backends.redis.RedisBackend"
 SENTRY_WEB_HOST = "0.0.0.0"
 SENTRY_WEB_PORT = 9000
 SENTRY_WEB_OPTIONS = {
-    "http-keepalive": True,
-    "so-keepalive": True,
-    "http-auto-chunked": True,
-    "http-chunked-input": True,
-    # the number of web workers
+    'protocol': 'http11',
+    'so-keepalive": True,
+    'http-keepalive': 5,
+    'http-chunked-input': True,
+    ' the number of web workers
     'workers': 3,
     'threads': 4,
-    # Turn off memory reporting
-    "memory-report": False,
+    'memory-report': False,
     # Some stuff so uwsgi will cycle workers sensibly
     'max-requests': 100000,
     'max-requests-delta': 500,
@@ -203,7 +202,6 @@ SENTRY_WEB_OPTIONS = {
     'thunder-lock': True,
     'log-x-forwarded-for': False,
     'buffer-size': 32768,
-    # Relay cannot authenticate without the following
     'post-buffering': 32768,
     'limit-post': 209715200,
     'disable-logging': True,
