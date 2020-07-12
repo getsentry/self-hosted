@@ -70,8 +70,6 @@ sentry_api_request -X PUT "internal/options/?query=is:required" --data '{"mail.u
 
 SENTRY_DSN=$(sentry_api_request "projects/sentry/internal/keys/" | awk 'BEGIN { RS=",|:{\n"; FS="\""; } $2 == "public" { print $4; exit; }')
 
-echo $SENTRY_DSN
-
 TEST_EVENT_ID=$(docker run --rm --net host -e "SENTRY_DSN=$SENTRY_DSN" -v $(pwd):/work getsentry/sentry-cli send-event -m "a failure" -e task:create-user -e object:42 | tr -d '-')
 echo "Created event $TEST_EVENT_ID. Checking existence..."
 sleep 3  # Give it some time to be ingested through the bowels of Sentry
