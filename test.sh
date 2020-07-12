@@ -55,7 +55,7 @@ login () {
 LOGIN_RESPONSE=$(login);
 declare -a LOGIN_TEST_STRINGS=(
     '"isAuthenticated":true'
-    '"username":"ben@byk.im"'
+    '"username":"test@example.com"'
     '"isSuperuser":true'
 )
 for i in "${LOGIN_TEST_STRINGS[@]}"
