@@ -71,8 +71,14 @@ sentry_api_request "internal/options/?query=is:required" -X PUT --data '{"mail.u
 SENTRY_DSN=$(sentry_api_request "projects/sentry/internal/keys/" | awk 'BEGIN { RS=",|:{\n"; FS="\""; } $2 == "public" { print $4; exit; }')
 
 TEST_EVENT_ID=$(docker run --rm --net host -e "SENTRY_DSN=$SENTRY_DSN" -v $(pwd):/work getsentry/sentry-cli send-event -m "a failure" -e task:create-user -e object:42 | tr -d '-')
-echo "Created event $TEST_EVENT_ID. Checking existence..."
-sleep 3  # Give it some time to be ingested through the bowels of Sentry
+echo "Created event $TEST_EVENT_ID."
+
+EVENT_PATH="projects/sentry/internal/events/$TEST_EVENT_ID/"
+export -f sentry_api_request get_csrf_token
+export SENTRY_TEST_HOST COOKIE_FILE EVENT_PATH
+printf "Checking its existence"
+timeout 15 bash -c 'until $(sentry_api_request "$EVENT_PATH" -Isf -X GET -o /dev/null); do printf '.'; sleep 0.5; done'
+echo "";
 
 EVENT_RESPONSE=$(sentry_api_request "projects/sentry/internal/events/$TEST_EVENT_ID/")
 declare -a EVENT_TEST_STRINGS=(
