@@ -202,7 +202,6 @@ SENTRY_WEB_OPTIONS = {
     'thunder-lock': True,
     'log-x-forwarded-for': False,
     'buffer-size': 32768,
-    'post-buffering': 32768,
     'limit-post': 209715200,
     'disable-logging': True,
     'reload-on-rss': 600,
