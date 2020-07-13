@@ -10,7 +10,7 @@ COOKIE_FILE=$(mktemp)
 trap_with_arg() {
     func="$1" ; shift
     for sig ; do
-        trap "$func $sig" "$sig"
+        trap "$func $sig "'$LINENO' "$sig"
     done
 }
 
@@ -23,7 +23,7 @@ cleanup () {
   DID_CLEAN_UP=1
 
   if [ "$1" != "EXIT" ]; then
-    echo "An error occurred, caught SIG$1";
+    echo "An error occurred, caught SIG$1 on line $2";
   fi
 
   echo "Cleaning up..."
@@ -76,11 +76,11 @@ PROJECT_ID=${DSN_PIECES[1]}
 
 TEST_EVENT_ID=$(export LC_ALL=C; head /dev/urandom | tr -dc "a-f0-9" | head -c 32)
 # Thanks @untitaker - https://forum.sentry.io/t/how-can-i-post-with-curl-a-sentry-event-which-authentication-credentials/4759/2?u=byk
-curl --data '{"event_id": "'"$TEST_EVENT_ID"'","level":"error","message":"a failure","extra":{"object":"42"} }' \
+TEST_EVENT=$(curl --data '{"event_id": "'"$TEST_EVENT_ID"'","level":"error","message":"a failure","extra":{"object":"42"}}' \
   -H 'Content-Type: application/json' \
   -H "X-Sentry-Auth: Sentry sentry_version=7, sentry_key=$SENTRY_KEY, sentry_client=test-bash/0.1" \
-  $SENTRY_TEST_HOST/api/$PROJECT_ID/store/ -sf -o /dev/null
-echo "Created event $TEST_EVENT_ID."
+  $SENTRY_TEST_HOST/api/$PROJECT_ID/store/ -sf)
+echo "Created event: $TEST_EVENT"
 
 EVENT_PATH="projects/sentry/internal/events/$TEST_EVENT_ID/"
 export -f sentry_api_request get_csrf_token
@@ -89,7 +89,7 @@ printf "Checking its existence"
 timeout 15 bash -c 'until $(sentry_api_request "$EVENT_PATH" -Isf -X GET -o /dev/null); do printf '.'; sleep 0.5; done'
 echo "";
 
-EVENT_RESPONSE=$(sentry_api_request "projects/sentry/internal/events/$TEST_EVENT_ID/")
+EVENT_RESPONSE=$(sentry_api_request "$EVENT_PATH")
 declare -a EVENT_TEST_STRINGS=(
     '"eventID":"'"$TEST_EVENT_ID"'"'
     '"message":"a failure"'
