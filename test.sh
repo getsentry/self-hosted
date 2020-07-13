@@ -74,7 +74,7 @@ DSN_PIECES=(`echo $SENTRY_DSN | sed -ne 's|^https\?://\([0-9a-z]\+\)@[^/]\+/\([0
 SENTRY_KEY=${DSN_PIECES[0]}
 PROJECT_ID=${DSN_PIECES[1]}
 
-TEST_EVENT_ID=$(uuidgen -r | tr -d '-')
+TEST_EVENT_ID=$(export LC_ALL=C; head /dev/urandom | tr -dc "a-f0-9" | head -c 32)
 # Thanks @untitaker - https://forum.sentry.io/t/how-can-i-post-with-curl-a-sentry-event-which-authentication-credentials/4759/2?u=byk
 curl --data '{"event_id": "'"$TEST_EVENT_ID"'","level":"error","message":"a failure","extra":{"object":"42"} }' \
   -H 'Content-Type: application/json' \
