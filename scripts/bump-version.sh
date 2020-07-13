@@ -12,6 +12,7 @@ SYMBOLICATOR_VERSION=$(curl -sSL 'https://api.github.com/repos/getsentry/symboli
 sed -i -e "s/^SYMBOLICATOR_VERSION=.*\$/SYMBOLICATOR_VERSION=$SYMBOLICATOR_VERSION/" .env
 sed -i -e "s/^SENTRY_VERSION=.*\$/SENTRY_VERSION=$NEW_VERSION/" .env
 sed -i -e "s/^\# Sentry .* On-Premise/# Sentry $NEW_VERSION On-Premise/" README.md
+sed -i -e "s/\(Change Date:\s*\)[-0-9]\+\$/\\1$(date +'%Y-%m-%d')/" LICENSE
 
 echo "New version: $NEW_VERSION"
 echo "New Symbolicator version: $SYMBOLICATOR_VERSION"
