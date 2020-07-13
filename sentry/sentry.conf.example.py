@@ -12,22 +12,22 @@ def get_internal_network():
     import socket
     import struct
 
-    iface = 'eth0'
+    iface = "eth0"
     sockfd = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    ifreq = struct.pack('16sH14s', iface, socket.AF_INET, b'\x00' * 14)
+    ifreq = struct.pack("16sH14s", iface, socket.AF_INET, b"\x00" * 14)
 
     try:
         ip = struct.unpack(
-            "!I", struct.unpack('16sH2x4s8x', fcntl.ioctl(sockfd, 0x8915, ifreq))[2]
+            "!I", struct.unpack("16sH2x4s8x", fcntl.ioctl(sockfd, 0x8915, ifreq))[2]
         )[0]
         netmask = socket.ntohl(
-            struct.unpack('16sH2xI8x', fcntl.ioctl(sockfd, 0x891B, ifreq))[2]
+            struct.unpack("16sH2xI8x", fcntl.ioctl(sockfd, 0x891B, ifreq))[2]
         )
     except IOError:
         return ()
     base = socket.inet_ntoa(struct.pack("!I", ip & netmask))
     netmask_bits = 32 - int(round(math.log(ctypes.c_uint32(~netmask).value + 1, 2), 1))
-    return ('{0:s}/{1:d}'.format(base, netmask_bits),)
+    return ("{0:s}/{1:d}".format(base, netmask_bits),)
 
 
 INTERNAL_IPS = get_internal_network()
@@ -60,7 +60,7 @@ SENTRY_USE_BIG_INTS = True
 SENTRY_SINGLE_ORGANIZATION = True
 
 SENTRY_OPTIONS["system.event-retention-days"] = int(
-    env('SENTRY_EVENT_RETENTION_DAYS', '90')
+    env("SENTRY_EVENT_RETENTION_DAYS", "90")
 )
 
 #########
@@ -185,32 +185,33 @@ SENTRY_DIGESTS = "sentry.digests.backends.redis.RedisBackend"
 SENTRY_WEB_HOST = "0.0.0.0"
 SENTRY_WEB_PORT = 9000
 SENTRY_WEB_OPTIONS = {
-    "http-keepalive": True,
+    "http": "%s:%s" % (SENTRY_WEB_HOST, SENTRY_WEB_PORT),
+    "protocol": "uwsgi",
+    # This is need to prevent https://git.io/fj7Lw
+    "uwsgi-socket": None,
     "so-keepalive": True,
-    "http-auto-chunked": True,
+    # Keep this between 15s-75s as that's what Relay supports
+    "http-keepalive": 15,
     "http-chunked-input": True,
     # the number of web workers
-    'workers': 3,
-    'threads': 4,
-    # Turn off memory reporting
+    "workers": 3,
+    "threads": 4,
     "memory-report": False,
     # Some stuff so uwsgi will cycle workers sensibly
-    'max-requests': 100000,
-    'max-requests-delta': 500,
-    'max-worker-lifetime': 86400,
+    "max-requests": 100000,
+    "max-requests-delta": 500,
+    "max-worker-lifetime": 86400,
     # Duplicate options from sentry default just so we don't get
     # bit by sentry changing a default value that we depend on.
-    'thunder-lock': True,
-    'log-x-forwarded-for': False,
-    'buffer-size': 32768,
-    # Relay cannot authenticate without the following
-    'post-buffering': 32768,
-    'limit-post': 209715200,
-    'disable-logging': True,
-    'reload-on-rss': 600,
-    'ignore-sigpipe': True,
-    'ignore-write-errors': True,
-    'disable-write-exception': True,
+    "thunder-lock": True,
+    "log-x-forwarded-for": False,
+    "buffer-size": 32768,
+    "limit-post": 209715200,
+    "disable-logging": True,
+    "reload-on-rss": 600,
+    "ignore-sigpipe": True,
+    "ignore-write-errors": True,
+    "disable-write-exception": True,
 }
 
 ###########
@@ -259,7 +260,7 @@ SENTRY_FEATURES.update(
 # GitHub Integration #
 ######################
 
-GITHUB_EXTENDED_PERMISSIONS = ['repo']
+GITHUB_EXTENDED_PERMISSIONS = ["repo"]
 
 #########################
 # Bitbucket Integration #
