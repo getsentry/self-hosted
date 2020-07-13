@@ -69,8 +69,17 @@ done
 sentry_api_request "internal/options/?query=is:required" -X PUT --data '{"mail.use-tls":false,"mail.username":"","mail.port":25,"system.admin-email":"ben@byk.im","mail.password":"","mail.from":"root@localhost","system.url-prefix":"'"$SENTRY_TEST_HOST"'","auth.allow-registration":false,"beacon.anonymous":true}' > /dev/null
 
 SENTRY_DSN=$(sentry_api_request "projects/sentry/internal/keys/" | awk 'BEGIN { RS=",|:{\n"; FS="\""; } $2 == "public" { print $4; exit; }')
+# We ignore the protocol and the host as we already know those
+DSN_PIECES=(`echo $SENTRY_DSN | sed -ne 's|^https\?://\([0-9a-z]\+\)@[^/]\+/\([0-9]\+\)$|\1\n\2|p'`)
+SENTRY_KEY=${DSN_PIECES[0]}
+PROJECT_ID=${DSN_PIECES[1]}
 
-TEST_EVENT_ID=$(docker run --rm --net host -e "SENTRY_DSN=$SENTRY_DSN" -v $(pwd):/work getsentry/sentry-cli send-event -m "a failure" -e task:create-user -e object:42 | tr -d '-')
+TEST_EVENT_ID=$(uuidgen -r | tr -d '-')
+# Thanks @untitaker - https://forum.sentry.io/t/how-can-i-post-with-curl-a-sentry-event-which-authentication-credentials/4759/2?u=byk
+curl --data '{"event_id": "'"$TEST_EVENT_ID"'","level":"error","message":"a failure","extra":{"object":"42"} }' \
+  -H 'Content-Type: application/json' \
+  -H "X-Sentry-Auth: Sentry sentry_version=7, sentry_key=$SENTRY_KEY, sentry_client=test-bash/0.1" \
+  $SENTRY_TEST_HOST/api/$PROJECT_ID/store/ -sf -o /dev/null
 echo "Created event $TEST_EVENT_ID."
 
 EVENT_PATH="projects/sentry/internal/events/$TEST_EVENT_ID/"
