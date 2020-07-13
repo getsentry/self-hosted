@@ -30,8 +30,8 @@ def get_internal_network():
     return ("{0:s}/{1:d}".format(base, netmask_bits),)
 
 
-INTERNAL_IPS = get_internal_network()
-INTERNAL_SYSTEM_IPS = INTERNAL_IPS
+INTERNAL_SYSTEM_IPS = get_internal_network()
+
 
 DATABASES = {
     "default": {
