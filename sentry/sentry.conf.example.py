@@ -246,6 +246,7 @@ SENTRY_FEATURES.update(
             "organizations:sso-basic",
             "organizations:sso-rippling",
             "organizations:sso-saml2",
+            "organizations:performance-view",
             "projects:custom-inbound-filters",
             "projects:data-forwarding",
             "projects:discard-groups",
