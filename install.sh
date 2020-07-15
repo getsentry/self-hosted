@@ -200,8 +200,7 @@ fi
 
 # [begin] Snuba/Clickhouse transactions table rebuild
 $dc up -d clickhouse
-SNUBA_TRANSACTIONS_NEED_UPGRADE=$($dcr clickhouse clickhouse-client --host clickhouse -q "SHOW CREA
-TE TABLE transactions_local" | grep -v 'SAMPLE BY cityHash64(span_id)')
+SNUBA_TRANSACTIONS_NEED_UPGRADE=$($dcr clickhouse clickhouse-client --host clickhouse -q "SHOW CREATE TABLE transactions_local" | grep -v 'SAMPLE BY cityHash64(span_id)')
 if [ ! -z "$SNUBA_TRANSACTIONS_NEED_UPGRADE" ]; then
   SNUBA_TRANSACTIONS_TABLE_CONTENTS=$($dcr clickhouse clickhouse-client --host clickhouse -q "SELECT * FROM transactions_local LIMIT 1")
   if [ -z $SNUBA_TRANSACTIONS_TABLE_CONTENTS ]; then
