@@ -21,10 +21,10 @@ SENTRY_EXTRA_REQUIREMENTS='sentry/requirements.txt'
 
 # Courtesy of https://stackoverflow.com/a/2183063/90297
 trap_with_arg() {
-    func="$1" ; shift
-    for sig ; do
-        trap "$func $sig" "$sig"
-    done
+  func="$1" ; shift
+  for sig ; do
+      trap "$func $sig "'$LINENO' "$sig"
+  done
 }
 
 DID_CLEAN_UP=0
@@ -36,7 +36,7 @@ cleanup () {
   DID_CLEAN_UP=1
 
   if [ "$1" != "EXIT" ]; then
-    echo "An error occurred, caught SIG$1";
+    echo "An error occurred, caught SIG$1 on line $2";
     echo "Cleaning up..."
   fi
 
@@ -125,40 +125,40 @@ if grep -xq "system.secret-key: '!!changeme!!'" $SENTRY_CONFIG_YML ; then
 fi
 
 replace_tsdb() {
-    if (
-        [ -f "$SENTRY_CONFIG_PY" ] &&
-        ! grep -xq 'SENTRY_TSDB = "sentry.tsdb.redissnuba.RedisSnubaTSDB"' "$SENTRY_CONFIG_PY"
-    ); then
-        tsdb_settings="SENTRY_TSDB = \"sentry.tsdb.redissnuba.RedisSnubaTSDB\"
+  if (
+    [ -f "$SENTRY_CONFIG_PY" ] &&
+    ! grep -xq 'SENTRY_TSDB = "sentry.tsdb.redissnuba.RedisSnubaTSDB"' "$SENTRY_CONFIG_PY"
+  ); then
+    tsdb_settings="SENTRY_TSDB = \"sentry.tsdb.redissnuba.RedisSnubaTSDB\"
 
-# Automatic switchover 90 days after $(date). Can be removed afterwards.
-SENTRY_TSDB_OPTIONS = {\"switchover_timestamp\": $(date +%s) + (90 * 24 * 3600)}"
+    # Automatic switchover 90 days after $(date). Can be removed afterwards.
+    SENTRY_TSDB_OPTIONS = {\"switchover_timestamp\": $(date +%s) + (90 * 24 * 3600)}"
 
-        if grep -q 'SENTRY_TSDB_OPTIONS = ' "$SENTRY_CONFIG_PY"; then
-            echo "Not attempting automatic TSDB migration due to presence of SENTRY_TSDB_OPTIONS"
-        else
-            echo "Attempting to automatically migrate to new TSDB"
-            # Escape newlines for sed
-            tsdb_settings="${tsdb_settings//$'\n'/\\n}"
-            cp "$SENTRY_CONFIG_PY" "$SENTRY_CONFIG_PY.bak"
-            sed -i -e "s/^SENTRY_TSDB = .*$/${tsdb_settings}/g" "$SENTRY_CONFIG_PY" || true
+    if grep -q 'SENTRY_TSDB_OPTIONS = ' "$SENTRY_CONFIG_PY"; then
+      echo "Not attempting automatic TSDB migration due to presence of SENTRY_TSDB_OPTIONS"
+    else
+      echo "Attempting to automatically migrate to new TSDB"
+      # Escape newlines for sed
+      tsdb_settings="${tsdb_settings//$'\n'/\\n}"
+      cp "$SENTRY_CONFIG_PY" "$SENTRY_CONFIG_PY.bak"
+      sed -i -e "s/^SENTRY_TSDB = .*$/${tsdb_settings}/g" "$SENTRY_CONFIG_PY" || true
 
-            if grep -xq 'SENTRY_TSDB = "sentry.tsdb.redissnuba.RedisSnubaTSDB"' "$SENTRY_CONFIG_PY"; then
-                echo "Migrated TSDB to Snuba. Old configuration file backed up to $SENTRY_CONFIG_PY.bak"
-                return
-            fi
+      if grep -xq 'SENTRY_TSDB = "sentry.tsdb.redissnuba.RedisSnubaTSDB"' "$SENTRY_CONFIG_PY"; then
+        echo "Migrated TSDB to Snuba. Old configuration file backed up to $SENTRY_CONFIG_PY.bak"
+        return
+      fi
 
-            echo "Failed to automatically migrate TSDB. Reverting..."
-            mv "$SENTRY_CONFIG_PY.bak" "$SENTRY_CONFIG_PY"
-            echo "$SENTRY_CONFIG_PY restored from backup."
-        fi
-
-        echo "WARN: Your Sentry configuration uses a legacy data store for time-series data. Remove the options SENTRY_TSDB and SENTRY_TSDB_OPTIONS from $SENTRY_CONFIG_PY and add:"
-        echo ""
-        echo "$tsdb_settings"
-        echo ""
-        echo "For more information please refer to https://github.com/getsentry/onpremise/pull/430"
+      echo "Failed to automatically migrate TSDB. Reverting..."
+      mv "$SENTRY_CONFIG_PY.bak" "$SENTRY_CONFIG_PY"
+      echo "$SENTRY_CONFIG_PY restored from backup."
     fi
+
+    echo "WARN: Your Sentry configuration uses a legacy data store for time-series data. Remove the options SENTRY_TSDB and SENTRY_TSDB_OPTIONS from $SENTRY_CONFIG_PY and add:"
+    echo ""
+    echo "$tsdb_settings"
+    echo ""
+    echo "For more information please refer to https://github.com/getsentry/onpremise/pull/430"
+  fi
 }
 
 replace_tsdb
@@ -197,6 +197,35 @@ if [ "$ZOOKEEPER_SNAPSHOT_FOLDER_EXISTS" -eq "1" ]; then
     $dc run -d -e ZOOKEEPER_SNAPSHOT_TRUST_EMPTY=true zookeeper
   fi
 fi
+
+# [begin] Snuba/Clickhouse transactions table rebuild
+clickhouse_query () { $dcr clickhouse clickhouse-client --host clickhouse -q "$1"; }
+$dc up -d clickhouse
+set +e
+CLICKHOUSE_CLIENT_MAX_RETRY=5
+# Wait until clickhouse server is up
+until clickhouse_query 'SELECT 1' > /dev/null; do
+  ((CLICKHOUSE_CLIENT_MAX_RETRY--))
+  [[ CLICKHOUSE_CLIENT_MAX_RETRY -eq 0 ]] && echo "Clickhouse server failed to come up in 5 tries." && exit 1;
+   echo "Trying again. Remaining tries #$CLICKHOUSE_CLIENT_MAX_RETRY"
+  sleep 0.5;
+done
+set -e
+
+SNUBA_HAS_TRANSACTIONS_TABLE=$(clickhouse_query 'EXISTS TABLE transactions_local' | tr -d '\n\r')
+SNUBA_TRANSACTIONS_NEEDS_UPDATE=$([ "$SNUBA_HAS_TRANSACTIONS_TABLE" == "1" ] && clickhouse_query 'SHOW CREATE TABLE transactions_local' | grep -v 'SAMPLE BY' || echo '')
+
+if [ "$SNUBA_TRANSACTIONS_NEEDS_UPDATE" ]; then
+  SNUBA_TRANSACTIONS_TABLE_CONTENTS=$(clickhouse_query "SELECT * FROM transactions_local LIMIT 1")
+  if [ -z $SNUBA_TRANSACTIONS_TABLE_CONTENTS ]; then
+    echo "Dropping the old transactions table from Clickhouse...";
+    clickhouse_query 'DROP TABLE transactions_local'
+    echo "Done."
+  else
+    echo "Seems like your Clickhouse transactions table is old and non-empty. You may experience issues if/when you have more than 10000 records in this table. See https://github.com/getsentry/sentry/pull/19882 for more information and consider disabling the 'discover2.tags_facet_enable_sampling' feature flag.";
+  fi
+fi
+# [end] Snuba/Clickhouse transactions table rebuild
 
 echo "Bootstrapping and migrating Snuba..."
 $dcr snuba-api bootstrap --force
