@@ -199,7 +199,7 @@ if [ "$ZOOKEEPER_SNAPSHOT_FOLDER_EXISTS" -eq "1" ]; then
 fi
 
 # [begin] Snuba/Clickhouse transactions table rebuild
-$dc up clickhouse -d
+$dc up -d clickhouse
 SNUBA_TRANSACTIONS_NEED_UPGRADE=$($dcr clickhouse clickhouse-client --host clickhouse -q "SHOW CREA
 TE TABLE transactions_local" | grep -v 'SAMPLE BY cityHash64(span_id)')
 if [ ! -z "$SNUBA_TRANSACTIONS_NEED_UPGRADE" ]; then
