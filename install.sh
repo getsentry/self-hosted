@@ -14,9 +14,18 @@ MIN_RAM=2400 # MB
 
 SENTRY_CONFIG_PY='sentry/sentry.conf.py'
 SENTRY_CONFIG_YML='sentry/config.yml'
+SYMBOLICATOR_CONFIG_YML='symbolicator/config.yml'
 RELAY_CONFIG_YML='relay/config.yml'
 RELAY_CREDENTIALS_JSON='relay/credentials.json'
 SENTRY_EXTRA_REQUIREMENTS='sentry/requirements.txt'
+
+# Courtesy of https://stackoverflow.com/a/2183063/90297
+trap_with_arg() {
+    func="$1" ; shift
+    for sig ; do
+        trap "$func $sig" "$sig"
+    done
+}
 
 DID_CLEAN_UP=0
 # the cleanup function will be the exit point
@@ -24,11 +33,17 @@ cleanup () {
   if [ "$DID_CLEAN_UP" -eq 1 ]; then
     return 0;
   fi
-  echo "Cleaning up..."
-  $dc stop &> /dev/null
   DID_CLEAN_UP=1
+
+  if [ "$1" != "EXIT" ]; then
+    echo "An error occurred, caught SIG$1";
+    echo "Cleaning up..."
+  fi
+
+  $dc stop &> /dev/null
 }
-trap cleanup ERR INT TERM
+trap_with_arg cleanup ERR INT TERM EXIT
+
 
 echo "Checking minimum requirements..."
 
@@ -95,6 +110,8 @@ echo ""
 ensure_file_from_example $SENTRY_CONFIG_PY
 ensure_file_from_example $SENTRY_CONFIG_YML
 ensure_file_from_example $SENTRY_EXTRA_REQUIREMENTS
+ensure_file_from_example $SYMBOLICATOR_CONFIG_YML
+ensure_file_from_example $RELAY_CONFIG_YML
 
 if grep -xq "system.secret-key: '!!changeme!!'" $SENTRY_CONFIG_YML ; then
     echo ""
@@ -170,15 +187,16 @@ $dc build --force-rm --parallel
 echo ""
 echo "Docker images built."
 
-
-ZOOKEEPER_LOG_FILE_COUNT=$($dcr zookeeper bash -c 'ls 2>/dev/null -Ubad1 -- /var/lib/zookeeper/log/version-2/* | wc -l | tr -d '[:space:]'')
-ZOOKEEPER_SNAPSHOT_FILE_COUNT=$($dcr zookeeper bash -c 'ls 2>/dev/null -Ubad1 -- /var/lib/zookeeper/data/version-2/* | wc -l | tr -d '[:space:]'')
-# This is a workaround for a ZK upgrade bug: https://issues.apache.org/jira/browse/ZOOKEEPER-3056
-if [ "$ZOOKEEPER_LOG_FILE_COUNT" -gt "0" ] && [ "$ZOOKEEPER_SNAPSHOT_FILE_COUNT" -eq "0" ]; then
-  $dcr -v $(pwd)/zookeeper:/temp zookeeper bash -c 'cp /temp/snapshot.0 /var/lib/zookeeper/data/version-2/snapshot.0'
-  $dc run -d -e ZOOKEEPER_SNAPSHOT_TRUST_EMPTY=true zookeeper
+ZOOKEEPER_SNAPSHOT_FOLDER_EXISTS=$($dcr zookeeper bash -c 'ls 2>/dev/null -Ubad1 -- /var/lib/zookeeper/data/version-2 | wc -l | tr -d '[:space:]'')
+if [ "$ZOOKEEPER_SNAPSHOT_FOLDER_EXISTS" -eq "1" ]; then
+  ZOOKEEPER_LOG_FILE_COUNT=$($dcr zookeeper bash -c 'ls 2>/dev/null -Ubad1 -- /var/lib/zookeeper/log/version-2/* | wc -l | tr -d '[:space:]'')
+  ZOOKEEPER_SNAPSHOT_FILE_COUNT=$($dcr zookeeper bash -c 'ls 2>/dev/null -Ubad1 -- /var/lib/zookeeper/data/version-2/* | wc -l | tr -d '[:space:]'')
+  # This is a workaround for a ZK upgrade bug: https://issues.apache.org/jira/browse/ZOOKEEPER-3056
+  if [ "$ZOOKEEPER_LOG_FILE_COUNT" -gt "0" ] && [ "$ZOOKEEPER_SNAPSHOT_FILE_COUNT" -eq "0" ]; then
+    $dcr -v $(pwd)/zookeeper:/temp zookeeper bash -c 'cp /temp/snapshot.0 /var/lib/zookeeper/data/version-2/snapshot.0'
+    $dc run -d -e ZOOKEEPER_SNAPSHOT_TRUST_EMPTY=true zookeeper
+  fi
 fi
-
 
 echo "Bootstrapping and migrating Snuba..."
 $dcr snuba-api bootstrap --force
@@ -241,22 +259,6 @@ if [ ! -f "$RELAY_CREDENTIALS_JSON" ]; then
   $dcr --no-deps -v $(pwd)/$RELAY_CONFIG_YML:/tmp/config.yml relay --config /tmp credentials generate --stdout > "$RELAY_CREDENTIALS_JSON"
   echo "Relay credentials written to $RELAY_CREDENTIALS_JSON"
 fi
-
-RELAY_CREDENTIALS=$(sed -n 's/^.*"public_key"[[:space:]]*:[[:space:]]*"\([a-zA-Z0-9_-]\{1,\}\)".*$/\1/p' "$RELAY_CREDENTIALS_JSON")
-if [ -z "$RELAY_CREDENTIALS" ]; then
-  >&2 echo "FAIL: Cannot read credentials back from $RELAY_CREDENTIALS_JSON."
-  >&2 echo "      Please ensure this file is readable and contains valid credentials."
-  >&2 echo ""
-  exit 1
-fi
-
-if ! grep -q "\"$RELAY_CREDENTIALS\"" "$SENTRY_CONFIG_PY"; then
-  echo "SENTRY_RELAY_WHITELIST_PK = (SENTRY_RELAY_WHITELIST_PK or []) + ([\"$RELAY_CREDENTIALS\"])" >> "$SENTRY_CONFIG_PY"
-  echo "Relay public key written to $SENTRY_CONFIG_PY"
-  echo ""
-fi
-
-cleanup
 
 echo ""
 echo "----------------"

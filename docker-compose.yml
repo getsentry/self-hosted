@@ -136,7 +136,11 @@ services:
     image: 'getsentry/symbolicator:$SYMBOLICATOR_VERSION'
     volumes:
       - 'sentry-symbolicator:/data'
-    command: run
+      - type: bind
+        read_only: true
+        source: ./symbolicator
+        target: /etc/symbolicator
+    command: run -c /etc/symbolicator/config.yml
   symbolicator-cleanup:
     << : *restart_policy
     image: symbolicator-cleanup-onpremise-local

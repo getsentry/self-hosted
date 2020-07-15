@@ -14,7 +14,7 @@ script:
   - ./install.sh
   - docker-compose run --rm web createuser --superuser --email test@example.com --password test123TEST
   - docker-compose up -d
-  - timeout 60 bash -c 'until $(curl -Isf -o /dev/null http://localhost:9000); do printf '.'; sleep 0.5; done'
+  - printf "Waiting for Sentry to be up"; timeout 60 bash -c 'until $(curl -Isf -o /dev/null http://localhost:9000); do printf '.'; sleep 0.5; done'
   - ./test.sh
 
 after_failure:

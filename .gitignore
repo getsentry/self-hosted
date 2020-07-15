@@ -79,3 +79,5 @@ sentry/config.yml
 sentry/*.bak
 sentry/requirements.txt
 relay/credentials.json
+relay/config.yml
+symbolicator/config.yml
