@@ -209,7 +209,7 @@ until clickhouse_query 'SELECT 1' > /dev/null; do
   [[ CLICKHOUSE_CLIENT_MAX_RETRY -eq 0 ]] && echo "Clickhouse server failed to come up in 5 tries." && exit 1;
    echo "Trying again. Remaining tries #$CLICKHOUSE_CLIENT_MAX_RETRY"
   sleep 0.5;
-  SNUBA_TRANSACTIONS_NEED_UPGRADE=$(clickhouse_query "SHOW CREATE TABLE transactions_local" | grep -v 'SAMPLE BY cityHash64(span_id)')
+  SNUBA_TRANSACTIONS_NEED_UPGRADE=$(clickhouse_query "SHOW CREATE TABLE transactions_local" | grep -v 'SAMPLE BY')
 done
 set -e
 
