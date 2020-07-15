@@ -198,6 +198,22 @@ if [ "$ZOOKEEPER_SNAPSHOT_FOLDER_EXISTS" -eq "1" ]; then
   fi
 fi
 
+# [begin] Snuba/Clickhouse transactions table rebuild
+$dc up clickhouse -d
+SNUBA_TRANSACTIONS_NEED_UPGRADE=$($dcr clickhouse clickhouse-client --host clickhouse -q "SHOW CREA
+TE TABLE transactions_local" | grep -v 'SAMPLE BY cityHash64(span_id)')
+if [ ! -z "$SNUBA_TRANSACTIONS_NEED_UPGRADE" ]; then
+  SNUBA_TRANSACTIONS_TABLE_CONTENTS=$($dcr clickhouse clickhouse-client --host clickhouse -q "SELECT * FROM transactions_local LIMIT 1")
+  if [ -z $SNUBA_TRANSACTIONS_TABLE_CONTENTS ]; then
+    echo "Dropping the old transactions table from Clickhouse...";
+    $dcr clickhouse clickhouse-client --host clickhouse -q "DROP TABLE transactions_local"
+    echo "Done."
+  else
+    echo "Seems like your Clickhouse transactions table is old and non-empty. You may experience issues if/when you have more than 10000 records in this table. See https://github.com/getsentry/sentry/pull/19882 for more information and consider disabling the 'discover2.tags_facet_enable_sampling' feature flag.";
+  fi
+fi
+# [end] Snuba/Clickhouse transactions table rebuild
+
 echo "Bootstrapping and migrating Snuba..."
 $dcr snuba-api bootstrap --force
 echo ""
