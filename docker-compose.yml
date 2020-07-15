@@ -34,7 +34,7 @@ x-snuba-defaults: &snuba_defaults
     - redis
     - clickhouse
     - kafka
-  image: 'getsentry/snuba:$SENTRY_VERSION'
+  image: 'getsentry/snuba:$SNUBA_VERSION'
   environment:
     SNUBA_SETTINGS: docker
     CLICKHOUSE_HOST: clickhouse
@@ -134,7 +134,7 @@ services:
     build:
       context: ./cron
       args:
-        BASE_IMAGE: 'getsentry/snuba:$SENTRY_VERSION'
+        BASE_IMAGE: 'getsentry/snuba:$SNUBA_VERSION'
     command: '"*/5 * * * * gosu snuba snuba cleanup --dry-run False"'
   symbolicator:
     << : *restart_policy
@@ -194,7 +194,7 @@ services:
       - relay
   relay:
     << : *restart_policy
-    image: 'getsentry/relay:$SENTRY_VERSION'
+    image: 'getsentry/relay:$RELAY_VERSION'
     volumes:
       - type: bind
         read_only: true
