@@ -21,10 +21,10 @@ SENTRY_EXTRA_REQUIREMENTS='sentry/requirements.txt'
 
 # Courtesy of https://stackoverflow.com/a/2183063/90297
 trap_with_arg() {
-    func="$1" ; shift
-    for sig ; do
-        trap "$func $sig "'$LINENO' "$sig"
-    done
+  func="$1" ; shift
+  for sig ; do
+      trap "$func $sig "'$LINENO' "$sig"
+  done
 }
 
 DID_CLEAN_UP=0
@@ -125,40 +125,40 @@ if grep -xq "system.secret-key: '!!changeme!!'" $SENTRY_CONFIG_YML ; then
 fi
 
 replace_tsdb() {
-    if (
-        [ -f "$SENTRY_CONFIG_PY" ] &&
-        ! grep -xq 'SENTRY_TSDB = "sentry.tsdb.redissnuba.RedisSnubaTSDB"' "$SENTRY_CONFIG_PY"
-    ); then
-        tsdb_settings="SENTRY_TSDB = \"sentry.tsdb.redissnuba.RedisSnubaTSDB\"
+  if (
+    [ -f "$SENTRY_CONFIG_PY" ] &&
+    ! grep -xq 'SENTRY_TSDB = "sentry.tsdb.redissnuba.RedisSnubaTSDB"' "$SENTRY_CONFIG_PY"
+  ); then
+    tsdb_settings="SENTRY_TSDB = \"sentry.tsdb.redissnuba.RedisSnubaTSDB\"
 
-        # Automatic switchover 90 days after $(date). Can be removed afterwards.
-        SENTRY_TSDB_OPTIONS = {\"switchover_timestamp\": $(date +%s) + (90 * 24 * 3600)}"
+    # Automatic switchover 90 days after $(date). Can be removed afterwards.
+    SENTRY_TSDB_OPTIONS = {\"switchover_timestamp\": $(date +%s) + (90 * 24 * 3600)}"
 
-        if grep -q 'SENTRY_TSDB_OPTIONS = ' "$SENTRY_CONFIG_PY"; then
-            echo "Not attempting automatic TSDB migration due to presence of SENTRY_TSDB_OPTIONS"
-        else
-            echo "Attempting to automatically migrate to new TSDB"
-            # Escape newlines for sed
-            tsdb_settings="${tsdb_settings//$'\n'/\\n}"
-            cp "$SENTRY_CONFIG_PY" "$SENTRY_CONFIG_PY.bak"
-            sed -i -e "s/^SENTRY_TSDB = .*$/${tsdb_settings}/g" "$SENTRY_CONFIG_PY" || true
+    if grep -q 'SENTRY_TSDB_OPTIONS = ' "$SENTRY_CONFIG_PY"; then
+      echo "Not attempting automatic TSDB migration due to presence of SENTRY_TSDB_OPTIONS"
+    else
+      echo "Attempting to automatically migrate to new TSDB"
+      # Escape newlines for sed
+      tsdb_settings="${tsdb_settings//$'\n'/\\n}"
+      cp "$SENTRY_CONFIG_PY" "$SENTRY_CONFIG_PY.bak"
+      sed -i -e "s/^SENTRY_TSDB = .*$/${tsdb_settings}/g" "$SENTRY_CONFIG_PY" || true
 
-            if grep -xq 'SENTRY_TSDB = "sentry.tsdb.redissnuba.RedisSnubaTSDB"' "$SENTRY_CONFIG_PY"; then
-                echo "Migrated TSDB to Snuba. Old configuration file backed up to $SENTRY_CONFIG_PY.bak"
-                return
-            fi
+      if grep -xq 'SENTRY_TSDB = "sentry.tsdb.redissnuba.RedisSnubaTSDB"' "$SENTRY_CONFIG_PY"; then
+        echo "Migrated TSDB to Snuba. Old configuration file backed up to $SENTRY_CONFIG_PY.bak"
+        return
+      fi
 
-            echo "Failed to automatically migrate TSDB. Reverting..."
-            mv "$SENTRY_CONFIG_PY.bak" "$SENTRY_CONFIG_PY"
-            echo "$SENTRY_CONFIG_PY restored from backup."
-        fi
-
-        echo "WARN: Your Sentry configuration uses a legacy data store for time-series data. Remove the options SENTRY_TSDB and SENTRY_TSDB_OPTIONS from $SENTRY_CONFIG_PY and add:"
-        echo ""
-        echo "$tsdb_settings"
-        echo ""
-        echo "For more information please refer to https://github.com/getsentry/onpremise/pull/430"
+      echo "Failed to automatically migrate TSDB. Reverting..."
+      mv "$SENTRY_CONFIG_PY.bak" "$SENTRY_CONFIG_PY"
+      echo "$SENTRY_CONFIG_PY restored from backup."
     fi
+
+    echo "WARN: Your Sentry configuration uses a legacy data store for time-series data. Remove the options SENTRY_TSDB and SENTRY_TSDB_OPTIONS from $SENTRY_CONFIG_PY and add:"
+    echo ""
+    echo "$tsdb_settings"
+    echo ""
+    echo "For more information please refer to https://github.com/getsentry/onpremise/pull/430"
+  fi
 }
 
 replace_tsdb
