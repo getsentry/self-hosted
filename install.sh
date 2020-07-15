@@ -169,23 +169,23 @@ echo ""
 # We tag locally built images with an '-onpremise-local' suffix. docker-compose pull tries to pull these too and
 # shows a 404 error on the console which is confusing and unnecessary. To overcome this, we add the stderr>stdout
 # redirection below and pass it through grep, ignoring all lines having this '-onpremise-local' suffix.
-# $dc pull -q --ignore-pull-failures 2>&1 | grep -v -- -onpremise-local || true
+$dc pull -q --ignore-pull-failures 2>&1 | grep -v -- -onpremise-local || true
 
-# if [ -z "$SENTRY_IMAGE" ]; then
-#   docker pull getsentry/sentry:${SENTRY_VERSION:-latest}
-# else
-#   # We may not have the set image on the repo (local images) so allow fails
-#   docker pull $SENTRY_IMAGE || true;
-# fi
+if [ -z "$SENTRY_IMAGE" ]; then
+  docker pull getsentry/sentry:${SENTRY_VERSION:-latest}
+else
+  # We may not have the set image on the repo (local images) so allow fails
+  docker pull $SENTRY_IMAGE || true;
+fi
 
-# echo ""
-# echo "Building and tagging Docker images..."
-# echo ""
-# # Build the sentry onpremise image first as it is needed for the cron image
-# $dc build --force-rm web
-# $dc build --force-rm --parallel
-# echo ""
-# echo "Docker images built."
+echo ""
+echo "Building and tagging Docker images..."
+echo ""
+# Build the sentry onpremise image first as it is needed for the cron image
+$dc build --force-rm web
+$dc build --force-rm --parallel
+echo ""
+echo "Docker images built."
 
 ZOOKEEPER_SNAPSHOT_FOLDER_EXISTS=$($dcr zookeeper bash -c 'ls 2>/dev/null -Ubad1 -- /var/lib/zookeeper/data/version-2 | wc -l | tr -d '[:space:]'')
 if [ "$ZOOKEEPER_SNAPSHOT_FOLDER_EXISTS" -eq "1" ]; then
