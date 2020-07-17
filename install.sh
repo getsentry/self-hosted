@@ -1,9 +1,7 @@
 #!/usr/bin/env bash
 set -e
 
-if [ -f ".env" ]; then
-  source .env
-fi
+source <(grep -v '^#' .env | sed -E 's|^(.+)=(.*)$|: ${\1=\2}; export \1|g')
 
 dc="docker-compose --no-ansi"
 dcr="$dc run --rm"
