@@ -173,12 +173,8 @@ echo ""
 # redirection below and pass it through grep, ignoring all lines having this '-onpremise-local' suffix.
 $dc pull -q --ignore-pull-failures 2>&1 | grep -v -- -onpremise-local || true
 
-if [ -z "$SENTRY_IMAGE" ]; then
-  docker pull getsentry/sentry:${SENTRY_VERSION:-latest}
-else
-  # We may not have the set image on the repo (local images) so allow fails
-  docker pull $SENTRY_IMAGE || true;
-fi
+# We may not have the set image on the repo (local images) so allow fails
+docker pull $SENTRY_IMAGE || true;
 
 echo ""
 echo "Building and tagging Docker images..."
