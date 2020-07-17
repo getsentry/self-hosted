@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 set -e
 
+if [ -f ".env" ]; then
+  source .env
+fi
+
 dc="docker-compose --no-ansi"
 dcr="$dc run --rm"
 
