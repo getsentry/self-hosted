@@ -1,6 +1,5 @@
-ARG SENTRY_VERSION=latest
 ARG SENTRY_IMAGE
-FROM ${SENTRY_IMAGE:-getsentry/sentry:$SENTRY_VERSION}
+FROM ${SENTRY_IMAGE}
 
 WORKDIR /usr/src/sentry
 
