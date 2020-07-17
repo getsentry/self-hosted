@@ -9,8 +9,8 @@ NEW_VERSION="$2"
 
 SYMBOLICATOR_VERSION=$(curl -sSL 'https://api.github.com/repos/getsentry/symbolicator/git/refs/heads/master' | grep -Po '(?<=\"sha\": \")([a-f0-9]{5,40})(?=\",?)')
 
-sed -i -e "s/^SYMBOLICATOR_VERSION=.*\$/SYMBOLICATOR_VERSION=$SYMBOLICATOR_VERSION/" .env
-sed -i -e "s/^SENTRY_VERSION=.*\$/SENTRY_VERSION=$NEW_VERSION/" .env
+sed -i -e "s/^SYMBOLICATOR_IMAGE=\([^:]\+\):.\+\$/SYMBOLICATOR_IMAGE=\1:$SYMBOLICATOR_VERSION/" .env
+sed -i -e "s/^\(SENTRY\|SNUBA\|RELAY\)_IMAGE=\([^:]\+\):.\+\$/\1_IMAGE=\2:$NEW_VERSION/" .env
 sed -i -e "s/^\# Sentry .* On-Premise/# Sentry $NEW_VERSION On-Premise/" README.md
 sed -i -e "s/\(Change Date:\s*\)[-0-9]\+\$/\\1$(date +'%Y-%m-%d' -d '3 years')/" LICENSE
 

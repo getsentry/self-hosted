@@ -7,7 +7,6 @@ x-sentry-defaults: &sentry_defaults
     context: ./sentry
     args:
       - SENTRY_IMAGE
-      - SENTRY_VERSION
   image: sentry-onpremise-local
   depends_on:
     - redis
@@ -34,7 +33,7 @@ x-snuba-defaults: &snuba_defaults
     - redis
     - clickhouse
     - kafka
-  image: 'getsentry/snuba:$SENTRY_VERSION'
+  image: '$SNUBA_IMAGE'
   environment:
     SNUBA_SETTINGS: docker
     CLICKHOUSE_HOST: clickhouse
@@ -134,11 +133,11 @@ services:
     build:
       context: ./cron
       args:
-        BASE_IMAGE: 'getsentry/snuba:$SENTRY_VERSION'
+        BASE_IMAGE: '$SNUBA_IMAGE'
     command: '"*/5 * * * * gosu snuba snuba cleanup --dry-run False"'
   symbolicator:
     << : *restart_policy
-    image: 'getsentry/symbolicator:$SYMBOLICATOR_VERSION'
+    image: '$SYMBOLICATOR_IMAGE'
     volumes:
       - 'sentry-symbolicator:/data'
       - type: bind
@@ -152,7 +151,7 @@ services:
     build:
       context: ./cron
       args:
-        BASE_IMAGE: 'getsentry/symbolicator:$SYMBOLICATOR_VERSION'
+        BASE_IMAGE: '$SYMBOLICATOR_IMAGE'
     command: '"55 23 * * * gosu symbolicator symbolicator cleanup"'
     volumes:
       - 'sentry-symbolicator:/data'
@@ -194,7 +193,7 @@ services:
       - relay
   relay:
     << : *restart_policy
-    image: 'getsentry/relay:$SENTRY_VERSION'
+    image: '$RELAY_IMAGE'
     volumes:
       - type: bind
         read_only: true
