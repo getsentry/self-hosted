@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -e
 
+source <(grep -v '^#' .env | sed -E 's|^(.+)=(.*)$|: ${\1=\2}; export \1|g')
+
 dc="docker-compose --no-ansi"
 dcr="$dc run --rm"
 
@@ -108,7 +110,9 @@ echo ""
 # shows a 404 error on the console which is confusing and unnecessary. To overcome this, we add the stderr>stdout
 # redirection below and pass it through grep, ignoring all lines having this '-onpremise-local' suffix.
 $dc pull -q --ignore-pull-failures 2>&1 | grep -v -- -onpremise-local || true
-docker pull ${SENTRY_IMAGE:-getsentry/sentry:latest}
+
+# We may not have the set image on the repo (local images) so allow fails
+docker pull $SENTRY_IMAGE || true;
 
 echo ""
 echo "Building and tagging Docker images..."
