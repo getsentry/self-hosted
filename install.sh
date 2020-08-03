@@ -92,12 +92,6 @@ if (($IS_KVM == 0)); then
   fi
 fi
 
-# Clean up old stuff and ensure nothing is working while we install/update
-# This is for older versions of on-premise:
-$dc -p onpremise down --rmi local --remove-orphans
-# This is for newer versions
-$dc down --rmi local --remove-orphans
-
 echo ""
 echo "Creating volumes for persistent storage..."
 echo "Created $(docker volume create --name=sentry-data)."
@@ -184,6 +178,12 @@ $dc build --force-rm web
 $dc build --force-rm --parallel
 echo ""
 echo "Docker images built."
+
+# Clean up old stuff and ensure nothing is working while we install/update
+# This is for older versions of on-premise:
+$dc -p onpremise down --rmi local --remove-orphans
+# This is for newer versions
+$dc down --rmi local --remove-orphans
 
 ZOOKEEPER_SNAPSHOT_FOLDER_EXISTS=$($dcr zookeeper bash -c 'ls 2>/dev/null -Ubad1 -- /var/lib/zookeeper/data/version-2 | wc -l | tr -d '[:space:]'')
 if [ "$ZOOKEEPER_SNAPSHOT_FOLDER_EXISTS" -eq "1" ]; then
