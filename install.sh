@@ -21,6 +21,30 @@ RELAY_CONFIG_YML='relay/config.yml'
 RELAY_CREDENTIALS_JSON='relay/credentials.json'
 SENTRY_EXTRA_REQUIREMENTS='sentry/requirements.txt'
 
+load_options() {
+  while [[ -n "$@" ]]; do
+    case "$1" in
+	    -h | --help) show_help; exit;;
+	    --) ;;
+	    *) echo "Unexpected argument: $1. Use --help for usage information."; exit 1;;
+    esac
+    shift
+  done
+}
+
+show_help() {
+  cat <<EOF
+Usage: $0 [-h | --help]
+
+Install Sentry with docker-compose.
+
+Options:
+ -h, --help             Show this message and exit.
+EOF
+}
+
+load_options $(getopt -n "$0" -o 'h' -l 'help' -- "$@")
+
 # Courtesy of https://stackoverflow.com/a/2183063/90297
 trap_with_arg() {
   func="$1" ; shift
