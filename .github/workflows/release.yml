@@ -13,6 +13,10 @@ on:
         description: Do not actually cut the release
         required: false
         default: false
+      force:
+        description: Force the release, bypassing the 'release-blocker' issue killswitch
+        required: false
+        default: false
   schedule:
     # We want the release to be at 10 or 11am Pacific Time
     # We also make this an hour after all others such as Sentry,
