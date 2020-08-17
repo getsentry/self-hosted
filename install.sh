@@ -126,10 +126,14 @@ replace_tsdb() {
     [ -f "$SENTRY_CONFIG_PY" ] &&
     ! grep -xq 'SENTRY_TSDB = "sentry.tsdb.redissnuba.RedisSnubaTSDB"' "$SENTRY_CONFIG_PY"
   ); then
-    tsdb_settings="SENTRY_TSDB = \"sentry.tsdb.redissnuba.RedisSnubaTSDB\"
+    # Do NOT indent the following string as it would be reflected in the end result,
+    # breaking the final config file. See getsentry/onpremise#624.
+    tsdb_settings="\
+SENTRY_TSDB = \"sentry.tsdb.redissnuba.RedisSnubaTSDB\"
 
-    # Automatic switchover 90 days after $(date). Can be removed afterwards.
-    SENTRY_TSDB_OPTIONS = {\"switchover_timestamp\": $(date +%s) + (90 * 24 * 3600)}"
+# Automatic switchover 90 days after $(date). Can be removed afterwards.
+SENTRY_TSDB_OPTIONS = {\"switchover_timestamp\": $(date +%s) + (90 * 24 * 3600)}\
+"
 
     if grep -q 'SENTRY_TSDB_OPTIONS = ' "$SENTRY_CONFIG_PY"; then
       echo "Not attempting automatic TSDB migration due to presence of SENTRY_TSDB_OPTIONS"
