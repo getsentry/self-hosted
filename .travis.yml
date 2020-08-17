@@ -1,6 +1,9 @@
 language: bash
 services: docker
 
+os:
+  - linux
+
 env:
   - DOCKER_COMPOSE_VERSION=1.24.1
 
