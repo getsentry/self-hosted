@@ -3,6 +3,7 @@ services: docker
 
 os:
   - linux
+  - osx
 
 env:
   - DOCKER_COMPOSE_VERSION=1.24.1
