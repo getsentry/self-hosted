@@ -329,9 +329,17 @@ if [ ! -f "$RELAY_CREDENTIALS_JSON" ]; then
 fi
 
 if [[ "$MINIMIZE_DOWNTIME" ]]; then
+  # Start the whole setup, except nginx and relay.
+  $dc up -d --remove-orphans $($dc config --services |grep -v -e '^nginx$' -e '^relay$')
   $dc exec nginx service nginx reload
-  # Start the whole setup, this might restart nginx and relay.
-  $dc up -d --remove-orphans
+
+  echo "Waiting for Sentry to start..."
+  while [[ "$(curl -m 1 http://localhost:9000/_health/ --silent)" != "ok" ]]; do
+    sleep 0.5
+  done
+
+  # Make sure everything is up. This should only touch relay and nginx
+  $dc up -d
 else
   echo ""
   echo "----------------"
