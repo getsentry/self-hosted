@@ -334,9 +334,8 @@ if [[ "$MINIMIZE_DOWNTIME" ]]; then
   $dc exec nginx service nginx reload
 
   echo "Waiting for Sentry to start..."
-  while [[ "$(curl -m 1 http://localhost:9000/_health/ --silent)" != "ok" ]]; do
-    sleep 0.5
-  done
+  docker run --rm --network="${COMPOSE_PROJECT_NAME}_default" alpine ash \
+    -c 'while [[ "$(wget -T 1 -q -O- http://web:9000/_health/)" != "ok" ]]; do sleep 0.5; done'
 
   # Make sure everything is up. This should only touch relay and nginx
   $dc up -d
