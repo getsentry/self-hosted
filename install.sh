@@ -217,7 +217,7 @@ echo "Docker images built."
 
 if [[ "$MINIMIZE_DOWNTIME" ]]; then
   # Stop everything but relay and nginx
-  $dc rm -fsv $($dc config --services |grep -v -e '^nginx$' -e '^relay$')
+  $dc rm -fsv $($dc config --services | grep -v -E '^(nginx|relay)$')
 else
   # Clean up old stuff and ensure nothing is working while we install/update
   # This is for older versions of on-premise:
@@ -330,7 +330,7 @@ fi
 
 if [[ "$MINIMIZE_DOWNTIME" ]]; then
   # Start the whole setup, except nginx and relay.
-  $dc up -d --remove-orphans $($dc config --services |grep -v -e '^nginx$' -e '^relay$')
+  $dc up -d --remove-orphans $($dc config --services | grep -v -E '^(nginx|relay)$')
   $dc exec nginx service nginx reload
 
   echo "Waiting for Sentry to start..."
