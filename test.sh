@@ -89,7 +89,7 @@ echo "";
 EVENT_RESPONSE=$(sentry_api_request "$EVENT_PATH")
 declare -a EVENT_TEST_STRINGS=(
     '"eventID":"'"$TEST_EVENT_ID"'"'
-    '"message":"a failure"'
+    '"message":"a tailor"'
     '"title":"a failure"'
     '"object":"42"'
 )
