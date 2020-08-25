@@ -7,9 +7,9 @@ about: Suggest an idea for this project
 <!--
 
 Note that the Sentry team has finite resources and priorities that are not
-always visible on GitHub. If your issue doesn't align with our priorities it's
+always visible on GitHub. If your issue doesn't align with our priorities, it's
 unlikely it will be worked on. If we're interested in a particular feature however,
-we'll follow up and ask you to submit an RFC to talk about it in more detail.
+we'll follow up and ask you to submit an RFC to discuss it in more detail.
 
 -->
 
@@ -24,5 +24,5 @@ improve?
 
 ## Additional Context
 
-Any other context or screenshots or API request payload/responses that you
+Any other context or screenshots or API request payload/responses that
 pertain to the feature.
