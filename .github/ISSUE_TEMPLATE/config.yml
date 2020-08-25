@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Question about self-hosting/on-premise
+    url: https://forum.sentry.io
+    about: Please use the community forums for questions
+  - name: Report a security vulnerability
+    url: https://sentry.io/security/#vulnerability-disclosure
+    about: Please see our guide for responsible disclosure.
