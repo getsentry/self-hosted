@@ -1,8 +1,4 @@
 #!/usr/bin/env bash
-set -e
-
-# With a tip o' the hat to https://unix.stackexchange.com/a/79077
-set -a && . ./.env && set +a
 
 skip_user_prompt=0
 
@@ -15,6 +11,11 @@ while [[ -n $1 ]]; do
   esac
   shift
 done
+
+set -e
+
+# With a tip o' the hat to https://unix.stackexchange.com/a/79077
+set -a && . ./.env && set +a
 
 dc="docker-compose --no-ansi"
 dcr="$dc run --rm"
