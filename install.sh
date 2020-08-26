@@ -4,6 +4,18 @@ set -e
 # With a tip o' the hat to https://unix.stackexchange.com/a/79077
 set -a && . ./.env && set +a
 
+skip_user_prompt=0
+
+while [[ -n $1 ]]; do
+  case $1 in
+    -n | --no-user-prompt)
+      shift
+      skip_user_prompt=1
+      ;;
+  esac
+  shift
+done
+
 dc="docker-compose --no-ansi"
 dcr="$dc run --rm"
 
@@ -257,7 +269,7 @@ fi
 
 echo ""
 echo "Setting up database..."
-if [ $CI ]; then
+if [ $CI ] || [ $skip_user_prompt == 1 ]; then
   $dcr web upgrade --noinput
   echo ""
   echo "Did not prompt for user creation due to non-interactive shell."

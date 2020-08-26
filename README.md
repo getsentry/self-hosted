@@ -15,6 +15,8 @@ Official bootstrap for running your own [Sentry](https://sentry.io/) with [Docke
 
 To get started with all the defaults, simply clone the repo and run `./install.sh` in your local check-out.
 
+During the install, a prompt will ask if you want to create a user account. If you require that the install not be blocked by the prompt, run `./install.sh --no-user-prompt`, or `./install.sh -n`.
+
 There may need to be modifications to the included example config files (`sentry/config.example.yml` and `sentry/sentry.conf.example.py`) to accommodate your needs or your environment (such as adding GitHub credentials). If you want to perform these, do them before you run the install script and copy them without the `.example` extensions in the name (such as `sentry/sentry.conf.py`) before running the `install.sh` script.
 
 The recommended way to customize your configuration is using the files below, in that order:
