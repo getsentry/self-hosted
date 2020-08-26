@@ -25,10 +25,10 @@ MINIMIZE_DOWNTIME=
 load_options() {
   while [[ -n "$@" ]]; do
     case "$1" in
-	    -h | --help) show_help; exit;;
-	    --minimize-downtime) MINIMIZE_DOWNTIME=1;;
-	    --) ;;
-	    *) echo "Unexpected argument: $1. Use --help for usage information."; exit 1;;
+        -h | --help) show_help; exit;;
+        --minimize-downtime) MINIMIZE_DOWNTIME=1;;
+        --) ;;
+        *) echo "Unexpected argument: $1. Use --help for usage information."; exit 1;;
     esac
     shift
   done
