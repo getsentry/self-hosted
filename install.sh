@@ -4,7 +4,7 @@ skip_user_prompt=0
 
 while [[ -n $1 ]]; do
   case $1 in
-    -n | --no-user-prompt)
+    --no-user-prompt)
       shift
       skip_user_prompt=1
       ;;
