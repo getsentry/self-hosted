@@ -8,10 +8,10 @@ COOKIE_FILE=$(mktemp)
 
 # Courtesy of https://stackoverflow.com/a/2183063/90297
 trap_with_arg() {
-    func="$1" ; shift
-    for sig ; do
-        trap "$func $sig "'$LINENO' "$sig"
-    done
+  func="$1" ; shift
+  for sig ; do
+    trap "$func $sig "'$LINENO' "$sig"
+  done
 }
 
 DID_CLEAN_UP=0
@@ -36,33 +36,33 @@ get_csrf_token () { awk '$6 == "sc" { print $7 }' $COOKIE_FILE; }
 sentry_api_request () { curl -s -H 'Accept: application/json; charset=utf-8' -H "Referer: $SENTRY_TEST_HOST" -H 'Content-Type: application/json' -H "X-CSRFToken: $(get_csrf_token)" -b "$COOKIE_FILE" -c "$COOKIE_FILE" "$SENTRY_TEST_HOST/api/0/$1" ${@:2}; }
 
 login () {
-    INITIAL_AUTH_REDIRECT=$(curl -sL -o /dev/null $SENTRY_TEST_HOST -w %{url_effective})
-    if [ "$INITIAL_AUTH_REDIRECT" != "$SENTRY_TEST_HOST/auth/login/sentry/" ]; then
-        echo "Initial /auth/login/ redirect failed, exiting..."
-        echo "$INITIAL_AUTH_REDIRECT"
-        exit -1
-    fi
+  INITIAL_AUTH_REDIRECT=$(curl -sL -o /dev/null $SENTRY_TEST_HOST -w %{url_effective})
+  if [ "$INITIAL_AUTH_REDIRECT" != "$SENTRY_TEST_HOST/auth/login/sentry/" ]; then
+    echo "Initial /auth/login/ redirect failed, exiting..."
+    echo "$INITIAL_AUTH_REDIRECT"
+    exit -1
+  fi
 
-    CSRF_TOKEN_FOR_LOGIN=$(curl $SENTRY_TEST_HOST -sL -c "$COOKIE_FILE" | awk -F "'" '
-        /csrfmiddlewaretoken/ {
-        print $4 "=" $6;
-        exit;
-    }')
+  CSRF_TOKEN_FOR_LOGIN=$(curl $SENTRY_TEST_HOST -sL -c "$COOKIE_FILE" | awk -F "'" '
+    /csrfmiddlewaretoken/ {
+    print $4 "=" $6;
+    exit;
+  }')
 
-    curl -sL --data-urlencode 'op=login' --data-urlencode "username=$TEST_USER" --data-urlencode "password=$TEST_PASS" --data-urlencode "$CSRF_TOKEN_FOR_LOGIN" "$SENTRY_TEST_HOST/auth/login/sentry/" -H "Referer: $SENTRY_TEST_HOST/auth/login/sentry/" -b "$COOKIE_FILE" -c "$COOKIE_FILE";
+  curl -sL --data-urlencode 'op=login' --data-urlencode "username=$TEST_USER" --data-urlencode "password=$TEST_PASS" --data-urlencode "$CSRF_TOKEN_FOR_LOGIN" "$SENTRY_TEST_HOST/auth/login/sentry/" -H "Referer: $SENTRY_TEST_HOST/auth/login/sentry/" -b "$COOKIE_FILE" -c "$COOKIE_FILE";
 }
 
 LOGIN_RESPONSE=$(login);
 declare -a LOGIN_TEST_STRINGS=(
-    '"isAuthenticated":true'
-    '"username":"test@example.com"'
-    '"isSuperuser":true'
+  '"isAuthenticated":true'
+  '"username":"test@example.com"'
+  '"isSuperuser":true'
 )
 for i in "${LOGIN_TEST_STRINGS[@]}"
 do
-   echo "Testing '$i'..."
-   echo "$LOGIN_RESPONSE" | grep "$i[,}]" >& /dev/null
-   echo "Pass."
+  echo "Testing '$i'..."
+  echo "$LOGIN_RESPONSE" | grep "$i[,}]" >& /dev/null
+  echo "Pass."
 done
 
 # Set up initial/required settings (InstallWizard request)
@@ -88,14 +88,14 @@ echo "";
 
 EVENT_RESPONSE=$(sentry_api_request "$EVENT_PATH")
 declare -a EVENT_TEST_STRINGS=(
-    '"eventID":"'"$TEST_EVENT_ID"'"'
-    '"message":"a failure"'
-    '"title":"a failure"'
-    '"object":"42"'
+  '"eventID":"'"$TEST_EVENT_ID"'"'
+  '"message":"a failure"'
+  '"title":"a failure"'
+  '"object":"42"'
 )
 for i in "${EVENT_TEST_STRINGS[@]}"
 do
-   echo "Testing '$i'..."
-   echo "$EVENT_RESPONSE" | grep "$i[,}]" >& /dev/null
-   echo "Pass."
+  echo "Testing '$i'..."
+  echo "$EVENT_RESPONSE" | grep "$i[,}]" >& /dev/null
+  echo "Pass."
 done

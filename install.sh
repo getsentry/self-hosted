@@ -26,11 +26,11 @@ MINIMIZE_DOWNTIME=
 load_options() {
   while [[ -n "$@" ]]; do
     case "$1" in
-        -h | --help) show_help; exit;;
-        --no-user-prompt) SKIP_USER_PROMPT=1;;
-        --minimize-downtime) MINIMIZE_DOWNTIME=1;;
-        --) ;;
-        *) echo "Unexpected argument: $1. Use --help for usage information."; exit 1;;
+      -h | --help) show_help; exit;;
+      --no-user-prompt) SKIP_USER_PROMPT=1;;
+      --minimize-downtime) MINIMIZE_DOWNTIME=1;;
+      --) ;;
+      *) echo "Unexpected argument: $1. Use --help for usage information."; exit 1;;
     esac
     shift
   done
@@ -57,7 +57,7 @@ load_options $(getopt -n "$0" -o 'h' -l 'help,minimize-downtime' -- "$@")
 trap_with_arg() {
   func="$1" ; shift
   for sig ; do
-      trap "$func $sig "'$LINENO' "$sig"
+    trap "$func $sig "'$LINENO' "$sig"
   done
 }
 
@@ -106,18 +106,18 @@ function ensure_file_from_example {
 }
 
 if [ $(ver $DOCKER_VERSION) -lt $(ver $MIN_DOCKER_VERSION) ]; then
-    echo "FAIL: Expected minimum Docker version to be $MIN_DOCKER_VERSION but found $DOCKER_VERSION"
-    exit 1
+  echo "FAIL: Expected minimum Docker version to be $MIN_DOCKER_VERSION but found $DOCKER_VERSION"
+  exit 1
 fi
 
 if [ $(ver $COMPOSE_VERSION) -lt $(ver $MIN_COMPOSE_VERSION) ]; then
-    echo "FAIL: Expected minimum docker-compose version to be $MIN_COMPOSE_VERSION but found $COMPOSE_VERSION"
-    exit 1
+  echo "FAIL: Expected minimum docker-compose version to be $MIN_COMPOSE_VERSION but found $COMPOSE_VERSION"
+  exit 1
 fi
 
 if [ "$RAM_AVAILABLE_IN_DOCKER" -lt "$MIN_RAM" ]; then
-    echo "FAIL: Expected minimum RAM available to Docker to be $MIN_RAM MB but found $RAM_AVAILABLE_IN_DOCKER MB"
-    exit 1
+  echo "FAIL: Expected minimum RAM available to Docker to be $MIN_RAM MB but found $RAM_AVAILABLE_IN_DOCKER MB"
+  exit 1
 fi
 
 #SSE4.2 required by Clickhouse (https://clickhouse.yandex/docs/en/operations/requirements/)
@@ -149,14 +149,14 @@ ensure_file_from_example $SYMBOLICATOR_CONFIG_YML
 ensure_file_from_example $RELAY_CONFIG_YML
 
 if grep -xq "system.secret-key: '!!changeme!!'" $SENTRY_CONFIG_YML ; then
-    echo ""
-    echo "Generating secret key..."
-    # This is to escape the secret key to be used in sed below
-    # Note the need to set LC_ALL=C due to BSD tr and sed always trying to decode
-    # whatever is passed to them. Kudos to https://stackoverflow.com/a/23584470/90297
-    SECRET_KEY=$(export LC_ALL=C; head /dev/urandom | tr -dc "a-z0-9@#%^&*(-_=+)" | head -c 50 | sed -e 's/[\/&]/\\&/g')
-    sed -i -e 's/^system.secret-key:.*$/system.secret-key: '"'$SECRET_KEY'"'/' $SENTRY_CONFIG_YML
-    echo "Secret key written to $SENTRY_CONFIG_YML"
+  echo ""
+  echo "Generating secret key..."
+  # This is to escape the secret key to be used in sed below
+  # Note the need to set LC_ALL=C due to BSD tr and sed always trying to decode
+  # whatever is passed to them. Kudos to https://stackoverflow.com/a/23584470/90297
+  SECRET_KEY=$(export LC_ALL=C; head /dev/urandom | tr -dc "a-z0-9@#%^&*(-_=+)" | head -c 50 | sed -e 's/[\/&]/\\&/g')
+  sed -i -e 's/^system.secret-key:.*$/system.secret-key: '"'$SECRET_KEY'"'/' $SENTRY_CONFIG_YML
+  echo "Secret key written to $SENTRY_CONFIG_YML"
 fi
 
 replace_tsdb() {
@@ -253,7 +253,7 @@ CLICKHOUSE_CLIENT_MAX_RETRY=5
 until clickhouse_query 'SELECT 1' > /dev/null; do
   ((CLICKHOUSE_CLIENT_MAX_RETRY--))
   [[ CLICKHOUSE_CLIENT_MAX_RETRY -eq 0 ]] && echo "Clickhouse server failed to come up in 5 tries." && exit 1;
-   echo "Trying again. Remaining tries #$CLICKHOUSE_CLIENT_MAX_RETRY"
+  echo "Trying again. Remaining tries #$CLICKHOUSE_CLIENT_MAX_RETRY"
   sleep 0.5;
 done
 set -e
@@ -279,23 +279,23 @@ echo ""
 
 # Very naively check whether there's an existing sentry-postgres volume and the PG version in it
 if [[ $(docker volume ls -q --filter name=sentry-postgres) && $(docker run --rm -v sentry-postgres:/db busybox cat /db/PG_VERSION 2>/dev/null) == "9.5" ]]; then
-    docker volume rm sentry-postgres-new || true
-    # If this is Postgres 9.5 data, start upgrading it to 9.6 in a new volume
-    docker run --rm \
-    -v sentry-postgres:/var/lib/postgresql/9.5/data \
-    -v sentry-postgres-new:/var/lib/postgresql/9.6/data \
-    tianon/postgres-upgrade:9.5-to-9.6
+  docker volume rm sentry-postgres-new || true
+  # If this is Postgres 9.5 data, start upgrading it to 9.6 in a new volume
+  docker run --rm \
+  -v sentry-postgres:/var/lib/postgresql/9.5/data \
+  -v sentry-postgres-new:/var/lib/postgresql/9.6/data \
+  tianon/postgres-upgrade:9.5-to-9.6
 
-    # Get rid of the old volume as we'll rename the new one to that
-    docker volume rm sentry-postgres
-    docker volume create --name sentry-postgres
-    # There's no rename volume in Docker so copy the contents from old to new name
-    # Also append the `host all all all trust` line as `tianon/postgres-upgrade:9.5-to-9.6`
-    # doesn't do that automatically.
-    docker run --rm -v sentry-postgres-new:/from -v sentry-postgres:/to alpine ash -c \
-     "cd /from ; cp -av . /to ; echo 'host all all all trust' >> /to/pg_hba.conf"
-    # Finally, remove the new old volume as we are all in sentry-postgres now
-    docker volume rm sentry-postgres-new
+  # Get rid of the old volume as we'll rename the new one to that
+  docker volume rm sentry-postgres
+  docker volume create --name sentry-postgres
+  # There's no rename volume in Docker so copy the contents from old to new name
+  # Also append the `host all all all trust` line as `tianon/postgres-upgrade:9.5-to-9.6`
+  # doesn't do that automatically.
+  docker run --rm -v sentry-postgres-new:/from -v sentry-postgres:/to alpine ash -c \
+    "cd /from ; cp -av . /to ; echo 'host all all all trust' >> /to/pg_hba.conf"
+  # Finally, remove the new old volume as we are all in sentry-postgres now
+  docker volume rm sentry-postgres-new
 fi
 
 echo ""
