@@ -54,10 +54,6 @@ jobs:
             GIT_COMMITTER_NAME: getsentry-bot
             GIT_AUTHOR_NAME: getsentry-bot
             EMAIL: bot@getsentry.com
-        # Wait until the builds start. Craft should do this automatically
-        # but it is broken now.
-        # TODO: Remove this once getsentry/craft#111 is fixed
-        - run: sleep 10
         - uses: getsentry/craft@master
           with:
             action: publish
