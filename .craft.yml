@@ -10,6 +10,6 @@ statusProvider:
   name: github
   config:
     contexts:
-      - 'Travis CI - Branch'
+      - 'test / test (push)'
 targets:
   - name: github
