@@ -10,7 +10,6 @@ on:
   pull_request:
 env:
   DOCKER_COMPOSE_VERSION: 1.24.1
-  CI: 1
 jobs:
   test:
     runs-on: ubuntu-16.04

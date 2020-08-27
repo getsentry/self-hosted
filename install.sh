@@ -336,7 +336,7 @@ fi
 if [[ "$MINIMIZE_DOWNTIME" ]]; then
   # Start the whole setup, except nginx and relay.
   $dc up -d --remove-orphans $($dc config --services | grep -v -E '^(nginx|relay)$')
-  $dc exec nginx service nginx reload
+  $dc exec -T nginx service nginx reload
 
   echo "Waiting for Sentry to start..."
   docker run --rm --network="${COMPOSE_PROJECT_NAME}_default" alpine ash \
