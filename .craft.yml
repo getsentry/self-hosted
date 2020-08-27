@@ -10,6 +10,6 @@ statusProvider:
   name: github
   config:
     contexts:
-      - 'test / test (push)'
+      - 'test'
 targets:
   - name: github
