@@ -21,6 +21,35 @@ SYMBOLICATOR_CONFIG_YML='symbolicator/config.yml'
 RELAY_CONFIG_YML='relay/config.yml'
 RELAY_CREDENTIALS_JSON='relay/credentials.json'
 SENTRY_EXTRA_REQUIREMENTS='sentry/requirements.txt'
+MINIMIZE_DOWNTIME=
+
+load_options() {
+  while [[ -n "$@" ]]; do
+    case "$1" in
+        -h | --help) show_help; exit;;
+        --minimize-downtime) MINIMIZE_DOWNTIME=1;;
+        --) ;;
+        *) echo "Unexpected argument: $1. Use --help for usage information."; exit 1;;
+    esac
+    shift
+  done
+}
+
+show_help() {
+  cat <<EOF
+Usage: $0 [-h | --help] [--minimize-downtime]
+
+Install Sentry with docker-compose.
+
+Options:
+ -h, --help             Show this message and exit.
+ --minimize-downtime    EXPERIMENTAL: try to keep accepting events for as long as possible while upgrading.
+                        This will disable cleanup on error, and might leave your installation in partially upgraded state.
+                        This option might not reload all configuration, and is only meant for in-place upgrades.
+EOF
+}
+
+load_options $(getopt -n "$0" -o 'h' -l 'help,minimize-downtime' -- "$@")
 
 # Courtesy of https://stackoverflow.com/a/2183063/90297
 trap_with_arg() {
@@ -40,10 +69,17 @@ cleanup () {
 
   if [ "$1" != "EXIT" ]; then
     echo "An error occurred, caught SIG$1 on line $2";
-    echo "Cleaning up..."
+
+    if [[ "$MINIMIZE_DOWNTIME" ]]; then
+      echo "*NOT* cleaning up, to clean your environment run \"docker-compose stop\"."
+    else
+      echo "Cleaning up..."
+    fi
   fi
 
-  $dc stop &> /dev/null
+  if [[ ! "$MINIMIZE_DOWNTIME" ]]; then
+    $dc stop &> /dev/null
+  fi
 }
 trap_with_arg cleanup ERR INT TERM EXIT
 
@@ -184,11 +220,16 @@ $dc build --force-rm --parallel
 echo ""
 echo "Docker images built."
 
-# Clean up old stuff and ensure nothing is working while we install/update
-# This is for older versions of on-premise:
-$dc -p onpremise down --rmi local --remove-orphans
-# This is for newer versions
-$dc down --rmi local --remove-orphans
+if [[ "$MINIMIZE_DOWNTIME" ]]; then
+  # Stop everything but relay and nginx
+  $dc rm -fsv $($dc config --services | grep -v -E '^(nginx|relay)$')
+else
+  # Clean up old stuff and ensure nothing is working while we install/update
+  # This is for older versions of on-premise:
+  $dc -p onpremise down --rmi local --remove-orphans
+  # This is for newer versions
+  $dc down --rmi local --remove-orphans
+fi
 
 ZOOKEEPER_SNAPSHOT_FOLDER_EXISTS=$($dcr zookeeper bash -c 'ls 2>/dev/null -Ubad1 -- /var/lib/zookeeper/data/version-2 | wc -l | tr -d '[:space:]'')
 if [ "$ZOOKEEPER_SNAPSHOT_FOLDER_EXISTS" -eq "1" ]; then
@@ -292,9 +333,22 @@ if [ ! -f "$RELAY_CREDENTIALS_JSON" ]; then
   echo "Relay credentials written to $RELAY_CREDENTIALS_JSON"
 fi
 
-echo ""
-echo "----------------"
-echo "You're all done! Run the following command to get Sentry running:"
-echo ""
-echo "  docker-compose up -d"
-echo ""
+if [[ "$MINIMIZE_DOWNTIME" ]]; then
+  # Start the whole setup, except nginx and relay.
+  $dc up -d --remove-orphans $($dc config --services | grep -v -E '^(nginx|relay)$')
+  $dc exec -T nginx service nginx reload
+
+  echo "Waiting for Sentry to start..."
+  docker run --rm --network="${COMPOSE_PROJECT_NAME}_default" alpine ash \
+    -c 'while [[ "$(wget -T 1 -q -O- http://web:9000/_health/)" != "ok" ]]; do sleep 0.5; done'
+
+  # Make sure everything is up. This should only touch relay and nginx
+  $dc up -d
+else
+  echo ""
+  echo "----------------"
+  echo "You're all done! Run the following command to get Sentry running:"
+  echo ""
+  echo "  docker-compose up -d"
+  echo ""
+fi
