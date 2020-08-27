@@ -27,6 +27,7 @@ load_options() {
   while [[ -n "$@" ]]; do
     case "$1" in
         -h | --help) show_help; exit;;
+        --no-user-prompt) SKIP_USER_PROMPT=1;;
         --minimize-downtime) MINIMIZE_DOWNTIME=1;;
         --) ;;
         *) echo "Unexpected argument: $1. Use --help for usage information."; exit 1;;
@@ -43,6 +44,7 @@ Install Sentry with docker-compose.
 
 Options:
  -h, --help             Show this message and exit.
+ --no-user-prompt       Skips the initial user creation prompt (ideal for non-interactive installs).
  --minimize-downtime    EXPERIMENTAL: try to keep accepting events for as long as possible while upgrading.
                         This will disable cleanup on error, and might leave your installation in partially upgraded state.
                         This option might not reload all configuration, and is only meant for in-place upgrades.
@@ -298,7 +300,7 @@ fi
 
 echo ""
 echo "Setting up database..."
-if [ $CI ]; then
+if [ $CI ] || [ $SKIP_USER_PROMPT == 1 ]; then
   $dcr web upgrade --noinput
   echo ""
   echo "Did not prompt for user creation due to non-interactive shell."
