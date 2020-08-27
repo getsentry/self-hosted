@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -e
 
-SENTRY_TEST_HOST="${SENTRY_TEST_HOST:-http://localhost:9000}"
+export SENTRY_TEST_HOST="${SENTRY_TEST_HOST:-http://localhost:9000}"
 TEST_USER='test@example.com'
 TEST_PASS='test123TEST'
 COOKIE_FILE=$(mktemp)
@@ -31,6 +31,12 @@ cleanup () {
   echo "Done."
 }
 trap_with_arg cleanup ERR INT TERM EXIT
+
+# Disable beacon for e2e tests
+echo 'SENTRY_BEACON=False' >> sentry/sentry.conf.py
+docker-compose run --rm web createuser --superuser --email $TEST_USER --password $TEST_PASS || true
+docker-compose up -d
+printf "Waiting for Sentry to be up"; timeout 60 bash -c 'until $(curl -Isf -o /dev/null $SENTRY_TEST_HOST); do printf '.'; sleep 0.5; done'
 
 get_csrf_token () { awk '$6 == "sc" { print $7 }' $COOKIE_FILE; }
 sentry_api_request () { curl -s -H 'Accept: application/json; charset=utf-8' -H "Referer: $SENTRY_TEST_HOST" -H 'Content-Type: application/json' -H "X-CSRFToken: $(get_csrf_token)" -b "$COOKIE_FILE" -c "$COOKIE_FILE" "$SENTRY_TEST_HOST/api/0/$1" ${@:2}; }
