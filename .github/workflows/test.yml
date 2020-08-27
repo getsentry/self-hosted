@@ -1,0 +1,41 @@
+name: test
+on:
+  # Run CI on all pushes to the master and release/** branches, and on all new
+  # pull requests, and on all pushes to pull requests (even if a pull request
+  # is not against master).
+  push:
+    branches:
+    - "master"
+    - "releases/**"
+  pull_request:
+env:
+  DOCKER_COMPOSE_VERSION: 1.24.1
+jobs:
+  test:
+    runs-on: ubuntu-16.04
+    name: "test"
+    steps:
+
+      - name: Pin docker-compose
+        run: |
+          sudo rm /usr/local/bin/docker-compose
+          curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > docker-compose
+          chmod +x docker-compose
+          sudo mv docker-compose /usr/local/bin
+
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Install and test
+        run: |
+          ./install.sh
+          docker-compose run --rm web createuser --superuser --email test@example.com --password test123TEST
+          docker-compose up -d
+          printf "Waiting for Sentry to be up"; timeout 60 bash -c 'until $(curl -Isf -o /dev/null http://localhost:9000); do printf '.'; sleep 0.5; done'
+          ./test.sh
+
+      - name: Inspect failure
+        if: failure()
+        run: |
+          docker-compose ps
+          docker-compose logs
