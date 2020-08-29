@@ -96,7 +96,15 @@ services:
       - 'sentry-secrets:/etc/kafka/secrets'
   clickhouse:
     << : *restart_policy
-    image: 'yandex/clickhouse-server:20.3.9.70'
+    build:
+      context: ./clickhouse
+      args:
+        BASE_IMAGE: 'yandex/clickhouse-server:20.3.9.70'
+    environment:
+      # This limits Clickhouse's memory to 30% of the host memory
+      # If you have high volume and your search return incomplete results
+      # You might want to change this to a higher value (and ensure your host has enough memory)
+      CLICKHOUSE_MAX_SERVER_MEMORY_USAGE_TO_RAM_RATIO: 0.3
     ulimits:
       nofile:
         soft: 262144

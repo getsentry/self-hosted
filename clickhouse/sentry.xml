@@ -1,0 +1,3 @@
+<yandex>
+	<max_server_memory_usage_to_ram_ratio from_env="CLICKHOUSE_MAX_SERVER_MEMORY_USAGE_TO_RAM_RATIO" />
+</yandex>
