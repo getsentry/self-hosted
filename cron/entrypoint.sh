@@ -9,7 +9,7 @@ declare -p | grep -Ev 'BASHOPTS|BASH_VERSINFO|EUID|PPID|SHELLOPTS|UID' > /contai
 { for cron_job in "$@"; do echo -e "SHELL=/bin/bash
 BASH_ENV=/container.env
 ${cron_job} > /proc/1/fd/1 2>/proc/1/fd/2"; done } \
-    | sed --regexp-extended 's/\\(.)/\1/g' \
-    | crontab -
+  | sed --regexp-extended 's/\\(.)/\1/g' \
+  | crontab -
 crontab -l
 exec cron -f -l -L 15

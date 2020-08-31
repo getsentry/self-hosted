@@ -27,41 +27,41 @@ jobs:
     runs-on: ubuntu-latest
     name: "Release a new version"
     steps:
-        - id: killswitch
-          if: ${{ !github.event.inputs.force }}
-          run: |
-            if curl -s "https://api.github.com/repos/$GITHUB_REPOSITORY/issues?state=open&labels=release-blocker" | grep -Pzvo '\[[\s\n\r]*\]'; then
-              echo "Open release-blocking issues found, cancelling release...";
-              curl -sf -X POST -H 'Accept: application/vnd.github.v3+json' -H 'Authorization: token ${{ secrets.GITHUB_TOKEN }}' https://api.github.com/repos/$GITHUB_REPOSITORY/actions/runs/${{ github.run_id }}/cancel;
-            fi
-        - id: calver
-          if: ${{ !github.event.inputs.version }}
-          run: |
-            DATE_PART=$(date +'%y.%-m')
-            declare -i PATCH_VERSION=0
-            while curl -sf -o /dev/null "https://api.github.com/repos/$GITHUB_REPOSITORY/git/ref/tags/$DATE_PART.$PATCH_VERSION"; do
-              PATCH_VERSION+=1
-            done
-            echo "::set-output name=version::$DATE_PART.$PATCH_VERSION"
-        - uses: actions/checkout@v2
-        - uses: getsentry/craft@master
-          if: ${{ !github.event.inputs.skip_prepare }}
-          with:
-            action: prepare
-            version: ${{ github.event.inputs.version || steps.calver.outputs.version }}
-          env:
-            DRY_RUN: ${{ github.event.inputs.dry_run }}
-            GIT_COMMITTER_NAME: getsentry-bot
-            GIT_AUTHOR_NAME: getsentry-bot
-            EMAIL: bot@getsentry.com
-        - uses: getsentry/craft@master
-          with:
-            action: publish
-            version: ${{ github.event.inputs.version || steps.calver.outputs.version }}
-            keep_branch: '--keep-branch'
-            no_merge: '--no-merge'
-          env:
-            DRY_RUN: ${{ github.event.inputs.dry_run }}
-            GIT_COMMITTER_NAME: getsentry-bot
-            GIT_AUTHOR_NAME: getsentry-bot
-            EMAIL: bot@getsentry.com
+      - id: killswitch
+        if: ${{ !github.event.inputs.force }}
+        run: |
+          if curl -s "https://api.github.com/repos/$GITHUB_REPOSITORY/issues?state=open&labels=release-blocker" | grep -Pzvo '\[[\s\n\r]*\]'; then
+            echo "Open release-blocking issues found, cancelling release...";
+            curl -sf -X POST -H 'Accept: application/vnd.github.v3+json' -H 'Authorization: token ${{ secrets.GITHUB_TOKEN }}' https://api.github.com/repos/$GITHUB_REPOSITORY/actions/runs/${{ github.run_id }}/cancel;
+          fi
+      - id: calver
+        if: ${{ !github.event.inputs.version }}
+        run: |
+          DATE_PART=$(date +'%y.%-m')
+          declare -i PATCH_VERSION=0
+          while curl -sf -o /dev/null "https://api.github.com/repos/$GITHUB_REPOSITORY/git/ref/tags/$DATE_PART.$PATCH_VERSION"; do
+            PATCH_VERSION+=1
+          done
+          echo "::set-output name=version::$DATE_PART.$PATCH_VERSION"
+      - uses: actions/checkout@v2
+      - uses: getsentry/craft@master
+        if: ${{ !github.event.inputs.skip_prepare }}
+        with:
+          action: prepare
+          version: ${{ github.event.inputs.version || steps.calver.outputs.version }}
+        env:
+          DRY_RUN: ${{ github.event.inputs.dry_run }}
+          GIT_COMMITTER_NAME: getsentry-bot
+          GIT_AUTHOR_NAME: getsentry-bot
+          EMAIL: bot@getsentry.com
+      - uses: getsentry/craft@master
+        with:
+          action: publish
+          version: ${{ github.event.inputs.version || steps.calver.outputs.version }}
+          keep_branch: '--keep-branch'
+          no_merge: '--no-merge'
+        env:
+          DRY_RUN: ${{ github.event.inputs.dry_run }}
+          GIT_COMMITTER_NAME: getsentry-bot
+          GIT_AUTHOR_NAME: getsentry-bot
+          EMAIL: bot@getsentry.com
