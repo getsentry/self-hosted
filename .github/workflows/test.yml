@@ -29,9 +29,6 @@ jobs:
       - name: Install and test
         run: |
           ./install.sh
-          docker-compose run --rm web createuser --superuser --email test@example.com --password test123TEST
-          docker-compose up -d
-          printf "Waiting for Sentry to be up"; timeout 60 bash -c 'until $(curl -Isf -o /dev/null http://localhost:9000); do printf '.'; sleep 0.5; done'
           ./test.sh
           printf "Testing in-place upgrade"
           ./install.sh --minimize-downtime
