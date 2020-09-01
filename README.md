@@ -59,7 +59,7 @@ The included `install.sh` script is meant to be idempotent and to bring you to t
 
 ## Resources
 
- * [Documentation](https://docs.sentry.io/development/server/)
+ * [Documentation](https://develop.sentry.dev/onpremise/)
  * [Bug Tracker](https://github.com/getsentry/onpremise/issues)
  * [Community Forums](https://forum.sentry.io/c/on-premise)
 
