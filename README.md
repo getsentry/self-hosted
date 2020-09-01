@@ -64,5 +64,5 @@ The included `install.sh` script is meant to be idempotent and to bring you to t
  * [Community Forums](https://forum.sentry.io/c/on-premise)
 
 
-[build-status-image]: https://api.travis-ci.com/getsentry/onpremise.svg?branch=master
-[build-status-url]: https://travis-ci.com/getsentry/onpremise
+[build-status-image]: https://github.com/getsentry/onpremise/workflows/test/badge.svg
+[build-status-url]: https://git.io/JUYkh
