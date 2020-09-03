@@ -31,6 +31,7 @@ def get_internal_network():
 
 
 INTERNAL_SYSTEM_IPS = get_internal_network()
+SENTRY_DISALLOWED_IPS = INTERNAL_SYSTEM_IPS
 
 
 DATABASES = {
