@@ -44,6 +44,8 @@ jobs:
           done
           echo "::set-output name=version::$DATE_PART.$PATCH_VERSION"
       - uses: actions/checkout@v2
+        with:
+          token: ${{ secrets.GH_SENTRY_BOT_PAT }}
       - uses: getsentry/craft@master
         if: ${{ !github.event.inputs.skip_prepare }}
         with:
@@ -65,3 +67,12 @@ jobs:
           GIT_COMMITTER_NAME: getsentry-bot
           GIT_AUTHOR_NAME: getsentry-bot
           EMAIL: bot@getsentry.com
+      - id: bump-license-date
+        if: ${{ !github.event.inputs.dry_run && !github.event.inputs.version }}
+        env:
+          GIT_COMMITTER_NAME: getsentry-bot
+          GIT_AUTHOR_NAME: getsentry-bot
+          EMAIL: bot@getsentry.com
+        run: |
+          sed -i -e "s/\(Change Date:\s*\)[-0-9]\+\$/\\1$(date +'%Y-%m-%d' -d '3 years')/" LICENSE
+          git diff --quiet || git commit -anm 'license: Update BSL change date' && git push
