@@ -24,7 +24,7 @@ SENTRY_EXTRA_REQUIREMENTS='sentry/requirements.txt'
 MINIMIZE_DOWNTIME=
 
 load_options() {
-  while [[ -n "$@" ]]; do
+  while [[ -n "${@:1}" ]]; do
     case "$1" in
       -h | --help) show_help; exit;;
       --no-user-prompt) SKIP_USER_PROMPT=1;;
