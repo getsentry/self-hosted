@@ -23,22 +23,9 @@ RELAY_CREDENTIALS_JSON='relay/credentials.json'
 SENTRY_EXTRA_REQUIREMENTS='sentry/requirements.txt'
 MINIMIZE_DOWNTIME=
 
-load_options() {
-  while [[ -n "$@" ]]; do
-    case "$1" in
-      -h | --help) show_help; exit;;
-      --no-user-prompt) SKIP_USER_PROMPT=1;;
-      --minimize-downtime) MINIMIZE_DOWNTIME=1;;
-      --) ;;
-      *) echo "Unexpected argument: $1. Use --help for usage information."; exit 1;;
-    esac
-    shift
-  done
-}
-
 show_help() {
   cat <<EOF
-Usage: $0 [-h | --help] [--minimize-downtime]
+Usage: $0 [options]
 
 Install Sentry with docker-compose.
 
@@ -51,7 +38,16 @@ Options:
 EOF
 }
 
-load_options $(getopt -n "$0" -o 'h' -l 'help,minimize-downtime' -- "$@")
+while [[ -n "$@" ]]; do
+  case "$1" in
+    -h | --help) show_help; exit;;
+    --no-user-prompt) SKIP_USER_PROMPT=1;;
+    --minimize-downtime) MINIMIZE_DOWNTIME=1;;
+    --) ;;
+    *) echo "Unexpected argument: $1. Use --help for usage information."; exit 1;;
+  esac
+  shift
+done
 
 # Courtesy of https://stackoverflow.com/a/2183063/90297
 trap_with_arg() {
