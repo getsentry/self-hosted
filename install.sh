@@ -38,7 +38,7 @@ Options:
 EOF
 }
 
-while [[ -n "$@" ]]; do
+while (( $# )); do
   case "$1" in
     -h | --help) show_help; exit;;
     --no-user-prompt) SKIP_USER_PROMPT=1;;
