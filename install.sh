@@ -240,37 +240,9 @@ if [ "$ZOOKEEPER_SNAPSHOT_FOLDER_EXISTS" -eq "1" ]; then
   fi
 fi
 
-# [begin] Snuba/Clickhouse transactions table rebuild
-clickhouse_query () { $dcr clickhouse clickhouse-client --host clickhouse -q "$1"; }
-$dc up -d clickhouse
-set +e
-CLICKHOUSE_CLIENT_MAX_RETRY=5
-# Wait until clickhouse server is up
-until clickhouse_query 'SELECT 1' > /dev/null; do
-  ((CLICKHOUSE_CLIENT_MAX_RETRY--))
-  [[ CLICKHOUSE_CLIENT_MAX_RETRY -eq 0 ]] && echo "Clickhouse server failed to come up in 5 tries." && exit 1;
-  echo "Trying again. Remaining tries #$CLICKHOUSE_CLIENT_MAX_RETRY"
-  sleep 0.5;
-done
-set -e
-
-SNUBA_HAS_TRANSACTIONS_TABLE=$(clickhouse_query 'EXISTS TABLE transactions_local' | tr -d '\n\r')
-SNUBA_TRANSACTIONS_NEEDS_UPDATE=$([ "$SNUBA_HAS_TRANSACTIONS_TABLE" == "1" ] && clickhouse_query 'SHOW CREATE TABLE transactions_local' | grep -v 'SAMPLE BY' || echo '')
-
-if [ "$SNUBA_TRANSACTIONS_NEEDS_UPDATE" ]; then
-  SNUBA_TRANSACTIONS_TABLE_CONTENTS=$(clickhouse_query "SELECT * FROM transactions_local LIMIT 1")
-  if [ -z $SNUBA_TRANSACTIONS_TABLE_CONTENTS ]; then
-    echo "Dropping the old transactions table from Clickhouse...";
-    clickhouse_query 'DROP TABLE transactions_local'
-    echo "Done."
-  else
-    echo "Seems like your Clickhouse transactions table is old and non-empty. You may experience issues if/when you have more than 10000 records in this table. See https://github.com/getsentry/sentry/pull/19882 for more information and consider disabling the 'discover2.tags_facet_enable_sampling' feature flag.";
-  fi
-fi
-# [end] Snuba/Clickhouse transactions table rebuild
-
 echo "Bootstrapping and migrating Snuba..."
-$dcr snuba-api bootstrap --force
+$dcr snuba-api bootstrap --no-migrate --force
+$dcr snuba-api migrations migrate --force
 echo ""
 
 # Very naively check whether there's an existing sentry-postgres volume and the PG version in it
