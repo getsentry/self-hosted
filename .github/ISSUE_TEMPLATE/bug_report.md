@@ -1,6 +1,6 @@
 ---
 name: 🐞 Bug Report
-about: Report a bug to help improve Sentry On-Premise
+about: Report a bug to help improve Self-Hosted Sentry
 ---
 
 ## Version Information
