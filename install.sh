@@ -60,12 +60,12 @@ trap_with_arg() {
 DID_CLEAN_UP=0
 # the cleanup function will be the exit point
 cleanup () {
-  if [ "$DID_CLEAN_UP" -eq 1 ]; then
+  if [[ "$DID_CLEAN_UP" -eq 1 ]]; then
     return 0;
   fi
   DID_CLEAN_UP=1
 
-  if [ "$1" != "EXIT" ]; then
+  if [[ "$1" != "EXIT" ]]; then
     echo "An error occurred, caught SIG$1 on line $2";
 
     if [[ "$MINIMIZE_DOWNTIME" ]]; then
@@ -93,7 +93,7 @@ function ver () { echo "$@" | awk -F. '{ printf("%d%03d%03d", $1,$2,$3); }'; }
 
 # Thanks to https://stackoverflow.com/a/25123013/90297 for the quick `sed` pattern
 function ensure_file_from_example {
-  if [ -f "$1" ]; then
+  if [[ -f "$1" ]]; then
     echo "$1 already exists, skipped creation."
   else
     echo "Creating $1..."
@@ -101,17 +101,17 @@ function ensure_file_from_example {
   fi
 }
 
-if [ $(ver $DOCKER_VERSION) -lt $(ver $MIN_DOCKER_VERSION) ]; then
+if [[ "$(ver $DOCKER_VERSION)" -lt "$(ver $MIN_DOCKER_VERSION)" ]]; then
   echo "FAIL: Expected minimum Docker version to be $MIN_DOCKER_VERSION but found $DOCKER_VERSION"
   exit 1
 fi
 
-if [ $(ver $COMPOSE_VERSION) -lt $(ver $MIN_COMPOSE_VERSION) ]; then
+if [[ "$(ver $COMPOSE_VERSION)" -lt "$(ver $MIN_COMPOSE_VERSION)" ]]; then
   echo "FAIL: Expected minimum docker-compose version to be $MIN_COMPOSE_VERSION but found $COMPOSE_VERSION"
   exit 1
 fi
 
-if [ "$RAM_AVAILABLE_IN_DOCKER" -lt "$MIN_RAM" ]; then
+if [[ "$RAM_AVAILABLE_IN_DOCKER" -lt "$MIN_RAM" ]]; then
   echo "FAIL: Expected minimum RAM available to Docker to be $MIN_RAM MB but found $RAM_AVAILABLE_IN_DOCKER MB"
   exit 1
 fi
@@ -157,7 +157,7 @@ fi
 
 replace_tsdb() {
   if (
-    [ -f "$SENTRY_CONFIG_PY" ] &&
+    [[ -f "$SENTRY_CONFIG_PY" ]] &&
     ! grep -xq 'SENTRY_TSDB = "sentry.tsdb.redissnuba.RedisSnubaTSDB"' "$SENTRY_CONFIG_PY"
   ); then
     # Do NOT indent the following string as it would be reflected in the end result,
@@ -230,11 +230,11 @@ else
 fi
 
 ZOOKEEPER_SNAPSHOT_FOLDER_EXISTS=$($dcr zookeeper bash -c 'ls 2>/dev/null -Ubad1 -- /var/lib/zookeeper/data/version-2 | wc -l | tr -d '[:space:]'')
-if [ "$ZOOKEEPER_SNAPSHOT_FOLDER_EXISTS" -eq "1" ]; then
+if [[ "$ZOOKEEPER_SNAPSHOT_FOLDER_EXISTS" -eq 1 ]]; then
   ZOOKEEPER_LOG_FILE_COUNT=$($dcr zookeeper bash -c 'ls 2>/dev/null -Ubad1 -- /var/lib/zookeeper/log/version-2/* | wc -l | tr -d '[:space:]'')
   ZOOKEEPER_SNAPSHOT_FILE_COUNT=$($dcr zookeeper bash -c 'ls 2>/dev/null -Ubad1 -- /var/lib/zookeeper/data/version-2/* | wc -l | tr -d '[:space:]'')
   # This is a workaround for a ZK upgrade bug: https://issues.apache.org/jira/browse/ZOOKEEPER-3056
-  if [ "$ZOOKEEPER_LOG_FILE_COUNT" -gt "0" ] && [ "$ZOOKEEPER_SNAPSHOT_FILE_COUNT" -eq "0" ]; then
+  if [[ "$ZOOKEEPER_LOG_FILE_COUNT" -gt 0 ]] && [[ "$ZOOKEEPER_SNAPSHOT_FILE_COUNT" -eq 0 ]]; then
     $dcr -v $(pwd)/zookeeper:/temp zookeeper bash -c 'cp /temp/snapshot.0 /var/lib/zookeeper/data/version-2/snapshot.0'
     $dc run -d -e ZOOKEEPER_SNAPSHOT_TRUST_EMPTY=true zookeeper
   fi
@@ -282,7 +282,7 @@ fi
 
 
 SENTRY_DATA_NEEDS_MIGRATION=$(docker run --rm -v sentry-data:/data alpine ash -c "[ ! -d '/data/files' ] && ls -A1x /data | wc -l || true")
-if [ "$SENTRY_DATA_NEEDS_MIGRATION" ]; then
+if [[ -n "$SENTRY_DATA_NEEDS_MIGRATION" ]]; then
   echo "Migrating file storage..."
   # Use the web (Sentry) image so the file owners are kept as sentry:sentry
   # The `\"` escape pattern is to make this compatible w/ Git Bash on Windows. See #329.
@@ -291,7 +291,7 @@ if [ "$SENTRY_DATA_NEEDS_MIGRATION" ]; then
 fi
 
 
-if [ ! -f "$RELAY_CREDENTIALS_JSON" ]; then
+if [[ ! -f "$RELAY_CREDENTIALS_JSON" ]]; then
   echo ""
   echo "Generating Relay credentials..."
 
