@@ -68,14 +68,14 @@ cleanup () {
   if [[ "$1" != "EXIT" ]]; then
     echo "An error occurred, caught SIG$1 on line $2";
 
-    if [[ "$MINIMIZE_DOWNTIME" ]]; then
+    if [[ -n "$MINIMIZE_DOWNTIME" ]]; then
       echo "*NOT* cleaning up, to clean your environment run \"docker-compose stop\"."
     else
       echo "Cleaning up..."
     fi
   fi
 
-  if [[ ! "$MINIMIZE_DOWNTIME" ]]; then
+  if [[ -z "$MINIMIZE_DOWNTIME" ]]; then
     $dc stop &> /dev/null
   fi
 }
@@ -218,7 +218,7 @@ $dc build --force-rm --parallel
 echo ""
 echo "Docker images built."
 
-if [[ "$MINIMIZE_DOWNTIME" ]]; then
+if [[ -n "$MINIMIZE_DOWNTIME" ]]; then
   # Stop everything but relay and nginx
   $dc rm -fsv $($dc config --services | grep -v -E '^(nginx|relay)$')
 else
@@ -246,7 +246,7 @@ $dcr snuba-api migrations migrate --force
 echo ""
 
 # Very naively check whether there's an existing sentry-postgres volume and the PG version in it
-if [[ $(docker volume ls -q --filter name=sentry-postgres) && $(docker run --rm -v sentry-postgres:/db busybox cat /db/PG_VERSION 2>/dev/null) == "9.5" ]]; then
+if [[ -n "$(docker volume ls -q --filter name=sentry-postgres)" && "$(docker run --rm -v sentry-postgres:/db busybox cat /db/PG_VERSION 2>/dev/null)" == "9.5" ]]; then
   docker volume rm sentry-postgres-new || true
   # If this is Postgres 9.5 data, start upgrading it to 9.6 in a new volume
   docker run --rm \
