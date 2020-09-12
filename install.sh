@@ -268,7 +268,7 @@ fi
 
 echo ""
 echo "Setting up database..."
-if [ $CI ] || [ $SKIP_USER_PROMPT == 1 ]; then
+if [[ -n "$CI" || "$SKIP_USER_PROMPT" == 1 ]]; then
   $dcr web upgrade --noinput
   echo ""
   echo "Did not prompt for user creation due to non-interactive shell."
