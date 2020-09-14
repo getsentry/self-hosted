@@ -1,4 +1,4 @@
-# Sentry Nightly On-Premise [![Build Status][build-status-image]][build-status-url]
+# Self-Hosted Sentry Nightly [![Build Status][build-status-image]][build-status-url]
 
 Official bootstrap for running your own [Sentry](https://sentry.io/) with [Docker](https://www.docker.com/).
 
@@ -14,6 +14,8 @@ Official bootstrap for running your own [Sentry](https://sentry.io/) with [Docke
 ## Setup
 
 To get started with all the defaults, simply clone the repo and run `./install.sh` in your local check-out.
+
+During the install, a prompt will ask if you want to create a user account. If you require that the install not be blocked by the prompt, run `./install.sh --no-user-prompt`.
 
 There may need to be modifications to the included example config files (`sentry/config.example.yml` and `sentry/sentry.conf.example.py`) to accommodate your needs or your environment (such as adding GitHub credentials). If you want to perform these, do them before you run the install script and copy them without the `.example` extensions in the name (such as `sentry/sentry.conf.py`) before running the `install.sh` script.
 
@@ -47,7 +49,7 @@ Sentry comes with a cleanup cron job that prunes events older than `90 days` by 
 
 If you'd like to protect your Sentry install with SSL/TLS, there are
 fantastic SSL/TLS proxies like [HAProxy](http://www.haproxy.org/)
-and [Nginx](http://nginx.org/). You'll likely want to add this service to your `docker-compose.yml` file.
+and [Nginx](http://nginx.org/). Our recommendation is running and external Nginx instance or your choice of load balancer that does the TLS termination and more. Read more over at our [productionalizing self-hosted docs](https://develop.sentry.dev/self-hosted/#productionalizing).
 
 ## Updating Sentry
 
@@ -57,10 +59,10 @@ The included `install.sh` script is meant to be idempotent and to bring you to t
 
 ## Resources
 
- * [Documentation](https://docs.sentry.io/development/server/)
+ * [Documentation](https://develop.sentry.dev/onpremise/)
  * [Bug Tracker](https://github.com/getsentry/onpremise/issues)
  * [Community Forums](https://forum.sentry.io/c/on-premise)
 
 
-[build-status-image]: https://api.travis-ci.com/getsentry/onpremise.svg?branch=master
-[build-status-url]: https://travis-ci.com/getsentry/onpremise
+[build-status-image]: https://github.com/getsentry/onpremise/workflows/test/badge.svg
+[build-status-url]: https://git.io/JUYkh

@@ -80,7 +80,7 @@ SENTRY_OPTIONS["redis.clusters"] = {
 # Queue #
 #########
 
-# See https://docs.getsentry.com/on-premise/server/queue/ for more
+# See https://develop.sentry.dev/services/queue/ for more
 # information on configuring your queue broker and workers. Sentry relies
 # on a Python framework called Celery to manage queues.
 
@@ -187,7 +187,7 @@ SENTRY_WEB_PORT = 9000
 SENTRY_WEB_OPTIONS = {
     "http": "%s:%s" % (SENTRY_WEB_HOST, SENTRY_WEB_PORT),
     "protocol": "uwsgi",
-    # This is need to prevent https://git.io/fj7Lw
+    # This is needed in order to prevent https://git.io/fj7Lw
     "uwsgi-socket": None,
     "so-keepalive": True,
     # Keep this between 15s-75s as that's what Relay supports

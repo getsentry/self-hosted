@@ -7,7 +7,6 @@ x-sentry-defaults: &sentry_defaults
     context: ./sentry
     args:
       - SENTRY_IMAGE
-      - SENTRY_VERSION
   image: sentry-onpremise-local
   depends_on:
     - redis
@@ -18,6 +17,7 @@ x-sentry-defaults: &sentry_defaults
     - snuba-consumer
     - snuba-outcomes-consumer
     - snuba-sessions-consumer
+    - snuba-transactions-consumer
     - snuba-replacer
     - symbolicator
     - kafka
@@ -33,7 +33,7 @@ x-snuba-defaults: &snuba_defaults
     - redis
     - clickhouse
     - kafka
-  image: 'getsentry/snuba:$SENTRY_VERSION'
+  image: '$SNUBA_IMAGE'
   environment:
     SNUBA_SETTINGS: docker
     CLICKHOUSE_HOST: clickhouse
@@ -96,7 +96,7 @@ services:
       - 'sentry-secrets:/etc/kafka/secrets'
   clickhouse:
     << : *restart_policy
-    image: 'yandex/clickhouse-server:19.17'
+    image: 'yandex/clickhouse-server:20.3.9.70'
     ulimits:
       nofile:
         soft: 262144
@@ -104,6 +104,15 @@ services:
     volumes:
       - 'sentry-clickhouse:/var/lib/clickhouse'
       - 'sentry-clickhouse-log:/var/log/clickhouse-server'
+      - type: bind
+        read_only: true
+        source: ./clickhouse/config.xml
+        target: /etc/clickhouse-server/config.d/sentry.xml
+    environment:
+      # This limits Clickhouse's memory to 30% of the host memory
+      # If you have high volume and your search return incomplete results
+      # You might want to change this to a higher value (and ensure your host has enough memory)
+      MAX_MEMORY_USAGE_RATIO: 0.3
   snuba-api:
     << : *snuba_defaults
   # Kafka consumer responsible for feeding events into Clickhouse
@@ -120,6 +129,10 @@ services:
   snuba-sessions-consumer:
     << : *snuba_defaults
     command: consumer --storage sessions_raw --auto-offset-reset=latest --max-batch-time-ms 750
+  # Kafka consumer responsible for feeding transactions data into Clickhouse
+  snuba-transactions-consumer:
+    << : *snuba_defaults
+    command: consumer --storage transactions --consumer-group transactions_group --auto-offset-reset=latest --max-batch-time-ms 750
   snuba-replacer:
     << : *snuba_defaults
     command: replacer --storage events --auto-offset-reset=latest --max-batch-size 3
@@ -129,11 +142,11 @@ services:
     build:
       context: ./cron
       args:
-        BASE_IMAGE: 'getsentry/snuba:$SENTRY_VERSION'
+        BASE_IMAGE: '$SNUBA_IMAGE'
     command: '"*/5 * * * * gosu snuba snuba cleanup --dry-run False"'
   symbolicator:
     << : *restart_policy
-    image: 'getsentry/symbolicator:$SYMBOLICATOR_VERSION'
+    image: '$SYMBOLICATOR_IMAGE'
     volumes:
       - 'sentry-symbolicator:/data'
       - type: bind
@@ -147,7 +160,7 @@ services:
     build:
       context: ./cron
       args:
-        BASE_IMAGE: 'getsentry/symbolicator:$SYMBOLICATOR_VERSION'
+        BASE_IMAGE: '$SYMBOLICATOR_IMAGE'
     command: '"55 23 * * * gosu symbolicator symbolicator cleanup"'
     volumes:
       - 'sentry-symbolicator:/data'
@@ -189,7 +202,7 @@ services:
       - relay
   relay:
     << : *restart_policy
-    image: 'getsentry/relay:$SENTRY_VERSION'
+    image: '$RELAY_IMAGE'
     volumes:
       - type: bind
         read_only: true
