@@ -1,4 +1,4 @@
-mpoomposeversion: '3.4'
+version: '3.4'
 x-restart-policy: &restart_policy
   restart: unless-stopped
 x-sentry-defaults: &sentry_defaults
