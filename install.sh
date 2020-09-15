@@ -11,8 +11,8 @@ dcr="$dc run --rm"
 log_file="sentry_install_log-`date +'%Y-%m-%d_%H-%M-%S'`.txt"
 exec &> >(tee -a "$log_file")
 
-MIN_DOCKER_VERSION='17.05.0'
-MIN_COMPOSE_VERSION='1.23.0'
+MIN_DOCKER_VERSION='19.03.12'
+MIN_COMPOSE_VERSION='1.24.1'
 MIN_RAM=2400 # MB
 
 SENTRY_CONFIG_PY='sentry/sentry.conf.py'
