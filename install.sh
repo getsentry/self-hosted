@@ -240,6 +240,12 @@ if [[ "$ZOOKEEPER_SNAPSHOT_FOLDER_EXISTS" -eq 1 ]]; then
   fi
 fi
 
+# We need this for topic used outside of Snuba (attachments etc.)
+echo "Enabling auto topic creation for Kafka..."
+$dc up -d kafka
+$dcr kafka kafka-configs --bootstrap-server kafka:9002 --command-config config.properties --entity-type brokers --entity-default --alter --add-config auto.create.topics.enable=true
+echo ""
+
 echo "Bootstrapping and migrating Snuba..."
 $dcr snuba-api bootstrap --no-migrate --force
 $dcr snuba-api migrations migrate --force
