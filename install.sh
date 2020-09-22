@@ -247,13 +247,15 @@ echo ""
 
 # NOTE: This step relies on `kafka` being available from the previous `snuba-api bootstrap` step
 # XXX(BYK): We cannot use auto.create.topics as Confluence and Apache hates it now (and makes it very hard to enable)
-# TODO(BYK): Make this compatible with a list of topics & sync that from a central source
-EXISTING_KAFKA_TOPICS=$($dcr kafka kafka-topics --list --bootstrap-server kafka:9092)
-if ! echo "$EXISTING_KAFKA_TOPICS" | grep -wq ingest-attachments; then
-  echo "Creating additional Kafka topics..."
-  $dcr kafka kafka-topics --create --topic ingest-attachments --bootstrap-server kafka:9092
-  echo ""
-fi
+EXISTING_KAFKA_TOPICS=$($dcr kafka kafka-topics --list --bootstrap-server kafka:9092 2>/dev/null)
+NEEDED_KAFKA_TOPICS="ingest-attachments ingest-transactions"
+for topic in $NEEDED_KAFKA_TOPICS; do
+  if ! echo "$EXISTING_KAFKA_TOPICS" | grep -wq ingest-attachments; then
+    echo "Creating additional Kafka topics..."
+    $dcr kafka kafka-topics --create --topic $topic --bootstrap-server kafka:9092
+    echo ""
+  fi
+done
 
 # Very naively check whether there's an existing sentry-postgres volume and the PG version in it
 if [[ -n "$(docker volume ls -q --filter name=sentry-postgres)" && "$(docker run --rm -v sentry-postgres:/db busybox cat /db/PG_VERSION 2>/dev/null)" == "9.5" ]]; then
