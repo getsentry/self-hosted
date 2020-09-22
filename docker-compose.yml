@@ -56,6 +56,11 @@ services:
     image: 'redis:5.0-alpine'
     volumes:
       - 'sentry-redis:/data'
+    ulimits:
+      nofile:
+        soft: 10032
+        hard: 10032
+   
   postgres:
     << : *restart_policy
     image: 'postgres:9.6'
