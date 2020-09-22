@@ -243,7 +243,7 @@ fi
 # We need this for topic used outside of Snuba (attachments etc.)
 echo "Enabling auto topic creation for Kafka..."
 $dc up -d kafka
-$dcr kafka kafka-configs --bootstrap-server kafka:9002 --command-config config.properties --entity-type brokers --entity-default --alter --add-config auto.create.topics.enable=true
+$dcr kafka kafka-configs --bootstrap-server kafka:9092 --command-config config.properties --entity-type brokers --entity-default --alter --add-config auto.create.topics.enable=true
 echo ""
 
 echo "Bootstrapping and migrating Snuba..."
