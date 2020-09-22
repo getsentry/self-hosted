@@ -88,7 +88,7 @@ services:
       KAFKA_LOG_RETENTION_HOURS: '24'
       KAFKA_MESSAGE_MAX_BYTES: '50000000' # 50MB or bust
       KAFKA_MAX_REQUEST_SIZE: '50000000' # 50MB on requests apparently too
-      KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true' # We need this for topic used outside of Snuba (attachments etc.)
+      KAFKA_PRODUCER_AUTO_CREATE_TOPICS: 'client-side' # We need this for topic used outside of Snuba (attachments etc.)
       CONFLUENT_SUPPORT_METRICS_ENABLE: 'false'
       KAFKA_LOG4J_LOGGERS: 'kafka.cluster=WARN,kafka.controller=WARN,kafka.coordinator=WARN,kafka.log=WARN,kafka.server=WARN,kafka.zookeeper=WARN,state.change.logger=WARN'
       KAFKA_LOG4J_ROOT_LOGLEVEL: 'WARN'
