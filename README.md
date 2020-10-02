@@ -57,6 +57,8 @@ _You need to be on at least Sentry 9.1.2 to be able to upgrade automatically to 
 
 The included `install.sh` script is meant to be idempotent and to bring you to the latest version. What this means is you can and should run `install.sh` to upgrade to the latest version available. Remember that the output of the script will be stored in a log file, `sentry_install_log-<ISO_TIMESTAMP>.txt`, which you may share for diagnosis if anything goes wrong.
 
+Also make sure to check for any difference between the example config files and your current config files in use. There might be new configuration that has to be added to your adjusted files. E.g. feature flags or server configuration.
+
 ## Resources
 
  * [Documentation](https://develop.sentry.dev/onpremise/)
