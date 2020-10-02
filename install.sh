@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 set -e
 
-# With a tip o' the hat to https://unix.stackexchange.com/a/79077
-set -a && . ./.env && set +a
+# Read .env for default values with a tip o' the hat to https://stackoverflow.com/a/59831605/90297
+t=$(mktemp) && export -p > "$t" && set -a && . ./.env && set +a && . "$t" && rm "$t" && unset t
 
 dc="docker-compose --no-ansi"
 dcr="$dc run --rm"
