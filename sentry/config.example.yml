@@ -76,6 +76,7 @@ transaction-events.force-disable-internal-project: true
 # GitHub Integration #
 ######################
 
+# github-app.extended-permissions: ['repo']
 # github-app.id: GITHUB_APP_ID
 # github-app.name: 'GITHUB_APP_NAME'
 # github-app.webhook-secret: 'GITHUB_WEBHOOK_SECRET' # Use only if configured in GitHub
