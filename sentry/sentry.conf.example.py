@@ -257,12 +257,6 @@ SENTRY_FEATURES.update(
     }
 )
 
-######################
-# GitHub Integration #
-######################
-
-GITHUB_EXTENDED_PERMISSIONS = ["repo"]
-
 #########################
 # Bitbucket Integration #
 ########################
