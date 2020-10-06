@@ -4,7 +4,7 @@ Official bootstrap for running your own [Sentry](https://sentry.io/) with [Docke
 
 ## Requirements
 
- * Docker 19.03.8+
+ * Docker 19.03.6+
  * Compose 1.24.1+
 
 ## Minimum Hardware Requirements:
@@ -59,9 +59,11 @@ The included `install.sh` script is meant to be idempotent and to bring you to t
 
 Also make sure to check for any difference between the example config files and your current config files in use. There might be new configuration that has to be added to your adjusted files. E.g. feature flags or server configuration.
 
+For more information regarding updating your Sentry installation, please visit [our documentation](https://develop.sentry.dev/self-hosted/#upgrading).
+
 ## Resources
 
- * [Documentation](https://develop.sentry.dev/onpremise/)
+ * [Documentation](https://develop.sentry.dev/self-hosted/)
  * [Bug Tracker](https://github.com/getsentry/onpremise/issues)
  * [Community Forums](https://forum.sentry.io/c/on-premise)
 
