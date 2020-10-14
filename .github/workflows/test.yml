@@ -12,8 +12,11 @@ env:
   DOCKER_COMPOSE_VERSION: 1.24.1
 jobs:
   test:
+    strategy:
+      matrix:
+        py3: ['', '1']
     runs-on: ubuntu-18.04
-    name: "test"
+    name: "test${{ matrix.py3 == '1' && ' PY3' || ''}}"
     steps:
       - name: Pin docker-compose
         run: |
@@ -28,6 +31,7 @@ jobs:
       - name: Install and test
         env:
           COMPOSE_PARALLEL_LIMIT: 10
+          SENTRY_PYTHON3: ${{ matrix.py3 }}
         run: |
           ./install.sh
           ./test.sh
