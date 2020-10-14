@@ -16,7 +16,7 @@ jobs:
       matrix:
         py3: ['', '1']
     runs-on: ubuntu-18.04
-    name: "test"
+    name: "test${{ matrix.py3 == '1' && ' PY3' || ''}}"
     steps:
       - name: Pin docker-compose
         run: |
