@@ -31,7 +31,7 @@ jobs:
       - name: Install and test
         env:
           COMPOSE_PARALLEL_LIMIT: 10
-          SENTRY_PY3: ${{ matrix.py3 }}
+          SENTRY_PYTHON3: ${{ matrix.py3 }}
         run: |
           ./install.sh
           ./test.sh

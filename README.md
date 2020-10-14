@@ -15,7 +15,7 @@ Official bootstrap for running your own [Sentry](https://sentry.io/) with [Docke
 
 To get started with all the defaults, simply clone the repo and run `./install.sh` in your local check-out.
 
-_If you like trying out new things, you can run `SENTRY_PY3=1 ./install.sh` instead to use our brand new Python 3 images. **Keep in mind that Python 3 support is experimental at this point**_
+_If you like trying out new things, you can run `SENTRY_PYTHON3=1 ./install.sh` instead to use our brand new Python 3 images. **Keep in mind that Python 3 support is experimental at this point**_
 
 During the install, a prompt will ask if you want to create a user account. If you require that the install not be blocked by the prompt, run `./install.sh --no-user-prompt`.
 
