@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: Version to release
+        description: Version to release (optional)
         required: false
       skip_prepare:
         description: Skip preparation step (assume a release branch is ready)
@@ -21,7 +21,7 @@ on:
     # We want the release to be at 10 or 11am Pacific Time
     # We also make this an hour after all others such as Sentry,
     # Snuba, and Relay to make sure their releases finish.
-    - cron:  '0 18 15 * *'
+    - cron: "0 18 15 * *"
 jobs:
   release:
     runs-on: ubuntu-latest
@@ -60,8 +60,8 @@ jobs:
         with:
           action: publish
           version: ${{ github.event.inputs.version || steps.calver.outputs.version }}
-          keep_branch: '--keep-branch'
-          no_merge: '--no-merge'
+          keep_branch: "--keep-branch"
+          no_merge: "--no-merge"
         env:
           DRY_RUN: ${{ github.event.inputs.dry_run }}
           GIT_COMMITTER_NAME: getsentry-bot
