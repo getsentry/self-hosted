@@ -1,4 +1,4 @@
-# Self-Hosted Sentry Nightly [![Build Status][build-status-image]][build-status-url]
+# Self-Hosted Sentry 20.10.1
 
 Official bootstrap for running your own [Sentry](https://sentry.io/) with [Docker](https://www.docker.com/).
 
