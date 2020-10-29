@@ -17,7 +17,7 @@ MIN_RAM=2400 # MB
 
 # Increase the default 10 second SIGTERM timeout
 # to ensure celery queues are properly drained 
-# between upgrades as event formats may change across
+# between upgrades as task signatures may change across
 # versions
 STOP_TIMEOUT=60 # seconds
 SENTRY_CONFIG_PY='sentry/sentry.conf.py'
