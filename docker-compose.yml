@@ -120,6 +120,7 @@ services:
       # If you have high volume and your search return incomplete results
       # You might want to change this to a higher value (and ensure your host has enough memory)
       MAX_MEMORY_USAGE_RATIO: 0.3
+      CLICKHOUSE_LOGGER_LEVEL: 'information'
   snuba-api:
     << : *snuba_defaults
   # Kafka consumer responsible for feeding events into Clickhouse
