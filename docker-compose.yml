@@ -143,6 +143,12 @@ services:
   snuba-replacer:
     << : *snuba_defaults
     command: replacer --storage events --auto-offset-reset=latest --max-batch-size 3
+  snuba-subscription-consumer-events:
+    << : *snuba_defaults
+    command: subscriptions --auto-offset-reset=latest --consumer-group=snuba-events-subscriptions-consumers --topic=events --result-topic=events-subscription-results --dataset=events --commit-log-topic=snuba-commit-log --commit-log-group=snuba-consumers --delay-seconds=60 --schedule-ttl=60
+  snuba-subscription-consumer-transactions:
+    << : *snuba_defaults
+    command: subscriptions --auto-offset-reset=latest --consumer-group=snuba-transactions-subscriptions-consumers --topic=events --result-topic=transactions-subscription-results --dataset=transactions --commit-log-topic=snuba-commit-log --commit-log-group=snuba-transactions-consumers --delay-seconds=60 --schedule-ttl=60
   snuba-cleanup:
     << : *snuba_defaults
     image: snuba-cleanup-onpremise-local
@@ -186,6 +192,12 @@ services:
     << : *sentry_defaults
     # Increase `--commit-batch-size 1` below to deal with high-load environments.
     command: run post-process-forwarder --commit-batch-size 1
+  subscription-consumer-events:
+    << : *sentry_defaults
+    command: run query-subscription-consumer --commit-batch-size 1 --topic events-subscription-results
+  subscription-consumer-transactions:
+    << : *sentry_defaults
+    command: run query-subscription-consumer --commit-batch-size 1 --topic transactions-subscription-results
   sentry-cleanup:
     << : *sentry_defaults
     image: sentry-cleanup-onpremise-local
