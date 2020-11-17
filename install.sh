@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -e
 
-if [ -n ${MSYSTEM+x} ]; then
+if [[ -n "$MSYSTEM" ]]; then
   echo "Seems like you ar using Git-Bash which is not supported. Please use WSL instead.";
   exit 1
 fi
