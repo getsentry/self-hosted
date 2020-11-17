@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
 set -e
 
+if [[ -n "$MSYSTEM" ]]; then
+  echo "Seems like you are using an MSYS2-based system (such as Git Bash) which is not supported. Please use WSL instead.";
+  exit 1
+fi
+
 # Read .env for default values with a tip o' the hat to https://stackoverflow.com/a/59831605/90297
 t=$(mktemp) && export -p > "$t" && set -a && . ./.env && set +a && . "$t" && rm "$t" && unset t
 
