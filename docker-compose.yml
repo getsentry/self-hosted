@@ -139,7 +139,7 @@ services:
   # Kafka consumer responsible for feeding transactions data into Clickhouse
   snuba-transactions-consumer:
     << : *snuba_defaults
-    command: consumer --storage transactions --consumer-group transactions_group --auto-offset-reset=latest --max-batch-time-ms 750
+    command: consumer --storage transactions --consumer-group transactions_group --auto-offset-reset=latest --max-batch-time-ms 750 --commit-log-topic=snuba-commit-log
   snuba-replacer:
     << : *snuba_defaults
     command: replacer --storage events --auto-offset-reset=latest --max-batch-size 3
@@ -148,7 +148,7 @@ services:
     command: subscriptions --auto-offset-reset=latest --consumer-group=snuba-events-subscriptions-consumers --topic=events --result-topic=events-subscription-results --dataset=events --commit-log-topic=snuba-commit-log --commit-log-group=snuba-consumers --delay-seconds=60 --schedule-ttl=60
   snuba-subscription-consumer-transactions:
     << : *snuba_defaults
-    command: subscriptions --auto-offset-reset=latest --consumer-group=snuba-transactions-subscriptions-consumers --topic=events --result-topic=transactions-subscription-results --dataset=transactions --commit-log-topic=snuba-commit-log --commit-log-group=snuba-transactions-consumers --delay-seconds=60 --schedule-ttl=60
+    command: subscriptions --auto-offset-reset=latest --consumer-group=snuba-transactions-subscriptions-consumers --topic=events --result-topic=transactions-subscription-results --dataset=transactions --commit-log-topic=snuba-commit-log --commit-log-group=transactions_group --delay-seconds=60 --schedule-ttl=60
   snuba-cleanup:
     << : *snuba_defaults
     image: snuba-cleanup-onpremise-local
