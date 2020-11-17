@@ -54,8 +54,8 @@ jobs:
       - id: set-git-user
         name: Set git user to getsentry-bot
         run: |
-          git config --global user.name getsentry-bot
-          git config --global user.email bot@getsentry.com
+          git config user.name getsentry-bot
+          git config user.email bot@getsentry.com
       - uses: getsentry/craft@master
         name: Craft Prepare
         if: ${{ !github.event.inputs.skip_prepare }}
