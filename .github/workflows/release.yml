@@ -75,10 +75,10 @@ jobs:
           no_merge: '--no-merge'
         env:
           DRY_RUN: ${{ github.event.inputs.dry_run }}
-      # We need this additonal step because we don't merge release branches into master to
+      # We need this additional step because we don't merge release branches into master to
       # always keep it on nightlies
       - id: bump-license-date
-        name: Bump license chage date
+        name: Bump license change date
         if: ${{ !github.event.inputs.dry_run && !github.event.inputs.version }}
         run: |
           sed -i -e "s/\(Change Date:\s*\)[-0-9]\+\$/\\1$(date +'%Y-%m-%d' -d '3 years')/" LICENSE
