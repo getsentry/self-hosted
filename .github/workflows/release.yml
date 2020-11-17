@@ -77,7 +77,7 @@ jobs:
         env:
           DRY_RUN: ${{ github.event.inputs.dry_run }}
       # We need this additonal step because we don't merge release branches into master to
-      # keep always keep it on nightlies
+      # always keep it on nightlies
       - id: bump-license-date
         name: Bump license chage date
         if: ${{ !github.event.inputs.dry_run && !github.event.inputs.version }}
