@@ -21,58 +21,65 @@ on:
     # We want the release to be at 10 or 11am Pacific Time
     # We also make this an hour after all others such as Sentry,
     # Snuba, and Relay to make sure their releases finish.
-    - cron: "0 18 15 * *"
+    - cron: '0 18 15 * *'
 jobs:
   release:
     runs-on: ubuntu-latest
-    name: "Release a new version"
+    name: 'Release a new version'
     steps:
       - id: killswitch
+        name: Check release blockers
         if: ${{ !github.event.inputs.force }}
         run: |
           if curl -s "https://api.github.com/repos/$GITHUB_REPOSITORY/issues?state=open&labels=release-blocker" | grep -Pzvo '\[[\s\n\r]*\]'; then
             echo "Open release-blocking issues found, cancelling release...";
             curl -sf -X POST -H 'Accept: application/vnd.github.v3+json' -H 'Authorization: token ${{ secrets.GITHUB_TOKEN }}' https://api.github.com/repos/$GITHUB_REPOSITORY/actions/runs/${{ github.run_id }}/cancel;
           fi
-      - id: calver
-        if: ${{ !github.event.inputs.version }}
+      - id: set-version
+        name: Determine version
         run: |
-          DATE_PART=$(date +'%y.%-m')
-          declare -i PATCH_VERSION=0
-          while curl -sf -o /dev/null "https://api.github.com/repos/$GITHUB_REPOSITORY/git/ref/tags/$DATE_PART.$PATCH_VERSION"; do
-            PATCH_VERSION+=1
-          done
-          echo "::set-output name=version::$DATE_PART.$PATCH_VERSION"
+          if [[ -n '${{ github.event.inputs.version }}' ]]; then
+            echo 'RELEASE_VERSION=${{ github.event.inputs.version }}' >> $GITHUB_ENV;
+          else
+            DATE_PART=$(date +'%y.%-m')
+            declare -i PATCH_VERSION=0
+            while curl -sf -o /dev/null "https://api.github.com/repos/$GITHUB_REPOSITORY/git/ref/tags/$DATE_PART.$PATCH_VERSION"; do
+              PATCH_VERSION+=1
+            done
+            echo "RELEASE_VERSION=${DATE_PART}.${PATCH_VERSION}" >> $GITHUB_ENV;
+          fi
       - uses: actions/checkout@v2
         with:
           token: ${{ secrets.GH_SENTRY_BOT_PAT }}
+      - id: set-git-user
+        name: Set git user to getsentry-bot
+        run: |
+          git config --global user.name getsentry-bot
+          git config --global user.email bot@getsentry.com
       - uses: getsentry/craft@master
+        name: Craft Prepare
         if: ${{ !github.event.inputs.skip_prepare }}
         with:
           action: prepare
-          version: ${{ github.event.inputs.version || steps.calver.outputs.version }}
+          version: ${{ env.RELEASE_VERSION }}
         env:
           DRY_RUN: ${{ github.event.inputs.dry_run }}
-          GIT_COMMITTER_NAME: getsentry-bot
-          GIT_AUTHOR_NAME: getsentry-bot
-          EMAIL: bot@getsentry.com
+      # Wait until the builds start. Craft should do this automatically
+      # but it is broken now.
+      - run: sleep 10
       - uses: getsentry/craft@master
+        name: Craft Publish
         with:
           action: publish
-          version: ${{ github.event.inputs.version || steps.calver.outputs.version }}
-          keep_branch: "--keep-branch"
-          no_merge: "--no-merge"
+          version: ${{ env.RELEASE_VERSION }}
+          no_merge: '--no-merge'
         env:
           DRY_RUN: ${{ github.event.inputs.dry_run }}
-          GIT_COMMITTER_NAME: getsentry-bot
-          GIT_AUTHOR_NAME: getsentry-bot
-          EMAIL: bot@getsentry.com
+      # We need this additonal step because we don't merge release branches into master to
+      # always keep it on nightlies
       - id: bump-license-date
+        name: Bump license chage date
         if: ${{ !github.event.inputs.dry_run && !github.event.inputs.version }}
-        env:
-          GIT_COMMITTER_NAME: getsentry-bot
-          GIT_AUTHOR_NAME: getsentry-bot
-          EMAIL: bot@getsentry.com
         run: |
           sed -i -e "s/\(Change Date:\s*\)[-0-9]\+\$/\\1$(date +'%Y-%m-%d' -d '3 years')/" LICENSE
           git diff --quiet || git commit -anm 'license: Update BSL change date' && git push
