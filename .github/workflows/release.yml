@@ -64,7 +64,6 @@ jobs:
           version: ${{ env.RELEASE_VERSION }}
         env:
           DRY_RUN: ${{ github.event.inputs.dry_run }}
-          ZEUS_API_TOKEN: ${{ secrets.ZEUS_API_TOKEN }}
       # Wait until the builds start. Craft should do this automatically
       # but it is broken now.
       - run: sleep 10
