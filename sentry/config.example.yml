@@ -14,7 +14,7 @@ mail.host: 'smtp'
 # mail.password: ''
 # mail.use-tls: false
 # The email address to send on behalf of
-# mail.from: 'root@localhost'
+mail.from: 'bastet@sensorsdata.cn'
 
 # If you'd like to configure email replies, enable this.
 # mail.enable-replies: true
