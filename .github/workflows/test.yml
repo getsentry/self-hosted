@@ -12,10 +12,12 @@ env:
   DOCKER_COMPOSE_VERSION: 1.24.1
 jobs:
   test:
-    runs-on: ubuntu-16.04
-    name: "test"
+    strategy:
+      matrix:
+        py3: ['', '1']
+    runs-on: ubuntu-18.04
+    name: "test${{ matrix.py3 == '1' && ' PY3' || ''}}"
     steps:
-
       - name: Pin docker-compose
         run: |
           sudo rm /usr/local/bin/docker-compose
@@ -27,11 +29,14 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Install and test
+        env:
+          COMPOSE_PARALLEL_LIMIT: 10
+          SENTRY_PYTHON3: ${{ matrix.py3 }}
         run: |
           ./install.sh
-          docker-compose run --rm web createuser --superuser --email test@example.com --password test123TEST
-          docker-compose up -d
-          printf "Waiting for Sentry to be up"; timeout 60 bash -c 'until $(curl -Isf -o /dev/null http://localhost:9000); do printf '.'; sleep 0.5; done'
+          ./test.sh
+          printf "Testing in-place upgrade"
+          ./install.sh --minimize-downtime
           ./test.sh
 
       - name: Inspect failure

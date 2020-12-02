@@ -8,8 +8,5 @@ artifactProvider:
   name: none
 statusProvider:
   name: github
-  config:
-    contexts:
-      - 'Travis CI - Branch'
 targets:
   - name: github

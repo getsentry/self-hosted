@@ -1,0 +1,10 @@
+<yandex>
+    <max_server_memory_usage_to_ram_ratio from_env="MAX_MEMORY_USAGE_RATIO" />
+    <logger>
+        <level>information</level>
+        <console>1</console>
+    </logger>
+    <merge_tree>
+        <enable_mixed_granularity_parts>1</enable_mixed_granularity_parts>
+    </merge_tree>
+</yandex>

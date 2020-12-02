@@ -1,6 +1,6 @@
 ---
 name: 🐞 Bug Report
-about: Report a bug to help improve Sentry On-Premise
+about: Report a bug to help improve Self-Hosted Sentry
 ---
 
 ## Version Information
@@ -22,5 +22,5 @@ Version: *VERSION HERE*
 
 Please share any applicable logs:
 
-- ./install.sh logs
+- `ls -1 sentry_install_log-*.txt | tail -1 | xargs cat` # latest instal logs
 - `docker-compose logs` output
