@@ -7,6 +7,7 @@ x-sentry-defaults: &sentry_defaults
     context: ./sentry
     args:
       - SENTRY_IMAGE
+      - SENTRY_PYTHON2
       - SENTRY_PYTHON3
   image: sentry-onpremise-local
   depends_on:
