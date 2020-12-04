@@ -16,7 +16,7 @@ jobs:
       matrix:
         py2: ['', '1']
     runs-on: ubuntu-18.04
-    name: "test${{ matrix.py2 == '2' && ' PY2' || ''}}"
+    name: "test${{ matrix.py2 == '1' && ' PY2' || ''}}"
     steps:
       - name: Pin docker-compose
         run: |
@@ -31,7 +31,7 @@ jobs:
       - name: Install and test
         env:
           COMPOSE_PARALLEL_LIMIT: 10
-          SENTRY_PYTHON: ${{ matrix.py2 }}
+          SENTRY_PYTHON2: ${{ matrix.py2 }}
         run: |
           ./install.sh
           ./test.sh
