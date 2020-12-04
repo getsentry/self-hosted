@@ -217,7 +217,7 @@ echo ""
 $dc pull -q --ignore-pull-failures 2>&1 | grep -v -- -onpremise-local || true
 
 # We may not have the set image on the repo (local images) so allow fails
-docker pull ${SENTRY_IMAGE}${SENTRY_PYTHON2:+-py2}${SENTRY_PYTHON2:--py3} || true;
+docker pull ${SENTRY_IMAGE}-py${SENTRY_PYTHON:-3} || true;
 
 echo ""
 echo "Building and tagging Docker images..."
