@@ -32,7 +32,7 @@ jobs:
         env:
           COMPOSE_PARALLEL_LIMIT: 10
           SENTRY_PYTHON2: ${{ matrix.py2 == '1' || '' }}
-          SENTRY_PYTHON3: ${{ matrix.py2 != '' || ''}}
+          SENTRY_PYTHON3: ${{ matrix.py2 != '1' || ''}}
         run: |
           ./install.sh
           ./test.sh
