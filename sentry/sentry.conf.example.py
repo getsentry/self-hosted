@@ -260,6 +260,12 @@ SENTRY_FEATURES.update(
     }
 )
 
+#######################
+# MaxMind Integration #
+######################
+
+GEOIP_PATH_MMDB = '/geoip/GeoIP2-City.mmdb'
+
 #########################
 # Bitbucket Integration #
 ########################

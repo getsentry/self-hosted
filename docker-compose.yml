@@ -30,6 +30,7 @@ x-sentry-defaults: &sentry_defaults
     SENTRY_EVENT_RETENTION_DAYS:
   volumes:
     - 'sentry-data:/data'
+    - 'sentry-geoip:/geoip'
     - './sentry:/etc/sentry'
 x-snuba-defaults: &snuba_defaults
   << : *restart_policy
@@ -126,6 +127,18 @@ services:
       # If you have high volume and your search return incomplete results
       # You might want to change this to a higher value (and ensure your host has enough memory)
       MAX_MEMORY_USAGE_RATIO: 0.3
+  geoipupdate:
+    << : *restart_policy
+    image: 'maxmindinc/geoipupdate:latest'
+    environment:
+      GEOIPUPDATE_FREQUENCY: 168  # one week, in hours
+      GEOIPUPDATE_EDITION_IDS: GeoLite2-City
+      # Set the following (e.g., via docker-compose.override.yml) to enable IP geolocation.
+      # See https://develop.sentry.dev/self-hosted/geolocation/.
+      GEOIPUPDATE_ACCOUNT_ID:
+      GEOIPUPDATE_LICENSE_KEY:
+    volumes:
+      - 'sentry-geoip:/usr/share/GeoIP'
   snuba-api:
     << : *snuba_defaults
   # Kafka consumer responsible for feeding events into Clickhouse
@@ -233,6 +246,7 @@ services:
         read_only: true
         source: ./relay
         target: /work/.relay
+      - 'sentry-geoip:/geoip'
     depends_on:
       - kafka
       - redis
@@ -250,6 +264,8 @@ volumes:
   sentry-clickhouse:
     external: true
   sentry-symbolicator:
+    external: true
+  sentry-geoip:
     external: true
   sentry-secrets:
   sentry-smtp:
