@@ -133,7 +133,7 @@ services:
     environment:
       GEOIPUPDATE_FREQUENCY: 168  # one week, in hours
       GEOIPUPDATE_EDITION_IDS: GeoLite2-City
-      # Set the following (e.g., via docker-compose.override.yml) to enable IP geolocation.
+      # Set the following environment variables to enable IP geolocation.
       # See https://develop.sentry.dev/self-hosted/geolocation/.
       GEOIPUPDATE_ACCOUNT_ID:
       GEOIPUPDATE_LICENSE_KEY:
