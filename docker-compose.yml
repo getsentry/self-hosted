@@ -131,7 +131,7 @@ services:
     << : *restart_policy
     image: 'maxmindinc/geoipupdate:latest'
     environment:
-      GEOIPUPDATE_FREQUENCY: 168  # one week, in hours
+      GEOIPUPDATE_FREQUENCY: # default set in .env
       GEOIPUPDATE_EDITION_IDS: GeoLite2-City
       # Set the following environment variables to enable IP geolocation.
       # See https://develop.sentry.dev/self-hosted/geolocation/.
