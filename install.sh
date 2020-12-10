@@ -30,6 +30,7 @@ SENTRY_CONFIG_YML='sentry/config.yml'
 SYMBOLICATOR_CONFIG_YML='symbolicator/config.yml'
 RELAY_CONFIG_YML='relay/config.yml'
 RELAY_CREDENTIALS_JSON='relay/credentials.json'
+GEOLITE2_CITY_MMDB='geoip/GeoLite2-City.mmdb'
 SENTRY_EXTRA_REQUIREMENTS='sentry/requirements.txt'
 MINIMIZE_DOWNTIME=
 
@@ -324,6 +325,17 @@ if [[ ! -f "$RELAY_CREDENTIALS_JSON" ]]; then
   $dcr --no-deps -v $(pwd)/$RELAY_CONFIG_YML:/tmp/config.yml relay --config /tmp credentials generate --stdout > "$RELAY_CREDENTIALS_JSON"
   echo "Relay credentials written to $RELAY_CREDENTIALS_JSON"
 fi
+
+
+if [[ -f "$GEOLITE2_CITY_MMDB" ]]; then
+  echo "IP address geolocation database already installed."
+else
+  echo ""
+  echo "Installing (empty) IP address geolocation database ..."
+  cp "$GEOLITE2_CITY_MMDB.empty" "$GEOLITE2_CITY_MMDB"
+  echo "See https://develop.sentry.dev/self-hosted/geolocation/ to configure geolocation."
+fi
+
 
 if [[ "$MINIMIZE_DOWNTIME" ]]; then
   # Start the whole setup, except nginx and relay.
