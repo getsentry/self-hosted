@@ -30,8 +30,8 @@ x-sentry-defaults: &sentry_defaults
     SENTRY_EVENT_RETENTION_DAYS:
   volumes:
     - 'sentry-data:/data'
-    - 'sentry-geoip:/geoip'
     - './sentry:/etc/sentry'
+    - './geoip:/geoip:ro'
 x-snuba-defaults: &snuba_defaults
   << : *restart_policy
   depends_on:
@@ -138,7 +138,7 @@ services:
       GEOIPUPDATE_ACCOUNT_ID:
       GEOIPUPDATE_LICENSE_KEY:
     volumes:
-      - 'sentry-geoip:/usr/share/GeoIP'
+      - './geoip:/usr/share/GeoIP'
   snuba-api:
     << : *snuba_defaults
   # Kafka consumer responsible for feeding events into Clickhouse
@@ -246,7 +246,10 @@ services:
         read_only: true
         source: ./relay
         target: /work/.relay
-      - 'sentry-geoip:/geoip'
+      - type: bind
+        read_only: true
+        source: ./geoip
+        target: /geoip
     depends_on:
       - kafka
       - redis
@@ -264,8 +267,6 @@ volumes:
   sentry-clickhouse:
     external: true
   sentry-symbolicator:
-    external: true
-  sentry-geoip:
     external: true
   sentry-secrets:
   sentry-smtp:
