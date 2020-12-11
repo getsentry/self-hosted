@@ -128,17 +128,10 @@ services:
       # You might want to change this to a higher value (and ensure your host has enough memory)
       MAX_MEMORY_USAGE_RATIO: 0.3
   geoipupdate:
-    << : *restart_policy
     image: 'maxmindinc/geoipupdate:latest'
-    environment:
-      GEOIPUPDATE_FREQUENCY: # default set in .env
-      GEOIPUPDATE_EDITION_IDS: GeoLite2-City
-      # Set the following environment variables to enable IP geolocation.
-      # See https://develop.sentry.dev/self-hosted/geolocation/.
-      GEOIPUPDATE_ACCOUNT_ID:
-      GEOIPUPDATE_LICENSE_KEY:
+    entrypoint: ['/usr/bin/geoipupdate', '-d', '/sentry', '-f', '/sentry/GeoIP.conf']
     volumes:
-      - './geoip:/usr/share/GeoIP'
+      - './geoip:/sentry'
   snuba-api:
     << : *snuba_defaults
   # Kafka consumer responsible for feeding events into Clickhouse

@@ -1,2 +1,3 @@
-GeoLite2-City.mmdb
+GeoIP.conf
+*.mmdb
 .geoipupdate.lock
