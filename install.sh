@@ -326,7 +326,7 @@ if [[ ! -f "$RELAY_CREDENTIALS_JSON" ]]; then
 fi
 
 
-./install/geoipupdate.sh
+./install/geoip.sh
 
 
 if [[ "$MINIMIZE_DOWNTIME" ]]; then
