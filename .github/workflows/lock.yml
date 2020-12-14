@@ -1,4 +1,4 @@
-name: 'Lock closed issues and pull requests'
+name: 'Lock closed issues/PRs'
 on:
   schedule:
     - cron: '*/5 * * * *'
