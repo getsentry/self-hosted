@@ -325,6 +325,10 @@ if [[ ! -f "$RELAY_CREDENTIALS_JSON" ]]; then
   echo "Relay credentials written to $RELAY_CREDENTIALS_JSON"
 fi
 
+
+./install/geoip.sh
+
+
 if [[ "$MINIMIZE_DOWNTIME" ]]; then
   # Start the whole setup, except nginx and relay.
   $dc up -d --remove-orphans $($dc config --services | grep -v -E '^(nginx|relay)$')

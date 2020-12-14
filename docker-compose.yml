@@ -31,6 +31,7 @@ x-sentry-defaults: &sentry_defaults
   volumes:
     - 'sentry-data:/data'
     - './sentry:/etc/sentry'
+    - './geoip:/geoip:ro'
 x-snuba-defaults: &snuba_defaults
   << : *restart_policy
   depends_on:
@@ -126,6 +127,14 @@ services:
       # If you have high volume and your search return incomplete results
       # You might want to change this to a higher value (and ensure your host has enough memory)
       MAX_MEMORY_USAGE_RATIO: 0.3
+  geoipupdate:
+    image: 'maxmindinc/geoipupdate:latest'
+    # Override the entrypoint in order to avoid using envvars for config.
+    # Futz with settings so we can keep mmdb and conf in same dir on host
+    # (image looks for them in separate dirs by default).
+    entrypoint: ['/usr/bin/geoipupdate', '-d', '/sentry', '-f', '/sentry/GeoIP.conf']
+    volumes:
+      - './geoip:/sentry'
   snuba-api:
     << : *snuba_defaults
   # Kafka consumer responsible for feeding events into Clickhouse
@@ -233,6 +242,10 @@ services:
         read_only: true
         source: ./relay
         target: /work/.relay
+      - type: bind
+        read_only: true
+        source: ./geoip
+        target: /geoip
     depends_on:
       - kafka
       - redis

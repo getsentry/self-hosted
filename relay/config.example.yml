@@ -10,3 +10,4 @@ processing:
     - {name: "bootstrap.servers", value: "kafka:9092"}
     - {name: "message.max.bytes", value: 50000000} #50MB or bust
   redis: redis://redis:6379
+  geoip_path: "/geoip/GeoLite2-City.mmdb"
