@@ -7,7 +7,7 @@ cd $SCRIPT_DIR/..
 OLD_VERSION="$1"
 NEW_VERSION="$2"
 
-SYMBOLICATOR_VERSION=$(curl -s "https://api.github.com/repos/getsentry/symbolicator/releases/latest" | grep -Po '"tag_name": "\K.*?(?=")')
+SYMBOLICATOR_VERSION=${SYMBOLICATOR_VERSION:-$(curl -s "https://api.github.com/repos/getsentry/symbolicator/releases/latest" | grep -Po '"tag_name": "\K.*?(?=")')}
 
 sed -i -e "s/^SYMBOLICATOR_IMAGE=\([^:]\+\):.\+\$/SYMBOLICATOR_IMAGE=\1:$SYMBOLICATOR_VERSION/" .env
 sed -i -e "s/^\(SENTRY\|SNUBA\|RELAY\)_IMAGE=\([^:]\+\):.\+\$/\1_IMAGE=\2:$NEW_VERSION/" .env
