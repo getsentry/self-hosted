@@ -6,7 +6,5 @@ cd $SCRIPT_DIR/..
 
 # Bring master back to nightlies after merge from release branch
 
-SYMBOLICATOR_VERSION=nightly
-
-./scripts/bump-version.sh '' 'nightly'
+SYMBOLICATOR_VERSION=nightly ./scripts/bump-version.sh '' 'nightly'
 git diff --quiet || git commit -anm 'build: Set master version to nightly' && git push
