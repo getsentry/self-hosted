@@ -1,0 +1,33 @@
+name: 'close stale issues/PRs'
+on:
+  schedule:
+    - cron: '* */6 * * *'
+  workflow_dispatch:
+jobs:
+  stale:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/stale@87c2b794b9b47a9bec68ae03c01aeb572ffebdb1
+        with:
+          repo-token: ${{ github.token }}
+          days-before-stale: 21
+          days-before-close: 7
+          only-labels: ""
+          operations-per-run: 100
+          remove-stale-when-updated: false
+          debug-only: false
+          ascending: false
+
+          exempt-issue-labels: "Triage: Accepted"
+          stale-issue-label: "Triage: Stale"
+          stale-issue-message: "This message is required, but you shouldn't see it."
+          skip-stale-issue-message: true
+          close-issue-label: ""
+          close-issue-message: ""
+
+          exempt-pr-labels: "Triage: Accepted"
+          stale-pr-label: "Triage: Stale"
+          stale-pr-message: "This message is required, but you shouldn't see it."
+          skip-stale-pr-message: true
+          close-pr-label:
+          close-pr-message: ""
