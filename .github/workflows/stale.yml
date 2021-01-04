@@ -14,20 +14,34 @@ jobs:
           days-before-close: 7
           only-labels: ""
           operations-per-run: 100
-          remove-stale-when-updated: false
+          remove-stale-when-updated: true
           debug-only: false
           ascending: false
 
-          exempt-issue-labels: "Triage: Accepted"
-          stale-issue-label: "Triage: Stale"
-          stale-issue-message: "This message is required, but you shouldn't see it."
-          skip-stale-issue-message: true
+          exempt-issue-labels: "Status: Accepted"
+          stale-issue-label: "Status: Stale"
+          stale-issue-message: |-
+            This issue has gone three weeks without activity. In another week, I will close it.
+
+            But! If you comment or otherwise update it, I will reset the clock, and if you label it `State: Accepted`, I will leave it alone entirely.
+
+            ----
+
+            "A weed is but an unloved flower." ― _Ella Wheeler Wilcox_ 🥀
+          skip-stale-issue-message: false
           close-issue-label: ""
           close-issue-message: ""
 
-          exempt-pr-labels: "Triage: Accepted"
-          stale-pr-label: "Triage: Stale"
-          stale-pr-message: "This message is required, but you shouldn't see it."
-          skip-stale-pr-message: true
+          exempt-pr-labels: "Status: Accepted"
+          stale-pr-label: "Status: Stale"
+          stale-pr-message: |-
+            This pull request has gone three weeks without activity. In another week, I will close it.
+
+            But! If you comment or otherwise update it, I will reset the clock, and if you label it `State: Accepted`, I will leave it alone entirely.
+
+            ----
+
+            "A weed is but an unloved flower." ― _Ella Wheeler Wilcox_ 🥀
+          skip-stale-pr-message: false
           close-pr-label:
           close-pr-message: ""
