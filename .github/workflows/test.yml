@@ -30,7 +30,8 @@ jobs:
 
       - name: Install and test
         env:
-          COMPOSE_PARALLEL_LIMIT: 8
+          COMPOSE_PARALLEL_LIMIT: 25
+          COMPOSE_HTTP_TIMEOUT: 300
           SENTRY_PYTHON2: ${{ matrix.py2 == '1' || '' }}
         run: |
           ./install.sh
