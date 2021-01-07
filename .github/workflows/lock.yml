@@ -7,7 +7,7 @@ jobs:
   lock:
     runs-on: ubuntu-latest
     steps:
-      - uses: getsentry/forked-action-lock-threads
+      - uses: getsentry/forked-action-lock-threads@latest
         with:
           github-token: ${{ github.token }}
           issue-lock-inactive-days: 15
