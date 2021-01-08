@@ -5,8 +5,8 @@ on:
   # is not against master).
   push:
     branches:
-    - "master"
-    - "releases/**"
+      - "master"
+      - "releases/**"
   pull_request:
 env:
   DOCKER_COMPOSE_VERSION: 1.24.1
@@ -14,7 +14,7 @@ jobs:
   test:
     strategy:
       matrix:
-        py2: ['', '1']
+        py2: ["", "1"]
     runs-on: ubuntu-18.04
     name: "test${{ matrix.py2 == '1' && ' PY2' || ''}}"
     steps:
@@ -30,7 +30,8 @@ jobs:
 
       - name: Install and test
         env:
-          COMPOSE_PARALLEL_LIMIT: 10
+          COMPOSE_PARALLEL_LIMIT: 50
+          COMPOSE_HTTP_TIMEOUT: 450
           SENTRY_PYTHON2: ${{ matrix.py2 == '1' || '' }}
         run: |
           ./install.sh
