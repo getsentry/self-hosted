@@ -18,7 +18,7 @@ exec &> >(tee -a "$log_file")
 
 MIN_DOCKER_VERSION='19.03.6'
 MIN_COMPOSE_VERSION='1.24.1'
-MIN_RAM=2400 # MB
+MIN_RAM=8000 # MB
 
 # Increase the default 10 second SIGTERM timeout
 # to ensure celery queues are properly drained
