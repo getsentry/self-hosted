@@ -2,9 +2,7 @@
 
 if [ ! -f 'install.sh' ]; then echo 'Where are you?'; exit 1; fi
 
-dc="docker-compose --no-ansi"
-dcr="$dc run --rm"
-
+source ./install/docker-aliases.sh
 
 install_geoip() {
   local mmdb='geoip/GeoLite2-City.mmdb'
