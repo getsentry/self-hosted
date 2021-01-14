@@ -1,26 +1,29 @@
 ---
 name: 🐞 Bug Report
-about: Report a bug to help improve Self-Hosted Sentry
+about: Report a bug in Self-Hosted Sentry
 ---
 
-## Version Information
+### Version Information
 
 Version: *VERSION HERE*
 
+### Steps to Reproduce
 
-## Description
+1. What
+2. you
+3. did.
 
-[What happened]
+### Expected Result
 
-## Steps to Reproduce
+What you thought would happen.
 
-1. [First Step]
-2. [Second Step]
-3. and so on.
+### Actual Result
 
-## Logs
+What actually happened. Maybe a screenshot/recording?
 
-Please share any applicable logs:
+### Logs
 
-- `ls -1 sentry_install_log-*.txt | tail -1 | xargs cat` # latest instal logs
+What you saw along the way, e.g.:
+
+- latest install logs: `ls -1 sentry_install_log-*.txt | tail -1 | xargs cat`
 - `docker-compose logs` output
