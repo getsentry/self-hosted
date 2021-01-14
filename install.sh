@@ -351,4 +351,7 @@ else
   echo ""
 fi
 
+
+echo 'CHEESE'
 source ./install/py2-warning.sh
+echo 'BREAD'

@@ -4,7 +4,7 @@ if [[ ! -f 'install.sh' ]]; then echo 'Where are you?'; exit 1; fi
 
 source ./install/docker-aliases.sh
 
-if $dcr --no-deps --entrypoint python web --version | grep -q 'Python 2'; then
+if $dcr --no-deps --entrypoint python web --version | grep -q 'Python 3'; then
   WARNING_TEXT="
  _  _   ____      ____  _       _______     ____  _____  _____  ____  _____   ______   _  _
 | || | |_  _|    |_  _|/ \     |_   __ \   |_   \|_   _||_   _||_   \|_   _|.' ___  | | || |
