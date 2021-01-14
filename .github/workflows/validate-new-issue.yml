@@ -1,4 +1,4 @@
-name: validate new issue
+name: Validate new issue
 on:
   issues:
     types: ['opened']
