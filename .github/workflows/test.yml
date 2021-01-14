@@ -10,6 +10,8 @@ on:
   pull_request:
 env:
   DOCKER_COMPOSE_VERSION: 1.24.1
+defaults:
+  shell: bash
 jobs:
   test:
     strategy:
