@@ -1,4 +1,4 @@
-name: test
+name: Test
 on:
   # Run CI on all pushes to the master and release/** branches, and on all new
   # pull requests, and on all pushes to pull requests (even if a pull request
@@ -16,6 +16,8 @@ defaults:
 jobs:
   test:
     strategy:
+      # Only run one job at a time as they are quite demanding
+      max-parallel: 1
       matrix:
         py2: ["", "1"]
     runs-on: ubuntu-18.04
