@@ -18,10 +18,11 @@ py2_warning() {
 EOW
         echo 'You are using Sentry with Python 2, which is deprecated.'
         echo 'Sentry 21.1 will be the last version with Python 2 support.'
-        echo ''
-    else
-      return 0;
     fi
 }
 
 py2_warning
+# Run a simple command that would exit with code 0 so the calling script won't think
+# there was a failure in this script. (otherwise it fails when Python 2 is *NOT* detected)
+# as the exit code for the `grep` call will be `-1` indicating no match found.
+echo ''
