@@ -1,4 +1,4 @@
-name: 'lock closed issues/PRs'
+name: 'Lock closed issues/PRs'
 on:
   schedule:
     - cron: '11 3 * * *'

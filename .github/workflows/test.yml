@@ -1,4 +1,4 @@
-name: test
+name: Test
 on:
   # Run CI on all pushes to the master and release/** branches, and on all new
   # pull requests, and on all pushes to pull requests (even if a pull request
