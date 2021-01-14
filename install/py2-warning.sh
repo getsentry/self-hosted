@@ -19,6 +19,8 @@ EOW
         echo 'You are using Sentry with Python 2, which is deprecated.'
         echo 'Sentry 21.1 will be the last version with Python 2 support.'
         echo ''
+    else
+      return 0;
     fi
 }
 
