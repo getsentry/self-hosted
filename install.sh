@@ -350,3 +350,5 @@ else
   echo "  docker-compose up -d"
   echo ""
 fi
+
+source ./install/py2-warning.sh
