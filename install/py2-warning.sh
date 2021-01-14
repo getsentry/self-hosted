@@ -2,8 +2,11 @@
 
 if [[ ! -f 'install.sh' ]]; then echo 'Where are you?'; exit 1; fi
 
-IS_PYTHON2=$(docker run --entrypoint python sentry-onpremise-local --version | grep -c 'Python 2' || [[ $? == 1 ]])
-if [[ "$IS_PYTHON2" == 1 ]]; then
+source ./install/docker-aliases.sh
+
+# Note the stderr>stdout redirection because Python thinks `--version` should
+# be on stderr: https://stackoverflow.com/a/31715011/90297
+if $dcr --no-deps --entrypoint python web --version 2>&1 | grep -q 'Python 2'; then
   WARNING_TEXT="
  _  _   ____      ____  _       _______     ____  _____  _____  ____  _____   ______   _  _
 | || | |_  _|    |_  _|/ \     |_   __ \   |_   \|_   _||_   _||_   \|_   _|.' ___  | | || |
