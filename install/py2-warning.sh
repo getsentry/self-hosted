@@ -4,8 +4,8 @@ if [[ ! -f 'install.sh' ]]; then echo 'Where are you?'; exit 1; fi
 
 source ./install/docker-aliases.sh
 
-SENTRY_PYTHON_VERSION=$($dcr --no-deps --entrypoint python web --version)
-if echo "$SENTRY_PYTHON_VERSION" | grep -q 'Python 2'; then
+IS_PYTHON2=$($dcr --no-deps --entrypoint python web --version | grep -c 'Python 2' || [[ $? == 1 ]])
+if [[ "$IS_PYTHON2" == 1]]; then
   WARNING_TEXT="
  _  _   ____      ____  _       _______     ____  _____  _____  ____  _____   ______   _  _
 | || | |_  _|    |_  _|/ \     |_   __ \   |_   \|_   _||_   _||_   \|_   _|.' ___  | | || |
