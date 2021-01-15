@@ -12,17 +12,17 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ github.token }}
       run: |
-        # Trust users who belong to the getsentry org (id: 1396951). Due to API
-        # limitations, we can only see this if the user's membership is public.
-        sentry_org=$(
-          gh api "https://api.github.com/users/${{ github.actor }}/orgs" \
-            | jq '.[] | select(.id==1396951)'
-        )
-        if [ -z "$sentry_org" ]; then
-          echo "${{ github.actor }} is not a member of the getsentry org. 🧐"
-        else
+
+        # Trust users who belong to the getsentry org.
+        check_membership() {
+          gh api "https://api.github.com/orgs/getsentry/members/${{ github.actor }}" 2> /dev/null
+          return 0  # prevent GHA from exiting on non-zero return code from the previous line
+        }
+        if [ -z "$(check_membership)" ]; then
           echo "Skipping validation, because ${{ github.actor }} is a member of the getsentry org."
           exit 0
+        else
+          echo "${{ github.actor }} is not a member of the getsentry org. 🧐"
         fi
 
         # Look for a template where the headings match this issue's
