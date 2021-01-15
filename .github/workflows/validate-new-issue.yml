@@ -44,7 +44,9 @@ jobs:
         EOF
 
         # Might get `gh issue comment` some day - https://github.com/cli/cli/issues/517
+        echo -n "Commented: "
         gh api "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.issue.number }}/comments" \
           --method POST \
-          --input comment
+          --input comment \
+          | jq .html_url
         gh issue close ${{ github.event.issue.number }}
