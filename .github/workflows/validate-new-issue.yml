@@ -14,11 +14,7 @@ jobs:
       run: |
 
         # Trust users who belong to the getsentry org.
-        check_membership() {
-          gh api "https://api.github.com/orgs/getsentry/members/${{ github.actor }}" 2> /dev/null
-          return 0  # prevent GHA from exiting on non-zero return code from the previous line
-        }
-        if [ -z "$(check_membership)" ]; then
+        if gh api "https://api.github.com/orgs/getsentry/members/${{ github.actor }}" >/dev/null 2>&1; then
           echo "Skipping validation, because ${{ github.actor }} is a member of the getsentry org."
           exit 0
         else
