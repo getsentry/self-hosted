@@ -39,6 +39,8 @@ jobs:
           COMPOSE_HTTP_TIMEOUT: 450
           SENTRY_PYTHON2: ${{ matrix.py2 == '1' || '' }}
         run: |
+          lshw -c memory
+          lscpu
           ./install.sh
           ./test.sh
           printf "Testing in-place upgrade"
