@@ -92,7 +92,7 @@ cleanup () {
 trap_with_arg cleanup ERR INT TERM EXIT
 
 
-echo "Checking minimum requirements..."
+echo "::group::Checking minimum requirements..."
 
 DOCKER_VERSION=$(docker version --format '{{.Server.Version}}')
 COMPOSE_VERSION=$($dc --version | sed 's/docker-compose version \(.\{1,\}\),.*/\1/')
@@ -138,9 +138,10 @@ if [[ "$IS_KVM" -eq 0 ]]; then
     exit 1
   fi
 fi
+echo "::endgroup::"
 
 echo ""
-echo "Creating volumes for persistent storage..."
+echo "::group::Creating volumes for persistent storage..."
 echo "Created $(docker volume create --name=sentry-data)."
 echo "Created $(docker volume create --name=sentry-postgres)."
 echo "Created $(docker volume create --name=sentry-redis)."
@@ -148,25 +149,31 @@ echo "Created $(docker volume create --name=sentry-zookeeper)."
 echo "Created $(docker volume create --name=sentry-kafka)."
 echo "Created $(docker volume create --name=sentry-clickhouse)."
 echo "Created $(docker volume create --name=sentry-symbolicator)."
+echo "::endgroup::"
 
 echo ""
+echo "::group::Ensuring files from examples ..."
 ensure_file_from_example $SENTRY_CONFIG_PY
 ensure_file_from_example $SENTRY_CONFIG_YML
 ensure_file_from_example $SENTRY_EXTRA_REQUIREMENTS
 ensure_file_from_example $SYMBOLICATOR_CONFIG_YML
 ensure_file_from_example $RELAY_CONFIG_YML
+echo "::endgroup::"
 
 if grep -xq "system.secret-key: '!!changeme!!'" $SENTRY_CONFIG_YML ; then
   echo ""
-  echo "Generating secret key..."
+  echo "::group::Generating secret key..."
   # This is to escape the secret key to be used in sed below
   # Note the need to set LC_ALL=C due to BSD tr and sed always trying to decode
   # whatever is passed to them. Kudos to https://stackoverflow.com/a/23584470/90297
   SECRET_KEY=$(export LC_ALL=C; head /dev/urandom | tr -dc "a-z0-9@#%^&*(-_=+)" | head -c 50 | sed -e 's/[\/&]/\\&/g')
   sed -i -e 's/^system.secret-key:.*$/system.secret-key: '"'$SECRET_KEY'"'/' $SENTRY_CONFIG_YML
   echo "Secret key written to $SENTRY_CONFIG_YML"
+  echo "::endgroup::"
 fi
 
+echo ""
+echo "::group::Replacing TSDB ..."
 replace_tsdb() {
   if (
     [[ -f "$SENTRY_CONFIG_PY" ]] &&
@@ -209,9 +216,10 @@ SENTRY_TSDB_OPTIONS = {\"switchover_timestamp\": $(date +%s) + (90 * 24 * 3600)}
 }
 
 replace_tsdb
+echo "::endgroup::"
 
 echo ""
-echo "Fetching and updating Docker images..."
+echo "::group::Fetching and updating Docker images..."
 echo ""
 # We tag locally built images with an '-onpremise-local' suffix. docker-compose pull tries to pull these too and
 # shows a 404 error on the console which is confusing and unnecessary. To overcome this, we add the stderr>stdout
@@ -220,16 +228,21 @@ $dc pull -q --ignore-pull-failures 2>&1 | grep -v -- -onpremise-local || true
 
 # We may not have the set image on the repo (local images) so allow fails
 docker pull ${SENTRY_IMAGE}${SENTRY_PYTHON2:+-py2} || true;
+echo "::endgroup::"
+
 
 echo ""
-echo "Building and tagging Docker images..."
+echo "::group::Building and tagging Docker images..."
 echo ""
 # Build the sentry onpremise image first as it is needed for the cron image
 $dc build --force-rm web
 $dc build --force-rm --parallel
 echo ""
 echo "Docker images built."
+echo "::endgroup::"
 
+echo ""
+echo "::group::Turning things off ..."
 if [[ -n "$MINIMIZE_DOWNTIME" ]]; then
   # Stop everything but relay and nginx
   $dc rm -fsv $($dc config --services | grep -v -E '^(nginx|relay)$')
@@ -240,7 +253,10 @@ else
   # This is for newer versions
   $dc down -t $STOP_TIMEOUT --rmi local --remove-orphans
 fi
+echo "::endgroup::"
 
+echo ""
+echo "::group::Blah blah Zookeeper blah ..."
 ZOOKEEPER_SNAPSHOT_FOLDER_EXISTS=$($dcr zookeeper bash -c 'ls 2>/dev/null -Ubad1 -- /var/lib/zookeeper/data/version-2 | wc -l | tr -d '[:space:]'')
 if [[ "$ZOOKEEPER_SNAPSHOT_FOLDER_EXISTS" -eq 1 ]]; then
   ZOOKEEPER_LOG_FILE_COUNT=$($dcr zookeeper bash -c 'ls 2>/dev/null -Ubad1 -- /var/lib/zookeeper/log/version-2/* | wc -l | tr -d '[:space:]'')
@@ -251,11 +267,12 @@ if [[ "$ZOOKEEPER_SNAPSHOT_FOLDER_EXISTS" -eq 1 ]]; then
     $dc run -d -e ZOOKEEPER_SNAPSHOT_TRUST_EMPTY=true zookeeper
   fi
 fi
+echo "::endgroup::"
 
-echo "Bootstrapping and migrating Snuba..."
+echo "::group::Bootstrapping and migrating Snuba..."
 $dcr snuba-api bootstrap --no-migrate --force
 $dcr snuba-api migrations migrate --force
-echo ""
+echo "::endgroup::"
 
 # NOTE: This step relies on `kafka` being available from the previous `snuba-api bootstrap` step
 # XXX(BYK): We cannot use auto.create.topics as Confluence and Apache hates it now (and makes it very hard to enable)
@@ -263,14 +280,16 @@ EXISTING_KAFKA_TOPICS=$($dcr kafka kafka-topics --list --bootstrap-server kafka:
 NEEDED_KAFKA_TOPICS="ingest-attachments ingest-transactions ingest-events"
 for topic in $NEEDED_KAFKA_TOPICS; do
   if ! echo "$EXISTING_KAFKA_TOPICS" | grep -wq $topic; then
-    echo "Creating additional Kafka topics..."
+    echo "::group::Creating additional Kafka topics..."
     $dcr kafka kafka-topics --create --topic $topic --bootstrap-server kafka:9092
     echo ""
+    echo "::endgroup::"
   fi
 done
 
 # Very naively check whether there's an existing sentry-postgres volume and the PG version in it
 if [[ -n "$(docker volume ls -q --filter name=sentry-postgres)" && "$(docker run --rm -v sentry-postgres:/db busybox cat /db/PG_VERSION 2>/dev/null)" == "9.5" ]]; then
+  echo "::group::Something something PostgreSQL something something ..."
   docker volume rm sentry-postgres-new || true
   # If this is Postgres 9.5 data, start upgrading it to 9.6 in a new volume
   docker run --rm \
@@ -288,10 +307,11 @@ if [[ -n "$(docker volume ls -q --filter name=sentry-postgres)" && "$(docker run
     "cd /from ; cp -av . /to ; echo 'host all all all trust' >> /to/pg_hba.conf"
   # Finally, remove the new old volume as we are all in sentry-postgres now
   docker volume rm sentry-postgres-new
+  echo "::endgroup::"
 fi
 
 echo ""
-echo "Setting up database..."
+echo "::group::Setting up database..."
 if [[ -n "$CI" || "$SKIP_USER_PROMPT" == 1 ]]; then
   $dcr web upgrade --noinput
   echo ""
@@ -303,21 +323,23 @@ if [[ -n "$CI" || "$SKIP_USER_PROMPT" == 1 ]]; then
 else
   $dcr web upgrade
 fi
+echo "::endgroup::"
 
 
 SENTRY_DATA_NEEDS_MIGRATION=$(docker run --rm -v sentry-data:/data alpine ash -c "[ ! -d '/data/files' ] && ls -A1x /data | wc -l || true")
 if [[ -n "$SENTRY_DATA_NEEDS_MIGRATION" ]]; then
-  echo "Migrating file storage..."
+  echo "::group::Migrating file storage..."
   # Use the web (Sentry) image so the file owners are kept as sentry:sentry
   # The `\"` escape pattern is to make this compatible w/ Git Bash on Windows. See #329.
   $dcr --entrypoint \"/bin/bash\" web -c \
     "mkdir -p /tmp/files; mv /data/* /tmp/files/; mv /tmp/files /data/files; chown -R sentry:sentry /data"
+  echo "::endgroup::"
 fi
 
 
 if [[ ! -f "$RELAY_CREDENTIALS_JSON" ]]; then
   echo ""
-  echo "Generating Relay credentials..."
+  echo "::group::Generating Relay credentials..."
 
   # We need the ugly hack below as `relay generate credentials` tries to read the config and the credentials
   # even with the `--stdout` and `--overwrite` flags and then errors out when the credentials file exists but
@@ -325,6 +347,7 @@ if [[ ! -f "$RELAY_CREDENTIALS_JSON" ]]; then
   # credentials file before relay runs.
   $dcr --no-deps -v $(pwd)/$RELAY_CONFIG_YML:/tmp/config.yml relay --config /tmp credentials generate --stdout > "$RELAY_CREDENTIALS_JSON"
   echo "Relay credentials written to $RELAY_CREDENTIALS_JSON"
+  echo "::endgroup::"
 fi
 
 
@@ -336,12 +359,13 @@ if [[ "$MINIMIZE_DOWNTIME" ]]; then
   $dc up -d --remove-orphans $($dc config --services | grep -v -E '^(nginx|relay)$')
   $dc exec -T nginx service nginx reload
 
-  echo "Waiting for Sentry to start..."
+  echo "::group::Waiting for Sentry to start..."
   docker run --rm --network="${COMPOSE_PROJECT_NAME}_default" alpine ash \
     -c 'while [[ "$(wget -T 1 -q -O- http://web:9000/_health/)" != "ok" ]]; do sleep 0.5; done'
 
   # Make sure everything is up. This should only touch relay and nginx
   $dc up -d
+  echo "::endgroup::"
 else
   echo ""
   echo "----------------"
