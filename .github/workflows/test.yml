@@ -40,8 +40,8 @@ jobs:
           SENTRY_PYTHON2: ${{ matrix.py2 == '1' || '' }}
         run: |
           echo "::group::Resources"
-          lshw -c memory
-          lscpu
+          sudo lshw -c memory
+          sudo lscpu
           echo "::endgroup::"
           ./install.sh
           ./test.sh
