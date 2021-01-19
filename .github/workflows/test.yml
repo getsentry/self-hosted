@@ -39,9 +39,15 @@ jobs:
           COMPOSE_HTTP_TIMEOUT: 450
           SENTRY_PYTHON2: ${{ matrix.py2 == '1' || '' }}
         run: |
-          echo "::group::Resources"
+          echo "::group::Memory"
           sudo lshw -c memory
+          echo "::endgroup::"
+          echo "::group::CPU"
           sudo lscpu
+          echo "::endgroup::"
+          which docker-compose
+          echo "::group::Memory"
+          head `which docker-compose`
           echo "::endgroup::"
           ./install.sh
           ./test.sh
