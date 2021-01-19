@@ -6,14 +6,22 @@ if [[ -n "$MSYSTEM" ]]; then
   exit 1
 fi
 
+# Thanks to https://unix.stackexchange.com/a/145654/108960
+log_file="sentry_install_log-`date +'%Y-%m-%d_%H-%M-%S'`.txt"
+exec &> >(tee -a "$log_file")
+if [ "$GITHUB_ACTIONS" = "true" ]; then
+  _group="::group::"
+  _endgroup="::endgroup::"
+else
+  _group="▶ "
+  _endgroup=""
+fi
+
+echo "${_group}Defining variables and helpers ..."
 # Read .env for default values with a tip o' the hat to https://stackoverflow.com/a/59831605/90297
 t=$(mktemp) && export -p > "$t" && set -a && . ./.env && set +a && . "$t" && rm "$t" && unset t
 
 source ./install/docker-aliases.sh
-
-# Thanks to https://unix.stackexchange.com/a/145654/108960
-log_file="sentry_install_log-`date +'%Y-%m-%d_%H-%M-%S'`.txt"
-exec &> >(tee -a "$log_file")
 
 MIN_DOCKER_VERSION='19.03.6'
 MIN_COMPOSE_VERSION='1.24.1'
@@ -32,7 +40,9 @@ RELAY_CONFIG_YML='relay/config.yml'
 RELAY_CREDENTIALS_JSON='relay/credentials.json'
 SENTRY_EXTRA_REQUIREMENTS='sentry/requirements.txt'
 MINIMIZE_DOWNTIME=
+echo $_endgroup
 
+echo "${_group}Parsing command line ..."
 show_help() {
   cat <<EOF
 Usage: $0 [options]
@@ -58,7 +68,9 @@ while (( $# )); do
   esac
   shift
 done
+echo "${_endgroup}"
 
+echo "${_group}Setting up error handling ..."
 # Courtesy of https://stackoverflow.com/a/2183063/90297
 trap_with_arg() {
   func="$1" ; shift
@@ -90,10 +102,9 @@ cleanup () {
   fi
 }
 trap_with_arg cleanup ERR INT TERM EXIT
+echo "${_endgroup}"
 
-
-echo "Checking minimum requirements..."
-
+echo "${_group}Checking minimum requirements ..."
 DOCKER_VERSION=$(docker version --format '{{.Server.Version}}')
 COMPOSE_VERSION=$($dc --version | sed 's/docker-compose version \(.\{1,\}\),.*/\1/')
 RAM_AVAILABLE_IN_DOCKER=$(docker run --rm busybox free -m 2>/dev/null | awk '/Mem/ {print $2}');
@@ -138,9 +149,9 @@ if [[ "$IS_KVM" -eq 0 ]]; then
     exit 1
   fi
 fi
+echo "${_endgroup}"
 
-echo ""
-echo "Creating volumes for persistent storage..."
+echo "${_group}Creating volumes for persistent storage ..."
 echo "Created $(docker volume create --name=sentry-data)."
 echo "Created $(docker volume create --name=sentry-postgres)."
 echo "Created $(docker volume create --name=sentry-redis)."
@@ -148,17 +159,18 @@ echo "Created $(docker volume create --name=sentry-zookeeper)."
 echo "Created $(docker volume create --name=sentry-kafka)."
 echo "Created $(docker volume create --name=sentry-clickhouse)."
 echo "Created $(docker volume create --name=sentry-symbolicator)."
+echo "${_endgroup}"
 
-echo ""
+echo "${_group}Ensuring files from examples ..."
 ensure_file_from_example $SENTRY_CONFIG_PY
 ensure_file_from_example $SENTRY_CONFIG_YML
 ensure_file_from_example $SENTRY_EXTRA_REQUIREMENTS
 ensure_file_from_example $SYMBOLICATOR_CONFIG_YML
 ensure_file_from_example $RELAY_CONFIG_YML
+echo "${_endgroup}"
 
+echo "${_group}Generating secret key ..."
 if grep -xq "system.secret-key: '!!changeme!!'" $SENTRY_CONFIG_YML ; then
-  echo ""
-  echo "Generating secret key..."
   # This is to escape the secret key to be used in sed below
   # Note the need to set LC_ALL=C due to BSD tr and sed always trying to decode
   # whatever is passed to them. Kudos to https://stackoverflow.com/a/23584470/90297
@@ -166,7 +178,9 @@ if grep -xq "system.secret-key: '!!changeme!!'" $SENTRY_CONFIG_YML ; then
   sed -i -e 's/^system.secret-key:.*$/system.secret-key: '"'$SECRET_KEY'"'/' $SENTRY_CONFIG_YML
   echo "Secret key written to $SENTRY_CONFIG_YML"
 fi
+echo "${_endgroup}"
 
+echo "${_group}Replacing TSDB ..."
 replace_tsdb() {
   if (
     [[ -f "$SENTRY_CONFIG_PY" ]] &&
@@ -209,10 +223,9 @@ SENTRY_TSDB_OPTIONS = {\"switchover_timestamp\": $(date +%s) + (90 * 24 * 3600)}
 }
 
 replace_tsdb
+echo "${_endgroup}"
 
-echo ""
-echo "Fetching and updating Docker images..."
-echo ""
+echo "${_group}Fetching and updating Docker images ..."
 # We tag locally built images with an '-onpremise-local' suffix. docker-compose pull tries to pull these too and
 # shows a 404 error on the console which is confusing and unnecessary. To overcome this, we add the stderr>stdout
 # redirection below and pass it through grep, ignoring all lines having this '-onpremise-local' suffix.
@@ -220,16 +233,18 @@ $dc pull -q --ignore-pull-failures 2>&1 | grep -v -- -onpremise-local || true
 
 # We may not have the set image on the repo (local images) so allow fails
 docker pull ${SENTRY_IMAGE}${SENTRY_PYTHON2:+-py2} || true;
+echo "${_endgroup}"
 
-echo ""
-echo "Building and tagging Docker images..."
+echo "${_group}Building and tagging Docker images ..."
 echo ""
 # Build the sentry onpremise image first as it is needed for the cron image
 $dc build --force-rm web
 $dc build --force-rm
 echo ""
 echo "Docker images built."
+echo "${_endgroup}"
 
+echo "${_group}Turning things off ..."
 if [[ -n "$MINIMIZE_DOWNTIME" ]]; then
   # Stop everything but relay and nginx
   $dc rm -fsv $($dc config --services | grep -v -E '^(nginx|relay)$')
@@ -240,7 +255,9 @@ else
   # This is for newer versions
   $dc down -t $STOP_TIMEOUT --rmi local --remove-orphans
 fi
+echo "${_endgroup}"
 
+echo "${_group}Setting up Zookeeper ..."
 ZOOKEEPER_SNAPSHOT_FOLDER_EXISTS=$($dcr zookeeper bash -c 'ls 2>/dev/null -Ubad1 -- /var/lib/zookeeper/data/version-2 | wc -l | tr -d '[:space:]'')
 if [[ "$ZOOKEEPER_SNAPSHOT_FOLDER_EXISTS" -eq 1 ]]; then
   ZOOKEEPER_LOG_FILE_COUNT=$($dcr zookeeper bash -c 'ls 2>/dev/null -Ubad1 -- /var/lib/zookeeper/log/version-2/* | wc -l | tr -d '[:space:]'')
@@ -251,24 +268,27 @@ if [[ "$ZOOKEEPER_SNAPSHOT_FOLDER_EXISTS" -eq 1 ]]; then
     $dc run -d -e ZOOKEEPER_SNAPSHOT_TRUST_EMPTY=true zookeeper
   fi
 fi
+echo "${_endgroup}"
 
-echo "Bootstrapping and migrating Snuba..."
+echo "${_group}Bootstrapping and migrating Snuba ..."
 $dcr snuba-api bootstrap --no-migrate --force
 $dcr snuba-api migrations migrate --force
-echo ""
+echo "${_endgroup}"
 
+echo "${_group}Creating additional Kafka topics ..."
 # NOTE: This step relies on `kafka` being available from the previous `snuba-api bootstrap` step
 # XXX(BYK): We cannot use auto.create.topics as Confluence and Apache hates it now (and makes it very hard to enable)
 EXISTING_KAFKA_TOPICS=$($dcr kafka kafka-topics --list --bootstrap-server kafka:9092 2>/dev/null)
 NEEDED_KAFKA_TOPICS="ingest-attachments ingest-transactions ingest-events"
 for topic in $NEEDED_KAFKA_TOPICS; do
   if ! echo "$EXISTING_KAFKA_TOPICS" | grep -wq $topic; then
-    echo "Creating additional Kafka topics..."
     $dcr kafka kafka-topics --create --topic $topic --bootstrap-server kafka:9092
     echo ""
   fi
 done
+echo "${_endgroup}"
 
+echo "${_group}Ensuring proper PostgreSQL version ..."
 # Very naively check whether there's an existing sentry-postgres volume and the PG version in it
 if [[ -n "$(docker volume ls -q --filter name=sentry-postgres)" && "$(docker run --rm -v sentry-postgres:/db busybox cat /db/PG_VERSION 2>/dev/null)" == "9.5" ]]; then
   docker volume rm sentry-postgres-new || true
@@ -289,9 +309,9 @@ if [[ -n "$(docker volume ls -q --filter name=sentry-postgres)" && "$(docker run
   # Finally, remove the new old volume as we are all in sentry-postgres now
   docker volume rm sentry-postgres-new
 fi
+echo "${_endgroup}"
 
-echo ""
-echo "Setting up database..."
+echo "${_group}Setting up database ..."
 if [[ -n "$CI" || "$SKIP_USER_PROMPT" == 1 ]]; then
   $dcr web upgrade --noinput
   echo ""
@@ -303,21 +323,20 @@ if [[ -n "$CI" || "$SKIP_USER_PROMPT" == 1 ]]; then
 else
   $dcr web upgrade
 fi
+echo "${_endgroup}"
 
-
+echo "${_group}Migrating file storage ..."
 SENTRY_DATA_NEEDS_MIGRATION=$(docker run --rm -v sentry-data:/data alpine ash -c "[ ! -d '/data/files' ] && ls -A1x /data | wc -l || true")
 if [[ -n "$SENTRY_DATA_NEEDS_MIGRATION" ]]; then
-  echo "Migrating file storage..."
   # Use the web (Sentry) image so the file owners are kept as sentry:sentry
   # The `\"` escape pattern is to make this compatible w/ Git Bash on Windows. See #329.
   $dcr --entrypoint \"/bin/bash\" web -c \
     "mkdir -p /tmp/files; mv /data/* /tmp/files/; mv /tmp/files /data/files; chown -R sentry:sentry /data"
 fi
+echo "${_endgroup}"
 
-
+echo "${_group}Generating Relay credentials ..."
 if [[ ! -f "$RELAY_CREDENTIALS_JSON" ]]; then
-  echo ""
-  echo "Generating Relay credentials..."
 
   # We need the ugly hack below as `relay generate credentials` tries to read the config and the credentials
   # even with the `--stdout` and `--overwrite` flags and then errors out when the credentials file exists but
@@ -325,30 +344,37 @@ if [[ ! -f "$RELAY_CREDENTIALS_JSON" ]]; then
   # credentials file before relay runs.
   $dcr --no-deps -v $(pwd)/$RELAY_CONFIG_YML:/tmp/config.yml relay --config /tmp credentials generate --stdout > "$RELAY_CREDENTIALS_JSON"
   echo "Relay credentials written to $RELAY_CREDENTIALS_JSON"
+  echo "${_endgroup}"
 fi
 
-
+echo "${_group}Setting up GeoIP integration ..."
 source ./install/geoip.sh
-
+echo "${_endgroup}"
 
 if [[ "$MINIMIZE_DOWNTIME" ]]; then
+  echo "${_group}Waiting for Sentry to start ..."
   # Start the whole setup, except nginx and relay.
   $dc up -d --remove-orphans $($dc config --services | grep -v -E '^(nginx|relay)$')
   $dc exec -T nginx service nginx reload
 
-  echo "Waiting for Sentry to start..."
   docker run --rm --network="${COMPOSE_PROJECT_NAME}_default" alpine ash \
     -c 'while [[ "$(wget -T 1 -q -O- http://web:9000/_health/)" != "ok" ]]; do sleep 0.5; done'
 
   # Make sure everything is up. This should only touch relay and nginx
   $dc up -d
+  echo "${_endgroup}"
 else
   echo ""
-  echo "----------------"
+  echo "-----------------------------------------------------------------"
+  echo ""
   echo "You're all done! Run the following command to get Sentry running:"
   echo ""
   echo "  docker-compose up -d"
   echo ""
+  echo "-----------------------------------------------------------------"
+  echo ""
 fi
 
+echo "${_group}Checking Python version ..."
 source ./install/py2-warning.sh
+echo "${_endgroup}"
