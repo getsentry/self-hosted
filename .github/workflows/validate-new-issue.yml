@@ -22,7 +22,7 @@ jobs:
         fi
 
         # Look for a template where the headings match this issue's
-        echo "${{ github.event.issue.body }}" > issue-body
+        jq -r .issue.body "$GITHUB_EVENT_PATH" > issue-body
         for template in $(ls .github/ISSUE_TEMPLATE/*.md 2> /dev/null); do
           echo -n "$(basename $template)? "
           # <() is process substitution - https://superuser.com/a/1060002
