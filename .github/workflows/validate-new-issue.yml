@@ -9,7 +9,18 @@ jobs:
     - uses: actions/checkout@v2
     - name: "Validate issue against templates"
       shell: bash
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
       run: |
+
+        # Trust users who belong to the getsentry org.
+        if gh api "https://api.github.com/orgs/getsentry/members/${{ github.actor }}" >/dev/null 2>&1; then
+          echo "Skipping validation, because ${{ github.actor }} is a member of the getsentry org."
+          exit 0
+        else
+          echo "${{ github.actor }} is not a member of the getsentry org. 🧐"
+        fi
+
         # Look for a template where the headings match this issue's
         echo "${{ github.event.issue.body }}" > issue-body
         for template in $(ls .github/ISSUE_TEMPLATE/*.md 2> /dev/null); do
@@ -24,13 +35,14 @@ jobs:
         done
 
         # Failed to find a match! Close the issue.
-        echo "${{ github.token }}" | gh auth login --with-token
         cat << EOF > comment
         {"body": "Sorry, friend. As far as this ol' bot can tell, your issue does not use one of this repo's available issue templates. Please [try again using a template](https://github.com/${{ github.repository }}/issues/new/choose) so that we have the best chance of understanding and addressing your issue. (And if I'm confused, please [let us know](https://github.com/getsentry/.github/issues/new?title=template+enforcer+is+confused&body=${{ github.event.issue.html_url }}). 😬)\n\n----\n\n[![Did you see the memo about this?](https://user-images.githubusercontent.com/134455/104515469-e04a9c80-55c0-11eb-8e15-ffe9c0b8dd7f.gif)](https://www.youtube.com/watch?v=Fy3rjQGc6lA)"}
         EOF
 
         # Might get `gh issue comment` some day - https://github.com/cli/cli/issues/517
+        echo -n "Commented: "
         gh api "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.issue.number }}/comments" \
           --method POST \
-          --input comment
+          --input comment \
+          | jq .html_url
         gh issue close ${{ github.event.issue.number }}
