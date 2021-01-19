@@ -140,7 +140,6 @@ if [[ "$IS_KVM" -eq 0 ]]; then
 fi
 echo "::endgroup::"
 
-echo ""
 echo "::group::Creating volumes for persistent storage..."
 echo "Created $(docker volume create --name=sentry-data)."
 echo "Created $(docker volume create --name=sentry-postgres)."
@@ -151,7 +150,6 @@ echo "Created $(docker volume create --name=sentry-clickhouse)."
 echo "Created $(docker volume create --name=sentry-symbolicator)."
 echo "::endgroup::"
 
-echo ""
 echo "::group::Ensuring files from examples ..."
 ensure_file_from_example $SENTRY_CONFIG_PY
 ensure_file_from_example $SENTRY_CONFIG_YML
@@ -160,19 +158,17 @@ ensure_file_from_example $SYMBOLICATOR_CONFIG_YML
 ensure_file_from_example $RELAY_CONFIG_YML
 echo "::endgroup::"
 
+echo "::group::Generating secret key..."
 if grep -xq "system.secret-key: '!!changeme!!'" $SENTRY_CONFIG_YML ; then
-  echo ""
-  echo "::group::Generating secret key..."
   # This is to escape the secret key to be used in sed below
   # Note the need to set LC_ALL=C due to BSD tr and sed always trying to decode
   # whatever is passed to them. Kudos to https://stackoverflow.com/a/23584470/90297
   SECRET_KEY=$(export LC_ALL=C; head /dev/urandom | tr -dc "a-z0-9@#%^&*(-_=+)" | head -c 50 | sed -e 's/[\/&]/\\&/g')
   sed -i -e 's/^system.secret-key:.*$/system.secret-key: '"'$SECRET_KEY'"'/' $SENTRY_CONFIG_YML
   echo "Secret key written to $SENTRY_CONFIG_YML"
-  echo "::endgroup::"
 fi
+echo "::endgroup::"
 
-echo ""
 echo "::group::Replacing TSDB ..."
 replace_tsdb() {
   if (
@@ -218,7 +214,6 @@ SENTRY_TSDB_OPTIONS = {\"switchover_timestamp\": $(date +%s) + (90 * 24 * 3600)}
 replace_tsdb
 echo "::endgroup::"
 
-echo ""
 echo "::group::Fetching and updating Docker images..."
 echo ""
 # We tag locally built images with an '-onpremise-local' suffix. docker-compose pull tries to pull these too and
@@ -274,22 +269,22 @@ $dcr snuba-api bootstrap --no-migrate --force
 $dcr snuba-api migrations migrate --force
 echo "::endgroup::"
 
+echo "::group::Creating additional Kafka topics..."
 # NOTE: This step relies on `kafka` being available from the previous `snuba-api bootstrap` step
 # XXX(BYK): We cannot use auto.create.topics as Confluence and Apache hates it now (and makes it very hard to enable)
 EXISTING_KAFKA_TOPICS=$($dcr kafka kafka-topics --list --bootstrap-server kafka:9092 2>/dev/null)
 NEEDED_KAFKA_TOPICS="ingest-attachments ingest-transactions ingest-events"
 for topic in $NEEDED_KAFKA_TOPICS; do
   if ! echo "$EXISTING_KAFKA_TOPICS" | grep -wq $topic; then
-    echo "::group::Creating additional Kafka topics..."
     $dcr kafka kafka-topics --create --topic $topic --bootstrap-server kafka:9092
     echo ""
-    echo "::endgroup::"
   fi
 done
+echo "::endgroup::"
 
+echo "::group::Something something PostgreSQL something something ..."
 # Very naively check whether there's an existing sentry-postgres volume and the PG version in it
 if [[ -n "$(docker volume ls -q --filter name=sentry-postgres)" && "$(docker run --rm -v sentry-postgres:/db busybox cat /db/PG_VERSION 2>/dev/null)" == "9.5" ]]; then
-  echo "::group::Something something PostgreSQL something something ..."
   docker volume rm sentry-postgres-new || true
   # If this is Postgres 9.5 data, start upgrading it to 9.6 in a new volume
   docker run --rm \
@@ -307,10 +302,9 @@ if [[ -n "$(docker volume ls -q --filter name=sentry-postgres)" && "$(docker run
     "cd /from ; cp -av . /to ; echo 'host all all all trust' >> /to/pg_hba.conf"
   # Finally, remove the new old volume as we are all in sentry-postgres now
   docker volume rm sentry-postgres-new
-  echo "::endgroup::"
 fi
+echo "::endgroup::"
 
-echo ""
 echo "::group::Setting up database..."
 if [[ -n "$CI" || "$SKIP_USER_PROMPT" == 1 ]]; then
   $dcr web upgrade --noinput
@@ -325,21 +319,18 @@ else
 fi
 echo "::endgroup::"
 
-
+echo "::group::Migrating file storage..."
 SENTRY_DATA_NEEDS_MIGRATION=$(docker run --rm -v sentry-data:/data alpine ash -c "[ ! -d '/data/files' ] && ls -A1x /data | wc -l || true")
 if [[ -n "$SENTRY_DATA_NEEDS_MIGRATION" ]]; then
-  echo "::group::Migrating file storage..."
   # Use the web (Sentry) image so the file owners are kept as sentry:sentry
   # The `\"` escape pattern is to make this compatible w/ Git Bash on Windows. See #329.
   $dcr --entrypoint \"/bin/bash\" web -c \
     "mkdir -p /tmp/files; mv /data/* /tmp/files/; mv /tmp/files /data/files; chown -R sentry:sentry /data"
-  echo "::endgroup::"
 fi
+echo "::endgroup::"
 
-
+echo "::group::Generating Relay credentials..."
 if [[ ! -f "$RELAY_CREDENTIALS_JSON" ]]; then
-  echo ""
-  echo "::group::Generating Relay credentials..."
 
   # We need the ugly hack below as `relay generate credentials` tries to read the config and the credentials
   # even with the `--stdout` and `--overwrite` flags and then errors out when the credentials file exists but
@@ -351,7 +342,9 @@ if [[ ! -f "$RELAY_CREDENTIALS_JSON" ]]; then
 fi
 
 
+echo "::group::Setting up GeoIP integration ..."
 source ./install/geoip.sh
+echo "::endgroup::"
 
 
 if [[ "$MINIMIZE_DOWNTIME" ]]; then
@@ -375,4 +368,6 @@ else
   echo ""
 fi
 
+echo "::group::Checking Python version ..."
 source ./install/py2-warning.sh
+echo "::endgroup::"
