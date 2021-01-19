@@ -1,5 +1,0 @@
-# Ignore everything
-*
-
-# Only allow requirements.txt
-!/requirements.txt
