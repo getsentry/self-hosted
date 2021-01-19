@@ -226,7 +226,7 @@ echo "Building and tagging Docker images..."
 echo ""
 # Build the sentry onpremise image first as it is needed for the cron image
 $dc build --force-rm web
-$dc build --force-rm --parallel
+$dc build --force-rm
 echo ""
 echo "Docker images built."
 
