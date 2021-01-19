@@ -35,7 +35,7 @@ jobs:
         env:
           SENTRY_PYTHON2: ${{ matrix.py2 == '1' || '' }}
         run: |
-          echo "Testing clobber-y upgrade"
+          echo "Testing initial install"
           ./install.sh
           ./test.sh
           echo "Testing in-place upgrade"
