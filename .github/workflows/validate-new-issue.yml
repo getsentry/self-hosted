@@ -11,6 +11,7 @@ jobs:
       shell: bash
       env:
         GITHUB_TOKEN: ${{ github.token }}
+        BODY: ${{ github.event.issue.body }}
       run: |
 
         # Trust users who belong to the getsentry org.
@@ -22,7 +23,7 @@ jobs:
         fi
 
         # Look for a template where the headings match this issue's
-        echo "${{ github.event.issue.body }}" > issue-body
+        echo "$BODY" > issue-body
         for template in $(ls .github/ISSUE_TEMPLATE/*.md 2> /dev/null); do
           echo -n "$(basename $template)? "
           # <() is process substitution - https://superuser.com/a/1060002
