@@ -18,6 +18,7 @@ x-sentry-defaults: &sentry_defaults
     - symbolicator
     - kafka
   entrypoint: "/etc/sentry/entrypoint.sh"
+  cmd: ["run", "web"]
   environment:
     PYTHONUSERBASE: "/data/custom-packages"
     SENTRY_CONF: "/etc/sentry"
