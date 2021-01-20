@@ -232,7 +232,7 @@ echo "${_group}Fetching and updating Docker images ..."
 $dc pull -q --ignore-pull-failures 2>&1 | grep -v -- -onpremise-local || true
 
 # We may not have the set image on the repo (local images) so allow fails
-docker pull ${SENTRY_IMAGE}${SENTRY_PYTHON2:+-py2} || true;
+docker pull ${SENTRY_IMAGE} || true;
 echo "${_endgroup}"
 
 echo "${_group}Building and tagging Docker images ..."
@@ -374,7 +374,3 @@ else
   echo "-----------------------------------------------------------------"
   echo ""
 fi
-
-echo "${_group}Checking Python version ..."
-source ./install/py2-warning.sh
-echo "${_endgroup}"
