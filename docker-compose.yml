@@ -1,13 +1,12 @@
-version: '3.4'
+version: "3.4"
 x-restart-policy: &restart_policy
   restart: unless-stopped
 x-sentry-defaults: &sentry_defaults
-  << : *restart_policy
+  <<: *restart_policy
   build:
     context: ./sentry
     args:
       - SENTRY_IMAGE
-      - SENTRY_PYTHON2
   image: sentry-onpremise-local
   depends_on:
     - redis
@@ -23,101 +22,101 @@ x-sentry-defaults: &sentry_defaults
     - symbolicator
     - kafka
   environment:
-    SENTRY_CONF: '/etc/sentry'
-    SNUBA: 'http://snuba-api:1218'
+    SENTRY_CONF: "/etc/sentry"
+    SNUBA: "http://snuba-api:1218"
     # Leaving the value empty to just pass whatever is set
     # on the host system (or in the .env file)
     SENTRY_EVENT_RETENTION_DAYS:
   volumes:
-    - 'sentry-data:/data'
-    - './sentry:/etc/sentry'
-    - './geoip:/geoip:ro'
+    - "sentry-data:/data"
+    - "./sentry:/etc/sentry"
+    - "./geoip:/geoip:ro"
 x-snuba-defaults: &snuba_defaults
-  << : *restart_policy
+  <<: *restart_policy
   depends_on:
     - redis
     - clickhouse
     - kafka
-  image: '$SNUBA_IMAGE'
+  image: "$SNUBA_IMAGE"
   environment:
     SNUBA_SETTINGS: docker
     CLICKHOUSE_HOST: clickhouse
-    DEFAULT_BROKERS: 'kafka:9092'
+    DEFAULT_BROKERS: "kafka:9092"
     REDIS_HOST: redis
-    UWSGI_MAX_REQUESTS: '10000'
-    UWSGI_DISABLE_LOGGING: 'true'
+    UWSGI_MAX_REQUESTS: "10000"
+    UWSGI_DISABLE_LOGGING: "true"
     # Leaving the value empty to just pass whatever is set
     # on the host system (or in the .env file)
     SENTRY_EVENT_RETENTION_DAYS:
 services:
   smtp:
-    << : *restart_policy
+    <<: *restart_policy
     image: tianon/exim4
     volumes:
-      - 'sentry-smtp:/var/spool/exim4'
-      - 'sentry-smtp-log:/var/log/exim4'
+      - "sentry-smtp:/var/spool/exim4"
+      - "sentry-smtp-log:/var/log/exim4"
   memcached:
-    << : *restart_policy
-    image: 'memcached:1.5-alpine'
+    <<: *restart_policy
+    image: "memcached:1.5-alpine"
   redis:
-    << : *restart_policy
-    image: 'redis:5.0-alpine'
+    <<: *restart_policy
+    image: "redis:5.0-alpine"
     volumes:
-      - 'sentry-redis:/data'
+      - "sentry-redis:/data"
     ulimits:
       nofile:
         soft: 10032
         hard: 10032
   postgres:
-    << : *restart_policy
-    image: 'postgres:9.6'
+    <<: *restart_policy
+    image: "postgres:9.6"
     environment:
-      POSTGRES_HOST_AUTH_METHOD: 'trust'
+      POSTGRES_HOST_AUTH_METHOD: "trust"
     volumes:
-      - 'sentry-postgres:/var/lib/postgresql/data'
+      - "sentry-postgres:/var/lib/postgresql/data"
   zookeeper:
-    << : *restart_policy
-    image: 'confluentinc/cp-zookeeper:5.5.0'
+    <<: *restart_policy
+    image: "confluentinc/cp-zookeeper:5.5.0"
     environment:
-      ZOOKEEPER_CLIENT_PORT: '2181'
-      CONFLUENT_SUPPORT_METRICS_ENABLE: 'false'
-      ZOOKEEPER_LOG4J_ROOT_LOGLEVEL: 'WARN'
-      ZOOKEEPER_TOOLS_LOG4J_LOGLEVEL: 'WARN'
+      ZOOKEEPER_CLIENT_PORT: "2181"
+      CONFLUENT_SUPPORT_METRICS_ENABLE: "false"
+      ZOOKEEPER_LOG4J_ROOT_LOGLEVEL: "WARN"
+      ZOOKEEPER_TOOLS_LOG4J_LOGLEVEL: "WARN"
     volumes:
-      - 'sentry-zookeeper:/var/lib/zookeeper/data'
-      - 'sentry-zookeeper-log:/var/lib/zookeeper/log'
-      - 'sentry-secrets:/etc/zookeeper/secrets'
+      - "sentry-zookeeper:/var/lib/zookeeper/data"
+      - "sentry-zookeeper-log:/var/lib/zookeeper/log"
+      - "sentry-secrets:/etc/zookeeper/secrets"
   kafka:
-    << : *restart_policy
+    <<: *restart_policy
     depends_on:
       - zookeeper
-    image: 'confluentinc/cp-kafka:5.5.0'
+    image: "confluentinc/cp-kafka:5.5.0"
     environment:
-      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
-      KAFKA_ADVERTISED_LISTENERS: 'PLAINTEXT://kafka:9092'
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: '1'
-      KAFKA_OFFSETS_TOPIC_NUM_PARTITIONS: '1'
-      KAFKA_LOG_RETENTION_HOURS: '24'
-      KAFKA_MESSAGE_MAX_BYTES: '50000000' #50MB or bust
-      KAFKA_MAX_REQUEST_SIZE: '50000000' #50MB on requests apparently too
-      CONFLUENT_SUPPORT_METRICS_ENABLE: 'false'
-      KAFKA_LOG4J_LOGGERS: 'kafka.cluster=WARN,kafka.controller=WARN,kafka.coordinator=WARN,kafka.log=WARN,kafka.server=WARN,kafka.zookeeper=WARN,state.change.logger=WARN'
-      KAFKA_LOG4J_ROOT_LOGLEVEL: 'WARN'
-      KAFKA_TOOLS_LOG4J_LOGLEVEL: 'WARN'
+      KAFKA_ZOOKEEPER_CONNECT: "zookeeper:2181"
+      KAFKA_ADVERTISED_LISTENERS: "PLAINTEXT://kafka:9092"
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: "1"
+      KAFKA_OFFSETS_TOPIC_NUM_PARTITIONS: "1"
+      KAFKA_LOG_RETENTION_HOURS: "24"
+      KAFKA_MESSAGE_MAX_BYTES: "50000000" #50MB or bust
+      KAFKA_MAX_REQUEST_SIZE: "50000000" #50MB on requests apparently too
+      CONFLUENT_SUPPORT_METRICS_ENABLE: "false"
+      KAFKA_LOG4J_LOGGERS: "kafka.cluster=WARN,kafka.controller=WARN,kafka.coordinator=WARN,kafka.log=WARN,kafka.server=WARN,kafka.zookeeper=WARN,state.change.logger=WARN"
+      KAFKA_LOG4J_ROOT_LOGLEVEL: "WARN"
+      KAFKA_TOOLS_LOG4J_LOGLEVEL: "WARN"
     volumes:
-      - 'sentry-kafka:/var/lib/kafka/data'
-      - 'sentry-kafka-log:/var/lib/kafka/log'
-      - 'sentry-secrets:/etc/kafka/secrets'
+      - "sentry-kafka:/var/lib/kafka/data"
+      - "sentry-kafka-log:/var/lib/kafka/log"
+      - "sentry-secrets:/etc/kafka/secrets"
   clickhouse:
-    << : *restart_policy
-    image: 'yandex/clickhouse-server:20.3.9.70'
+    <<: *restart_policy
+    image: "yandex/clickhouse-server:20.3.9.70"
     ulimits:
       nofile:
         soft: 262144
         hard: 262144
     volumes:
-      - 'sentry-clickhouse:/var/lib/clickhouse'
-      - 'sentry-clickhouse-log:/var/log/clickhouse-server'
+      - "sentry-clickhouse:/var/lib/clickhouse"
+      - "sentry-clickhouse-log:/var/log/clickhouse-server"
       - type: bind
         read_only: true
         source: ./clickhouse/config.xml
@@ -128,104 +127,105 @@ services:
       # You might want to change this to a higher value (and ensure your host has enough memory)
       MAX_MEMORY_USAGE_RATIO: 0.3
   geoipupdate:
-    image: 'maxmindinc/geoipupdate:latest'
+    image: "maxmindinc/geoipupdate:latest"
     # Override the entrypoint in order to avoid using envvars for config.
     # Futz with settings so we can keep mmdb and conf in same dir on host
     # (image looks for them in separate dirs by default).
-    entrypoint: ['/usr/bin/geoipupdate', '-d', '/sentry', '-f', '/sentry/GeoIP.conf']
+    entrypoint:
+      ["/usr/bin/geoipupdate", "-d", "/sentry", "-f", "/sentry/GeoIP.conf"]
     volumes:
-      - './geoip:/sentry'
+      - "./geoip:/sentry"
   snuba-api:
-    << : *snuba_defaults
+    <<: *snuba_defaults
   # Kafka consumer responsible for feeding events into Clickhouse
   snuba-consumer:
-    << : *snuba_defaults
+    <<: *snuba_defaults
     command: consumer --storage events --auto-offset-reset=latest --max-batch-time-ms 750
   # Kafka consumer responsible for feeding outcomes into Clickhouse
   # Use --auto-offset-reset=earliest to recover up to 7 days of TSDB data
   # since we did not do a proper migration
   snuba-outcomes-consumer:
-    << : *snuba_defaults
+    <<: *snuba_defaults
     command: consumer --storage outcomes_raw --auto-offset-reset=earliest --max-batch-time-ms 750
   # Kafka consumer responsible for feeding session data into Clickhouse
   snuba-sessions-consumer:
-    << : *snuba_defaults
+    <<: *snuba_defaults
     command: consumer --storage sessions_raw --auto-offset-reset=latest --max-batch-time-ms 750
   # Kafka consumer responsible for feeding transactions data into Clickhouse
   snuba-transactions-consumer:
-    << : *snuba_defaults
+    <<: *snuba_defaults
     command: consumer --storage transactions --consumer-group transactions_group --auto-offset-reset=latest --max-batch-time-ms 750 --commit-log-topic=snuba-commit-log
   snuba-replacer:
-    << : *snuba_defaults
+    <<: *snuba_defaults
     command: replacer --storage events --auto-offset-reset=latest --max-batch-size 3
   snuba-subscription-consumer-events:
-    << : *snuba_defaults
+    <<: *snuba_defaults
     command: subscriptions --auto-offset-reset=latest --consumer-group=snuba-events-subscriptions-consumers --topic=events --result-topic=events-subscription-results --dataset=events --commit-log-topic=snuba-commit-log --commit-log-group=snuba-consumers --delay-seconds=60 --schedule-ttl=60
   snuba-subscription-consumer-transactions:
-    << : *snuba_defaults
+    <<: *snuba_defaults
     command: subscriptions --auto-offset-reset=latest --consumer-group=snuba-transactions-subscriptions-consumers --topic=events --result-topic=transactions-subscription-results --dataset=transactions --commit-log-topic=snuba-commit-log --commit-log-group=transactions_group --delay-seconds=60 --schedule-ttl=60
   snuba-cleanup:
-    << : *snuba_defaults
+    <<: *snuba_defaults
     image: snuba-cleanup-onpremise-local
     build:
       context: ./cron
       args:
-        BASE_IMAGE: '$SNUBA_IMAGE'
+        BASE_IMAGE: "$SNUBA_IMAGE"
     command: '"*/5 * * * * gosu snuba snuba cleanup --dry-run False"'
   symbolicator:
-    << : *restart_policy
-    image: '$SYMBOLICATOR_IMAGE'
+    <<: *restart_policy
+    image: "$SYMBOLICATOR_IMAGE"
     volumes:
-      - 'sentry-symbolicator:/data'
+      - "sentry-symbolicator:/data"
       - type: bind
         read_only: true
         source: ./symbolicator
         target: /etc/symbolicator
     command: run -c /etc/symbolicator/config.yml
   symbolicator-cleanup:
-    << : *restart_policy
+    <<: *restart_policy
     image: symbolicator-cleanup-onpremise-local
     build:
       context: ./cron
       args:
-        BASE_IMAGE: '$SYMBOLICATOR_IMAGE'
+        BASE_IMAGE: "$SYMBOLICATOR_IMAGE"
     command: '"55 23 * * * gosu symbolicator symbolicator cleanup"'
     volumes:
-      - 'sentry-symbolicator:/data'
+      - "sentry-symbolicator:/data"
   web:
-    << : *sentry_defaults
+    <<: *sentry_defaults
   cron:
-    << : *sentry_defaults
+    <<: *sentry_defaults
     command: run cron
   worker:
-    << : *sentry_defaults
+    <<: *sentry_defaults
     command: run worker
   ingest-consumer:
-    << : *sentry_defaults
+    <<: *sentry_defaults
     command: run ingest-consumer --all-consumer-types
   post-process-forwarder:
-    << : *sentry_defaults
+    <<: *sentry_defaults
     # Increase `--commit-batch-size 1` below to deal with high-load environments.
     command: run post-process-forwarder --commit-batch-size 1
   subscription-consumer-events:
-    << : *sentry_defaults
+    <<: *sentry_defaults
     command: run query-subscription-consumer --commit-batch-size 1 --topic events-subscription-results
   subscription-consumer-transactions:
-    << : *sentry_defaults
+    <<: *sentry_defaults
     command: run query-subscription-consumer --commit-batch-size 1 --topic transactions-subscription-results
   sentry-cleanup:
-    << : *sentry_defaults
+    <<: *sentry_defaults
     image: sentry-cleanup-onpremise-local
     build:
       context: ./cron
       args:
-        BASE_IMAGE: 'sentry-onpremise-local'
+        BASE_IMAGE: "sentry-onpremise-local"
     command: '"0 0 * * * gosu sentry sentry cleanup --days $SENTRY_EVENT_RETENTION_DAYS"'
   nginx:
-    << : *restart_policy
+    <<: *restart_policy
     ports:
-      - '$SENTRY_BIND:80/tcp'
-    image: 'nginx:1.16'
+      - "$SENTRY_BIND:80/tcp"
+    image: "nginx:1.16"
     volumes:
       - type: bind
         read_only: true
@@ -235,8 +235,8 @@ services:
       - web
       - relay
   relay:
-    << : *restart_policy
-    image: '$RELAY_IMAGE'
+    <<: *restart_policy
+    image: "$RELAY_IMAGE"
     volumes:
       - type: bind
         read_only: true

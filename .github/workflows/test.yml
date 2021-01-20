@@ -15,11 +15,8 @@ defaults:
     shell: bash
 jobs:
   test:
-    strategy:
-      matrix:
-        py2: ["", "1"]
     runs-on: ubuntu-18.04
-    name: "test${{ matrix.py2 == '1' && ' PY2' || ''}}"
+    name: "test"
     steps:
       - name: Pin docker-compose
         run: |
@@ -32,8 +29,6 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Install and test
-        env:
-          SENTRY_PYTHON2: ${{ matrix.py2 == '1' || '' }}
         run: |
           echo "Testing initial install"
           ./install.sh
