@@ -1,9 +1,13 @@
 #!/bin/bash
 set -e
 
-if [[ -s /etc/sentry/requirements.txt ]] && grep -qv '^\s*$\|^\s*\#' /etc/sentry/requirements.txt; then
+req_file="/etc/sentry/requirements.txt"
+checksum_file="/data/custom-packages/.checksum"
+
+if [[ -s "$req_file" ]] && ! cat "$req_file" | grep '^[^#[:space:]]' | shasum -s -c "$checksum_file" 2>/dev/null; then
     echo "Installing additional dependencies..."
     pip install --user -r /etc/sentry/requirements.txt
+    cat "$req_file" | grep '^[^#[:space:]]' | shasum > "$checksum_file"
     echo ""
 fi
 
