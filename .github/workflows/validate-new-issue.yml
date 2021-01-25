@@ -12,6 +12,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ github.token }}
       run: |
+        echo "Validating issue #${{ github.event.issue.number }}."
 
         # Trust users who belong to the getsentry org.
         if gh api "https://api.github.com/orgs/getsentry/members/${{ github.actor }}" >/dev/null 2>&1; then
@@ -21,12 +22,16 @@ jobs:
           echo "${{ github.actor }} is not a member of the getsentry org. 🧐"
         fi
 
-        # Look for a template where the headings match this issue's
-        jq -r .issue.body "$GITHUB_EVENT_PATH" > issue-body
+        # Look for a template where all the headings are also in this issue.
+        # - extra headings in the issue are fine
+        # - order doesn't matter
+        # - case-sensitive tho
+        function extract-headings { grep '^#' "$1" | sort; }
+        extract-headings <(jq -r .issue.body "$GITHUB_EVENT_PATH") > headings-in-issue
         for template in $(ls .github/ISSUE_TEMPLATE/*.md 2> /dev/null); do
           echo -n "$(basename $template)? "
-          # <() is process substitution - https://superuser.com/a/1060002
-          if diff -rub <(grep '^#' $template) <(grep '^#' issue-body) > /dev/null; then
+          extract-headings "$template" > headings-in-template
+          if [ -z "$(comm -23 headings-in-template headings-in-issue)" ]; then
             echo "👍 💃"
             exit 0
           else
