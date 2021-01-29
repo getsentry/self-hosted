@@ -26,16 +26,18 @@ jobs:
         # - extra headings in the issue are fine
         # - order doesn't matter
         # - case-sensitive tho
-        function extract-headings { grep '^#' "$1" | sort; }
+        function extract-headings { { grep '^#' "$1" || echo -n ''; } | sort; }
         extract-headings <(jq -r .issue.body "$GITHUB_EVENT_PATH") > headings-in-issue
         for template in $(ls .github/ISSUE_TEMPLATE/*.md 2> /dev/null); do
-          echo -n "$(basename $template)? "
           extract-headings "$template" > headings-in-template
-          if [ -z "$(comm -23 headings-in-template headings-in-issue)" ]; then
-            echo "👍 💃"
+          echo -n "$(basename $template)? "
+          if [ ! -s headings-in-template ]; then
+            echo "No headers in template. 🤷"
+          elif [ -z "$(comm -23 headings-in-template headings-in-issue)" ]; then
+            echo "Match! 👍 💃"
             exit 0
           else
-            echo "👎"
+            echo "No match. 👎"
           fi
         done
 
