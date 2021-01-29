@@ -25,7 +25,7 @@ source ./install/docker-aliases.sh
 
 MIN_DOCKER_VERSION='19.03.6'
 MIN_COMPOSE_VERSION='1.24.1'
-MIN_RAM_HARD=4000 # MB
+MIN_RAM_HARD=3800 # MB
 MIN_RAM_SOFT=8000 # MB
 
 # Increase the default 10 second SIGTERM timeout
