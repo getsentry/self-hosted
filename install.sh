@@ -27,7 +27,8 @@ MIN_DOCKER_VERSION='19.03.6'
 MIN_COMPOSE_VERSION='1.24.1'
 MIN_RAM_HARD=3800 # MB
 MIN_RAM_SOFT=7800 # MB
-MIN_CPU_HARD=4
+MIN_CPU_HARD=2
+MIN_CPU_SOFT=4
 
 # Increase the default 10 second SIGTERM timeout
 # to ensure celery queues are properly drained
@@ -137,6 +138,8 @@ fi
 if [[ "$CPU_AVAILABLE_IN_DOCKER" -lt "$MIN_CPU_HARD" ]]; then
   echo "FAIL: Required minimum CPU cores available to Docker is $MIN_CPU_HARD, found $CPU_AVAILABLE_IN_DOCKER"
   exit 1
+elif [[ "$RAM_AVAILABLE_IN_DOCKER" -lt "$MIN_CPU_SOFT" ]]; then
+  echo "WARN: Recommended minimum CPU cores available to Docker is $MIN_CPU_SOFT MB, found $CPU_AVAILABLE_IN_DOCKER"
 fi
 
 if [[ "$RAM_AVAILABLE_IN_DOCKER" -lt "$MIN_RAM_HARD" ]]; then
