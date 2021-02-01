@@ -26,16 +26,25 @@ jobs:
         # - extra headings in the issue are fine
         # - order doesn't matter
         # - case-sensitive tho
+        # - can't post a template unchanged (ignoring whitespace)
         function extract-headings { { grep '^#' "$1" || echo -n ''; } | sort; }
-        extract-headings <(jq -r .issue.body "$GITHUB_EVENT_PATH") > headings-in-issue
+        jq -r .issue.body "$GITHUB_EVENT_PATH" > issue
+        extract-headings <(cat issue) > headings-in-issue
         for template in $(ls .github/ISSUE_TEMPLATE/*.md 2> /dev/null); do
+          # Strip front matter. https://stackoverflow.com/a/29292490/14946704
+          sed -i'' '1{/^---$/!q;};1,/^---$/d' "$template"
           extract-headings "$template" > headings-in-template
           echo -n "$(basename $template)? "
           if [ ! -s headings-in-template ]; then
             echo "No headers in template. 🤷"
           elif [ -z "$(comm -23 headings-in-template headings-in-issue)" ]; then
             echo "Match! 👍 💃"
-            exit 0
+            if diff -Bw "$template" issue > /dev/null; then
+              echo "... like, an /exact/ match. 😖"
+              break
+            else
+              exit 0
+            fi
           else
             echo "No match. 👎"
           fi
@@ -48,8 +57,5 @@ jobs:
 
         # Might get `gh issue comment` some day - https://github.com/cli/cli/issues/517
         echo -n "Commented: "
-        gh api "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.issue.number }}/comments" \
-          --method POST \
-          --input comment \
-          | jq .html_url
+        gh issue comment ${{ github.event.issue.number }} --body "$(cat comment)"
         gh issue close ${{ github.event.issue.number }}
