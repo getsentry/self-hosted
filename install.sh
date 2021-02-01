@@ -26,7 +26,9 @@ source ./install/docker-aliases.sh
 MIN_DOCKER_VERSION='19.03.6'
 MIN_COMPOSE_VERSION='1.24.1'
 MIN_RAM_HARD=3800 # MB
-MIN_RAM_SOFT=8000 # MB
+MIN_RAM_SOFT=7800 # MB
+MIN_CPU_HARD=2
+MIN_CPU_SOFT=4
 
 # Increase the default 10 second SIGTERM timeout
 # to ensure celery queues are properly drained
@@ -108,6 +110,7 @@ echo "${_group}Checking minimum requirements ..."
 DOCKER_VERSION=$(docker version --format '{{.Server.Version}}')
 COMPOSE_VERSION=$($dc --version | sed 's/docker-compose version \(.\{1,\}\),.*/\1/')
 RAM_AVAILABLE_IN_DOCKER=$(docker run --rm busybox free -m 2>/dev/null | awk '/Mem/ {print $2}');
+CPU_AVAILABLE_IN_DOCKER=$(docker run --rm busybox nproc --all);
 
 # Compare dot-separated strings - function below is inspired by https://stackoverflow.com/a/37939589/808368
 function ver () { echo "$@" | awk -F. '{ printf("%d%03d%03d", $1,$2,$3); }'; }
@@ -130,6 +133,13 @@ fi
 if [[ "$(ver $COMPOSE_VERSION)" -lt "$(ver $MIN_COMPOSE_VERSION)" ]]; then
   echo "FAIL: Expected minimum docker-compose version to be $MIN_COMPOSE_VERSION but found $COMPOSE_VERSION"
   exit 1
+fi
+
+if [[ "$CPU_AVAILABLE_IN_DOCKER" -lt "$MIN_CPU_HARD" ]]; then
+  echo "FAIL: Required minimum CPU cores available to Docker is $MIN_CPU_HARD, found $CPU_AVAILABLE_IN_DOCKER"
+  exit 1
+elif [[ "$RAM_AVAILABLE_IN_DOCKER" -lt "$MIN_CPU_SOFT" ]]; then
+  echo "WARN: Recommended minimum CPU cores available to Docker is $MIN_CPU_SOFT MB, found $CPU_AVAILABLE_IN_DOCKER"
 fi
 
 if [[ "$RAM_AVAILABLE_IN_DOCKER" -lt "$MIN_RAM_HARD" ]]; then
