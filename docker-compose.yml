@@ -3,11 +3,7 @@ x-restart-policy: &restart_policy
   restart: unless-stopped
 x-sentry-defaults: &sentry_defaults
   <<: *restart_policy
-  build:
-    context: ./sentry
-    args:
-      - SENTRY_IMAGE
-  image: sentry-onpremise-local
+  image: "$SENTRY_IMAGE"
   depends_on:
     - redis
     - postgres
@@ -21,7 +17,10 @@ x-sentry-defaults: &sentry_defaults
     - snuba-replacer
     - symbolicator
     - kafka
+  entrypoint: "/etc/sentry/entrypoint.sh"
+  command: ["run", "web"]
   environment:
+    PYTHONUSERBASE: "/data/custom-packages"
     SENTRY_CONF: "/etc/sentry"
     SNUBA: "http://snuba-api:1218"
     # Leaving the value empty to just pass whatever is set
@@ -219,7 +218,7 @@ services:
     build:
       context: ./cron
       args:
-        BASE_IMAGE: "sentry-onpremise-local"
+        BASE_IMAGE: "$SENTRY_IMAGE"
     command: '"0 0 * * * gosu sentry sentry cleanup --days $SENTRY_EVENT_RETENTION_DAYS"'
   nginx:
     <<: *restart_policy
