@@ -113,3 +113,7 @@ do
   echo "Pass."
 done
 echo "::endgroup::"
+
+echo "::group::Ensure cleanup crons are working ..."
+docker-compose ps | grep -q -- "-cleanup_.\+[[:space:]]\+Up[[:space:]]\+"
+echo "::endgroup::"
