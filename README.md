@@ -48,12 +48,13 @@ Where you replace `83b1380` with the sha you want to use.
 
 ## Running sentry cleanup
 
-To free up DB space etc, run `sentry cleanup --days 90`. Steps to do so:
+To free up DB space etc, run `sentry cleanup --days 90 --concurrency 25`. Steps to do so:
 * Build docker containers locally by running `docker-compose build`
 * make sure the correct AWS envs vars are set (e.g., run `./htprod` to set aws keys)
 * run `docker run -it --entrypoint bash  sentry-onpremise_cron`
 * copy the env vars from ECS tasks and convert them into `export foo=bar` strings
 * run `sentry cleanup --days 90` and make sure you have access to reources in the vpc (e.g., run `sshuttle -r vpn-prod 172.23.0.0/16 -v`)
+* concurrency needs to be set or cleanup will take a very long time
 
 ## Resources
 
