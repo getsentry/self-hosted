@@ -33,7 +33,7 @@ setup() {
         rm "$_SANDBOX/$filepath"
         ;;
       A | M | AM)
-        ln -sf "$(realpath $filepath)" "$_SANDBOX/$(dirname $filepath)"
+        ln -sf "$(realpath $filepath)" "$_SANDBOX/$filepath"
         ;;
       **)
         echo "Wuh? $line"
