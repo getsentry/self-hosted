@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-source _test_setup.sh
+source "$(dirname $0)/_test_setup.sh"
 
 cfg="relay/config.yml"
 creds="relay/credentials.json"
@@ -21,4 +21,4 @@ echo MOAR GARBAGE > $creds
 test "$(cat $cfg)" = "GARBAGE"
 test "$(cat $creds)" = "MOAR GARBAGE"
 
-echo "$0 - Success 👍"
+echo "$(basename $0) - Success 👍"
