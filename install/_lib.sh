@@ -1,7 +1,13 @@
 #!/usr/bin/env bash
 set -euo pipefail
-cd "$(dirname $0)/.."
+
+if [[ "$(basename $0)" = "install.sh" ]]; then
+  cd "$(dirname $0)"
+else
+  cd "$(dirname $0)/.."
+fi
 if [[ ! -d 'install' ]]; then echo 'Where are you?'; exit 1; fi
+
 _ENV="$(realpath ./.env)"
 
 define_stuff() {
