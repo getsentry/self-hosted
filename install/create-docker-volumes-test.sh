@@ -11,9 +11,9 @@ count() {
 before=$(count)
 test $before -eq 0 || test $before -eq $expected
 
-source ./install/create-docker-volumes.sh
-source ./install/create-docker-volumes.sh
-source ./install/create-docker-volumes.sh
+source create-docker-volumes.sh
+source create-docker-volumes.sh
+source create-docker-volumes.sh
 
 test $(count) -eq $expected
 

@@ -1,15 +1,18 @@
 set -euo pipefail
 test "${DEBUG:-}" && set -x
 
+# Thanks to https://unix.stackexchange.com/a/145654/108960
+log_file="sentry_install_log-`date +'%Y-%m-%d_%H-%M-%S'`.txt"
+exec &> >(tee -a "$log_file")
+
 # Work from the onpremise root, no matter which script is called from where.
 if [[ "$(basename $0)" = "install.sh" ]]; then
-  cd "$(dirname $0)"
+  cd "$(dirname $0)/install/"
 else
-  cd "$(dirname $0)/.."
+  cd "$(dirname $0)"  # assume we're a *-test.sh script
 fi
-if [[ ! -d 'install' ]]; then echo 'Where are you?'; exit 1; fi
 
-_ENV="$(realpath .env)"
+_ENV="$(realpath ../.env)"
 
 # Read .env for default values with a tip o' the hat to https://stackoverflow.com/a/59831605/90297
 t=$(mktemp) && export -p > "$t" && set -a && . $_ENV && set +a && . "$t" && rm "$t" && unset t
@@ -36,8 +39,8 @@ function ensure_file_from_example {
     # sed from https://stackoverflow.com/a/25123013/90297
   fi
 }
-SENTRY_CONFIG_PY='sentry/sentry.conf.py'
-SENTRY_CONFIG_YML='sentry/config.yml'
+SENTRY_CONFIG_PY='../sentry/sentry.conf.py'
+SENTRY_CONFIG_YML='../sentry/config.yml'
 
 # Increase the default 10 second SIGTERM timeout
 # to ensure celery queues are properly drained
