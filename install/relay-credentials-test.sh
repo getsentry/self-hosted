@@ -21,4 +21,4 @@ echo MOAR GARBAGE > $creds
 test "$(cat $cfg)" = "GARBAGE"
 test "$(cat $creds)" = "MOAR GARBAGE"
 
-echo "$(basename $0) - Success 👍"
+report_success

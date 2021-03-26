@@ -139,15 +139,7 @@ if [[ "$IS_KVM" -eq 0 ]]; then
 fi
 echo "${_endgroup}"
 
-echo "${_group}Creating volumes for persistent storage ..."
-echo "Created $(docker volume create --name=sentry-data)."
-echo "Created $(docker volume create --name=sentry-postgres)."
-echo "Created $(docker volume create --name=sentry-redis)."
-echo "Created $(docker volume create --name=sentry-zookeeper)."
-echo "Created $(docker volume create --name=sentry-kafka)."
-echo "Created $(docker volume create --name=sentry-clickhouse)."
-echo "Created $(docker volume create --name=sentry-symbolicator)."
-echo "${_endgroup}"
+./install/create-docker-volumes.sh
 
 echo "${_group}Ensuring files from examples ..."
 ensure_file_from_example $SENTRY_CONFIG_PY
@@ -320,13 +312,8 @@ if [[ -n "$SENTRY_DATA_NEEDS_MIGRATION" ]]; then
 fi
 echo "${_endgroup}"
 
-echo "${_group}Generating Relay credentials ..."
-source ./install/relay-credentials.sh
-echo "${_endgroup}"
-
-echo "${_group}Setting up GeoIP integration ..."
-source ./install/geoip.sh
-echo "${_endgroup}"
+./install/relay-credentials.sh
+./install/geoip.sh
 
 if [[ "$MINIMIZE_DOWNTIME" ]]; then
   echo "${_group}Waiting for Sentry to start ..."

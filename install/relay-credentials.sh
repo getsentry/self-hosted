@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-source ./install/_lib.sh
+source "$(dirname $0)/_lib.sh"
+echo "${_group}Generating Relay credentials ..."
 
 RELAY_CONFIG_YML="relay/config.yml"
 RELAY_CREDENTIALS_JSON="relay/credentials.json"
@@ -22,3 +23,5 @@ if [[ ! -f "$RELAY_CREDENTIALS_JSON" ]]; then
 
   echo "Relay credentials written to $RELAY_CREDENTIALS_JSON"
 fi
+
+echo "${_endgroup}"

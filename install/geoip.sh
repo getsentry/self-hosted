@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-source ./install/_lib.sh
+source "$(dirname $0)/_lib.sh"
+echo "${_group}Setting up GeoIP integration ..."
 
 install_geoip() {
   local mmdb='geoip/GeoLite2-City.mmdb'
@@ -31,3 +32,5 @@ install_geoip() {
 }
 
 install_geoip
+
+echo "${_endgroup}"
