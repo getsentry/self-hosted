@@ -42,6 +42,7 @@ jobs:
       - name: Unit Tests
         run: |
           cd install
+          ./create-docker-volumes-test.sh
           ./relay-credentials-test.sh
           cd ..
 
