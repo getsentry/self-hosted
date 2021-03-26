@@ -39,6 +39,9 @@ jobs:
           ./install.sh --minimize-downtime
           ./test.sh
 
+          cd install
+          ./relay-credentials-test.sh
+
       - name: Inspect failure
         if: failure()
         run: |
