@@ -3,18 +3,6 @@ test ${DEBUG:-''} && set -x
 cd "$(dirname $0)"
 _SANDBOX="$(mktemp -d -t sentry-onpremise-test)"
 
-dump() {
-  echo
-  echo 'dump =============================================\'
-  echo
-  pwd
-  echo
-  ls -FGla *
-  echo
-  echo '\=========================================== dumped'
-  echo
-}
-
 teardown() {
   test ${DEBUG:-''} || rm -rf "$_SANDBOX"
 }
