@@ -1,7 +1,8 @@
 set -euo pipefail
 test ${DEBUG:-''} && set -x
 cd "$(dirname $0)"
-_SANDBOX="$(mktemp -d -t sentry-onpremise-test)"
+rm -rf /tmp/sentry-onpremise-test-sandbox.*
+_SANDBOX="$(mktemp -d /tmp/sentry-onpremise-test-sandbox.XXX)"
 
 teardown() {
   test ${DEBUG:-''} || rm -rf "$_SANDBOX"
