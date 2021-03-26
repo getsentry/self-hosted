@@ -9,20 +9,10 @@ fi
 # Thanks to https://unix.stackexchange.com/a/145654/108960
 log_file="sentry_install_log-`date +'%Y-%m-%d_%H-%M-%S'`.txt"
 exec &> >(tee -a "$log_file")
-if [ "$GITHUB_ACTIONS" = "true" ]; then
-  _group="::group::"
-  _endgroup="::endgroup::"
-else
-  _group="▶ "
-  _endgroup=""
-fi
+
+source ./install/_lib.sh
 
 echo "${_group}Defining variables and helpers ..."
-# Read .env for default values with a tip o' the hat to https://stackoverflow.com/a/59831605/90297
-t=$(mktemp) && export -p > "$t" && set -a && . ./.env && set +a && . "$t" && rm "$t" && unset t
-
-source ./install/docker-aliases.sh
-
 MIN_DOCKER_VERSION='19.03.6'
 MIN_COMPOSE_VERSION='1.24.1'
 MIN_RAM_HARD=3800 # MB
@@ -38,8 +28,6 @@ STOP_TIMEOUT=60 # seconds
 SENTRY_CONFIG_PY='sentry/sentry.conf.py'
 SENTRY_CONFIG_YML='sentry/config.yml'
 SYMBOLICATOR_CONFIG_YML='symbolicator/config.yml'
-RELAY_CONFIG_YML='relay/config.yml'
-RELAY_CREDENTIALS_JSON='relay/credentials.json'
 SENTRY_EXTRA_REQUIREMENTS='sentry/requirements.txt'
 MINIMIZE_DOWNTIME=
 echo $_endgroup
@@ -115,16 +103,6 @@ CPU_AVAILABLE_IN_DOCKER=$(docker run --rm busybox nproc --all);
 # Compare dot-separated strings - function below is inspired by https://stackoverflow.com/a/37939589/808368
 function ver () { echo "$@" | awk -F. '{ printf("%d%03d%03d", $1,$2,$3); }'; }
 
-# Thanks to https://stackoverflow.com/a/25123013/90297 for the quick `sed` pattern
-function ensure_file_from_example {
-  if [[ -f "$1" ]]; then
-    echo "$1 already exists, skipped creation."
-  else
-    echo "Creating $1..."
-    cp -n $(echo "$1" | sed 's/\.[^.]*$/.example&/') "$1"
-  fi
-}
-
 if [[ "$(ver $DOCKER_VERSION)" -lt "$(ver $MIN_DOCKER_VERSION)" ]]; then
   echo "FAIL: Expected minimum Docker version to be $MIN_DOCKER_VERSION but found $DOCKER_VERSION"
   exit 1
@@ -176,7 +154,6 @@ ensure_file_from_example $SENTRY_CONFIG_PY
 ensure_file_from_example $SENTRY_CONFIG_YML
 ensure_file_from_example $SENTRY_EXTRA_REQUIREMENTS
 ensure_file_from_example $SYMBOLICATOR_CONFIG_YML
-ensure_file_from_example $RELAY_CONFIG_YML
 echo "${_endgroup}"
 
 echo "${_group}Generating secret key ..."
@@ -344,16 +321,8 @@ fi
 echo "${_endgroup}"
 
 echo "${_group}Generating Relay credentials ..."
-if [[ ! -f "$RELAY_CREDENTIALS_JSON" ]]; then
-
-  # We need the ugly hack below as `relay generate credentials` tries to read the config and the credentials
-  # even with the `--stdout` and `--overwrite` flags and then errors out when the credentials file exists but
-  # not valid JSON. We hit this case as we redirect output to the same config folder, creating an empty
-  # credentials file before relay runs.
-  $dcr --no-deps -v $(pwd)/$RELAY_CONFIG_YML:/tmp/config.yml relay --config /tmp credentials generate --stdout > "$RELAY_CREDENTIALS_JSON"
-  echo "Relay credentials written to $RELAY_CREDENTIALS_JSON"
-  echo "${_endgroup}"
-fi
+source ./install/relay-credentials.sh
+echo "${_endgroup}"
 
 echo "${_group}Setting up GeoIP integration ..."
 source ./install/geoip.sh
