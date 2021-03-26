@@ -40,11 +40,10 @@ jobs:
           ./test.sh
 
       - name: Unit Tests
+        working-directory: install
         run: |
-          cd install
           ./create-docker-volumes-test.sh
           ./relay-credentials-test.sh
-          cd ..
 
       - name: Inspect failure
         if: failure()
