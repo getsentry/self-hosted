@@ -44,6 +44,7 @@ jobs:
         run: |
           ./create-docker-volumes-test.sh
           ./relay-credentials-test.sh
+          ./geoip-test.sh
 
       - name: Inspect failure
         if: failure()
