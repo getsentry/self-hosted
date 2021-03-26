@@ -320,13 +320,8 @@ if [[ -n "$SENTRY_DATA_NEEDS_MIGRATION" ]]; then
 fi
 echo "${_endgroup}"
 
-echo "${_group}Generating Relay credentials ..."
-source ./install/relay-credentials.sh
-echo "${_endgroup}"
-
-echo "${_group}Setting up GeoIP integration ..."
-source ./install/geoip.sh
-echo "${_endgroup}"
+./install/relay-credentials.sh
+./install/geoip.sh
 
 if [[ "$MINIMIZE_DOWNTIME" ]]; then
   echo "${_group}Waiting for Sentry to start ..."

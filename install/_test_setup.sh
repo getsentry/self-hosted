@@ -5,6 +5,10 @@ cd "$(dirname $0)/.."
 rm -rf /tmp/sentry-onpremise-test-sandbox.*
 _SANDBOX="$(mktemp -d /tmp/sentry-onpremise-test-sandbox.XXX)"
 
+report_success() {
+  echo "$(basename $0) - Success 👍"
+}
+
 teardown() {
   test ${DEBUG:-''} || rm -rf "$_SANDBOX"
 }
@@ -21,7 +25,7 @@ setup() {
       D)
         rm "$_SANDBOX/$filepath"
         ;;
-      A | M | AM)
+      A | M | AM | ??)
         ln -sf "$(realpath $filepath)" "$_SANDBOX/$filepath"
         ;;
       **)
