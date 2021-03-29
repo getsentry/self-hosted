@@ -1,8 +1,6 @@
-#!/usr/bin/env bash
-source "$(dirname $0)/_lib.sh"
-
 echo "${_group}Setting up / migrating database ..."
-if [[ -n "${CI:-''}" || "${SKIP_USER_PROMPT:-0}" == 1 ]]; then
+
+if [[ -n "${CI:-}" || "${SKIP_USER_PROMPT:-0}" == 1 ]]; then
   $dcr web upgrade --noinput
   echo ""
   echo "Did not prompt for user creation due to non-interactive shell."
@@ -13,4 +11,5 @@ if [[ -n "${CI:-''}" || "${SKIP_USER_PROMPT:-0}" == 1 ]]; then
 else
   $dcr web upgrade
 fi
+
 echo "${_endgroup}"

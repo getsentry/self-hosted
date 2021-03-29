@@ -1,5 +1,3 @@
-#!/usr/bin/env bash
-source "$(dirname $0)/_lib.sh"
 echo "${_group}Generating Relay credentials ..."
 
 RELAY_CONFIG_YML="relay/config.yml"

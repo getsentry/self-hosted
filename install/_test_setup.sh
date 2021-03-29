@@ -1,6 +1,5 @@
 set -euo pipefail
-test ${DEBUG:-''} && set -x
-cd "$(dirname $0)/.."
+source "$(dirname $0)/_lib.sh"
 
 rm -rf /tmp/sentry-onpremise-test-sandbox.*
 _SANDBOX="$(mktemp -d /tmp/sentry-onpremise-test-sandbox.XXX)"
@@ -10,7 +9,7 @@ report_success() {
 }
 
 teardown() {
-  test ${DEBUG:-''} || rm -rf "$_SANDBOX"
+  test "${DEBUG:-}" || rm -rf "$_SANDBOX"
 }
 
 setup() {
