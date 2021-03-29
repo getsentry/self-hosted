@@ -265,68 +265,14 @@ for topic in $NEEDED_KAFKA_TOPICS; do
 done
 echo "${_endgroup}"
 
-echo "${_group}Ensuring proper PostgreSQL version ..."
-# Very naively check whether there's an existing sentry-postgres volume and the PG version in it
-if [[ -n "$(docker volume ls -q --filter name=sentry-postgres)" && "$(docker run --rm -v sentry-postgres:/db busybox cat /db/PG_VERSION 2>/dev/null)" == "9.5" ]]; then
-  docker volume rm sentry-postgres-new || true
-  # If this is Postgres 9.5 data, start upgrading it to 9.6 in a new volume
-  docker run --rm \
-  -v sentry-postgres:/var/lib/postgresql/9.5/data \
-  -v sentry-postgres-new:/var/lib/postgresql/9.6/data \
-  tianon/postgres-upgrade:9.5-to-9.6
-
-  # Get rid of the old volume as we'll rename the new one to that
-  docker volume rm sentry-postgres
-  docker volume create --name sentry-postgres
-  # There's no rename volume in Docker so copy the contents from old to new name
-  # Also append the `host all all all trust` line as `tianon/postgres-upgrade:9.5-to-9.6`
-  # doesn't do that automatically.
-  docker run --rm -v sentry-postgres-new:/from -v sentry-postgres:/to alpine ash -c \
-    "cd /from ; cp -av . /to ; echo 'host all all all trust' >> /to/pg_hba.conf"
-  # Finally, remove the new old volume as we are all in sentry-postgres now
-  docker volume rm sentry-postgres-new
-fi
-echo "${_endgroup}"
-
-echo "${_group}Setting up database ..."
-if [[ -n "${CI:-''}" || "${SKIP_USER_PROMPT:-0}" == 1 ]]; then
-  $dcr web upgrade --noinput
-  echo ""
-  echo "Did not prompt for user creation due to non-interactive shell."
-  echo "Run the following command to create one yourself (recommended):"
-  echo ""
-  echo "  docker-compose run --rm web createuser"
-  echo ""
-else
-  $dcr web upgrade
-fi
-echo "${_endgroup}"
-
-echo "${_group}Migrating file storage ..."
-SENTRY_DATA_NEEDS_MIGRATION=$(docker run --rm -v sentry-data:/data alpine ash -c "[ ! -d '/data/files' ] && ls -A1x /data | wc -l || true")
-if [[ -n "$SENTRY_DATA_NEEDS_MIGRATION" ]]; then
-  # Use the web (Sentry) image so the file owners are kept as sentry:sentry
-  # The `\"` escape pattern is to make this compatible w/ Git Bash on Windows. See #329.
-  $dcr --entrypoint \"/bin/bash\" web -c \
-    "mkdir -p /tmp/files; mv /data/* /tmp/files/; mv /tmp/files /data/files; chown -R sentry:sentry /data"
-fi
-echo "${_endgroup}"
-
+./install/upgrade-postgres.sh
+./install/set-up-and-migrate-database.sh
+./install/migrate-file-storage.sh
 ./install/relay-credentials.sh
 ./install/geoip.sh
 
 if [[ "$MINIMIZE_DOWNTIME" ]]; then
-  echo "${_group}Waiting for Sentry to start ..."
-  # Start the whole setup, except nginx and relay.
-  $dc up -d --remove-orphans $($dc config --services | grep -v -E '^(nginx|relay)$')
-  $dc exec -T nginx service nginx reload
-
-  docker run --rm --network="${COMPOSE_PROJECT_NAME}_default" alpine ash \
-    -c 'while [[ "$(wget -T 1 -q -O- http://web:9000/_health/)" != "ok" ]]; do sleep 0.5; done'
-
-  # Make sure everything is up. This should only touch relay and nginx
-  $dc up -d
-  echo "${_endgroup}"
+  ./install/restart-carefully.sh
 else
   echo ""
   echo "-----------------------------------------------------------------"
