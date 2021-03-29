@@ -265,8 +265,8 @@ for topic in $NEEDED_KAFKA_TOPICS; do
 done
 echo "${_endgroup}"
 
-./install/ensure-postgresql-version.sh
-./install/set-up-database.sh
+./install/upgrade-postgres.sh
+./install/set-up-and-migrate-database.sh
 ./install/migrate-file-storage.sh
 ./install/relay-credentials.sh
 ./install/geoip.sh

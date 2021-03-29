@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 source "$(dirname $0)/_lib.sh"
 
-echo "${_group}Setting up database ..."
+echo "${_group}Setting up / migrating database ..."
 if [[ -n "${CI:-''}" || "${SKIP_USER_PROMPT:-0}" == 1 ]]; then
   $dcr web upgrade --noinput
   echo ""
