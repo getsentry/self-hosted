@@ -13,6 +13,8 @@ teardown() {
 }
 
 setup() {
+  cd ..
+
   # Clone the local repo into a temp dir. FWIW `git clone --local` breaks for
   # me because it depends on hard-linking, which doesn't work across devices,
   # and I happen to have my workspace and /tmp on separate devices.
@@ -42,7 +44,7 @@ setup() {
     esac
   done
 
-  cd "$_SANDBOX"
+  cd "$_SANDBOX/install"
 
   trap teardown EXIT
 }

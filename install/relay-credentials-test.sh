@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 source "$(dirname $0)/_test_setup.sh"
 
-cfg="relay/config.yml"
-creds="relay/credentials.json"
+cfg="../relay/config.yml"
+creds="../relay/credentials.json"
 
 # Relay files don't exist in a clean clone.
 test ! -f $cfg
