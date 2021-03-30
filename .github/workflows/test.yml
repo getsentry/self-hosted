@@ -14,7 +14,18 @@ defaults:
   run:
     shell: bash
 jobs:
-  test:
+  unit-test:
+    runs-on: unbuntu-18.04
+    name: "unit tests"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Unit Tests
+        working-directory: install
+        run: find ./ -type f -name "*-test.sh" -exec "./{}" \;
+
+  integration-test:
     runs-on: ubuntu-18.04
     name: "test"
     steps:
