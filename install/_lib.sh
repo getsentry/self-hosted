@@ -1,5 +1,5 @@
-#!/usr/bin/env bash
 set -euo pipefail
+test "${DEBUG:-}" && set -x
 
 # Work from the onpremise root, no matter which script is called from where.
 if [[ "$(basename $0)" = "install.sh" ]]; then
@@ -15,7 +15,7 @@ define_stuff() {
   # Read .env for default values with a tip o' the hat to https://stackoverflow.com/a/59831605/90297
   t=$(mktemp) && export -p > "$t" && set -a && . $_ENV && set +a && . "$t" && rm "$t" && unset t
 
-  if [ "${GITHUB_ACTIONS:-''}" = "true" ]; then
+  if [ "${GITHUB_ACTIONS:-}" = "true" ]; then
     _group="::group::"
     _endgroup="::endgroup::"
   else

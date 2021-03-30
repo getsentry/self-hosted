@@ -1,7 +1,5 @@
-#!/usr/bin/env bash
-source "$(dirname $0)/_lib.sh"
-
 echo "${_group}Ensuring proper PostgreSQL version ..."
+
 # Very naively check whether there's an existing sentry-postgres volume and the PG version in it
 if [[ -n "$(docker volume ls -q --filter name=sentry-postgres)" && "$(docker run --rm -v sentry-postgres:/db busybox cat /db/PG_VERSION 2>/dev/null)" == "9.5" ]]; then
   docker volume rm sentry-postgres-new || true
@@ -22,4 +20,5 @@ if [[ -n "$(docker volume ls -q --filter name=sentry-postgres)" && "$(docker run
   # Finally, remove the new old volume as we are all in sentry-postgres now
   docker volume rm sentry-postgres-new
 fi
+
 echo "${_endgroup}"

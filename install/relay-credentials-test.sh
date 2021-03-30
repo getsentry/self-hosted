@@ -9,7 +9,7 @@ test ! -f $cfg
 test ! -f $creds
 
 # Running the install script adds them.
-./install/relay-credentials.sh
+source ./install/relay-credentials.sh
 test -f $cfg
 test -f $creds
 test "$(jq -r 'keys[2]' $creds)" = "secret_key"
@@ -17,7 +17,7 @@ test "$(jq -r 'keys[2]' $creds)" = "secret_key"
 # If the files exist we don't touch it.
 echo GARBAGE > $cfg
 echo MOAR GARBAGE > $creds
-./install/relay-credentials.sh
+source ./install/relay-credentials.sh
 test "$(cat $cfg)" = "GARBAGE"
 test "$(cat $creds)" = "MOAR GARBAGE"
 

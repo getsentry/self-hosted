@@ -10,7 +10,7 @@ fi
 log_file="sentry_install_log-`date +'%Y-%m-%d_%H-%M-%S'`.txt"
 exec &> >(tee -a "$log_file")
 
-source ./install/_lib.sh
+source "$(dirname $0)/install/_lib.sh"
 
 echo "${_group}Defining variables and helpers ..."
 MIN_DOCKER_VERSION='19.03.6'
@@ -139,7 +139,7 @@ if [[ "$IS_KVM" -eq 0 ]]; then
 fi
 echo "${_endgroup}"
 
-./install/create-docker-volumes.sh
+source ./install/create-docker-volumes.sh
 
 echo "${_group}Ensuring files from examples ..."
 ensure_file_from_example $SENTRY_CONFIG_PY
@@ -265,14 +265,14 @@ for topic in $NEEDED_KAFKA_TOPICS; do
 done
 echo "${_endgroup}"
 
-./install/upgrade-postgres.sh
-./install/set-up-and-migrate-database.sh
-./install/migrate-file-storage.sh
-./install/relay-credentials.sh
-./install/geoip.sh
+source ./install/upgrade-postgres.sh
+source ./install/set-up-and-migrate-database.sh
+source ./install/migrate-file-storage.sh
+source ./install/relay-credentials.sh
+source ./install/geoip.sh
 
 if [[ "$MINIMIZE_DOWNTIME" ]]; then
-  ./install/restart-carefully.sh
+  source ./install/restart-carefully.sh
 else
   echo ""
   echo "-----------------------------------------------------------------"
