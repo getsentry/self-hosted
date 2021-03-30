@@ -15,7 +15,7 @@ defaults:
     shell: bash
 jobs:
   unit-test:
-    runs-on: unbuntu-18.04
+    runs-on: ubuntu-18.04
     name: "unit tests"
     steps:
       - name: Checkout
