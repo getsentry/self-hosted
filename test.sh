@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -e
 
+source "$(dirname $0)/install/_lib.sh" 
+
 echo "${_group}Setting up variables and helpers ..."
 export SENTRY_TEST_HOST="${SENTRY_TEST_HOST:-http://localhost:9000}"
 TEST_USER='test@example.com'
@@ -37,8 +39,8 @@ echo "${_endgroup}"
 echo "${_group}Starting Sentry for tests ..."
 # Disable beacon for e2e tests
 echo 'SENTRY_BEACON=False' >> sentry/sentry.conf.py
-docker-compose run --rm web createuser --superuser --email $TEST_USER --password $TEST_PASS || true
-docker-compose up -d
+$dcr web createuser --superuser --email $TEST_USER --password $TEST_PASS || true
+$dc up -d
 printf "Waiting for Sentry to be up"; timeout 60 bash -c 'until $(curl -Isf -o /dev/null $SENTRY_TEST_HOST); do printf '.'; sleep 0.5; done'
 echo "${_endgroup}"
 
@@ -115,5 +117,5 @@ done
 echo "${_endgroup}"
 
 echo "${_group}Ensure cleanup crons are working ..."
-docker-compose ps | grep -q -- "-cleanup_.\+[[:space:]]\+Up[[:space:]]\+"
+$dc ps | grep -q -- "-cleanup_.\+[[:space:]]\+Up[[:space:]]\+"
 echo "${_endgroup}"
