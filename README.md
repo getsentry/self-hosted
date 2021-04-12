@@ -40,6 +40,24 @@ SENTRY_IMAGE=getsentry/sentry:83b1380 ./install.sh
 
 Note that this may not work for all commit SHAs as this repository evolves with Sentry and its satellite projects. It is highly recommended to check out a version of this repository that is close to the timestamp of the Sentry commit you are installing.
 
+### Using Linux
+
+If you are using Linux and you need to use `sudo` when running `./install.sh`, modifying the version of Sentry is slightly different. First, run the following:
+```shell
+sudo visudo
+```
+Then add the following line:
+```shell
+Defaults  env_keep += "SENTRY_IMAGE"
+```
+Save the file then in your terminal run the following
+
+```shell
+export SENTRY_IMAGE=us.gcr.io/sentryio/sentry:83b1380
+sudo ./install.sh
+```
+Where you replace `83b1380` with the sha you want to use.
+
 ## Event Retention
 
 Sentry comes with a cleanup cron job that prunes events older than `90 days` by default. If you want to change that, you can change the `SENTRY_EVENT_RETENTION_DAYS` environment variable in `.env` or simply override it in your environment. If you do not want the cleanup cron, you can remove the `sentry-cleanup` service from the `docker-compose.yml`file.
