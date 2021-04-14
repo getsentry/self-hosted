@@ -172,7 +172,7 @@ services:
       context: ./cron
       args:
         BASE_IMAGE: "$SNUBA_IMAGE"
-    command: '"*/5 * * * * gosu snuba snuba cleanup --dry-run False"'
+    command: '"*/5 * * * * gosu snuba snuba cleanup --storage errors --dry-run False"'
   symbolicator:
     <<: *restart_policy
     image: "$SYMBOLICATOR_IMAGE"
