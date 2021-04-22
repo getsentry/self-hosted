@@ -38,7 +38,7 @@ echo "${_endgroup}"
 
 echo "${_group}Starting Sentry for tests ..."
 # Disable beacon for e2e tests
-echo 'SENTRY_BEACON=False' >> sentry/sentry.conf.py
+echo 'SENTRY_BEACON=False' >> $SENTRY_CONFIG_PY
 $dcr web createuser --superuser --email $TEST_USER --password $TEST_PASS || true
 $dc up -d
 printf "Waiting for Sentry to be up"; timeout 60 bash -c 'until $(curl -Isf -o /dev/null $SENTRY_TEST_HOST); do printf '.'; sleep 0.5; done'

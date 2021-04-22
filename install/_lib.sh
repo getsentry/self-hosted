@@ -6,14 +6,13 @@ log_file="sentry_install_log-`date +'%Y-%m-%d_%H-%M-%S'`.txt"
 exec &> >(tee -a "$log_file")
 
 # Work from /install/ for install.sh, project root otherwise
-if [[ "$(basename $0)" = "install.sh" ]]; then
+if [[ "$(basename $0)" = "install.sh" || "$(basename $0)" = "test.sh" ]]; then
   cd "$(dirname $0)/install/"
 else
   cd "$(dirname $0)"  # assume we're a *-test.sh script
 fi
 
-_ENV="$(realpath ./.env)"
-
+_ENV="$(realpath ../.env)"
 
 # Read .env for default values with a tip o' the hat to https://stackoverflow.com/a/59831605/90297
 t=$(mktemp) && export -p > "$t" && set -a && . $_ENV && set +a && . "$t" && rm "$t" && unset t
