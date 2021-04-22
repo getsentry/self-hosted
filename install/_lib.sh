@@ -8,11 +8,11 @@ exec &> >(tee -a "$log_file")
 # Work from /install/ for install.sh, project root otherwise
 if [[ "$(basename $0)" = "install.sh" ]]; then
   cd "$(dirname $0)/install/"
-  _ENV="$(realpath ../.env)"
 else
   cd "$(dirname $0)"  # assume we're a *-test.sh script
-  _ENV="$(realpath ./.env)"
 fi
+
+_ENV="$(realpath ./.env)"
 
 
 # Read .env for default values with a tip o' the hat to https://stackoverflow.com/a/59831605/90297
