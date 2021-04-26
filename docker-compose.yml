@@ -259,6 +259,7 @@ services:
     depends_on:
       - kafka
       - redis
+      - web
 volumes:
   sentry-data:
     external: true
