@@ -1,6 +1,6 @@
 echo "${_group}Downloading and installing wal2json ..."
 
-VERSION_FILE="../postgres/wal2json/wal2json.so"
+FILE_TO_USE="../postgres/wal2json/wal2json.so"
 ARCH=$(uname -m)
 FILE_NAME="wal2json-Linux-$ARCH.so"
 
@@ -25,7 +25,7 @@ if [ ! -f "../postgres/wal2json/$VERSION/$FILE_NAME" ]; then
     wget \
         "https://github.com/getsentry/wal2json/releases/download/$VERSION/$FILE_NAME" \
         -P "../postgres/wal2json/$VERSION/"; then
-    ln -s "`pwd`/../postgres/wal2json/$VERSION/$FILE_NAME" "$VERSION_FILE"
+    ln -s "`pwd`/../postgres/wal2json/$VERSION/$FILE_NAME" "$FILE_TO_USE"
 fi  
 
 echo "${_endgroup}"
