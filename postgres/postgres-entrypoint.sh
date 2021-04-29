@@ -29,7 +29,7 @@ cdc_setup_hba_conf() {
 
 bind_wal2json() {
     # Create the symlink to wal2json.so
-    ln -s /wal2json/wal2json.so `pg_config --pkglibdir`/wal2json.so
+    ln -sf /wal2json/wal2json.so `pg_config --pkglibdir`/wal2json.so
 }
 
 echo "Setting up Change Data Capture"
