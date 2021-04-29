@@ -24,7 +24,7 @@ if [ ! -f "../postgres/wal2json/$VERSION/$FILE_NAME" ]; then
     mkdir -p "../postgres/wal2json/$VERSION"
     wget \
         "https://github.com/getsentry/wal2json/releases/download/$VERSION/$FILE_NAME" \
-        -P "../postgres/wal2json/$VERSION/"; then
+        -P "../postgres/wal2json/$VERSION/"
     ln -s "`pwd`/../postgres/wal2json/$VERSION/$FILE_NAME" "$FILE_TO_USE"
 fi  
 
