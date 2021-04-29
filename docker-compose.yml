@@ -92,6 +92,10 @@ services:
         read_only: true
         source: ./postgres/postgres-entrypoint.sh
         target: /cdc/postgres-entrypoint.sh
+      - type: bind
+        read_only: true
+        source: ./postgres/wal2json/wal2json.so
+        target: /wal2json/wal2json.so
   zookeeper:
     <<: *restart_policy
     image: "confluentinc/cp-zookeeper:5.5.0"
