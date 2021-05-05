@@ -25,8 +25,9 @@ fi
 mkdir -p ../postgres/wal2json
 if [ ! -f "../postgres/wal2json/$VERSION/$FILE_NAME" ]; then
     mkdir -p "../postgres/wal2json/$VERSION"
+    ls -al "../postgres/wal2json/"
     $DOCKER -v "`pwd`/../postgres/wal2json/$VERSION/$FILE_NAME:/tmp" \
-        --user=`whoami` $CURL \
+        $CURL \
         "https://github.com/getsentry/wal2json/releases/download/$VERSION/$FILE_NAME" \
         -o /tmp/$FILE_NAME
     cp "`pwd`/../postgres/wal2json/$VERSION/$FILE_NAME" "$FILE_TO_USE"
