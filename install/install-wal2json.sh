@@ -28,7 +28,7 @@ if [ ! -f "../postgres/wal2json/$VERSION/$FILE_NAME" ]; then
         "https://github.com/getsentry/wal2json/releases/download/$VERSION/$FILE_NAME" \
         > "../postgres/wal2json/$VERSION/$FILE_NAME"
         
-    cp "`pwd`/../postgres/wal2json/$VERSION/$FILE_NAME" "$FILE_TO_USE"
+    cp "../postgres/wal2json/$VERSION/$FILE_NAME" "$FILE_TO_USE"
 fi  
 
 echo "${_endgroup}"
