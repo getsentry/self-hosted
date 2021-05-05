@@ -25,12 +25,11 @@ fi
 mkdir -p ../postgres/wal2json
 if [ ! -f "../postgres/wal2json/$VERSION/$FILE_NAME" ]; then
     mkdir -p "../postgres/wal2json/$VERSION"
-    mkdir -p "/tmp/wal2json"
-    $DOCKER -v "/tmp/wal2json:/tmp" $CURL \
+    $DOCKER -v "`pwd`/../postgres/wal2json/$VERSION/$FILE_NAME:/tmp" \
+        --user=`whoami` $CURL \
         "https://github.com/getsentry/wal2json/releases/download/$VERSION/$FILE_NAME" \
         -o /tmp/$FILE_NAME
-    mv "/tmp/wal2json/$FILE_NAME" "../postgres/wal2json/$VERSION/$FILE_NAME"
-    cp "../postgres/wal2json/$VERSION/$FILE_NAME" "$FILE_TO_USE"
+    cp "`pwd`/../postgres/wal2json/$VERSION/$FILE_NAME" "$FILE_TO_USE"
 fi  
 
 echo "${_endgroup}"
