@@ -83,10 +83,16 @@ services:
       CONFLUENT_SUPPORT_METRICS_ENABLE: "false"
       ZOOKEEPER_LOG4J_ROOT_LOGLEVEL: "WARN"
       ZOOKEEPER_TOOLS_LOG4J_LOGLEVEL: "WARN"
+      KAFKA_OPTS: "-Dzookeeper.4lw.commands.whitelist=ruok"
     volumes:
       - "sentry-zookeeper:/var/lib/zookeeper/data"
       - "sentry-zookeeper-log:/var/lib/zookeeper/log"
       - "sentry-secrets:/etc/zookeeper/secrets"
+    healthcheck:
+      test: ["CMD-SHELL", 'echo "ruok" | nc -w 2 -q 2 localhost 2181 | grep imok']
+      interval: 10s
+      timeout: 5s
+      retries: 6
   kafka:
     <<: *restart_policy
     depends_on:
@@ -108,6 +114,11 @@ services:
       - "sentry-kafka:/var/lib/kafka/data"
       - "sentry-kafka-log:/var/lib/kafka/log"
       - "sentry-secrets:/etc/kafka/secrets"
+    healthcheck:
+      test: ["CMD-SHELL", 'nc -z localhost 9092']
+      interval: 10s
+      timeout: 5s
+      retries: 6
   clickhouse:
     <<: *restart_policy
     image: "yandex/clickhouse-server:20.3.9.70"
