@@ -2,7 +2,7 @@ echo "${_group}Downloading and installing wal2json ..."
 
 FILE_TO_USE="../postgres/wal2json/wal2json.so"
 ARCH=$(uname -m)
-FILE_NAME="wal2json-Linux-$ARCH.so"
+FILE_NAME="wal2json-Linux-$ARCH-glibc.so"
 
 DOCKER_CURL="docker run --rm curlimages/curl"
 
