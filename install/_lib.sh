@@ -26,7 +26,8 @@ else
 fi
 
 dc="docker-compose --no-ansi"
-dcr="$dc run --rm"
+dcri="$dc run --rm"
+dcr="$dcri -T"
 
 # A couple of the config files are referenced from other subscripts, so they
 # get vars, while multiple subscripts call ensure_file_from_example.
