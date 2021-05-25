@@ -84,3 +84,6 @@ symbolicator/config.yml
 geoip/GeoIP.conf
 geoip/*.mmdb
 geoip/.geoipupdate.lock
+
+# wal2json download
+postgres/wal2json

@@ -71,10 +71,16 @@ services:
   postgres:
     <<: *restart_policy
     image: "postgres:9.6"
+    command: ["postgres", "-c", "wal_level=logical", "-c", "max_replication_slots=1", "-c", "max_wal_senders=1"]
     environment:
       POSTGRES_HOST_AUTH_METHOD: "trust"
+    entrypoint: /opt/sentry/postgres-entrypoint.sh
     volumes:
       - "sentry-postgres:/var/lib/postgresql/data"
+      - type: bind
+        read_only: true
+        source: ./postgres/
+        target: /opt/sentry/
   zookeeper:
     <<: *restart_policy
     image: "confluentinc/cp-zookeeper:5.5.0"
