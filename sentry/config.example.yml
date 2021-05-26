@@ -8,7 +8,7 @@
 ###############
 
 # mail.backend: 'smtp'  # Use dummy if you want to disable email entirely
-mail.host: 'smtp'
+# mail.host: 'smtp'
 # mail.port: 25
 # mail.username: ''
 # mail.password: ''
