@@ -1,0 +1,6 @@
+/.gitattributes export-ignore
+/.gitignore export-ignore
+/.github export-ignore
+/.editorconfig export-ignore
+/.craft.yml export-ignore
+/test.sh export-ignore
