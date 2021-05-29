@@ -59,9 +59,22 @@ services:
   memcached:
     <<: *restart_policy
     image: "memcached:1.5-alpine"
+    healthcheck:
+      # From: https://stackoverflow.com/a/31877626/5155484
+      test: echo stats | nc 127.0.0.1 11211
+      interval: 2s
+      timeout: 3s
+      retries: 30
+      start_period: 3s
   redis:
     <<: *restart_policy
     image: "redis:5.0-alpine"
+    healthcheck:
+      test: redis-cli ping
+      interval: 2s
+      timeout: 3s
+      retries: 30
+      start_period: 3s
     volumes:
       - "sentry-redis:/data"
     ulimits:
@@ -71,6 +84,13 @@ services:
   postgres:
     <<: *restart_policy
     image: "postgres:9.6"
+    healthcheck:
+      # Using default user "postgres" from sentry/sentry.conf.example.py or value of PING_USER if provided
+      test: ["CMD-SHELL", "pg_isready -U ${PING_USER:-postgres}"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+      start_period: 10s
     command: ["postgres", "-c", "wal_level=logical", "-c", "max_replication_slots=1", "-c", "max_wal_senders=1"]
     environment:
       POSTGRES_HOST_AUTH_METHOD: "trust"
