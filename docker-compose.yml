@@ -85,8 +85,8 @@ services:
     <<: *restart_policy
     image: "postgres:9.6"
     healthcheck:
-      # Using default user "postgres" from sentry/sentry.conf.example.py or value of PING_USER if provided
-      test: ["CMD-SHELL", "pg_isready -U ${PING_USER:-postgres}"]
+      # Using default user "postgres" from sentry/sentry.conf.example.py or value of POSTGRES_USER if provided
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
       interval: 2s
       timeout: 3s
       retries: 30
