@@ -1,12 +1,6 @@
-minVersion: "0.14.0"
-github:
-  owner: getsentry
-  repo: onpremise
-releaseBranchPrefix: releases
+minVersion: "0.23.1"
 changelogPolicy: none
 artifactProvider:
   name: none
-statusProvider:
-  name: github
 targets:
   - name: github
