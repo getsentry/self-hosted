@@ -4,6 +4,4 @@
 
 - feat: Add healthchecks for redis, memcached and postgres (#975)
 
-### Breaking
-- The frontend bundle will be loaded asynchronously. This is a breaking change that can affect custom plugins that access certain globals in the django template. Please see https://forum.sentry.io/t/breaking-frontend-changes-for-custom-plugins/14184 for more information.
-
+- BREAKING CHANGE: The frontend bundle will be loaded asynchronously. This is a breaking change that can affect custom plugins that access certain globals in the django template. Please see https://forum.sentry.io/t/breaking-frontend-changes-for-custom-plugins/14184 for more information.
