@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # The purpose of this script is to make it easy to reset a local onpremise
-# install to a clean state, optionally installing a particular version/sha.
+# install to a clean state, optionally installing a particular version/ref.
 
 set -euo pipefail
 
@@ -34,7 +34,7 @@ for volume in $(docker volume list --format '{{ .Name }}' | grep sentry); do
     || echo "Skipped volume: $volume"
 done
 
-# If we have a version (or other sha) given, install it.
+# If we have a version (or other git ref) given, install it.
 ref="${1:-}"
 if [ -z "$ref" ]; then
   exit
