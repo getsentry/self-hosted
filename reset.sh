@@ -46,8 +46,8 @@ echo "Okay ... good luck! 😰"
 # Hit the reset button.
 docker compose down --volumes --remove-orphans --rmi local
 
-# Remove any remaining (likely external) volumes with name matching '.*sentry.*'.
-for volume in $(docker volume list --format '{{ .Name }}' | grep sentry); do
+# Remove any remaining (likely external) volumes with name matching 'sentry-.*'.
+for volume in $(docker volume list --format '{{ .Name }}' | grep '^sentry-'); do
   docker volume remove $volume > /dev/null \
     && echo "Removed volume: $volume" \
     || echo "Skipped volume: $volume"
