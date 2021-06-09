@@ -25,7 +25,7 @@ confirm "☠️  Warning! 😳 This is highly destructive! 😱 Are you sure you
 echo "Okay ... good luck! 😰"
 
 # Hit the reset button.
-docker compose down --volumes --rmi local
+docker compose down --volumes --remove-orphans --rmi local
 
 # Remove any remaining (likely external) volumes with name matching '.*sentry.*'.
 for volume in $(docker volume list --format '{{ .Name }}' | grep sentry); do
