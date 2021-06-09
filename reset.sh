@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # The purpose of this script is to make it easy to reset a local onpremise
-# install to a clean state, optionally installing a particular version/ref.
+# install to a clean state, optionally targeting a particular version.
 
 set -euo pipefail
 
