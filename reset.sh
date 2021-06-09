@@ -20,6 +20,25 @@ function confirm () {
   fi
 }
 
+
+# If we have a version given, validate it.
+# ----------------------------------------
+# Note that arbitrary git refs won't work, because the *_IMAGE variables in
+# .env will almost certainly point to :latest. Tagged releases are generally
+# the only refs where these component versions are pinned, so enforce that
+# we're targeting a valid tag here. Do this early in order to fail fast.
+
+version="${1:-}"
+if [ -n "$version" ]; then
+  set +e
+  git rev-parse --verify --quiet "refs/tags/$version" > /dev/null
+  if [ $? -gt 0 ]; then
+    echo "Bad version: $version"
+    exit
+  fi
+  set -e
+fi
+
 # Make sure they mean it.
 confirm "☠️  Warning! 😳 This is highly destructive! 😱 Are you sure you wish to proceed?"
 echo "Okay ... good luck! 😰"
@@ -35,15 +54,7 @@ for volume in $(docker volume list --format '{{ .Name }}' | grep sentry); do
 done
 
 # If we have a version given, switch to it.
-# -----------------------------------------
-# Note that arbitrary git refs won't work, because the *_IMAGE variables in
-# .env will almost certainly point to :latest. Tagged releases are generally
-# the only refs where these component versions are pinned, so enforce that
-# we're targeting a valid tag here.
-
-version="${1:-}"
 if [ -n "$version" ]; then
-  git rev-parse --verify --quiet "refs/tags/$version" > /dev/null
   git checkout "$version"
 fi
 
