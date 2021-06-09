@@ -35,13 +35,15 @@ for volume in $(docker volume list --format '{{ .Name }}' | grep sentry); do
 done
 
 # If we have a version given, switch to it.
-
+# -----------------------------------------
 # Note that arbitrary git refs won't work, because the *_IMAGE variables in
-# .env will almost certainly point to :latest. Release tags of onpremise are
-# generally the only refs where these component versions are pinned.
+# .env will almost certainly point to :latest. Tagged releases are generally
+# the only refs where these component versions are pinned, so enforce that
+# we're targeting a valid tag here.
 
 version="${1:-}"
 if [ -n "$version" ]; then
+  git rev-parse --verify --quiet "refs/tags/$version" > /dev/null
   git checkout "$version"
 fi
 
