@@ -34,10 +34,15 @@ for volume in $(docker volume list --format '{{ .Name }}' | grep sentry); do
     || echo "Skipped volume: $volume"
 done
 
-# If we have a version (or other git ref) given, install it.
-ref="${1:-}"
-if [ -z "$ref" ]; then
+# If we have a version given, install it.
+
+# Note that arbitrary git refs won't work, because the *_IMAGE variables in
+# .env will almost certainly point to :latest. Release tags of onpremise are
+# generally the only refs where these component versions are pinned.
+
+version="${1:-}"
+if [ -z "$version" ]; then
   exit
 fi
-git checkout "$ref"
+git checkout "$version"
 exec ./install.sh
