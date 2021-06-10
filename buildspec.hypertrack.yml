@@ -15,10 +15,10 @@ phases:
   pre_build:
     commands:
       - echo "Starting pre-build phase on `date`"
-      - pip3 install awscli<1.19.91 --upgrade --user
+      - pip3 install awscli --upgrade --user
       - echo `aws --version`
       - echo "Logging in to Amazon ECR..."
-      - $(aws ecr get-login --region $HT_REGION --no-include-email)
+      -aws ecr get-login-password | docker login --username AWS --password-stdin $HT_REPOSITORY_URI
       - IMAGE_TAG=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
       - echo "    pre_build phase is done..."
 
