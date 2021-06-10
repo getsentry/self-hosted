@@ -339,6 +339,9 @@ if 'SENTRY_RUNNING_UWSGI' not in os.environ and len(secret_key) < 32:
 
 SENTRY_OPTIONS['system.secret-key'] = secret_key
 
+# Enables the Custom Inbound Filters feature
+SENTRY_FEATURES['projects:custom-inbound-filters'] = True
+
 #####################
 #  GITHUB  SSO      #
 #####################
