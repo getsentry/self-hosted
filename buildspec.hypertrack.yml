@@ -18,7 +18,7 @@ phases:
       - pip3 install awscli --upgrade --user
       - echo `aws --version`
       - echo "Logging in to Amazon ECR..."
-      -aws ecr get-login-password | docker login --username AWS --password-stdin $HT_REPOSITORY_URI
+      - aws ecr get-login-password | docker login --username AWS --password-stdin $HT_REPOSITORY_URI
       - IMAGE_TAG=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
       - echo "    pre_build phase is done..."
 
