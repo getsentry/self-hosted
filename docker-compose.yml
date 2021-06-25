@@ -58,7 +58,7 @@ services:
       - "sentry-smtp-log:/var/log/exim4"
   memcached:
     <<: *restart_policy
-    image: "memcached:1.5-alpine"
+    image: "memcached:1.6.9-alpine"
     healthcheck:
       # From: https://stackoverflow.com/a/31877626/5155484
       test: echo stats | nc 127.0.0.1 11211
@@ -68,7 +68,7 @@ services:
       start_period: 3s
   redis:
     <<: *restart_policy
-    image: "redis:5.0-alpine"
+    image: "redis:6.2.4-alpine"
     healthcheck:
       test: redis-cli ping
       interval: 2s
@@ -103,7 +103,7 @@ services:
         target: /opt/sentry/
   zookeeper:
     <<: *restart_policy
-    image: "confluentinc/cp-zookeeper:5.5.0"
+    image: "confluentinc/cp-zookeeper:6.2.0"
     environment:
       ZOOKEEPER_CLIENT_PORT: "2181"
       CONFLUENT_SUPPORT_METRICS_ENABLE: "false"
@@ -123,7 +123,7 @@ services:
     <<: *restart_policy
     depends_on:
       - zookeeper
-    image: "confluentinc/cp-kafka:5.5.0"
+    image: "confluentinc/cp-kafka:6.2.0"
     environment:
       KAFKA_ZOOKEEPER_CONNECT: "zookeeper:2181"
       KAFKA_ADVERTISED_LISTENERS: "PLAINTEXT://kafka:9092"
@@ -165,7 +165,7 @@ services:
       # You might want to change this to a higher value (and ensure your host has enough memory)
       MAX_MEMORY_USAGE_RATIO: 0.3
   geoipupdate:
-    image: "maxmindinc/geoipupdate:latest"
+    image: "maxmindinc/geoipupdate:v4.7.1"
     # Override the entrypoint in order to avoid using envvars for config.
     # Futz with settings so we can keep mmdb and conf in same dir on host
     # (image looks for them in separate dirs by default).
@@ -272,7 +272,7 @@ services:
     <<: *restart_policy
     ports:
       - "$SENTRY_BIND:80/tcp"
-    image: "nginx:1.16"
+    image: "nginx:1.21.0-alpine"
     volumes:
       - type: bind
         read_only: true
