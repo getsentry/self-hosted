@@ -1,6 +1,16 @@
 version: "3.4"
 x-restart-policy: &restart_policy
   restart: unless-stopped
+x-healthcheck-defaults: &healthcheck_defaults
+  # Avoid setting the interval too small, as docker uses much more CPU than one would expect.
+  # Related issues:
+  # https://github.com/moby/moby/issues/39102
+  # https://github.com/moby/moby/issues/39388
+  # https://github.com/getsentry/onpremise/issues/1000
+  interval: 30s
+  timeout: 5s
+  retries: 3
+  start_period: 10s
 x-sentry-defaults: &sentry_defaults
   <<: *restart_policy
   image: "$SENTRY_IMAGE"
@@ -60,21 +70,15 @@ services:
     <<: *restart_policy
     image: "memcached:1.5-alpine"
     healthcheck:
+      <<: *healthcheck_defaults
       # From: https://stackoverflow.com/a/31877626/5155484
       test: echo stats | nc 127.0.0.1 11211
-      interval: 30s
-      timeout: 3s
-      retries: 3
-      start_period: 3s
   redis:
     <<: *restart_policy
     image: "redis:5.0-alpine"
     healthcheck:
+      <<: *healthcheck_defaults
       test: redis-cli ping
-      interval: 30s
-      timeout: 3s
-      retries: 3
-      start_period: 3s
     volumes:
       - "sentry-redis:/data"
     ulimits:
@@ -85,13 +89,19 @@ services:
     <<: *restart_policy
     image: "postgres:9.6"
     healthcheck:
+      <<: *healthcheck_defaults
       # Using default user "postgres" from sentry/sentry.conf.example.py or value of POSTGRES_USER if provided
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
-      interval: 30s
-      timeout: 3s
-      retries: 3
-      start_period: 10s
-    command: ["postgres", "-c", "wal_level=logical", "-c", "max_replication_slots=1", "-c", "max_wal_senders=1"]
+    command:
+      [
+        "postgres",
+        "-c",
+        "wal_level=logical",
+        "-c",
+        "max_replication_slots=1",
+        "-c",
+        "max_wal_senders=1",
+      ]
     environment:
       POSTGRES_HOST_AUTH_METHOD: "trust"
     entrypoint: /opt/sentry/postgres-entrypoint.sh
@@ -115,10 +125,9 @@ services:
       - "sentry-zookeeper-log:/var/lib/zookeeper/log"
       - "sentry-secrets:/etc/zookeeper/secrets"
     healthcheck:
-      test: ["CMD-SHELL", 'echo "ruok" | nc -w 2 -q 2 localhost 2181 | grep imok']
-      interval: 10s
-      timeout: 5s
-      retries: 6
+      <<: *healthcheck_defaults
+      test:
+        ["CMD-SHELL", 'echo "ruok" | nc -w 2 -q 2 localhost 2181 | grep imok']
   kafka:
     <<: *restart_policy
     depends_on:
@@ -141,10 +150,8 @@ services:
       - "sentry-kafka-log:/var/lib/kafka/log"
       - "sentry-secrets:/etc/kafka/secrets"
     healthcheck:
-      test: ["CMD-SHELL", 'nc -z localhost 9092']
-      interval: 10s
-      timeout: 5s
-      retries: 6
+      <<: *healthcheck_defaults
+      test: ["CMD-SHELL", "nc -z localhost 9092"]
   clickhouse:
     <<: *restart_policy
     image: "yandex/clickhouse-server:20.3.9.70"
