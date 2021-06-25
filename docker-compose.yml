@@ -62,18 +62,18 @@ services:
     healthcheck:
       # From: https://stackoverflow.com/a/31877626/5155484
       test: echo stats | nc 127.0.0.1 11211
-      interval: 2s
+      interval: 30s
       timeout: 3s
-      retries: 30
+      retries: 3
       start_period: 3s
   redis:
     <<: *restart_policy
     image: "redis:5.0-alpine"
     healthcheck:
       test: redis-cli ping
-      interval: 2s
+      interval: 30s
       timeout: 3s
-      retries: 30
+      retries: 3
       start_period: 3s
     volumes:
       - "sentry-redis:/data"
@@ -87,9 +87,9 @@ services:
     healthcheck:
       # Using default user "postgres" from sentry/sentry.conf.example.py or value of POSTGRES_USER if provided
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
-      interval: 2s
+      interval: 30s
       timeout: 3s
-      retries: 30
+      retries: 3
       start_period: 10s
     command: ["postgres", "-c", "wal_level=logical", "-c", "max_replication_slots=1", "-c", "max_wal_senders=1"]
     environment:
