@@ -1,0 +1,46 @@
+name: 🐞 Bug Report
+description: Tell us about something that's not working the way we (probably) intend.
+body:
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      placeholder: 21.7.0 ← should look like this (check the footer)
+      description: What version of self-hosted Sentry are you running?
+    validations:
+      required: false
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to Reproduce
+      description: How can we see what you're seeing? Specific is terrific.
+      value: |-
+        1. foo
+        2. bar
+        3. baz
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Result
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual Result
+      description: Logs? Screenshots? Yes, please.
+      value: |-
+        e.g.:
+        - latest install logs: `ls -1 sentry_install_log-*.txt | tail -1 | xargs cat`
+        - `docker-compose logs` output
+    validations:
+      required: true
+  - type: markdown
+    attributes:
+      value: |-
+        ## Thanks 🙏
+        Check our [triage docs](https://open.sentry.io/triage/) for what to expect next.
+    validations:
+      required: false
