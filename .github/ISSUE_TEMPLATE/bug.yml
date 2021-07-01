@@ -8,7 +8,7 @@ body:
       placeholder: 21.7.0 ← should look like this (check the footer)
       description: What version of self-hosted Sentry are you running?
     validations:
-      required: false
+      required: true
   - type: textarea
     id: repro
     attributes:
