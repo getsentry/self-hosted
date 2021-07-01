@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- feat: Support custom CA roots ([#27062](https://github.com/getsentry/sentry/pull/27062)), see the [docs](https://develop.sentry.dev/self-hosted/custom-ca-roots/) for more details.
+
 ## 21.7.0
 
 - No documented changes.

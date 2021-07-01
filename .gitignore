@@ -87,3 +87,6 @@ geoip/.geoipupdate.lock
 
 # wal2json download
 postgres/wal2json
+
+# custom certificate authorities
+certificates
