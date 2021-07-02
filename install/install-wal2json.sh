@@ -27,8 +27,8 @@ if [ ! -f "../postgres/wal2json/$VERSION/$FILE_NAME" ]; then
     $DOCKER_CURL -L \
         "https://github.com/getsentry/wal2json/releases/download/$VERSION/$FILE_NAME" \
         > "../postgres/wal2json/$VERSION/$FILE_NAME"
-        
-    cp "../postgres/wal2json/$VERSION/$FILE_NAME" "$FILE_TO_USE"
-fi  
+fi
+cp "../postgres/wal2json/$VERSION/$FILE_NAME" "$FILE_TO_USE"
+
 
 echo "${_endgroup}"
