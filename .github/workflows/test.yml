@@ -43,12 +43,12 @@ jobs:
         run: |
           echo "Testing initial install"
           ./install.sh
-          ./test.sh
+          ./test/core.sh
           echo "Testing in-place upgrade"
           # Also test plugin installation here
           echo "sentry-auth-oidc" >> sentry/requirements.txt
           ./install.sh --minimize-downtime
-          ./test.sh
+          ./test/core.sh
 
       - name: Inspect failure
         if: failure()

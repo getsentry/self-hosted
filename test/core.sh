@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -e
 
-source "$(dirname $0)/install/_lib.sh" 
+source "$(dirname $0)/../install/_lib.sh" 
 
 echo "${_group}Setting up variables and helpers ..."
 export SENTRY_TEST_HOST="${SENTRY_TEST_HOST:-http://localhost:9000}"
