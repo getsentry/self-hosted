@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 set -e
 
+COMPOSE_FILE=docker-compose.yml:test/docker-compose.ca-test.yml
 source "$(dirname $0)/../install/_lib.sh" 
 
 echo "${_group}Setting up variables and helpers ..."
@@ -118,4 +119,8 @@ echo "${_endgroup}"
 
 echo "${_group}Ensure cleanup crons are working ..."
 $dc ps | grep -q -- "-cleanup_.\+[[:space:]]\+Up[[:space:]]\+"
+echo "${_endgroup}"
+
+echo "${_group}Test customs CAs work ..."
+$dc exec -T web python3 /etc/sentry/cert-test.py
 echo "${_endgroup}"

@@ -90,3 +90,10 @@ postgres/wal2json
 
 # custom certificate authorities
 certificates
+
+# testing for custom CAs
+sentry/cert-test.py
+test/**/*.crt
+test/**/*.key
+test/**/*.req
+test/ca.srl

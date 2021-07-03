@@ -1,0 +1,14 @@
+version: '3.9'
+services:
+  test:
+    image: nginx:1.21.0-alpine 
+    restart: unless-stopped
+    volumes:
+      - ./test/nginx:/etc/nginx:ro
+    networks:
+      default:
+        aliases:
+          - self.test
+          - fail.test
+  geoipupdate:
+    scale: 0
