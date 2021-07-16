@@ -9,7 +9,7 @@ exec &> >(tee -a "$log_file")
 if [[ "$(basename $0)" = "install.sh" || "$(basename $0)" = "test.sh" ]]; then
   cd "$(dirname $0)/install/"
 else
-  cd "$(dirname $0)"  # assume we're a *-test.sh script
+  cd "$(dirname $0)"  # assume we're a test script or some such
 fi
 
 _ENV="$(realpath ../.env)"

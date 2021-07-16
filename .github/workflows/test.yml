@@ -14,7 +14,7 @@ defaults:
   run:
     shell: bash
 jobs:
-  unit-test:
+  run-unit-tests:
     runs-on: ubuntu-18.04
     name: "unit tests"
     steps:
@@ -25,9 +25,9 @@ jobs:
         working-directory: install
         run: find ./ -type f -name "*-test.sh" -exec "./{}" \;
 
-  integration-test:
+  run-integration-tests:
     runs-on: ubuntu-18.04
-    name: "test"
+    name: "integration tests"
     steps:
       - name: Pin docker-compose
         run: |
@@ -39,16 +39,16 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Integration Test
+      - name: Integration Tests
         run: |
           echo "Testing initial install"
           ./install.sh
-          ./test/core.sh
+          ./_integration_tests/run.sh
           echo "Testing in-place upgrade"
           # Also test plugin installation here
           echo "sentry-auth-oidc" >> sentry/requirements.txt
           ./install.sh --minimize-downtime
-          ./test/core.sh
+          ./_integration_tests/run.sh
 
       - name: Inspect failure
         if: failure()

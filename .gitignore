@@ -91,9 +91,7 @@ postgres/wal2json
 # custom certificate authorities
 certificates
 
-# testing for custom CAs
+# integration testing
 sentry/cert-test.py
-test/**/*.crt
-test/**/*.key
-test/**/*.req
-test/ca.srl
+_integration_tests/tmp/*
+_integration_tests/nginx/*

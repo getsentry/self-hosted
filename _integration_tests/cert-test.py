@@ -1,4 +1,6 @@
 import requests
+import traceback
+
 try:
   value = requests.get("https://self.test").text
   if value != 'ok':
@@ -7,6 +9,7 @@ try:
   print('Custom CA worked.')
 except:
   print('Custom CA cert failed to work.')
+  traceback.print_exc()
   exit(1)
 try:
   requests.get("https://fail.test")
