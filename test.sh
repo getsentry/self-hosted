@@ -85,7 +85,7 @@ sentry_api_request "internal/options/?query=is:required" -X PUT --data '{"mail.u
 
 SENTRY_DSN=$(sentry_api_request "projects/sentry/internal/keys/" | awk 'BEGIN { RS=",|:{\n"; FS="\""; } $2 == "public" && $4 ~ "^http" { print $4; exit; }')
 # We ignore the protocol and the host as we already know those
-DSN_PIECES=(`echo $SENTRY_DSN | sed -ne 's|^https\?://\([0-9a-z]\+\)@[^/]\+/\([0-9]\+\)$|\1\n\2|p'`)
+DSN_PIECES=(`echo $SENTRY_DSN | sed -ne 's|^https\{0,1\}://\([0-9a-z]\{1,\}\)@[^/]\{1,\}/\([0-9]\{1,\}\)$|\1 \2|p' | tr ' ' '\n'`)
 SENTRY_KEY=${DSN_PIECES[0]}
 PROJECT_ID=${DSN_PIECES[1]}
 
