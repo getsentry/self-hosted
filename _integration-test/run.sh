@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 set -e
 
-export COMPOSE_FILE=../docker-compose.yml:docker-compose.test.yml
 source "$(dirname $0)/../install/_lib.sh" 
 
 echo "${_group}Setting up variables and helpers ..."
 export SENTRY_TEST_HOST="${SENTRY_TEST_HOST:-http://localhost:9000}"
+export COMPOSE_FILE=../docker-compose.yml:custom-ca-roots/docker-compose.test.yml
 TEST_USER='test@example.com'
 TEST_PASS='test123TEST'
 COOKIE_FILE=$(mktemp)
@@ -100,7 +100,7 @@ export -f sentry_api_request get_csrf_token
 export SENTRY_TEST_HOST COOKIE_FILE EVENT_PATH
 printf "Getting the test event back"
 timeout 30 bash -c 'until $(sentry_api_request "$EVENT_PATH" -Isf -X GET -o /dev/null); do printf '.'; sleep 0.5; done'
-echo "";
+echo " got it!";
 
 EVENT_RESPONSE=$(sentry_api_request "$EVENT_PATH")
 declare -a EVENT_TEST_STRINGS=(
@@ -122,6 +122,8 @@ $dc ps | grep -q -- "-cleanup_.\+[[:space:]]\+Up[[:space:]]\+"
 echo "${_endgroup}"
 
 echo "${_group}Test custom CAs work ..."
-$dc up -d cert-fixture
-$dc exec -T web python3 /etc/sentry/cert-test.py
+./custom-ca-roots/setup.sh
+$dc up -d fixture-custom-ca-roots
+$dc exec -T web python3 /etc/sentry/test-custom-ca-roots.py
+./custom-ca-roots/teardown.sh
 echo "${_endgroup}"

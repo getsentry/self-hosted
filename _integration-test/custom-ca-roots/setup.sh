@@ -3,8 +3,6 @@ set -e
 
 cd $(dirname "$0")
 ./teardown.sh
-mkdir -p ../certificates/
-cp cert-test.py ../sentry/
 
 # generate tightly constrained CA
 # NB: `-addext` requires LibreSSL 3.1.0+, or OpenSSL (brew install openssl)
@@ -17,8 +15,8 @@ openssl req -x509 -new -nodes -newkey rsa:2048 -keyout nginx/ca.key \
 ## Lines like the following are debug helpers ...
 # openssl x509 -in nginx/ca.crt -text -noout
 
-mkdir -p ../certificates/
-cp nginx/ca.crt ../certificates/integration-test.crt
+mkdir -p ../../certificates/
+cp nginx/ca.crt ../../certificates/test-custom-ca-roots.crt
 
 # generate server certificate
 openssl req -new -nodes -newkey rsa:2048 -keyout nginx/self.test.key \
@@ -41,3 +39,5 @@ openssl req -x509 -newkey rsa:2048 -nodes -days 1 -keyout nginx/fake.test.key \
 -out nginx/fake.test.crt -addext "subjectAltName=DNS:fake.test" -subj "/CN=Self Signed Test Server"
 
 # openssl x509 -in nginx/fake.test.crt -text -noout
+
+cp test.py ../../sentry/test-custom-ca-roots.py

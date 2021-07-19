@@ -92,6 +92,5 @@ postgres/wal2json
 certificates
 
 # integration testing
-sentry/cert-test.py
-_integration_tests/tmp/*
-_integration_tests/nginx/*
+_integration-test/custom-ca-roots/nginx/*
+sentry/test-custom-ca-roots.py

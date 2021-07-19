@@ -1,14 +1,12 @@
-version: '3.9'
+version: '3.4'
 services:
-  cert-fixture:
+  fixture-custom-ca-roots:
     image: nginx:1.21.0-alpine 
     restart: unless-stopped
     volumes:
-      - ./_integration_tests/nginx:/etc/nginx:ro
+      - ./_integration-test/custom-ca-roots/nginx:/etc/nginx:ro
     networks:
       default:
         aliases:
           - self.test
           - fail.test
-  geoipupdate:
-    scale: 0
