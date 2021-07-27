@@ -1,6 +1,14 @@
 import requests
 import traceback
 
+# ===========================================
+import os
+
+for k,v in sorted(os.environ.items()):
+    print(f'{k:<24} {v}')
+# ===========================================
+
+
 try:
     value = requests.get("https://self.test").text
     if value != 'ok':

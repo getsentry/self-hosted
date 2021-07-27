@@ -27,7 +27,7 @@ openssl req -new -nodes -newkey rsa:2048 -keyout nginx/self.test.key \
 
 openssl x509 -req -in nginx/self.test.req -CA nginx/ca.crt -CAkey nginx/ca.key \
 -extfile <(printf "subjectAltName=DNS:self.test") \
--CAcreateserial -out nginx/self.test.crt -days 1 -sha256 
+-CAcreateserial -out nginx/self.test.crt -days 1 -sha256
 
 # openssl x509 -in nginx/self.test.crt -text -noout
 

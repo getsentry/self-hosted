@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -e
 
-source "$(dirname $0)/../install/_lib.sh" 
+source "$(dirname $0)/../install/_lib.sh"
 
 echo "${_group}Setting up variables and helpers ..."
 export SENTRY_TEST_HOST="${SENTRY_TEST_HOST:-http://localhost:9000}"
@@ -122,8 +122,21 @@ $dc ps | grep -q -- "-cleanup_.\+[[:space:]]\+Up[[:space:]]\+"
 echo "${_endgroup}"
 
 echo "${_group}Test custom CAs work ..."
+$dc down
 ./custom-ca-roots/setup.sh
-$dc up -d fixture-custom-ca-roots
-$dc exec -T web python3 /etc/sentry/test-custom-ca-roots.py
-./custom-ca-roots/teardown.sh
+$dc up -d
+$dc exec -T web python3 /etc/sentry/test-custom-ca-roots.py || true
+#./custom-ca-roots/teardown.sh
 echo "${_endgroup}"
+
+dref() { docker ps --format "table {{.ID}}\t{{.Names}}" | grep "$1" | cut -d ' ' -f1; }
+dcat() { printf "\n\n\n$2\n\n" && docker container exec -t $(dref $1) cat $2; }
+
+echo "${_group}DEBUGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG"
+cat ../certificates/test-custom-ca-roots.crt
+dcat fixture  /etc/nginx/ca.crt
+dcat web      /usr/local/share/ca-certificates/test-custom-ca-roots.crt
+dcat web      /etc/ssl/certs/ca-certificates.crt | tail -n32
+echo "${_endgroup}"
+
+exit 1
