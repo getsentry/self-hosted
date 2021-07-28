@@ -10,8 +10,6 @@ on:
   pull_request:
 env:
   DOCKER_COMPOSE_VERSION: 1.24.1
-  # TODO: DELETE ME BEFORE MERGING
-  SENTRY_IMAGE: 'us.gcr.io/sentryio/sentry:449412b925fbef18963f3b0bb95133e8caa82841'
 defaults:
   run:
     shell: bash

@@ -6,7 +6,7 @@ log_file="sentry_install_log-`date +'%Y-%m-%d_%H-%M-%S'`.txt"
 exec &> >(tee -a "$log_file")
 
 # Work from /install/ for install.sh, project root otherwise
-if [[ "$(basename $0)" = "install.sh" || "$(basename $0)" = "test.sh" ]]; then
+if [[ "$(basename $0)" = "install.sh"  ]]; then
   cd "$(dirname $0)/install/"
 else
   cd "$(dirname $0)"  # assume we're a test script or some such

@@ -35,6 +35,8 @@ x-sentry-defaults: &sentry_defaults
     PYTHONUSERBASE: "/data/custom-packages"
     SENTRY_CONF: "/etc/sentry"
     SNUBA: "http://snuba-api:1218"
+    REQUESTS_CA_BUNDLE: "/etc/ssl/certs/ca-certificates.crt"
+    GRPC_DEFAULT_SSL_ROOTS_FILE_PATH_ENV_VAR: "/etc/ssl/certs/ca-certificates.crt"
     # Leaving the value empty to just pass whatever is set
     # on the host system (or in the .env file)
     SENTRY_EVENT_RETENTION_DAYS:
@@ -42,7 +44,7 @@ x-sentry-defaults: &sentry_defaults
     - "sentry-data:/data"
     - "./sentry:/etc/sentry"
     - "./geoip:/geoip:ro"
-    - "./certificates:/usr/local/share/ca-certificates:ro"
+    - "./certificates:/usr/local/share/ca-certificates"
 x-snuba-defaults: &snuba_defaults
   <<: *restart_policy
   depends_on:
