@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+if [ "$(ls -A /usr/local/share/ca-certificates/)" ]; then
+  update-ca-certificates
+fi
+
 # Prior art:
 # - https://git.io/fjNOg
 # - https://blog.knoldus.com/running-a-cron-job-in-docker-container/

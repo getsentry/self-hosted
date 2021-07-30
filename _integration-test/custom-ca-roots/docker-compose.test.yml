@@ -1,0 +1,12 @@
+version: '3.4'
+services:
+  fixture-custom-ca-roots:
+    image: nginx:1.21.0-alpine
+    restart: unless-stopped
+    volumes:
+      - ./_integration-test/custom-ca-roots/nginx:/etc/nginx:ro
+    networks:
+      default:
+        aliases:
+          - self.test
+          - fail.test

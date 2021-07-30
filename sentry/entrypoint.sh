@@ -1,6 +1,10 @@
 #!/bin/bash
 set -e
 
+if [ "$(ls -A /usr/local/share/ca-certificates/)" ]; then
+  update-ca-certificates
+fi
+
 req_file="/etc/sentry/requirements.txt"
 plugins_dir="/data/custom-packages"
 checksum_file="$plugins_dir/.checksum"

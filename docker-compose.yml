@@ -35,6 +35,14 @@ x-sentry-defaults: &sentry_defaults
     PYTHONUSERBASE: "/data/custom-packages"
     SENTRY_CONF: "/etc/sentry"
     SNUBA: "http://snuba-api:1218"
+    # Force everything to use the system CA bundle
+    # This is mostly needed to support installing custom CA certs
+    # This one is used by botocore
+    DEFAULT_CA_BUNDLE: &ca_bundle "/etc/ssl/certs/ca-certificates.crt"
+    # This one is used by requests
+    REQUESTS_CA_BUNDLE: *ca_bundle
+    # This one is used by grpc/google modules
+    GRPC_DEFAULT_SSL_ROOTS_FILE_PATH_ENV_VAR: *ca_bundle
     # Leaving the value empty to just pass whatever is set
     # on the host system (or in the .env file)
     SENTRY_EVENT_RETENTION_DAYS:
@@ -42,6 +50,7 @@ x-sentry-defaults: &sentry_defaults
     - "sentry-data:/data"
     - "./sentry:/etc/sentry"
     - "./geoip:/geoip:ro"
+    - "./certificates:/usr/local/share/ca-certificates:ro"
 x-snuba-defaults: &snuba_defaults
   <<: *restart_policy
   depends_on:

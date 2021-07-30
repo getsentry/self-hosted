@@ -15,7 +15,7 @@ defaults:
     shell: bash
 jobs:
   unit-test:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     name: "unit tests"
     steps:
       - name: Checkout
@@ -26,8 +26,8 @@ jobs:
         run: find ./ -type f -name "*-test.sh" -exec "./{}" \;
 
   integration-test:
-    runs-on: ubuntu-18.04
-    name: "test"
+    runs-on: ubuntu-20.04
+    name: "integration test"
     steps:
       - name: Pin docker-compose
         run: |
@@ -42,13 +42,16 @@ jobs:
       - name: Integration Test
         run: |
           echo "Testing initial install"
+          # Create ./certificates here because install.sh will create it with root:root
+          # and then run.sh (-> setup.sh) won't be able to write to it.
+          mkdir certificates
           ./install.sh
-          ./test.sh
+          ./_integration-test/run.sh
           echo "Testing in-place upgrade"
           # Also test plugin installation here
           echo "sentry-auth-oidc" >> sentry/requirements.txt
           ./install.sh --minimize-downtime
-          ./test.sh
+          ./_integration-test/run.sh
 
       - name: Inspect failure
         if: failure()

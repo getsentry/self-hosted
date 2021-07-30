@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -e
 
-source "$(dirname $0)/install/_lib.sh" 
+source "$(dirname $0)/../install/_lib.sh"
 
 echo "${_group}Setting up variables and helpers ..."
 export SENTRY_TEST_HOST="${SENTRY_TEST_HOST:-http://localhost:9000}"
@@ -42,6 +42,7 @@ echo 'SENTRY_BEACON=False' >> $SENTRY_CONFIG_PY
 $dcr web createuser --superuser --email $TEST_USER --password $TEST_PASS || true
 $dc up -d
 printf "Waiting for Sentry to be up"; timeout 60 bash -c 'until $(curl -Isf -o /dev/null $SENTRY_TEST_HOST); do printf '.'; sleep 0.5; done'
+echo ""
 echo "${_endgroup}"
 
 echo "${_group}Running tests ..."
@@ -99,7 +100,7 @@ export -f sentry_api_request get_csrf_token
 export SENTRY_TEST_HOST COOKIE_FILE EVENT_PATH
 printf "Getting the test event back"
 timeout 30 bash -c 'until $(sentry_api_request "$EVENT_PATH" -Isf -X GET -o /dev/null); do printf '.'; sleep 0.5; done'
-echo "";
+echo " got it!";
 
 EVENT_RESPONSE=$(sentry_api_request "$EVENT_PATH")
 declare -a EVENT_TEST_STRINGS=(
@@ -118,4 +119,10 @@ echo "${_endgroup}"
 
 echo "${_group}Ensure cleanup crons are working ..."
 $dc ps | grep -q -- "-cleanup_.\+[[:space:]]\+Up[[:space:]]\+"
+echo "${_endgroup}"
+
+echo "${_group}Test custom CAs work ..."
+source ./custom-ca-roots/setup.sh
+$dcr --no-deps web python3 /etc/sentry/test-custom-ca-roots.py
+source ./custom-ca-roots/teardown.sh
 echo "${_endgroup}"
