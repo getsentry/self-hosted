@@ -1,21 +1,15 @@
+import unittest
 import requests
-import traceback
 
 
-try:
-    value = requests.get("https://self.test").text
-    if value != 'ok':
-        print('Got something other than ok: ' + value)
-        exit(1)
-    print('Custom CA worked.')
-except:
-    print('Custom CA cert failed to work.')
-    traceback.print_exc()
-    exit(1)
-try:
-    requests.get("https://fail.test")
-    print('Accepted a self signed cert! That\'s bad.')
-    exit(1)
-except:
-    print('Self signed cert didn\'t work, which is good.')
-    exit(0)
+class CustomCATests(unittest.TestCase):
+    def test_valid_self_signed(self):
+        self.assertEqual(requests.get("https://self.test").text, 'ohk')
+
+    def test_invalid_self_signed(self):
+        with self.assertRaises(requests.exceptions.SSLError):
+            requests.get("https://fail.test")
+
+
+if __name__ == '__main__':
+    unittest.main()
