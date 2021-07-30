@@ -1,7 +1,6 @@
 #! /usr/bin/env bash
 set -e
 
-export RANDFILE="$RUNNER_TEMP/.rnd"
 export COMPOSE_FILE="../docker-compose.yml:./custom-ca-roots/docker-compose.test.yml"
 
 TEST_NGINX_CONF_PATH="./custom-ca-roots/nginx"
@@ -42,8 +41,6 @@ openssl req -x509 -newkey rsa:2048 -nodes -days 1 -keyout $TEST_NGINX_CONF_PATH/
 -out $TEST_NGINX_CONF_PATH/fake.test.crt -addext "subjectAltName=DNS:fake.test" -subj "/CN=Self Signed Test Server"
 
 # openssl x509 -in nginx/fake.test.crt -text -noout
-
-unset RANDFILE
 
 cp ./custom-ca-roots/test.py ../sentry/test-custom-ca-roots.py
 
