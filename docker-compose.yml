@@ -44,7 +44,7 @@ x-sentry-defaults: &sentry_defaults
     - "sentry-data:/data"
     - "./sentry:/etc/sentry"
     - "./geoip:/geoip:ro"
-    - "./certificates:/usr/local/share/ca-certificates"
+    - "./certificates:/usr/local/share/ca-certificates:ro"
 x-snuba-defaults: &snuba_defaults
   <<: *restart_policy
   depends_on:
