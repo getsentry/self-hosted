@@ -5,7 +5,7 @@ Official bootstrap for running your own [Sentry](https://sentry.io/) with [Docke
 ## Requirements
 
 * Docker 19.03.6+
-* Compose 1.24.1+
+* Compose 1.28.0+
 * 4 CPU Cores
 * 8 GB RAM
 * 20 GB Free Disk Space

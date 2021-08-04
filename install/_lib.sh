@@ -25,7 +25,7 @@ else
   _endgroup=""
 fi
 
-dc="docker-compose --no-ansi"
+dc="docker-compose --ansi never"
 dcr="$dc run --rm"
 
 # A couple of the config files are referenced from other subscripts, so they
