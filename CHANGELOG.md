@@ -4,6 +4,7 @@
 
 - feat: Support custom CA roots ([#27062](https://github.com/getsentry/sentry/pull/27062)), see the [docs](https://develop.sentry.dev/self-hosted/custom-ca-roots/) for more details.
 - fix: Fix `curl` image to version 7.77.0
+- upgrade: docker-compose version to 1.29.2
 
 ## 21.7.0
 
@@ -24,4 +25,3 @@
 ## 21.6.0
 
 - feat: Add healthchecks for redis, memcached and postgres (#975)
-

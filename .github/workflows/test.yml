@@ -9,7 +9,7 @@ on:
       - "release/**"
   pull_request:
 env:
-  DOCKER_COMPOSE_VERSION: 1.24.1
+  DOCKER_COMPOSE_VERSION: 1.29.2
 defaults:
   run:
     shell: bash
