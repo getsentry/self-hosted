@@ -7,7 +7,7 @@ FILE_NAME="wal2json-Linux-$ARCH-glibc.so"
 docker_curl() {
     # The environment variables can be specified in lower case or upper case.
     # The lower case version has precedence. http_proxy is an exception as it is only available in lower case.
-    docker run --rm -e http_proxy -e https_proxy -e HTTPS_PROXY -e no_proxy -e NO_PROXY curlimages/curl "$@"
+    docker run --rm -e http_proxy -e https_proxy -e HTTPS_PROXY -e no_proxy -e NO_PROXY curlimages/curl:7.77.0 "$@"
 }
 
 if [[ $WAL2JSON_VERSION == "latest" ]]; then
