@@ -57,7 +57,7 @@ login () {
     exit -1
   fi
 
-  CSRF_TOKEN_FOR_LOGIN=$(curl $SENTRY_TEST_HOST -sL -c "$COOKIE_FILE" | awk -F "'" '
+  CSRF_TOKEN_FOR_LOGIN=$(curl $SENTRY_TEST_HOST -sL -c "$COOKIE_FILE" | awk -F "['\"]" '
     /csrfmiddlewaretoken/ {
     print $4 "=" $6;
     exit;
