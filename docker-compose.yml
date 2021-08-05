@@ -54,9 +54,12 @@ x-sentry-defaults: &sentry_defaults
 x-snuba-defaults: &snuba_defaults
   <<: *restart_policy
   depends_on:
-    - redis
-    - clickhouse
-    - kafka
+    clickhouse:
+      condition: service_healthy
+    kafka:
+      condition: service_healthy
+    redis:
+      condition: service_healthy
   image: "$SNUBA_IMAGE"
   environment:
     SNUBA_SETTINGS: docker
@@ -180,6 +183,11 @@ services:
       # If you have high volume and your search return incomplete results
       # You might want to change this to a higher value (and ensure your host has enough memory)
       MAX_MEMORY_USAGE_RATIO: 0.3
+    healthcheck:
+      test: ["CMD-SHELL", "wget -nv -t1 --spider 'http://localhost:9000/' || exit 1"]
+      interval: 3s
+      timeout: 600s
+      retries: 200
   geoipupdate:
     image: "maxmindinc/geoipupdate:v4.7.1"
     # Override the entrypoint in order to avoid using envvars for config.
