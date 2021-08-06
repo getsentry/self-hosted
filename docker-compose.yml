@@ -1,6 +1,8 @@
 version: "3.4"
 x-restart-policy: &restart_policy
   restart: unless-stopped
+x-depends_on-condition: &depends_on_condition
+    condition: service_healthy
 x-healthcheck-defaults: &healthcheck_defaults
   # Avoid setting the interval too small, as docker uses much more CPU than one would expect.
   # Related issues:
@@ -15,20 +17,23 @@ x-sentry-defaults: &sentry_defaults
   <<: *restart_policy
   image: "$SENTRY_IMAGE"
   depends_on:
-    - redis
-    - postgres
-    - memcached
-    - smtp
-    - snuba-api
-    - snuba-consumer
-    - snuba-outcomes-consumer
-    - snuba-sessions-consumer
-    - snuba-transactions-consumer
-    - snuba-subscription-consumer-events
-    - snuba-subscription-consumer-transactions
-    - snuba-replacer
-    - symbolicator
-    - kafka
+    redis:
+      <<: *depends_on_condition
+    kafka:
+      <<: *depends_on_condition
+    postgres:
+      <<: *depends_on_condition
+    memcached: ~
+    smtp: ~
+    snuba-api: ~
+    snuba-consumer: ~
+    snuba-outcomes-consumer: ~
+    snuba-sessions-consumer: ~
+    snuba-transactions-consumer: ~
+    snuba-subscription-consumer-events: ~
+    snuba-subscription-consumer-transactions: ~
+    snuba-replacer: ~
+    symbolicator: ~
   entrypoint: "/etc/sentry/entrypoint.sh"
   command: ["run", "web"]
   environment:
@@ -55,11 +60,11 @@ x-snuba-defaults: &snuba_defaults
   <<: *restart_policy
   depends_on:
     clickhouse:
-      condition: service_healthy
+      <<: *depends_on_condition
     kafka:
-      condition: service_healthy
+      <<: *depends_on_condition
     redis:
-      condition: service_healthy
+      <<: *depends_on_condition
   image: "$SNUBA_IMAGE"
   environment:
     SNUBA_SETTINGS: docker
@@ -143,7 +148,8 @@ services:
   kafka:
     <<: *restart_policy
     depends_on:
-      - zookeeper
+      zookeeper:
+        <<: *depends_on_condition
     image: "confluentinc/cp-kafka:5.5.0"
     environment:
       KAFKA_ZOOKEEPER_CONNECT: "zookeeper:2181"
@@ -318,9 +324,11 @@ services:
         source: ./geoip
         target: /geoip
     depends_on:
-      - kafka
-      - redis
-      - web
+      kafka:
+        <<: *depends_on_condition
+      redis:
+        <<: *depends_on_condition
+      web: ~
 volumes:
   sentry-data:
     external: true
