@@ -23,28 +23,17 @@ x-sentry-defaults: &sentry_defaults
       <<: *depends_on_condition
     postgres:
       <<: *depends_on_condition
-    memcached:
-      <<: *depends_on_condition
-    smtp:
-      <<: *depends_on_condition
-    snuba-api:
-      <<: *depends_on_condition
-    snuba-consumer:
-      <<: *depends_on_condition
-    snuba-outcomes-consumer:
-      <<: *depends_on_condition
-    snuba-sessions-consumer:
-      <<: *depends_on_condition
-    snuba-transactions-consumer:
-      <<: *depends_on_condition
-    snuba-subscription-consumer-events:
-      <<: *depends_on_condition
-    snuba-subscription-consumer-transactions:
-      <<: *depends_on_condition
-    snuba-replacer:
-      <<: *depends_on_condition
-    symbolicator:
-      <<: *depends_on_condition
+    memcached: ~
+    smtp: ~
+    snuba-api: ~
+    snuba-consumer: ~
+    snuba-outcomes-consumer: ~
+    snuba-sessions-consumer: ~
+    snuba-transactions-consumer: ~
+    snuba-subscription-consumer-events: ~
+    snuba-subscription-consumer-transactions: ~
+    snuba-replacer: ~
+    symbolicator: ~
   entrypoint: "/etc/sentry/entrypoint.sh"
   command: ["run", "web"]
   environment:
@@ -339,8 +328,7 @@ services:
         <<: *depends_on_condition
       redis:
         <<: *depends_on_condition
-      web:
-        <<: *depends_on_condition
+      web: ~
 volumes:
   sentry-data:
     external: true
