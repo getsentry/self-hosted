@@ -1,8 +1,10 @@
 version: "3.4"
 x-restart-policy: &restart_policy
   restart: unless-stopped
-x-depends_on-condition: &depends_on_condition
-    condition: service_healthy
+x-depends_on-healthy: &depends_on-healthy
+  condition: service_healthy
+x-depends_on-default: &depends_on-default
+  condition: service_started
 x-healthcheck-defaults: &healthcheck_defaults
   # Avoid setting the interval too small, as docker uses much more CPU than one would expect.
   # Related issues:
@@ -18,22 +20,33 @@ x-sentry-defaults: &sentry_defaults
   image: "$SENTRY_IMAGE"
   depends_on:
     redis:
-      <<: *depends_on_condition
+      <<: *depends_on-healthy
     kafka:
-      <<: *depends_on_condition
+      <<: *depends_on-healthy
     postgres:
-      <<: *depends_on_condition
-    memcached: ~
-    smtp: ~
-    snuba-api: ~
-    snuba-consumer: ~
-    snuba-outcomes-consumer: ~
-    snuba-sessions-consumer: ~
-    snuba-transactions-consumer: ~
-    snuba-subscription-consumer-events: ~
-    snuba-subscription-consumer-transactions: ~
-    snuba-replacer: ~
-    symbolicator: ~
+      <<: *depends_on-healthy
+    memcached:
+      <<: *depends_on-default
+    smtp:
+      <<: *depends_on-default
+    snuba-api:
+      <<: *depends_on-default
+    snuba-consumer:
+      <<: *depends_on-default
+    snuba-outcomes-consumer:
+      <<: *depends_on-default
+    snuba-sessions-consumer:
+      <<: *depends_on-default
+    snuba-transactions-consumer:
+      <<: *depends_on-default
+    snuba-subscription-consumer-events:
+      <<: *depends_on-default
+    snuba-subscription-consumer-transactions:
+      <<: *depends_on-default
+    snuba-replacer:
+      <<: *depends_on-default
+    symbolicator:
+      <<: *depends_on-default
   entrypoint: "/etc/sentry/entrypoint.sh"
   command: ["run", "web"]
   environment:
@@ -60,11 +73,11 @@ x-snuba-defaults: &snuba_defaults
   <<: *restart_policy
   depends_on:
     clickhouse:
-      <<: *depends_on_condition
+      <<: *depends_on-healthy
     kafka:
-      <<: *depends_on_condition
+      <<: *depends_on-healthy
     redis:
-      <<: *depends_on_condition
+      <<: *depends_on-healthy
   image: "$SNUBA_IMAGE"
   environment:
     SNUBA_SETTINGS: docker
@@ -149,7 +162,7 @@ services:
     <<: *restart_policy
     depends_on:
       zookeeper:
-        <<: *depends_on_condition
+        <<: *depends_on-healthy
     image: "confluentinc/cp-kafka:5.5.0"
     environment:
       KAFKA_ZOOKEEPER_CONNECT: "zookeeper:2181"
@@ -190,7 +203,11 @@ services:
       # You might want to change this to a higher value (and ensure your host has enough memory)
       MAX_MEMORY_USAGE_RATIO: 0.3
     healthcheck:
-      test: ["CMD-SHELL", "wget -nv -t1 --spider 'http://localhost:9000/' || exit 1"]
+      test:
+        [
+          "CMD-SHELL",
+          "wget -nv -t1 --spider 'http://localhost:9000/' || exit 1",
+        ]
       interval: 3s
       timeout: 600s
       retries: 200
@@ -325,10 +342,11 @@ services:
         target: /geoip
     depends_on:
       kafka:
-        <<: *depends_on_condition
+        <<: *depends_on-healthy
       redis:
-        <<: *depends_on_condition
-      web: ~
+        <<: *depends_on-healthy
+      web:
+        <<: *depends_on-default
 volumes:
   sentry-data:
     external: true
