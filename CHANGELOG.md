@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 21.8.0
 
 - feat: Support custom CA roots ([#27062](https://github.com/getsentry/sentry/pull/27062)), see the [docs](https://develop.sentry.dev/self-hosted/custom-ca-roots/) for more details.
 - fix: Fix `curl` image to version 7.77.0
