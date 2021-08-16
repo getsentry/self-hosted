@@ -1,7 +1,7 @@
 echo "${_group}Checking minimum requirements ..."
 
 MIN_DOCKER_VERSION='19.03.6'
-MIN_COMPOSE_VERSION='1.28.0'
+MIN_COMPOSE_VERSION='1.29.2'
 MIN_RAM_HARD=3800 # MB
 MIN_RAM_SOFT=7800 # MB
 MIN_CPU_HARD=2
