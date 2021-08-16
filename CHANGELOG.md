@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- feat: Relaxed minimum `docker-compose` version requirement to allow back to 1.25.0 ([#1062](https://github.com/getsentry/onpremise/issues/1062))
+
 ## 21.8.0
 
 - feat: Support custom CA roots ([#27062](https://github.com/getsentry/sentry/pull/27062)), see the [docs](https://develop.sentry.dev/self-hosted/custom-ca-roots/) for more details.

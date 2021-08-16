@@ -25,7 +25,17 @@ else
   _endgroup=""
 fi
 
-dc="docker-compose --ansi never"
+function version_gt() {
+  # https://stackoverflow.com/questions/16989598/
+  test "$(printf '%s\n' "$@" | sort -V | head -n 1)" != "$1";
+}
+if version_gt "$COMPOSE_VERSION" "1.28.0"; then
+  ANSI='--ansi never'
+else
+  ANSI='--no-ansi'
+fi
+
+dc="docker-compose $ANSI"
 dcr="$dc run --rm"
 
 # A couple of the config files are referenced from other subscripts, so they
