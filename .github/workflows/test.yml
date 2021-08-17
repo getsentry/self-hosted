@@ -42,9 +42,6 @@ jobs:
       - name: Integration Test
         run: |
           echo "Testing initial install"
-          # Create ./certificates here because install.sh will create it with root:root
-          # and then run.sh (-> setup.sh) won't be able to write to it.
-          mkdir certificates
           ./install.sh
           ./_integration-test/run.sh
           echo "Testing in-place upgrade"

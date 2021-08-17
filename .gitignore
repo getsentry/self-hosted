@@ -88,9 +88,6 @@ geoip/.geoipupdate.lock
 # wal2json download
 postgres/wal2json
 
-# custom certificate authorities
-certificates
-
 # integration testing
 _integration-test/custom-ca-roots/nginx/*
 sentry/test-custom-ca-roots.py
