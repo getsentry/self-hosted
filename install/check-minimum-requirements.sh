@@ -8,7 +8,8 @@ MIN_CPU_HARD=2
 MIN_CPU_SOFT=4
 
 DOCKER_VERSION=$(docker version --format '{{.Server.Version}}')
-COMPOSE_VERSION=$($dc --version | sed 's/docker-compose version \(.\{1,\}\),.*/\1/')
+# Do NOT use $dc instead of `docker-compose` below as older versions don't support certain options and fail
+COMPOSE_VERSION=$(docker-compose --version | sed 's/docker-compose version \(.\{1,\}\),.*/\1/')
 RAM_AVAILABLE_IN_DOCKER=$(docker run --rm busybox free -m 2>/dev/null | awk '/Mem/ {print $2}');
 CPU_AVAILABLE_IN_DOCKER=$(docker run --rm busybox nproc --all);
 
