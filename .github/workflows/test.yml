@@ -8,8 +8,6 @@ on:
       - "master"
       - "release/**"
   pull_request:
-env:
-  DOCKER_COMPOSE_VERSION: 1.29.2
 defaults:
   run:
     shell: bash
@@ -29,15 +27,16 @@ jobs:
     runs-on: ubuntu-20.04
     name: "integration test"
     steps:
-      - name: Pin docker-compose
-        run: |
-          sudo rm /usr/local/bin/docker-compose
-          curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > docker-compose
-          chmod +x docker-compose
-          sudo mv docker-compose /usr/local/bin
-
       - name: Checkout
         uses: actions/checkout@v2
+  
+      - name: Pin docker-compose
+        run: |
+          COMPOSE_PATH=/usr/local/bin/docker-compose
+          source ./install/_min-requirements.sh
+          sudo rm $COMPOSE_PATH
+          sudo curl -L https://github.com/docker/compose/releases/download/${MIN_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` -o $COMPOSE_PATH
+          sudo chmod +x $COMPOSE_PATH
 
       - name: Integration Test
         run: |
