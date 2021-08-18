@@ -32,11 +32,11 @@ jobs:
   
       - name: Pin docker-compose
         run: |
+          COMPOSE_PATH=/usr/local/bin/docker-compose
           source ./install/_min-requirements.sh
-          sudo rm /usr/local/bin/docker-compose
-          curl -L https://github.com/docker/compose/releases/download/${MIN_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > docker-compose
-          chmod +x docker-compose
-          sudo mv docker-compose /usr/local/bin
+          sudo rm $COMPOSE_PATH
+          sudo curl -L https://github.com/docker/compose/releases/download/${MIN_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` -o $COMPOSE_PATH
+          sudo chmod +x $COMPOSE_PATH
 
       - name: Integration Test
         run: |
