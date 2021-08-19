@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- fix(clickhouse): Use correct HTTP port for healthcheck (#1069)
+  Fixes the regular `Unexpected packet` errors in Clickhouse
+
 ## 21.8.0
 
 - feat: Support custom CA roots ([#27062](https://github.com/getsentry/sentry/pull/27062)), see the [docs](https://develop.sentry.dev/self-hosted/custom-ca-roots/) for more details.
