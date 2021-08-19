@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- fix(healthcheck): Increase retries to 5 (#1072)
 - fix(requirements): Make compose version check bw-compatible (#1068)
 - ci: Test with the required minimum docker-compose (#1066)
   Run tests using docker-compose `1.28.0` instead of latest
