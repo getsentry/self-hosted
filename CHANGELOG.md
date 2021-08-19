@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- fix(requirements): Make compose version check bw-compatible (#1068)
+- ci: Test with the required minimum docker-compose (#1066)
+  Run tests using docker-compose `1.28.0` instead of latest
 - fix(clickhouse): Use correct HTTP port for healthcheck (#1069)
   Fixes the regular `Unexpected packet` errors in Clickhouse
 
