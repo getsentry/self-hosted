@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- fix(requirements): Make compose version check bw-compatible (#1068)
+- ci: Test with the required minimum docker-compose (#1066)
+  Run tests using docker-compose `1.28.0` instead of latest
+  
 ## 21.8.0
 
 - feat: Support custom CA roots ([#27062](https://github.com/getsentry/sentry/pull/27062)), see the [docs](https://develop.sentry.dev/self-hosted/custom-ca-roots/) for more details.
