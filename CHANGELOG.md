@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- fix(healthcheck): Increase retries to 5 (#1072)
 - fix(clickhouse): Use correct HTTP port for healthcheck (#1069)
   Fixes the regular `Unexpected packet` errors in Clickhouse
 
