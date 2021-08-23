@@ -1,4 +1,3 @@
-version: "3.4"
 x-restart-policy: &restart_policy
   restart: unless-stopped
 x-depends_on-healthy: &depends_on-healthy
