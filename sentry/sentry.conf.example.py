@@ -228,6 +228,12 @@ SENTRY_WEB_OPTIONS = {
 
 # End of SSL/TLS settings
 
+########
+# Mail #
+########
+
+SENTRY_OPTIONS["mail.from"] = f"sentry@{env('SENTRY_MAIL_FROM', 'localhost')}"
+
 ############
 # Features #
 ############
