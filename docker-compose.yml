@@ -93,7 +93,7 @@ services:
   smtp:
     <<: *restart_policy
     image: tianon/exim4
-    hostname: ${SENTRY_MAIL_FROM:-}
+    hostname: ${SENTRY_MAIL_HOST:-}
     volumes:
       - "sentry-smtp:/var/spool/exim4"
       - "sentry-smtp-log:/var/log/exim4"
