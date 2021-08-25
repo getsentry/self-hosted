@@ -232,7 +232,8 @@ SENTRY_WEB_OPTIONS = {
 # Mail #
 ########
 
-SENTRY_OPTIONS["mail.from"] = f"sentry@{env('SENTRY_MAIL_FROM', 'localhost')}"
+SENTRY_OPTIONS["mail.list-namespace"] = env('SENTRY_MAIL_HOST', 'localhost')
+SENTRY_OPTIONS["mail.from"] = f"sentry@{SENTRY_OPTIONS["mail.list-namespace"]}"
 
 ############
 # Features #

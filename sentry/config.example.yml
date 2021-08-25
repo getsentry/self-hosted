@@ -14,6 +14,12 @@ mail.host: 'smtp'
 # mail.password: ''
 # mail.use-tls: false
 # mail.use-ssl: false
+
+# NOTE: The following 2 configs (mail.from and mail.list-namespace) are set
+#       through SENTRY_MAIL_HOST in sentry.conf.py so remove those first if
+#       you want your values in this file to be effective!
+
+
 # The email address to send on behalf of
 # mail.from: 'root@localhost'
 
