@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 21.9.0
 
 - fix(healthcheck): Increase retries to 5 (#1072)
 - fix(requirements): Make compose version check bw-compatible (#1068)
