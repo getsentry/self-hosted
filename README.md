@@ -38,23 +38,10 @@ Note that this may not work for all commit SHAs as this repository evolves with 
 
 ### Using Linux
 
-If you are using Linux and you need to use `sudo` when running `./install.sh`, modifying the version of Sentry is slightly different. First, run the following:
+If you are using Linux and you need to use `sudo` when running `./install.sh`, make sure to place the environment variable *after* `sudo`:
 
 ```shell
-sudo visudo
-```
-
-Then add the following line:
-
-```shell
-Defaults  env_keep += "SENTRY_IMAGE"
-```
-
-Save the file then in your terminal run the following
-
-```shell
-export SENTRY_IMAGE=us.gcr.io/sentryio/sentry:83b1380
-sudo ./install.sh
+sudo SENTRY_IMAGE=us.gcr.io/sentryio/sentry:83b1380 ./install.sh
 ```
 
 Where you replace `83b1380` with the sha you want to use.
