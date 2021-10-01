@@ -66,6 +66,9 @@ target/
 # pyenv
 .python-version
 
+# environment specific file
+.env
+
 # https://docs.docker.com/compose/extends/
 docker-compose.override.yml
 
