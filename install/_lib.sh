@@ -12,11 +12,6 @@ else
   cd "$(dirname $0)"  # assume we're a test script or some such
 fi
 
-_ENV="$(realpath ../.env)"
-
-# Read .env for default values with a tip o' the hat to https://stackoverflow.com/a/59831605/90297
-t=$(mktemp) && export -p > "$t" && set -a && . $_ENV && set +a && . "$t" && rm "$t" && unset t
-
 if [ "${GITHUB_ACTIONS:-}" = "true" ]; then
   _group="::group::"
   _endgroup="::endgroup::"
@@ -24,6 +19,28 @@ else
   _group="▶ "
   _endgroup=""
 fi
+
+# Create .env file from the example template, if it does not exist yet
+echo "${_group}Setting up .env file ..."
+
+if [[ -f "../.env" ]]; then
+  echo ".env file already exist. Leaving it untouched."
+else
+  cp ../.env.example ../.env
+  if [[ $? -eq 0 ]]; then
+      echo "Successfully copied the .env.example file to .env."
+  else
+      echo "Failed to copy the .env.example file to .env."
+      exit 1
+  fi
+fi
+
+echo "${_endgroup}"
+
+_ENV="$(realpath ../.env)"
+
+# Read .env for default values with a tip o' the hat to https://stackoverflow.com/a/59831605/90297
+t=$(mktemp) && export -p > "$t" && set -a && . $_ENV && set +a && . "$t" && rm "$t" && unset t
 
 dc="docker-compose --ansi never"
 dcr="$dc run --rm"
