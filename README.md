@@ -12,6 +12,16 @@ Official bootstrap for running your own [Sentry](https://sentry.io/) with [Docke
 
 ## Setup
 
+### DotEnv (.env) file
+
+Environment specific configurations can be done in the `.env` file. It will be located in the root directory of the Sentry installation.
+
+By default, there exists no `.env` file. In this case, you can either manually add this file by copying the `.env.example` file to a new `.env` file or you simply follow the below **Installation**, which will automatically create the missing `.env` file, if there is none yet.
+
+If there already exists a `.env` file, the installer will not touch it. So please keep in mind to check the `.env.example` file for changes, when you perform an upgrade of Sentry.
+
+### Installation
+
 To get started with all the defaults, simply clone the repo and run `./install.sh` in your local check-out. Sentry uses Python 3 by default since December 4th, 2020 and Sentry 21.1.0 is the last version to support Python 2.
 
 During the install, a prompt will ask if you want to create a user account. If you require that the install not be blocked by the prompt, run `./install.sh --no-user-prompt`.
