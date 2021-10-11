@@ -1,3 +1,5 @@
+x-restart-policy-slow: &restart_policy-slow
+  restart: always
 x-restart-policy: &restart_policy
   restart: unless-stopped
 x-depends_on-healthy: &depends_on-healthy
@@ -338,7 +340,7 @@ services:
       - web
       - relay
   relay:
-    <<: *restart_policy
+    <<: *restart_policy-slow
     image: "$RELAY_IMAGE"
     volumes:
       - type: bind
