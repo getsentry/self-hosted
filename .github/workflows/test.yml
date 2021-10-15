@@ -40,7 +40,7 @@ jobs:
       - name: Get Compose
         run: |
           sudo rm -f "${{ matrix.compose_path }}"
-          sudo curl -L https://github.com/docker/compose/releases/download/${{ matrix.compose_version }}/docker-compose-`uname -s`-`uname -m` -o "${{ matrix.compose_path}}"
+          sudo curl -L https://github.com/docker/compose/releases/download/${{ matrix.compose_version }}/docker-compose-`uname -s`-`uname -m` -o "${{ matrix.compose_path }}"
           sudo chmod +x "${{ matrix.compose_path }}"
 
       - name: Integration Test
