@@ -26,28 +26,22 @@ jobs:
   integration-test:
     runs-on: ubuntu-20.04
     name: "integration test"
+    strategy:
+      matrix:
+        include:
+          - compose_version: '1.28.0'
+            compose_path: '/usr/local/bin/docker-compose'
+          - compose_version: 'v2.0.0'
+            compose_path: '/usr/local/lib/docker/cli-plugins/docker-compose'
     steps:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Test support of docker compose v2
+      - name: Get Compose
         run: |
-          COMPOSE_PATH=/usr/local/lib/docker/cli-plugins/docker-compose
-          sudo rm $COMPOSE_PATH
-          sudo curl -L https://github.com/docker/compose/releases/download/v2.0.0/docker-compose-$(uname -s)-$(uname -m | sed 's/x86_64/amd64/') -o $COMPOSE_PATH
-          sudo chmod +x $COMPOSE_PATH
-          echo "Testing install with docker compose v2"
-          ./install.sh
-          ./_integration-test/run.sh
-          sudo rm $COMPOSE_PATH
-
-      - name: Pin docker-compose
-        run: |
-          COMPOSE_PATH=/usr/local/bin/docker-compose
-          source ./install/_min-requirements.sh
-          sudo rm $COMPOSE_PATH
-          sudo curl -L https://github.com/docker/compose/releases/download/${MIN_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` -o $COMPOSE_PATH
-          sudo chmod +x $COMPOSE_PATH
+          sudo rm "${{ matrix.compose_path }}"
+          sudo curl -L https://github.com/docker/compose/releases/download/${{ matrix.compose_version }}/docker-compose-`uname -s`-`uname -m` -o "${{ matrix.compose_path}}"
+          sudo chmod +x "${{ matrix.compose_path }}"
 
       - name: Integration Test
         run: |
