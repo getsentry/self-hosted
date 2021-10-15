@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -e
+set -ex
 
 source "$(dirname $0)/../install/_lib.sh"
 
@@ -118,7 +118,7 @@ done
 echo "${_endgroup}"
 
 echo "${_group}Ensure cleanup crons are working ..."
-$dc ps | grep -q -- "-cleanup_.\+[[:space:]]\+\(Up\|running\)[[:space:]]\+"
+$dc ps | grep -q -E "-cleanup\s+running\s+|-cleanup_.+\s+Up\s+"
 echo "${_endgroup}"
 
 echo "${_group}Test custom CAs work ..."
