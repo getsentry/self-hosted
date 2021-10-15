@@ -27,9 +27,9 @@ jobs:
     runs-on: ubuntu-20.04
     name: "integration test"
     strategy:
+      max-parallel: 1
+      fail-fast: false
       matrix:
-        max-parallel: 1
-        fail-fast: false
         include:
           - compose_version: '1.28.0'
             compose_path: '/usr/local/bin'
