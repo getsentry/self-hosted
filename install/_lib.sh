@@ -25,7 +25,8 @@ else
   _endgroup=""
 fi
 
-dc="docker-compose --ansi never"
+dc_base="$(docker compose version >/dev/null && echo 'docker compose' || echo 'docker-compose')"
+dc="$dc_base --ansi never"
 dcr="$dc run --rm"
 
 # A couple of the config files are referenced from other subscripts, so they

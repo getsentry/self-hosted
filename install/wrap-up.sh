@@ -18,7 +18,7 @@ else
   echo ""
   echo "You're all done! Run the following command to get Sentry running:"
   echo ""
-  echo "  docker-compose up -d"
+  echo "  $dc_base up -d"
   echo ""
   echo "-----------------------------------------------------------------"
   echo ""

@@ -3,8 +3,13 @@ echo "${_group}Checking minimum requirements ..."
 source "$(dirname $0)/_min-requirements.sh"
 
 DOCKER_VERSION=$(docker version --format '{{.Server.Version}}')
-# Do NOT use $dc instead of `docker-compose` below as older versions don't support certain options and fail
-COMPOSE_VERSION=$(docker-compose --version | sed 's/docker-compose version \(.\{1,\}\),.*/\1/')
+# Get semantic version of Docker Compose v2
+if docker compose version >/dev/null; then
+  COMPOSE_VERSION=$(docker compose version --short | sed 's/v\{0,1\}\(.\{1,\}\)/\1/')
+else
+  # Do NOT use $dc instead of `docker-compose` below as older versions don't support certain options and fail
+  COMPOSE_VERSION=$(docker-compose --version | sed 's/docker-compose version \(.\{1,\}\),.*/\1/')
+fi
 RAM_AVAILABLE_IN_DOCKER=$(docker run --rm busybox free -m 2>/dev/null | awk '/Mem/ {print $2}');
 CPU_AVAILABLE_IN_DOCKER=$(docker run --rm busybox nproc --all);
 
