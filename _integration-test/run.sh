@@ -118,7 +118,7 @@ done
 echo "${_endgroup}"
 
 echo "${_group}Ensure cleanup crons are working ..."
-$dc ps | grep -q -E "\-cleanup\s+running\s+|\-cleanup[_-].+\s+Up\s+"
+$dc ps | grep -q -E -e '\-cleanup\s+running\s+' -e '\-cleanup[_-].+\s+Up\s+'
 echo "${_endgroup}"
 
 echo "${_group}Test custom CAs work ..."
