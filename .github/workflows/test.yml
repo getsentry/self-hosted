@@ -28,6 +28,8 @@ jobs:
     name: "integration test"
     strategy:
       matrix:
+        max-parallel: 1
+        fail-fast: false
         include:
           - compose_version: '1.28.0'
             compose_path: '/usr/local/bin'
