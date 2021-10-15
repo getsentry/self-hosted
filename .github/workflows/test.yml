@@ -29,7 +29,18 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-  
+
+      - name: Test support of docker compose v2
+        run: |
+          COMPOSE_PATH=/usr/local/lib/docker/cli-plugins/docker-compose
+          sudo rm $COMPOSE_PATH
+          sudo curl -L https://github.com/docker/compose/releases/download/v2.0.0/docker-compose-$(uname -s)-$(uname -m | sed 's/x86_64/amd64/') -o $COMPOSE_PATH
+          sudo chmod +x $COMPOSE_PATH
+          echo "Testing install with docker compose v2"
+          ./install.sh
+          ./_integration-test/run.sh
+          sudo rm $COMPOSE_PATH
+
       - name: Pin docker-compose
         run: |
           COMPOSE_PATH=/usr/local/bin/docker-compose
