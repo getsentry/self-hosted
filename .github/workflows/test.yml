@@ -27,7 +27,6 @@ jobs:
     runs-on: ubuntu-20.04
     name: "integration test"
     strategy:
-      max-parallel: 1
       fail-fast: false
       matrix:
         include:

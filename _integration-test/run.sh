@@ -41,7 +41,7 @@ echo "${_group}Starting Sentry for tests ..."
 echo 'SENTRY_BEACON=False' >> $SENTRY_CONFIG_PY
 $dcr web createuser --superuser --email $TEST_USER --password $TEST_PASS || true
 $dc up -d
-printf "Waiting for Sentry to be up"; timeout 60 bash -c 'until $(curl -Isf -o /dev/null $SENTRY_TEST_HOST); do printf '.'; sleep 0.5; done'
+printf "Waiting for Sentry to be up"; timeout 90 bash -c 'until $(curl -Isf -o /dev/null $SENTRY_TEST_HOST); do printf '.'; sleep 0.5; done'
 echo ""
 echo "${_endgroup}"
 
@@ -99,7 +99,7 @@ EVENT_PATH="projects/sentry/internal/events/$TEST_EVENT_ID/"
 export -f sentry_api_request get_csrf_token
 export SENTRY_TEST_HOST COOKIE_FILE EVENT_PATH
 printf "Getting the test event back"
-timeout 30 bash -c 'until $(sentry_api_request "$EVENT_PATH" -Isf -X GET -o /dev/null); do printf '.'; sleep 0.5; done'
+timeout 60 bash -c 'until $(sentry_api_request "$EVENT_PATH" -Isf -X GET -o /dev/null); do printf '.'; sleep 0.5; done'
 echo " got it!";
 
 EVENT_RESPONSE=$(sentry_api_request "$EVENT_PATH")
