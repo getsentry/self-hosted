@@ -25,7 +25,7 @@ else
   _endgroup=""
 fi
 
-dc_base="$(docker compose version >/dev/null && echo 'docker compose' || echo 'docker-compose')"
+dc_base="$(docker compose version &> /dev/null && echo 'docker compose' || echo 'docker-compose')"
 dc="$dc_base --ansi never"
 dcr="$dc run --rm"
 

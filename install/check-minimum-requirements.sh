@@ -4,7 +4,7 @@ source "$(dirname $0)/_min-requirements.sh"
 
 DOCKER_VERSION=$(docker version --format '{{.Server.Version}}')
 # Get semantic version of Docker Compose v2
-if docker compose version >/dev/null; then
+if docker compose version &>/dev/null; then
   COMPOSE_VERSION=$(docker compose version --short | sed 's/v\{0,1\}\(.\{1,\}\)/\1/')
 else
   # Do NOT use $dc instead of `docker-compose` below as older versions don't support certain options and fail
