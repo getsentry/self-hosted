@@ -59,4 +59,4 @@ if [ -n "$version" ]; then
 fi
 
 # Install.
-exec ./install.sh
+./install.sh
