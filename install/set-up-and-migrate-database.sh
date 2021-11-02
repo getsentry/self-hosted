@@ -9,7 +9,9 @@ if [[ -n "${CI:-}" || "${SKIP_USER_PROMPT:-0}" == 1 ]]; then
   echo "  docker-compose run --rm web createuser"
   echo ""
 else
-  $dcr web upgrade
+  cmd="docker compose --ansi never run --rm web upgrade"
+  echo "$cmd"
+  $cmd
 fi
 
 echo "${_endgroup}"

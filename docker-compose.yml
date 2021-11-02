@@ -20,32 +20,8 @@ x-sentry-defaults: &sentry_defaults
   depends_on:
     redis:
       <<: *depends_on-healthy
-    kafka:
-      <<: *depends_on-healthy
     postgres:
       <<: *depends_on-healthy
-    memcached:
-      <<: *depends_on-default
-    smtp:
-      <<: *depends_on-default
-    snuba-api:
-      <<: *depends_on-default
-    snuba-consumer:
-      <<: *depends_on-default
-    snuba-outcomes-consumer:
-      <<: *depends_on-default
-    snuba-sessions-consumer:
-      <<: *depends_on-default
-    snuba-transactions-consumer:
-      <<: *depends_on-default
-    snuba-subscription-consumer-events:
-      <<: *depends_on-default
-    snuba-subscription-consumer-transactions:
-      <<: *depends_on-default
-    snuba-replacer:
-      <<: *depends_on-default
-    symbolicator:
-      <<: *depends_on-default
   entrypoint: "/etc/sentry/entrypoint.sh"
   command: ["run", "web"]
   environment:
