@@ -264,6 +264,8 @@ services:
       - "sentry-symbolicator:/data"
   web:
     <<: *sentry_defaults
+    stdin_open: true
+    tty: true
     healthcheck:
       <<: *healthcheck_defaults
       test:
