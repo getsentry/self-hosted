@@ -26,17 +26,27 @@ jobs:
   integration-test:
     runs-on: ubuntu-20.04
     name: "integration test"
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - compose_version: '1.28.0'
+            compose_path: '/usr/local/bin'
+          - compose_version: 'v2.0.1'
+            compose_path: '/usr/local/lib/docker/cli-plugins'
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-  
-      - name: Pin docker-compose
+
+      - name: Get Compose
         run: |
-          COMPOSE_PATH=/usr/local/bin/docker-compose
-          source ./install/_min-requirements.sh
-          sudo rm $COMPOSE_PATH
-          sudo curl -L https://github.com/docker/compose/releases/download/${MIN_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` -o $COMPOSE_PATH
-          sudo chmod +x $COMPOSE_PATH
+          # Always remove `docker compose` support as that's the newer version
+          # and comes installed by default nowadays.
+          sudo rm -f "/usr/local/lib/docker/cli-plugins/docker-compose"
+          sudo rm -f "${{ matrix.compose_path }}/docker-compose"
+          sudo mkdir -p "${{ matrix.compose_path }}"
+          sudo curl -L https://github.com/docker/compose/releases/download/${{ matrix.compose_version }}/docker-compose-`uname -s`-`uname -m` -o "${{ matrix.compose_path }}/docker-compose"
+          sudo chmod +x "${{ matrix.compose_path }}/docker-compose"
 
       - name: Integration Test
         run: |
@@ -52,5 +62,5 @@ jobs:
       - name: Inspect failure
         if: failure()
         run: |
-          docker-compose ps
-          docker-compose logs
+          docker compose ps
+          docker compose logs

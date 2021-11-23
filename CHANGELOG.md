@@ -1,5 +1,28 @@
 # Changelog
 
+## 21.11.0
+
+### Various fixes & improvements
+
+- Fix #1079 - bug in reset.sh (#1134) by @chadwhitacre
+- ci: Enable parallel tests again, increase timeouts (#1125) by @BYK
+- fix: Hide compose errors during version check (#1124) by @BYK
+- build: Omit nightly bump commit from changelog (#1120) by @BYK
+- build: Set master version to nightly (d3e77857)
+
+## 21.10.0
+
+### Support for Docker Compose v2 (ongoing)
+
+You asked for it and you did it! Sentry self-hosted now can work with Docker Compose v2 thanks to our community's contributions.
+
+PRs: #1116
+
+### Various fixes & improvements
+
+- docs: simplify Linux `sudo` instructions in README (#1096)
+- build: Set master version to nightly (58874cf9)
+
 ## 21.9.0
 
 - fix(healthcheck): Increase retries to 5 (#1072)

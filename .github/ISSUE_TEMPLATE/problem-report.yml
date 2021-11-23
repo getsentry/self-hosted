@@ -1,5 +1,5 @@
-name: 🐞 Bug Report
-description: Tell us about something that's not working the way we (probably) intend.
+name: 🐞 Problem Report
+description: Tell us about something that's not working the way you expect.
 body:
   - type: input
     id: version
@@ -40,7 +40,7 @@ body:
   - type: markdown
     attributes:
       value: |-
-        ## Thanks 🙏
+        ## Thanks
         Check our [triage docs](https://open.sentry.io/triage/) for what to expect next.
     validations:
       required: false

@@ -3,6 +3,7 @@ if [[ "$MINIMIZE_DOWNTIME" ]]; then
 
   # Start the whole setup, except nginx and relay.
   $dc up -d --remove-orphans $($dc config --services | grep -v -E '^(nginx|relay)$')
+  $dc restart relay
   $dc exec -T nginx nginx -s reload
 
   docker run --rm --network="${COMPOSE_PROJECT_NAME}_default" alpine ash \
@@ -18,7 +19,7 @@ else
   echo ""
   echo "You're all done! Run the following command to get Sentry running:"
   echo ""
-  echo "  docker-compose up -d"
+  echo "  $dc_base up -d"
   echo ""
   echo "-----------------------------------------------------------------"
   echo ""
