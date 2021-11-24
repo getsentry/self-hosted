@@ -56,5 +56,5 @@ sudo SENTRY_IMAGE=us.gcr.io/sentryio/sentry:83b1380 ./install.sh
 
 Where you replace `83b1380` with the sha you want to use.
 
-[build-status-image]: https://github.com/getsentry/onpremise/workflows/test/badge.svg
+[build-status-image]: https://github.com/getsentry/self-hosted/workflows/test/badge.svg
 [build-status-url]: https://git.io/JUYkh
