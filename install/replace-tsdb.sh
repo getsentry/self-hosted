@@ -6,7 +6,7 @@ replace_tsdb() {
     ! grep -xq 'SENTRY_TSDB = "sentry.tsdb.redissnuba.RedisSnubaTSDB"' "$SENTRY_CONFIG_PY"
   ); then
     # Do NOT indent the following string as it would be reflected in the end result,
-    # breaking the final config file. See getsentry/onpremise#624.
+    # breaking the final config file. See getsentry/self-hosted#624.
     tsdb_settings="\
 SENTRY_TSDB = \"sentry.tsdb.redissnuba.RedisSnubaTSDB\"
 
@@ -37,7 +37,7 @@ SENTRY_TSDB_OPTIONS = {\"switchover_timestamp\": $(date +%s) + (90 * 24 * 3600)}
     echo ""
     echo "$tsdb_settings"
     echo ""
-    echo "For more information please refer to https://github.com/getsentry/onpremise/pull/430"
+    echo "For more information please refer to https://github.com/getsentry/self-hosted/pull/430"
   fi
 }
 

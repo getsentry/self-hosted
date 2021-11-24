@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# The purpose of this script is to make it easy to reset a local onpremise
+# The purpose of this script is to make it easy to reset a local self-hosted
 # install to a clean state, optionally targeting a particular version.
 
 set -euo pipefail
