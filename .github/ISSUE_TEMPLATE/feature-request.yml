@@ -5,9 +5,9 @@ body:
     id: problem
     attributes:
       label: Problem Statement
-      description: What problem could `self-hosted` solve that it doesn't?
+      description: What problem could `onpremise` solve that it doesn't?
       placeholder: |-
-        I want to make whirled peas, but `self-hosted` doesn't blend.
+        I want to make whirled peas, but `onpremise` doesn't blend.
     validations:
       required: true
   - type: textarea
@@ -16,7 +16,7 @@ body:
       label: Solution Brainstorm
       description: We know you have bright ideas to share ... share away, friend.
       placeholder: |-
-        Add a blender to `self-hosted`.
+        Add a blender to `onpremise`.
     validations:
       required: false
   - type: markdown
