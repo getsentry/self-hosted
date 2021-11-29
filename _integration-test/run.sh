@@ -17,23 +17,23 @@ trap_with_arg() {
   done
 }
 
-DID_CLEAN_UP=0
-# the cleanup function will be the exit point
-cleanup () {
-  if [ "$DID_CLEAN_UP" -eq 1 ]; then
+DID_TEAR_DOWN=0
+# the teardown function will be the exit point
+teardown() {
+  if [ "$DID_TEAR_DOWN" -eq 1 ]; then
     return 0;
   fi
-  DID_CLEAN_UP=1
+  DID_TEAR_DOWN=1
 
   if [ "$1" != "EXIT" ]; then
     echo "An error occurred, caught SIG$1 on line $2";
   fi
 
-  echo "Cleaning up..."
+  echo "Tearing down ..."
   rm $COOKIE_FILE
   echo "Done."
 }
-trap_with_arg cleanup ERR INT TERM EXIT
+trap_with_arg teardown ERR INT TERM EXIT
 echo "${_endgroup}"
 
 echo "${_group}Starting Sentry for tests ..."
