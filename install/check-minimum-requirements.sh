@@ -16,7 +16,8 @@ if docker compose version &>/dev/null; then
   true
 else
   # If we have `docker-compose` instead then it could be either v1 or v2 (also, use portable sed).
-  COMPOSE_VERSION=$(docker-compose version | head -n1 | sed 's/^.* version:\{0,1\} v\{0,1\}\(.\{1,\}\),.*$/\1/')
+  # See https://github.com/getsentry/self-hosted/issues/1132#issuecomment-982823712 ff. for regex testing.
+  COMPOSE_VERSION=$(docker-compose version | head -n1 | sed -E 's/^.* version:? v?([0-9.]+),?.*$/\1/'
   if [[ "$(ver $COMPOSE_VERSION)" -lt "$(ver $MIN_COMPOSE_VERSION)" ]]; then
     echo "FAIL: Expected minimum docker-compose version to be $MIN_COMPOSE_VERSION but found $COMPOSE_VERSION"
     exit 1
