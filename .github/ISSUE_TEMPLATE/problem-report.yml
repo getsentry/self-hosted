@@ -34,7 +34,7 @@ body:
       placeholder: |-
         e.g.:
         - latest install logs: `ls -1 sentry_install_log-*.txt | tail -1 | xargs cat`
-        - `docker-compose logs` output
+        - `docker compose logs` output
     validations:
       required: true
   - type: markdown

@@ -4,7 +4,7 @@ show_help() {
   cat <<EOF
 Usage: $0 [options]
 
-Install Sentry with docker-compose.
+Install Sentry with `docker compose`.
 
 Options:
  -h, --help             Show this message and exit.
