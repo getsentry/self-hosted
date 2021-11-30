@@ -9,6 +9,12 @@ if docker compose version &>/dev/null; then
 else
   # Do NOT use $dc instead of `docker-compose` below as older versions don't support certain options and fail
   COMPOSE_VERSION=$(docker-compose --version | sed 's/docker-compose version \(.\{1,\}\),.*/\1/')
+
+  # Another check if is the newer version with additional prefix
+  if [[ $COMPOSE_VERSION =~ v ]]; then
+    # Extract only the version number
+    COMPOSE_VERSION=$(echo ${COMPOSE_VERSION} | rev | cut -d 'v' -f 1 | rev)
+  fi
 fi
 RAM_AVAILABLE_IN_DOCKER=$(docker run --rm busybox free -m 2>/dev/null | awk '/Mem/ {print $2}');
 CPU_AVAILABLE_IN_DOCKER=$(docker run --rm busybox nproc --all);
