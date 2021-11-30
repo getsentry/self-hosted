@@ -20,7 +20,7 @@ cleanup () {
     echo "An error occurred, caught SIG$1 on line $2";
 
     if [[ -n "$MINIMIZE_DOWNTIME" ]]; then
-      echo "*NOT* cleaning up, to clean your environment run \"docker-compose stop\"."
+      echo "*NOT* cleaning up, to clean your environment run \"docker compose stop\"."
     else
       echo "Cleaning up..."
     fi
