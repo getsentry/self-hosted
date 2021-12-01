@@ -357,6 +357,7 @@ services:
       web:
         <<: *depends_on-healthy
 volumes:
+  # These store application data that should persist across restarts.
   sentry-data:
     external: true
   sentry-postgres:
@@ -371,6 +372,8 @@ volumes:
     external: true
   sentry-symbolicator:
     external: true
+
+  # These store ephemeral data that needn't persist across restarts.
   sentry-secrets:
   sentry-smtp:
   sentry-zookeeper-log:
