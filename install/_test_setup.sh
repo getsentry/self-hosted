@@ -1,8 +1,8 @@
 set -euo pipefail
 source "$(dirname $0)/_lib.sh"
 
-rm -rf /tmp/sentry-onpremise-test-sandbox.*
-_SANDBOX="$(mktemp -d /tmp/sentry-onpremise-test-sandbox.XXX)"
+rm -rf /tmp/sentry-self-hosted-test-sandbox.*
+_SANDBOX="$(mktemp -d /tmp/sentry-self-hosted-test-sandbox.XXX)"
 
 report_success() {
   echo "$(basename $0) - Success 👍"
