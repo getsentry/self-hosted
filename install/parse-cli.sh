@@ -17,12 +17,14 @@ EOF
 
 SKIP_USER_PROMPT="${SKIP_USER_PROMPT:-}"
 MINIMIZE_DOWNTIME="${MINIMIZE_DOWNTIME:-}"
+NOT_LATEST_COMMIT="${NOT_LATEST_COMMIT:-}"
 
 while (( $# )); do
   case "$1" in
     -h | --help) show_help; exit;;
     --no-user-prompt) SKIP_USER_PROMPT=1;;
     --minimize-downtime) MINIMIZE_DOWNTIME=1;;
+    --not-latest-commit) NOT_LATEST_COMMIT=1;;
     --) ;;
     *) echo "Unexpected argument: $1. Use --help for usage information."; exit 1;;
   esac
