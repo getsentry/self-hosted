@@ -8,6 +8,7 @@ fi
 source "$(dirname $0)/install/_lib.sh"  # does a `cd .../install/`, among other things
 
 source parse-cli.sh
+source check-latest-commit.sh
 source error-handling.sh
 source check-minimum-requirements.sh
 source create-docker-volumes.sh
