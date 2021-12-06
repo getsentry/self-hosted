@@ -5,6 +5,7 @@ if [[ -n "$MSYSTEM" ]]; then
   exit 1
 fi
 
+# Checks if we are on latest commit from github if it is running from master branch
 if [[ -d ".git" ]]; then
   if [[ $(git branch | sed -n '/\* /s///p') == "master" ]]; then
     if [[ $(git rev-parse HEAD) != $(git ls-remote $(git rev-parse --abbrev-ref @{u} | sed 's/\// /g') | cut -f1) ]]; then
