@@ -4,14 +4,20 @@ show_help() {
   cat <<EOF
 Usage: $0 [options]
 
-Install Sentry with `docker compose`.
+Install Sentry with \`docker compose\`.
 
 Options:
  -h, --help             Show this message and exit.
- --no-user-prompt       Skips the initial user creation prompt (ideal for non-interactive installs).
- --minimize-downtime    EXPERIMENTAL: try to keep accepting events for as long as possible while upgrading.
-                        This will disable cleanup on error, and might leave your installation in partially upgraded state.
-                        This option might not reload all configuration, and is only meant for in-place upgrades.
+ --minimize-downtime    EXPERIMENTAL: try to keep accepting events for as long
+                          as possible while upgrading. This will disable cleanup
+                          on error, and might leave your installation in a
+                          partially upgraded state. This option might not reload
+                          all configuration, and is only meant for in-place
+                          upgrades.
+ --skip-commit-check    Skip the check for the latest commit when on the master
+                          branch of a \`self-hosted\` Git working copy.
+ --skip-user-prompt     Skip the initial user creation prompt (ideal for non-
+                          interactive installs).
 EOF
 }
 
@@ -22,7 +28,8 @@ SKIP_COMMIT_CHECK="${SKIP_COMMIT_CHECK:-}"
 while (( $# )); do
   case "$1" in
     -h | --help) show_help; exit;;
-    --no-user-prompt) SKIP_USER_PROMPT=1;;
+    --no-user-prompt) SKIP_USER_PROMPT=1;;  # deprecated
+    --skip-user-prompt) SKIP_USER_PROMPT=1;;
     --minimize-downtime) MINIMIZE_DOWNTIME=1;;
     --skip-commit-check) SKIP_COMMIT_CHECK=1;;
     --) ;;
