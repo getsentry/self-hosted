@@ -58,3 +58,4 @@ Where you replace `83b1380` with the sha you want to use.
 
 [build-status-image]: https://github.com/getsentry/self-hosted/workflows/test/badge.svg
 [build-status-url]: https://git.io/JUYkh
+
