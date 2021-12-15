@@ -1,5 +1,48 @@
 # Changelog
 
+## 21.12.0
+
+### Support Docker Compose v2 (ongoing)
+
+Self-hosted Sentry mostly works with Docker Compose v2 (in addition to v1 >= 1.28.0). There is [one more bug](https://github.com/getsentry/self-hosted/issues/1133) we are trying to squash.
+
+By: @chadwhitacre (#1179)
+
+### Prevent Component Drift
+
+When a user runs the `install.sh` script, they get the latest version of the Sentry, Snuba, Relay and Symbolicator projects. However there is no guarantee they have pulled the latest `self-hosted` version first, and running an old one may cause problems. To mitigate this, we now perform a check during installation that the user is on the latest commit if they are on the `master` branch. You can disable this check with `--skip-commit-check`.
+
+By: @chadwhitacre (#1191), @aminvakil (#1186)
+
+### React to log4shell
+
+Self-hosted Sentry is [not vulnerable](https://github.com/getsentry/self-hosted/issues/1196) to the [log4shell](https://log4shell.com/) vulnerability.
+
+By: @chadwhitacre (#1203)
+
+### Forum → Issues
+
+In the interest of reducing sources of truth, providing better support, and restarting the fire of the self-hosted Sentry community, we [deprecated the Discourse forum in favor of GitHub Issues](https://github.com/getsentry/self-hosted/issues/1151).
+
+By: @chadwhitacre (#1167, #1160, #1159)
+
+### Rename onpremise to self-hosted (ongoing)
+
+In the beginning we used the term "on-premise" and over time we introduced the term "self-hosted." In an effort to regain some consistency for both branding and developer mental overhead purposes, we are standardizing on the term "self-hosted." This release includes a fair portion of the work towards this across multiple repos, hopefully a future release will include the remainder. Some orphaned containers / volumes / networks are [expected](https://github.com/getsentry/self-hosted/pull/1169&#35;discussion_r756401917). You may clean them up with `docker-compose down --remove-orphans`.
+
+By: @chadwhitacre (#1169)
+
+### Add support for custom DotEnv file
+
+There are several ways to [configure self-hosted Sentry](https://develop.sentry.dev/self-hosted/&#35;configuration) and one of them is the `.env` file. In this release we add support for a `.env.custom` file that is git-ignored to make it easier for you to override keys configured this way with custom values. Thanks to @Sebi94nbg for the contribution!
+
+By: @Sebi94nbg (#1113)
+
+### Various fixes & improvements
+
+- Revert "Rename onpremise to self-hosted" (5495fe2e) by @chadwhitacre
+- Rename onpremise to self-hosted (9ad05d87) by @chadwhitacre
+
 ## 21.11.0
 
 ### Various fixes & improvements
