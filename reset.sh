@@ -11,6 +11,7 @@ fi
 
 cd "$(dirname $0)"
 
+source install/dc-detect-version.sh
 
 function confirm () {
   read -p "$1 [y/n] " confirmation
@@ -44,7 +45,7 @@ confirm "☠️  Warning! 😳 This is highly destructive! 😱 Are you sure you
 echo "Okay ... good luck! 😰"
 
 # Hit the reset button.
-docker compose down --volumes --remove-orphans --rmi local
+$dc down --volumes --remove-orphans --rmi local
 
 # Remove any remaining (likely external) volumes with name matching 'sentry-.*'.
 for volume in $(docker volume list --format '{{ .Name }}' | grep '^sentry-'); do
