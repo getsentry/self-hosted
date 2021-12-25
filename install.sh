@@ -5,6 +5,8 @@ if [[ -n "$MSYSTEM" ]]; then
   exit 1
 fi
 
+umask 002
+
 source "$(dirname $0)/install/_lib.sh"  # does a `cd .../install/`, among other things
 
 source dc-detect-version.sh
