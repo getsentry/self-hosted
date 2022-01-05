@@ -9,8 +9,9 @@ umask 002
 
 source "$(dirname $0)/install/_lib.sh"  # does a `cd .../install/`, among other things
 
-source dc-detect-version.sh
 source parse-cli.sh
+source dc-detect-version.sh
+source turn-things-off.sh
 source check-latest-commit.sh
 source error-handling.sh
 source check-minimum-requirements.sh
@@ -20,7 +21,6 @@ source generate-secret-key.sh
 source replace-tsdb.sh
 source update-docker-images.sh
 source build-docker-images.sh
-source turn-things-off.sh
 source set-up-zookeeper.sh
 source install-wal2json.sh
 source bootstrap-snuba.sh
