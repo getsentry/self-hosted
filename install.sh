@@ -11,9 +11,9 @@ source "$(dirname $0)/install/_lib.sh"  # does a `cd .../install/`, among other 
 
 source parse-cli.sh
 source dc-detect-version.sh
+source error-handling.sh
 source turn-things-off.sh
 source check-latest-commit.sh
-source error-handling.sh
 source check-minimum-requirements.sh
 source create-docker-volumes.sh
 source ensure-files-from-examples.sh
