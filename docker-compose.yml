@@ -10,9 +10,9 @@ x-healthcheck-defaults: &healthcheck_defaults
   # https://github.com/moby/moby/issues/39102
   # https://github.com/moby/moby/issues/39388
   # https://github.com/getsentry/self-hosted/issues/1000
-  interval: 30s
-  timeout: 60s
-  retries: 5
+  interval: "$HEALTHCHECK_INTERVAL"
+  timeout: "$HEALTHCHECK_TIMEOUT"
+  retries: "$HEALTHCHECK_RETRIES"
   start_period: 10s
 x-sentry-defaults: &sentry_defaults
   <<: *restart_policy
