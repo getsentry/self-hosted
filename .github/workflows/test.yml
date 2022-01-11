@@ -32,7 +32,11 @@ jobs:
         include:
           - compose_version: '1.28.0'
             compose_path: '/usr/local/bin'
+          - compose_version: '1.29.2'
+            compose_path: '/usr/local/bin'
           - compose_version: 'v2.0.1'
+            compose_path: '/usr/local/lib/docker/cli-plugins'
+          - compose_version: 'v2.2.3'
             compose_path: '/usr/local/lib/docker/cli-plugins'
     steps:
       - name: Checkout
