@@ -1,5 +1,17 @@
 # Changelog
 
+## 22.1.0
+
+### Various fixes & improvements
+
+- Make healthcheck variables configurable in .env (#1248) by @aminvakil
+- Take some actions to avoid unhealthy containers (#1241) by @chadwhitacre
+- Install: setup umask (#1222) by @glensc
+- Deprecated /docker-entrypoint.sh call (#1218) by @marcinroman
+- Bump nginx:1.21.5-alpine (#1230) by @aminvakil
+- Fix reset.sh docker-compose call (#1215) by @aminvakil
+- Set worker_processes to auto (#1207) by @aminvakil
+
 ## 21.12.0
 
 ### Support Docker Compose v2 (ongoing)
