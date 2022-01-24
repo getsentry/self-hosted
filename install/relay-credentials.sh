@@ -20,16 +20,22 @@ if [[ ! -f "$RELAY_CREDENTIALS_JSON" ]]; then
     --entrypoint \"/bin/bash\" relay -c \
     "chown -R 10001 /tmp/relay"
 
+  ls -l $RELAY_DIRECTORY
+
   $dcr \
     --no-deps -T \
     --volume "$(pwd)/$RELAY_DIRECTORY:/tmp/relay" \
     relay --config /tmp/relay credentials generate
+
+  more $RELAY_DIRECTORY/* | cat
 
   $dcr \
     --no-deps \
     --volume "$(pwd)/$RELAY_DIRECTORY:/tmp/relay" \
     --entrypoint \"/bin/bash\" relay -c \
     "chown -R $UID /tmp/relay"
+
+  ls -l $RELAY_DIRECTORY
 
   echo "Relay credentials written to $RELAY_CREDENTIALS_JSON"
 fi
