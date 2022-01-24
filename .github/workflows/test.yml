@@ -12,17 +12,6 @@ defaults:
   run:
     shell: bash
 jobs:
-  unit-test:
-    runs-on: ubuntu-20.04
-    name: "unit tests"
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-
-      - name: Unit Tests
-        working-directory: install
-        run: find ./ -type f -name "*-test.sh" -exec "./{}" \;
-
   integration-test:
     runs-on: ubuntu-20.04
     name: "integration test"
@@ -32,8 +21,6 @@ jobs:
         include:
           - compose_version: '1.28.0'
             compose_path: '/usr/local/bin'
-          - compose_version: 'v2.0.1'
-            compose_path: '/usr/local/lib/docker/cli-plugins'
     steps:
       - name: Checkout
         uses: actions/checkout@v2
