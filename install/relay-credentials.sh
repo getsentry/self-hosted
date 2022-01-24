@@ -33,6 +33,7 @@ if [[ ! -f "$RELAY_CREDENTIALS_JSON" ]]; then
     --entrypoint \"/bin/bash\" relay -c \
     "chown -R $UID /tmp/relay"
 
+  tr -d '[:space:]' < "$RELAY_CREDENTIALS_JSON" > "$RELAY_CREDENTIALS_JSON"-temp && mv "$RELAY_CREDENTIALS_JSON"-temp "$RELAY_CREDENTIALS_JSON"
   ls -l $RELAY_DIRECTORY
   more $RELAY_DIRECTORY/* | cat
 
