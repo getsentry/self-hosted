@@ -27,8 +27,6 @@ if [[ ! -f "$RELAY_CREDENTIALS_JSON" ]]; then
     --volume "$(pwd)/$RELAY_DIRECTORY:/tmp/relay" \
     relay --config /tmp/relay credentials generate
 
-  more $RELAY_DIRECTORY/* | cat
-
   $dcr \
     --no-deps \
     --volume "$(pwd)/$RELAY_DIRECTORY:/tmp/relay" \
@@ -36,6 +34,7 @@ if [[ ! -f "$RELAY_CREDENTIALS_JSON" ]]; then
     "chown -R $UID /tmp/relay"
 
   ls -l $RELAY_DIRECTORY
+  more $RELAY_DIRECTORY/* | cat
 
   echo "Relay credentials written to $RELAY_CREDENTIALS_JSON"
 fi
