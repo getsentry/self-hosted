@@ -14,12 +14,22 @@ if [[ ! -f "$RELAY_CREDENTIALS_JSON" ]]; then
   # JSON. We hit this case as we redirect output to the same config folder,
   # creating an empty credentials file before relay runs.
 
-  docker run --rm --volume "$(pwd)/$RELAY_DIRECTORY:/tmp/relay" busybox chown -R 10001 /tmp/relay
+  $dcr \
+    --no-deps \
+    --volume "$(pwd)/$RELAY_DIRECTORY:/tmp/relay" \
+    --entrypoint \"/bin/bash\" relay -c \
+    "chown -R 10001 /tmp/relay"
+
   $dcr \
     --no-deps -T \
     --volume "$(pwd)/$RELAY_DIRECTORY:/tmp/relay" \
     relay --config /tmp/relay credentials generate
-  docker run --rm --volume "$(pwd)/$RELAY_DIRECTORY:/tmp/relay" busybox chown -R $UID /tmp/relay
+
+  $dcr \
+    --no-deps \
+    --volume "$(pwd)/$RELAY_DIRECTORY:/tmp/relay" \
+    --entrypoint \"/bin/bash\" relay -c \
+    "chown -R $UID /tmp/relay"
 
   echo "Relay credentials written to $RELAY_CREDENTIALS_JSON"
 fi
