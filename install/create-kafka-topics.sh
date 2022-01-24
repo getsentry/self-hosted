@@ -6,6 +6,7 @@ EXISTING_KAFKA_TOPICS=$($dcr -T kafka kafka-topics --list --bootstrap-server kaf
 NEEDED_KAFKA_TOPICS="ingest-attachments ingest-transactions ingest-events"
 for topic in $NEEDED_KAFKA_TOPICS; do
   if ! echo "$EXISTING_KAFKA_TOPICS" | grep -wq $topic; then
+    echo "$topic"
     $dcr kafka kafka-topics --create --topic $topic --bootstrap-server kafka:9092
     echo ""
   fi
