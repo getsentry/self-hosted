@@ -35,13 +35,6 @@ jobs:
           sudo curl -L https://github.com/docker/compose/releases/download/${{ matrix.compose_version }}/docker-compose-`uname -s`-`uname -m` -o "${{ matrix.compose_path }}/docker-compose"
           sudo chmod +x "${{ matrix.compose_path }}/docker-compose"
 
-      - name: Integration Test
+      - name: Hack Test
         run: |
-          echo "Testing initial install"
-          ./install.sh
-
-      - name: Inspect failure
-        if: failure()
-        run: |
-          docker compose ps
-          docker compose logs
+          ./dcrrelay credentials generate

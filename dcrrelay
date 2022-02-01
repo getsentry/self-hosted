@@ -1,0 +1,5 @@
+#!/usr/bin/env zsh
+
+dc="./docker-compose-1.28.0"
+$dc version
+$dc run --no-deps relay $@
