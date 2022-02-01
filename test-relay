@@ -27,7 +27,7 @@ cd ..
 echo 'list images -----------------------------'
 docker image list --all | grep relay
 echo 'generate --------------------------------'
-creds="$dcr -T --no-deps relay credentials"
+creds="$dcr --no-deps relay credentials"
 ls -FGl relay
 $creds generate --stdout 2> stderr > credentials.json.tmp
 echo 'list images again -----------------------'
