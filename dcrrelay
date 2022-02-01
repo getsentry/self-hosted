@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
 
-dc="./docker-compose-1.28.0"
-$dc version
-$dc run --no-deps relay $@
+docker-compose version
+docker-compose run --no-deps relay $@
