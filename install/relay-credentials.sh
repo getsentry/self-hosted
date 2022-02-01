@@ -5,6 +5,7 @@ RELAY_CREDENTIALS_JSON="../relay/credentials.json"
 
 ensure_file_from_example $RELAY_CONFIG_YML
 
+$dc version
 if [[ ! -f "$RELAY_CREDENTIALS_JSON" ]]; then
 
   # We need the ugly hack below as `relay generate credentials` tries to read
@@ -20,6 +21,9 @@ if [[ ! -f "$RELAY_CREDENTIALS_JSON" ]]; then
     > "$RELAY_CREDENTIALS_JSON"
 
   echo "Relay credentials written to $RELAY_CREDENTIALS_JSON"
+  cat "$RELAY_CREDENTIALS_JSON"
+else
+  echo "$RELAY_CREDENTIALS_JSON already exists, skipped creation."
 fi
 
 echo "${_endgroup}"
