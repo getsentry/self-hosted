@@ -8,10 +8,10 @@ ensure_file_from_example $RELAY_CONFIG_YML
 if [[ -f "$RELAY_CREDENTIALS_JSON" ]]; then
   echo "$RELAY_CREDENTIALS_JSON already exists, skipped creation."
 else
-  ls -FGl relay
+  ls -FGl ../relay
   $dcr relay credentials generate
-  ls -FGl relay
-  cat relay/credentials.json
+  ls -FGl ../relay
+  cat ../relay/credentials.json
   $dcr relay credentials show
   if [[ -f "$RELAY_CREDENTIALS_JSON" ]]; then
     echo "Relay credentials written to $RELAY_CREDENTIALS_JSON."
