@@ -1,8 +1,16 @@
 #!/usr/bin/env bash
 
-docker-compose version
+dc_base="$(docker compose version &> /dev/null && echo 'docker compose' || echo 'docker-compose')"
+if [[ "$(basename $0)" = "install.sh"  ]]; then
+  dc="$dc_base --ansi never --env-file ${_ENV}"
+else
+  dc="$dc_base --ansi never"
+fi
+dcr="$dc run --rm"
 
-docker-compose down --rmi local --remove-orphans
+$dc version
+
+$dc down --rmi local --remove-orphans
 docker volume create --name=sentry-clickhouse
 docker volume create --name=sentry-data
 docker volume create --name=sentry-kafka
@@ -16,16 +24,8 @@ cp config.example.yml config.yml
 rm credentials.json
 cd ..
 
-dc_base="$(docker compose version &> /dev/null && echo 'docker compose' || echo 'docker-compose')"
-if [[ "$(basename $0)" = "install.sh"  ]]; then
-  dc="$dc_base --ansi never --env-file ${_ENV}"
-else
-  dc="$dc_base --ansi never"
-fi
-dcr="$dc run --rm"
 
-
-creds="$dcr --no-deps relay credentials"
+creds="$dcr -T --no-deps relay credentials"
 ls -FGl relay
 $creds generate --stdout 2> stderr > credentials.json.tmp
 
