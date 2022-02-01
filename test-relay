@@ -30,7 +30,5 @@ mv credentials.json.tmp relay/credentials.json
 ls -FGl relay
 echo 'outside ---------------------------------'
 cat relay/credentials.json
-echo 'inside ----------------------------------'
-docker-compose run --no-deps relay bash -c 'whoami; pwd; ls -FGla; ls -FGla .relay; cat -ve /work/.relay/credentials.json'
 echo '========================================='
 $creds show 
