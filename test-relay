@@ -27,7 +27,7 @@ cd ..
 
 creds="$dcr -T --no-deps relay credentials"
 ls -FGl relay
-$creds generate --stdout 2> stderr > credentials.json.tmp
+$creds generate --stdout > credentials.json.tmp
 
 echo 'stderr ----------------------------------'
 cat stderr
