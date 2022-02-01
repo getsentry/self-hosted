@@ -37,3 +37,9 @@ jobs:
 
       - name: Hack Test
         run: ./install.sh
+
+      - name: Inspect failure
+        if: failure()
+        run: |
+          docker compose ps
+          docker compose logs
