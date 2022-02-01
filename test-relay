@@ -16,7 +16,16 @@ cp config.example.yml config.yml
 rm credentials.json
 cd ..
 
-creds="docker-compose run --no-deps relay credentials"
+dc_base="$(docker compose version &> /dev/null && echo 'docker compose' || echo 'docker-compose')"
+if [[ "$(basename $0)" = "install.sh"  ]]; then
+  dc="$dc_base --ansi never --env-file ${_ENV}"
+else
+  dc="$dc_base --ansi never"
+fi
+dcr="$dc run --rm"
+
+
+creds="$dcr --no-deps relay credentials"
 ls -FGl relay
 $creds generate --stdout 2> stderr > credentials.json.tmp
 
