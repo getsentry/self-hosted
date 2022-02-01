@@ -13,12 +13,12 @@ docker volume create --name=sentry-zookeeper
 
 cd relay
 cp config.example.yml config.yml
+rm credentials.json
 cd ..
 
 creds="docker-compose run --no-deps relay credentials"
 ls -FGl relay
 $creds generate --stdout | tail -n1 > credentials.json.tmp
-echo > credentials.json.tmp
 
 echo 'generated -------------------------------'
 ls -FGl relay
