@@ -2,6 +2,7 @@
 
 docker-compose version
 
+docker-compose down --rmi local --remove-orphans
 docker volume create --name=sentry-clickhouse
 docker volume create --name=sentry-data
 docker volume create --name=sentry-kafka

@@ -36,7 +36,11 @@ jobs:
           sudo chmod +x "${{ matrix.compose_path }}/docker-compose"
 
       - name: Hack Test
-        run: ./test-relay
+        run: |
+          pwd
+          ls -FGl
+          ls -FGl relay
+          ./test-relay
 
       - name: Inspect failure
         if: failure()
