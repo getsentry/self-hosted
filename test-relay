@@ -30,6 +30,6 @@ ls -FGl relay
 echo 'outside ---------------------------------'
 cat relay/credentials.json
 echo 'inside ----------------------------------'
-docker-compose run --no-deps relay bash -c 'whoami; ps|grep relay ; pwd; ls -FGla; ls -FGla .relay; cat /work/.relay/credentials.json'
+docker-compose run --no-deps relay bash -c 'whoami; ps auxww|grep relay ; pwd; ls -FGla; ls -FGla .relay; cat /work/.relay/credentials.json'
 echo '========================================='
 $creds show 
