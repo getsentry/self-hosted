@@ -11,6 +11,10 @@ docker volume create --name=sentry-redis
 docker volume create --name=sentry-symbolicator
 docker volume create --name=sentry-zookeeper
 
+cd relay
+cp config.example.yml config.yml
+cd ..
+
 creds="docker-compose run --no-deps relay credentials"
 ls -FGl relay
 $creds generate
