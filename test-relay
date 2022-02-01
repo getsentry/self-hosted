@@ -17,7 +17,7 @@ cd ..
 
 creds="docker-compose run --no-deps relay credentials"
 ls -FGl relay
-$creds generate --stdout > credentials.json.tmp
+$creds generate --stdout | tail -n1 > credentials.json.tmp
 echo > credentials.json.tmp
 
 echo 'generated -------------------------------'
