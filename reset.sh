@@ -11,6 +11,8 @@ fi
 
 cd "$(dirname $0)"
 
+_group=""
+_endgroup=""
 source install/dc-detect-version.sh
 
 function confirm () {

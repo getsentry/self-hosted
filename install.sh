@@ -16,12 +16,14 @@ source error-handling.sh
 source check-latest-commit.sh
 source check-minimum-requirements.sh
 
-source relay-credentials.sh
-exit
-
 # Let's go! Start impacting things.
 source turn-things-off.sh
 source create-docker-volumes.sh
+
+# Test thing
+source relay-credentials.sh
+exit
+
 source ensure-files-from-examples.sh
 source generate-secret-key.sh
 source replace-tsdb.sh

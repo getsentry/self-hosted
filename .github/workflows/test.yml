@@ -36,5 +36,4 @@ jobs:
           sudo chmod +x "${{ matrix.compose_path }}/docker-compose"
 
       - name: Hack Test
-        run: |
-          ./dcrrelay credentials generate
+        run: ./install.sh

@@ -10,14 +10,8 @@ if [[ -f "$RELAY_CREDENTIALS_JSON" ]]; then
   echo "$RELAY_CREDENTIALS_JSON already exists, skipped creation."
 else
 
-  # If we call `docker compose run relay`
-
-  $dcr \
-    --no-deps \
-    --volume "$(pwd)/$RELAY_CONFIG_YML:/tmp/config.yml" \
-    relay --config /tmp credentials generate --stdout \
-    > "$RELAY_CREDENTIALS_JSON_TMP"
-
+  ls -FGl ../relay
+  $dcr --no-deps relay credentials generate
   ls -FGl ../relay
   cat ../relay/credentials.json
   $dcr relay credentials show 
