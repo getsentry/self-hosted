@@ -16,6 +16,9 @@ source error-handling.sh
 source check-latest-commit.sh
 source check-minimum-requirements.sh
 
+source relay-credentials.sh
+exit
+
 # Let's go! Start impacting things.
 source turn-things-off.sh
 source create-docker-volumes.sh
