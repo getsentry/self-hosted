@@ -21,6 +21,7 @@ if [[ ! -f "$RELAY_CREDENTIALS_JSON" ]]; then
     > "$RELAY_CREDENTIALS_JSON"
 
   echo "Relay credentials written to $RELAY_CREDENTIALS_JSON"
+  ls ../relay
   cat "$RELAY_CREDENTIALS_JSON"
 else
   echo "$RELAY_CREDENTIALS_JSON already exists, skipped creation."
