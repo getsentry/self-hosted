@@ -16,9 +16,9 @@ cp config.example.yml config.yml
 rm credentials.json
 cd ..
 
-creds="docker-compose run --no-deps relay credentials"
+creds="docker-compose run --no-deps --quiet-pull relay credentials"
 ls -FGl relay
-$creds generate --stdout | tail -n1 > credentials.json.tmp
+$creds generate --stdout > credentials.json.tmp
 
 echo 'generated -------------------------------'
 ls -FGl relay
