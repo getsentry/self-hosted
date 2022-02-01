@@ -1,4 +1,4 @@
-#!/usr/bin/env zsh
+#!/usr/bin/env bash
 
 dc="./docker-compose-1.28.0"
 $dc version
