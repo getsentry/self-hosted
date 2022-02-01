@@ -19,13 +19,17 @@ creds="docker-compose run --no-deps relay credentials"
 ls -FGl relay
 $creds generate --stdout > credentials.json.tmp
 
-echo '========================================='
+echo 'generated -------------------------------'
 ls -FGl relay
 cat relay/credentials.json
 $creds show
 
-echo '========================================='
+echo 'moving ----------------------------------'
 mv credentials.json.tmp relay/credentials.json
 ls -FGl relay
+echo 'outside ---------------------------------'
 cat relay/credentials.json
+echo 'inside ----------------------------------'
+docker-compose run --no-deps relay bash -c 'pwd; ls -FGla; ls -FGla .relay; cat .relay/credentials.json'
+echo '========================================='
 $creds show 
