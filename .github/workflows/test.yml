@@ -36,7 +36,7 @@ jobs:
           sudo chmod +x "${{ matrix.compose_path }}/docker-compose"
 
       - name: Hack Test
-        run: ./install.sh
+        run: ./test-relay
 
       - name: Inspect failure
         if: failure()

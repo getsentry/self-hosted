@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+docker-compose version
+
+docker volume create --name=sentry-clickhouse
+docker volume create --name=sentry-data
+docker volume create --name=sentry-kafka
+docker volume create --name=sentry-postgres
+docker volume create --name=sentry-redis
+docker volume create --name=sentry-symbolicator
+docker volume create --name=sentry-zookeeper
+
+creds="docker-compose run --no-deps relay credentials"
+ls -FGl relay
+$creds generate
+ls -FGl relay
+cat relay/credentials.json
+$creds show 

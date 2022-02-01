@@ -1,4 +1,0 @@
-#!/usr/bin/env bash
-
-docker-compose version
-docker-compose run --no-deps relay $@
