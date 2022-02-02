@@ -14,7 +14,7 @@ if [[ ! -f "$RELAY_CREDENTIALS_JSON" ]]; then
   # creating an empty credentials file before relay runs.
 
   $dcr \
-    --no-deps --no-TTY \
+    --no-deps -T \
     --volume "$(pwd)/$RELAY_CONFIG_YML:/tmp/config.yml" \
     relay --config /tmp credentials generate --stdout \
     > "$RELAY_CREDENTIALS_JSON"
