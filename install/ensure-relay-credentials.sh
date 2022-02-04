@@ -16,10 +16,15 @@ else
   #    will then try to read from (regardless of options such as --stdout or
   #    --overwrite) and fail because it is empty.
   #
-  # 2. We need to use -T to avoid additional garbage output cluttering
-  #    credentials.json under Docker Compose 1.x and 2.2.3+. Note that the
-  #    long opt --no-tty doesn't exist in Docker Compose 1.
+  # 2. We pull relay:nightly before invoking `run relay credentials generate`
+  #    because an implicit pull under the run causes extra stdout that results
+  #    in a garbage credentials.json.
+  #
+  # 3. We need to use -T to ensure that we receive output on Docker Compose
+  #    1.x and 2.2.3+ (funny story about that ... ;). Note that the long opt
+  #    --no-tty doesn't exist in Docker Compose 1.
 
+  $dc pull relay
   creds="$dcr --no-deps -T relay credentials"
   $creds generate --stdout > "$RELAY_CREDENTIALS_JSON".tmp
   mv "$RELAY_CREDENTIALS_JSON".tmp "$RELAY_CREDENTIALS_JSON"
