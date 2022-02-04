@@ -26,6 +26,9 @@ else
   if ! grep -q Credentials <($creds show); then
     # Let's fail early if creds failed, to make debugging easier.
     echo "Failed to create relay credentials in $RELAY_CREDENTIALS_JSON."
+    echo "--- credentials.json v ---------------------------------------"
+    cat -v "$RELAY_CREDENTIALS_JSON" || true
+    echo "--- credentials.json ^ ---------------------------------------"
     exit 1
   fi
   echo "Relay credentials written to $RELAY_CREDENTIALS_JSON."
