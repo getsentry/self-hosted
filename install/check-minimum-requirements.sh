@@ -7,22 +7,18 @@ function ver () { echo "$@" | awk -F. '{ printf("%d%03d%03d", $1,$2,$3); }'; }
 
 DOCKER_VERSION=$(docker version --format '{{.Server.Version}}')
 if [[ "$(ver $DOCKER_VERSION)" -lt "$(ver $MIN_DOCKER_VERSION)" ]]; then
-  echo "FAIL: Expected minimum Docker version to be $MIN_DOCKER_VERSION but found $DOCKER_VERSION"
+  echo "FAIL: Expected minimum docker version to be $MIN_DOCKER_VERSION but found $DOCKER_VERSION"
   exit 1
 fi
+echo "Found Docker version $DOCKER_VERSION"
 
-if docker compose version &>/dev/null; then
-  # If `docker compose` exists then it's guaranteed to be Docker Compose v2, which is good enough for us.
-  true
-else
-  # If we have `docker-compose` instead then it could be either v1 or v2 (also, use portable sed).
-  # See https://github.com/getsentry/self-hosted/issues/1132#issuecomment-982823712 ff. for regex testing.
-  COMPOSE_VERSION=$(docker-compose version | head -n1 | sed -E 's/^.* version:? v?([0-9.]+),?.*$/\1/')
-  if [[ "$(ver $COMPOSE_VERSION)" -lt "$(ver $MIN_COMPOSE_VERSION)" ]]; then
-    echo "FAIL: Expected minimum docker-compose version to be $MIN_COMPOSE_VERSION but found $COMPOSE_VERSION"
-    exit 1
-  fi
+# See https://github.com/getsentry/self-hosted/issues/1132#issuecomment-982823712 ff. for regex testing.
+COMPOSE_VERSION=$($dc_base version | head -n1 | sed -E 's/^.* version:? v?([0-9.]+),?.*$/\1/')
+if [[ "$(ver $COMPOSE_VERSION)" -lt "$(ver $MIN_COMPOSE_VERSION)" ]]; then
+  echo "FAIL: Expected minimum $dc_base version to be $MIN_COMPOSE_VERSION but found $COMPOSE_VERSION"
+  exit 1
 fi
+echo "Found Docker Compose version $COMPOSE_VERSION"
 
 CPU_AVAILABLE_IN_DOCKER=$(docker run --rm busybox nproc --all);
 if [[ "$CPU_AVAILABLE_IN_DOCKER" -lt "$MIN_CPU_HARD" ]]; then
