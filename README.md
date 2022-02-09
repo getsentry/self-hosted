@@ -1,6 +1,8 @@
-# Self-Hosted Sentry nightly
+# Self-Hosted Sentry
 
 Official bootstrap for running your own [Sentry](https://sentry.io/) with [Docker](https://www.docker.com/).
+
+P.S. If you don't want to run your own Sentry you can [pay us to run it for you](https://sentry.io/signup/).
 
 ## Requirements
 
