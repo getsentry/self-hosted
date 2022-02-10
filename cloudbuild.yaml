@@ -1,0 +1,57 @@
+steps:
+  - name: "gcr.io/$PROJECT_ID/docker-compose"
+    id: clone-and-configure 
+    entrypoint: "bash"
+    args:
+      - "-e"
+      - "-c"
+      - |
+        git clone https://github.com/getsentry/self-hosted.git
+        echo '{"version": "3.4", "networks":{"default":{"external":{"name":"cloudbuild"}}}}' > self-hosted/docker-compose.override.yml
+    timeout: 60s
+  - name: "gcr.io/$PROJECT_ID/docker-compose"
+    id: install 
+    waitFor:
+      - clone-and-configure
+    dir: self-hosted
+    entrypoint: "bash"
+    args:
+      - "-e"
+      - "-c"
+      - |
+        ./install.sh
+    timeout: 600s
+
+    # The point is to run the tests that get run in sentry and snuba, to avoid
+    # accidentally breaking CI over there (not that this has ever happened;
+    # it's purely theoretical, you understand). Unfortunately this is a bit
+    # duplicatory. Meh.
+
+  - name: "gcr.io/$PROJECT_ID/docker-compose"
+    id: e2e-test
+    waitFor:
+      - install 
+    dir: self-hosted
+    entrypoint: "bash"
+    args:
+      - "-e"
+      - "-c"
+      - |
+        set +e
+        ./test.sh
+        test_return=$?
+        set -e
+        if [[ $test_return -ne 0 ]]; then
+          echo "Test failed.";
+          docker-compose ps;
+          docker-compose logs;
+          exit $test_return;
+        fi
+    timeout: 600s
+timeout: 2640s
+options:
+  # We need more memory for Webpack builds & e2e self-hosted tests
+  machineType: "N1_HIGHCPU_8"
+  env:
+    - "CI=1"
+    - "SENTRY_TEST_HOST=http://nginx"
