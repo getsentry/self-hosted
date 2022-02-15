@@ -1,3 +1,11 @@
+if [ "${GITHUB_ACTIONS:-}" = "true" ]; then
+  _group="::group::"
+  _endgroup="::endgroup::"
+else
+  _group="▶ "
+  _endgroup=""
+fi
+
 echo "${_group}Initializing Docker Compose ..."
 
 # Some environments still use `docker-compose` even for Docker Compose v2.
