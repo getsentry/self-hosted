@@ -1,5 +1,22 @@
 # Changelog
 
+## 22.2.0
+
+### Various fixes & improvements
+
+- fix: unbound variable _group in reset/dc-detect-version script (#1283) (#1284) by @lovetodream
+- Remove routing helper (#1323) by @chadwhitacre
+- Bump nginx:1.21.6-alpine (#1319) by @aminvakil
+- Add a cloudbuild.yaml for GCB (#1315) by @chadwhitacre
+- Update set-up-and-migrate-database.sh (#1308) by @drmrbrewer
+- Pull relay explicitly to avoid garbage in creds (#1301) by @chadwhitacre
+- Improve logging of docker versions and relay creds (#1298) by @chadwhitacre
+- Remove file again (#1299) by @chadwhitacre
+- Clean up relay credentials generation (#1289) by @chadwhitacre
+- Add CI compose version 1.29.2 / 2.0.1 / 2.2.3 (#1290) by @chadwhitacre
+- Revert "Add CI compose version 1.29.2 / 2.0.1 / 2.2.3 (#1251)" (#1272) by @chadwhitacre
+- Add CI compose version 1.29.2 / 2.0.1 / 2.2.3 (#1251) by @aminvakil
+
 ## 22.1.0
 
 ### Various fixes & improvements
