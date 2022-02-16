@@ -26,6 +26,8 @@ To get started with all the defaults, simply clone the repo and run `./install.s
 
 During the install, a prompt will ask if you want to create a user account. If you require that the install not be blocked by the prompt, run `./install.sh --skip-user-prompt`.
 
+Thinking of not managing this yourself? Check out the [SaaS migration docs](https://docs.sentry.io/product/sentry-basics/migration/) or [contact us](https://sentry.io/from/self-hosted) for help.
+
 Please visit [our documentation](https://develop.sentry.dev/self-hosted/) for everything else.
 
 ## Tips & Tricks
