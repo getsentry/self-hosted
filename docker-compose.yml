@@ -20,7 +20,7 @@ x-sentry-defaults: &sentry_defaults
   depends_on:
     redis:
       <<: *depends_on-healthy
-    kafka:
+    redpanda:
       <<: *depends_on-healthy
     postgres:
       <<: *depends_on-healthy
@@ -74,7 +74,7 @@ x-snuba-defaults: &snuba_defaults
   depends_on:
     clickhouse:
       <<: *depends_on-healthy
-    kafka:
+    redpanda:
       <<: *depends_on-healthy
     redis:
       <<: *depends_on-healthy
@@ -82,7 +82,7 @@ x-snuba-defaults: &snuba_defaults
   environment:
     SNUBA_SETTINGS: docker
     CLICKHOUSE_HOST: clickhouse
-    DEFAULT_BROKERS: "kafka:9092"
+    DEFAULT_BROKERS: "redpanda:9092"
     REDIS_HOST: redis
     UWSGI_MAX_REQUESTS: "10000"
     UWSGI_DISABLE_LOGGING: "true"
@@ -169,7 +169,7 @@ services:
   #   healthcheck:
   #     <<: *healthcheck_defaults
   #     test: ["CMD-SHELL", "nc -z localhost 9092"]
-  kafka:
+  redpanda:
     image: "vectorized/redpanda:v21.11.8"
     command:
       - redpanda start
@@ -178,7 +178,7 @@ services:
       - --overprovisioned
       - --node-id 0
       - --kafka-addr 0.0.0.0:9092
-      - --advertise-kafka-addr kafka:9092
+      - --advertise-kafka-addr redpanda:9092
       - --set redpanda.enable_transactions=true
       - --set redpanda.enable_idempotence=true
       # NOTE: Please use the latest version here!
@@ -354,7 +354,7 @@ services:
         source: ./geoip
         target: /geoip
     depends_on:
-      kafka:
+      redpanda:
         <<: *depends_on-healthy
       redis:
         <<: *depends_on-healthy

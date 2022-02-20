@@ -12,7 +12,7 @@ echo $EXISTING_KAFKA_TOPICS
 NEEDED_KAFKA_TOPICS="ingest-attachments ingest-transactions ingest-events"
 for topic in $NEEDED_KAFKA_TOPICS; do
   if ! echo "$EXISTING_KAFKA_TOPICS" | grep -wq $topic; then
-    $dcr redpanda topic create $topic --brokers kafka:9092
+    $dcr redpanda topic create $topic --brokers redpanda:9092
     echo ""
   fi
 done
