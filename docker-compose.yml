@@ -22,8 +22,6 @@ x-sentry-defaults: &sentry_defaults
       <<: *depends_on-healthy
     kafka:
       <<: *depends_on-healthy
-    # kafka:
-    #   <<: *depends_on-healthy
     postgres:
       <<: *depends_on-healthy
     memcached:
@@ -76,8 +74,6 @@ x-snuba-defaults: &snuba_defaults
   depends_on:
     clickhouse:
       <<: *depends_on-healthy
-    # kafka:
-    #   <<: *depends_on-healthy
     kafka:
       <<: *depends_on-healthy
     redis:
@@ -86,7 +82,6 @@ x-snuba-defaults: &snuba_defaults
   environment:
     SNUBA_SETTINGS: docker
     CLICKHOUSE_HOST: clickhouse
-    # DEFAULT_BROKERS: "kafka:9092"
     DEFAULT_BROKERS: "kafka:9092"
     REDIS_HOST: redis
     UWSGI_MAX_REQUESTS: "10000"
@@ -147,23 +142,8 @@ services:
         read_only: true
         source: ./postgres/
         target: /opt/sentry/
-  # zookeeper:
-  #   <<: *restart_policy
-  #   image: "confluentinc/cp-zookeeper:5.5.0"
-  #   environment:
-  #     ZOOKEEPER_CLIENT_PORT: "2181"
-  #     CONFLUENT_SUPPORT_METRICS_ENABLE: "false"
-  #     ZOOKEEPER_LOG4J_ROOT_LOGLEVEL: "WARN"
-  #     ZOOKEEPER_TOOLS_LOG4J_LOGLEVEL: "WARN"
-  #     KAFKA_OPTS: "-Dzookeeper.4lw.commands.whitelist=ruok"
-  #   volumes:
-  #     - "sentry-zookeeper:/var/lib/zookeeper/data"
-  #     - "sentry-zookeeper-log:/var/lib/zookeeper/log"
-  #     - "sentry-secrets:/etc/zookeeper/secrets"
-  #   healthcheck:
-  #     <<: *healthcheck_defaults
-  #     test:
-  #       ["CMD-SHELL", 'echo "ruok" | nc -w 2 -q 2 localhost 2181 | grep imok']
+  # TODO: Migrate config settings over to redpanda flags
+  #
   # kafka:
   #   <<: *restart_policy
   #   depends_on:
@@ -390,10 +370,6 @@ volumes:
     external: true
   sentry-redpanda:
     external: true
-  # sentry-zookeeper:
-  #   external: true
-  # sentry-kafka:
-  #   external: true
   sentry-clickhouse:
     external: true
   sentry-symbolicator:
@@ -402,7 +378,5 @@ volumes:
   # These store ephemeral data that needn't persist across restarts.
   sentry-secrets:
   sentry-smtp:
-  # sentry-zookeeper-log:
-  # sentry-kafka-log:
   sentry-smtp-log:
   sentry-clickhouse-log:
