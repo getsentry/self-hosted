@@ -142,33 +142,6 @@ services:
         read_only: true
         source: ./postgres/
         target: /opt/sentry/
-  # TODO: Migrate config settings over to redpanda flags
-  #
-  # kafka:
-  #   <<: *restart_policy
-  #   depends_on:
-  #     zookeeper:
-  #       <<: *depends_on-healthy
-  #   image: "confluentinc/cp-kafka:5.5.0"
-  #   environment:
-  #     KAFKA_ZOOKEEPER_CONNECT: "zookeeper:2181"
-  #     KAFKA_ADVERTISED_LISTENERS: "PLAINTEXT://kafka:9092"
-  #     KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: "1"
-  #     KAFKA_OFFSETS_TOPIC_NUM_PARTITIONS: "1"
-  #     KAFKA_LOG_RETENTION_HOURS: "24"
-  #     KAFKA_MESSAGE_MAX_BYTES: "50000000" #50MB or bust
-  #     KAFKA_MAX_REQUEST_SIZE: "50000000" #50MB on requests apparently too
-  #     CONFLUENT_SUPPORT_METRICS_ENABLE: "false"
-  #     KAFKA_LOG4J_LOGGERS: "kafka.cluster=WARN,kafka.controller=WARN,kafka.coordinator=WARN,kafka.log=WARN,kafka.server=WARN,kafka.zookeeper=WARN,state.change.logger=WARN"
-  #     KAFKA_LOG4J_ROOT_LOGLEVEL: "WARN"
-  #     KAFKA_TOOLS_LOG4J_LOGLEVEL: "WARN"
-  #   volumes:
-  #     - "sentry-kafka:/var/lib/kafka/data"
-  #     - "sentry-kafka-log:/var/lib/kafka/log"
-  #     - "sentry-secrets:/etc/kafka/secrets"
-  #   healthcheck:
-  #     <<: *healthcheck_defaults
-  #     test: ["CMD-SHELL", "nc -z localhost 9092"]
   redpanda:
     image: "vectorized/redpanda:v21.11.8"
     command:
