@@ -20,8 +20,10 @@ x-sentry-defaults: &sentry_defaults
   depends_on:
     redis:
       <<: *depends_on-healthy
-    kafka:
+    redpanda:
       <<: *depends_on-healthy
+    # kafka:
+    #   <<: *depends_on-healthy
     postgres:
       <<: *depends_on-healthy
     memcached:
@@ -76,13 +78,16 @@ x-snuba-defaults: &snuba_defaults
       <<: *depends_on-healthy
     kafka:
       <<: *depends_on-healthy
+    redpanda:
+      <<: *depends_on-healthy
     redis:
       <<: *depends_on-healthy
   image: "$SNUBA_IMAGE"
   environment:
     SNUBA_SETTINGS: docker
     CLICKHOUSE_HOST: clickhouse
-    DEFAULT_BROKERS: "kafka:9092"
+    # DEFAULT_BROKERS: "kafka:9092"
+    DEFAULT_BROKERS: "redpanda:9092"
     REDIS_HOST: redis
     UWSGI_MAX_REQUESTS: "10000"
     UWSGI_DISABLE_LOGGING: "true"
@@ -142,48 +147,72 @@ services:
         read_only: true
         source: ./postgres/
         target: /opt/sentry/
-  zookeeper:
-    <<: *restart_policy
-    image: "confluentinc/cp-zookeeper:5.5.0"
-    environment:
-      ZOOKEEPER_CLIENT_PORT: "2181"
-      CONFLUENT_SUPPORT_METRICS_ENABLE: "false"
-      ZOOKEEPER_LOG4J_ROOT_LOGLEVEL: "WARN"
-      ZOOKEEPER_TOOLS_LOG4J_LOGLEVEL: "WARN"
-      KAFKA_OPTS: "-Dzookeeper.4lw.commands.whitelist=ruok"
+  # zookeeper:
+  #   <<: *restart_policy
+  #   image: "confluentinc/cp-zookeeper:5.5.0"
+  #   environment:
+  #     ZOOKEEPER_CLIENT_PORT: "2181"
+  #     CONFLUENT_SUPPORT_METRICS_ENABLE: "false"
+  #     ZOOKEEPER_LOG4J_ROOT_LOGLEVEL: "WARN"
+  #     ZOOKEEPER_TOOLS_LOG4J_LOGLEVEL: "WARN"
+  #     KAFKA_OPTS: "-Dzookeeper.4lw.commands.whitelist=ruok"
+  #   volumes:
+  #     - "sentry-zookeeper:/var/lib/zookeeper/data"
+  #     - "sentry-zookeeper-log:/var/lib/zookeeper/log"
+  #     - "sentry-secrets:/etc/zookeeper/secrets"
+  #   healthcheck:
+  #     <<: *healthcheck_defaults
+  #     test:
+  #       ["CMD-SHELL", 'echo "ruok" | nc -w 2 -q 2 localhost 2181 | grep imok']
+  # kafka:
+  #   <<: *restart_policy
+  #   depends_on:
+  #     zookeeper:
+  #       <<: *depends_on-healthy
+  #   image: "confluentinc/cp-kafka:5.5.0"
+  #   environment:
+  #     KAFKA_ZOOKEEPER_CONNECT: "zookeeper:2181"
+  #     KAFKA_ADVERTISED_LISTENERS: "PLAINTEXT://kafka:9092"
+  #     KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: "1"
+  #     KAFKA_OFFSETS_TOPIC_NUM_PARTITIONS: "1"
+  #     KAFKA_LOG_RETENTION_HOURS: "24"
+  #     KAFKA_MESSAGE_MAX_BYTES: "50000000" #50MB or bust
+  #     KAFKA_MAX_REQUEST_SIZE: "50000000" #50MB on requests apparently too
+  #     CONFLUENT_SUPPORT_METRICS_ENABLE: "false"
+  #     KAFKA_LOG4J_LOGGERS: "kafka.cluster=WARN,kafka.controller=WARN,kafka.coordinator=WARN,kafka.log=WARN,kafka.server=WARN,kafka.zookeeper=WARN,state.change.logger=WARN"
+  #     KAFKA_LOG4J_ROOT_LOGLEVEL: "WARN"
+  #     KAFKA_TOOLS_LOG4J_LOGLEVEL: "WARN"
+  #   volumes:
+  #     - "sentry-kafka:/var/lib/kafka/data"
+  #     - "sentry-kafka-log:/var/lib/kafka/log"
+  #     - "sentry-secrets:/etc/kafka/secrets"
+  #   healthcheck:
+  #     <<: *healthcheck_defaults
+  #     test: ["CMD-SHELL", "nc -z localhost 9092"]
+  redpanda:
+    image: "vectorized/redpanda:v21.11.8"
+    command:
+      - redpanda
+      - start
+      - --smp
+      - '1'
+      - --reserve-memory
+      - 0M
+      - --overprovisioned
+      - --node-id
+      - '0'
+      - --kafka-addr
+      - PLAINTEXT://0.0.0.0:29092,OUTSIDE://0.0.0.0:9092
+      - --advertise-kafka-addr
+      - PLAINTEXT://redpanda:29092,OUTSIDE://localhost:9092
+      # NOTE: Please use the latest version here!
+    image: docker.vectorized.io/vectorized/redpanda:v21.9.5
+    container_name: redpanda-1
+    ports:
+      - 9092:9092
+      - 29092:29092
     volumes:
-      - "sentry-zookeeper:/var/lib/zookeeper/data"
-      - "sentry-zookeeper-log:/var/lib/zookeeper/log"
-      - "sentry-secrets:/etc/zookeeper/secrets"
-    healthcheck:
-      <<: *healthcheck_defaults
-      test:
-        ["CMD-SHELL", 'echo "ruok" | nc -w 2 -q 2 localhost 2181 | grep imok']
-  kafka:
-    <<: *restart_policy
-    depends_on:
-      zookeeper:
-        <<: *depends_on-healthy
-    image: "confluentinc/cp-kafka:5.5.0"
-    environment:
-      KAFKA_ZOOKEEPER_CONNECT: "zookeeper:2181"
-      KAFKA_ADVERTISED_LISTENERS: "PLAINTEXT://kafka:9092"
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: "1"
-      KAFKA_OFFSETS_TOPIC_NUM_PARTITIONS: "1"
-      KAFKA_LOG_RETENTION_HOURS: "24"
-      KAFKA_MESSAGE_MAX_BYTES: "50000000" #50MB or bust
-      KAFKA_MAX_REQUEST_SIZE: "50000000" #50MB on requests apparently too
-      CONFLUENT_SUPPORT_METRICS_ENABLE: "false"
-      KAFKA_LOG4J_LOGGERS: "kafka.cluster=WARN,kafka.controller=WARN,kafka.coordinator=WARN,kafka.log=WARN,kafka.server=WARN,kafka.zookeeper=WARN,state.change.logger=WARN"
-      KAFKA_LOG4J_ROOT_LOGLEVEL: "WARN"
-      KAFKA_TOOLS_LOG4J_LOGLEVEL: "WARN"
-    volumes:
-      - "sentry-kafka:/var/lib/kafka/data"
-      - "sentry-kafka-log:/var/lib/kafka/log"
-      - "sentry-secrets:/etc/kafka/secrets"
-    healthcheck:
-      <<: *healthcheck_defaults
-      test: ["CMD-SHELL", "nc -z localhost 9092"]
+      - "sentry-redpanda:/var/lib/redpanda/data"
   clickhouse:
     <<: *restart_policy
     image: "yandex/clickhouse-server:20.3.9.70"
@@ -350,7 +379,7 @@ services:
         source: ./geoip
         target: /geoip
     depends_on:
-      kafka:
+      redpanda:
         <<: *depends_on-healthy
       redis:
         <<: *depends_on-healthy
@@ -364,10 +393,12 @@ volumes:
     external: true
   sentry-redis:
     external: true
-  sentry-zookeeper:
+  sentry-redpanda:
     external: true
-  sentry-kafka:
-    external: true
+  # sentry-zookeeper:
+  #   external: true
+  # sentry-kafka:
+  #   external: true
   sentry-clickhouse:
     external: true
   sentry-symbolicator:
@@ -376,7 +407,7 @@ volumes:
   # These store ephemeral data that needn't persist across restarts.
   sentry-secrets:
   sentry-smtp:
-  sentry-zookeeper-log:
-  sentry-kafka-log:
+  # sentry-zookeeper-log:
+  # sentry-kafka-log:
   sentry-smtp-log:
   sentry-clickhouse-log:

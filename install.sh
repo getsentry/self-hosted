@@ -25,7 +25,8 @@ source generate-secret-key.sh
 source replace-tsdb.sh
 source update-docker-images.sh
 source build-docker-images.sh
-source set-up-zookeeper.sh
+# source set-up-zookeeper.sh
+source set-up-redpanda.sh # maybe not necessary?
 source install-wal2json.sh
 source bootstrap-snuba.sh
 source create-kafka-topics.sh
