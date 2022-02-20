@@ -20,7 +20,7 @@ x-sentry-defaults: &sentry_defaults
   depends_on:
     redis:
       <<: *depends_on-healthy
-    redpanda:
+    kafka:
       <<: *depends_on-healthy
     # kafka:
     #   <<: *depends_on-healthy
@@ -76,9 +76,9 @@ x-snuba-defaults: &snuba_defaults
   depends_on:
     clickhouse:
       <<: *depends_on-healthy
+    # kafka:
+    #   <<: *depends_on-healthy
     kafka:
-      <<: *depends_on-healthy
-    redpanda:
       <<: *depends_on-healthy
     redis:
       <<: *depends_on-healthy
@@ -87,7 +87,7 @@ x-snuba-defaults: &snuba_defaults
     SNUBA_SETTINGS: docker
     CLICKHOUSE_HOST: clickhouse
     # DEFAULT_BROKERS: "kafka:9092"
-    DEFAULT_BROKERS: "redpanda:9092"
+    DEFAULT_BROKERS: "kafka:9092"
     REDIS_HOST: redis
     UWSGI_MAX_REQUESTS: "10000"
     UWSGI_DISABLE_LOGGING: "true"
@@ -189,30 +189,25 @@ services:
   #   healthcheck:
   #     <<: *healthcheck_defaults
   #     test: ["CMD-SHELL", "nc -z localhost 9092"]
-  redpanda:
+  kafka:
     image: "vectorized/redpanda:v21.11.8"
     command:
-      - redpanda
-      - start
-      - --smp
-      - '1'
-      - --reserve-memory
-      - 0M
+      - redpanda start
+      - --smp 1
+      - --reserve-memory 0M
       - --overprovisioned
-      - --node-id
-      - '0'
-      - --kafka-addr
-      - PLAINTEXT://0.0.0.0:29092,OUTSIDE://0.0.0.0:9092
-      - --advertise-kafka-addr
-      - PLAINTEXT://redpanda:29092,OUTSIDE://localhost:9092
+      - --node-id 0
+      - --kafka-addr 0.0.0.0:9092
+      - --advertise-kafka-addr kafka:9092
+      - --set redpanda.enable_transactions=true
+      - --set redpanda.enable_idempotence=true
       # NOTE: Please use the latest version here!
     image: docker.vectorized.io/vectorized/redpanda:v21.9.5
-    container_name: redpanda-1
     ports:
       - 9092:9092
-      - 29092:29092
     volumes:
       - "sentry-redpanda:/var/lib/redpanda/data"
+    healthcheck: { test: curl -f localhost:9644/v1/status/ready, interval: 1s, start_period: 30s }
   clickhouse:
     <<: *restart_policy
     image: "yandex/clickhouse-server:20.3.9.70"
@@ -379,7 +374,7 @@ services:
         source: ./geoip
         target: /geoip
     depends_on:
-      redpanda:
+      kafka:
         <<: *depends_on-healthy
       redis:
         <<: *depends_on-healthy
