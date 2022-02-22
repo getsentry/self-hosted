@@ -1,1 +1,2 @@
 # Add plugins here
+boto3==1.21.4

@@ -64,6 +64,7 @@ x-sentry-defaults: &sentry_defaults
     # on the host system (or in the .env file)
     SENTRY_EVENT_RETENTION_DAYS:
     SENTRY_MAIL_HOST:
+    AWS_RDS_SECRET_NAME:
   volumes:
     - "sentry-data:/data"
     - "./sentry:/etc/sentry"

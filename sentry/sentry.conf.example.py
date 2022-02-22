@@ -2,6 +2,7 @@
 # you can inherit and tweak settings to your hearts content.
 
 from sentry.conf.server import *  # NOQA
+import boto3
 
 
 # Generously adapted from pynetlinux: https://git.io/JJmga
@@ -33,14 +34,25 @@ def get_internal_network():
 INTERNAL_SYSTEM_IPS = (get_internal_network(),)
 
 
+def get_db_secret_from_secrets_manager(secret_name, region_name="eu-west-1"):
+    session = boto3.session.Session()
+    client = session.client(
+        service_name="secretsmanager",
+        region_name=region_name,
+    )
+    return client.get_secret_value(SecretId=secret_name)
+
+
+db_secret = get_db_secret_from_secrets_manager(env("AWS_RDS_SECRET_NAME"))
+
 DATABASES = {
     "default": {
         "ENGINE": "sentry.db.postgres",
-        "NAME": "postgres",
-        "USER": "postgres",
-        "PASSWORD": "",
-        "HOST": "postgres",
-        "PORT": "",
+        "NAME": db_secret["dbname"],
+        "USER": db_secret["username"],
+        "PASSWORD": db_secret["password"],
+        "HOST": db_secret["host"],
+        "PORT": db_secret["port"],
     }
 }
 
