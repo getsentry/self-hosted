@@ -120,8 +120,11 @@ done
 echo "${_endgroup}"
 
 echo "${_group}Ensure cleanup crons are working ..."
-$dc ps -a | grep cleanup  # to debug https://github.com/getsentry/self-hosted/issues/1171
-$dc ps | grep -q -E -e '\-cleanup\s+running\s+' -e '\-cleanup[_-].+\s+Up\s+'
+$dc ps -a | tee debug.log | grep -q -E -e '\-cleanup\s+running\s+' -e '\-cleanup[_-].+\s+Up\s+'
+# to debug https://github.com/getsentry/self-hosted/issues/1171
+echo '------------------------------------------'
+cat debug.log
+echo '------------------------------------------'
 echo "${_endgroup}"
 
 echo "${_group}Test custom CAs work ..."
