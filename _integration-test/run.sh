@@ -120,7 +120,7 @@ done
 echo "${_endgroup}"
 
 echo "${_group}Ensure cleanup crons are working ..."
-$dc ps | grep cleanup  # to debug https://github.com/getsentry/self-hosted/issues/1171
+$dc ps -a | grep cleanup  # to debug https://github.com/getsentry/self-hosted/issues/1171
 $dc ps | grep -q -E -e '\-cleanup\s+running\s+' -e '\-cleanup[_-].+\s+Up\s+'
 echo "${_endgroup}"
 
