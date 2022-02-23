@@ -65,6 +65,7 @@ jobs:
           # Also test plugin installation here
           echo "sentry-auth-oidc" >> sentry/requirements.txt
           ./install.sh --minimize-downtime
+          cat /proc/sys/kernel/random/entropy_avail
           ./_integration-test/run.sh
 
       - name: Inspect failure

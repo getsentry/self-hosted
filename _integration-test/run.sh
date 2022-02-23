@@ -39,6 +39,7 @@ trap_with_arg teardown ERR INT TERM EXIT
 echo "${_endgroup}"
 
 echo "${_group}Starting Sentry for tests ..."
+cat /proc/sys/kernel/random/entropy_avail
 # Disable beacon for e2e tests
 echo 'SENTRY_BEACON=False' >> $SENTRY_CONFIG_PY
 echo y | $dcr web createuser --force-update --superuser --email $TEST_USER --password $TEST_PASS
