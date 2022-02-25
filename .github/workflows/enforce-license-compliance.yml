@@ -10,15 +10,15 @@ jobs:
   enforce-license-compliance:
     runs-on: ubuntu-latest
     steps:
-      - name: "Checkout Code"
+      - name: 'Checkout Code'
         uses: actions/checkout@v2
 
-      - name: "Run FOSSA Scan"
+      - name: 'Run FOSSA Scan'
         uses: fossas/fossa-action@v1.1.0
         with:
           api-key: ${{secrets.FOSSA_API_KEY}}
 
-      - name: "Run FOSSA Test"
+      - name: 'Run FOSSA Test'
         uses: fossas/fossa-action@v1.1.0
         with:
           api-key: ${{secrets.FOSSA_API_KEY}}
