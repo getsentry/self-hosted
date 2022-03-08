@@ -53,6 +53,8 @@ jobs:
           sudo chmod +x "${{ matrix.compose_path }}/docker-compose"
 
       - name: Integration Test
+        env:
+          COMPOSE_PROJECT_NAME: ${{ matrix.compose_version }}
         run: |
           echo "Testing initial install"
           ./install.sh
