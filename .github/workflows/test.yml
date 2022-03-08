@@ -52,11 +52,14 @@ jobs:
           sudo curl -L https://github.com/docker/compose/releases/download/${{ matrix.compose_version }}/docker-compose-`uname -s`-`uname -m` -o "${{ matrix.compose_path }}/docker-compose"
           sudo chmod +x "${{ matrix.compose_path }}/docker-compose"
 
-      - name: Integration Test
+      - name: Set COMPOSE_PROJECT_NAME
         env:
           COMPOSE_VERSION: ${{ matrix.compose_version }}
         run: |
-          COMPOSE_PROJECT_NAME="${COMPOSE_VERSION//./}"
+          echo "COMPOSE_PROJECT_NAME=${COMPOSE_VERSION//./}" >> "$GITHUB_ENV"
+
+      - name: Integration Test
+        run: |
           echo "Testing initial install"
           ./install.sh
           ./_integration-test/run.sh
