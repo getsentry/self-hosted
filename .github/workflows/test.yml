@@ -56,7 +56,7 @@ jobs:
         env:
           COMPOSE_VERSION: ${{ matrix.compose_version }}
         run: |
-          echo "COMPOSE_PROJECT_NAME=${COMPOSE_VERSION//./}" >> "$GITHUB_ENV"
+          COMPOSE_PROJECT_NAME="${COMPOSE_VERSION//./}"
           echo "Testing initial install"
           ./install.sh
           ./_integration-test/run.sh
