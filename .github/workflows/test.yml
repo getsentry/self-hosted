@@ -54,8 +54,9 @@ jobs:
 
       - name: Integration Test
         env:
-          COMPOSE_PROJECT_NAME: ${{ matrix.compose_version }}
+          COMPOSE_VERSION: ${{ matrix.compose_version }}
         run: |
+          echo "COMPOSE_PROJECT_NAME=${COMPOSE_VERSION//./}" >> "$GITHUB_ENV"
           echo "Testing initial install"
           ./install.sh
           ./_integration-test/run.sh
