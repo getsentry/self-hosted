@@ -10,16 +10,28 @@ jobs:
   enforce-license-compliance:
     runs-on: ubuntu-latest
     steps:
+      - name: 'Fetch FOSSA_API_KEY'
+        id: fetch_key
+        run: |
+
+          # We can't use GitHub Secrets for this key because we want it to be
+          # available in forks. This is a push-only key for a low-privilege
+          # account, so it is safe (enough) to expose publicly. This is a hack
+          # to set it in one place in case we ever do need to roll it. 🤷
+
+          curl -O https://raw.githubusercontent.com/getsentry/.github/main/.github/workflows/FOSSA_API_KEY
+          echo '::set-output name=key::$(cat FOSSA_API_KEY | grep -v #)'
+
       - name: 'Checkout Code'
         uses: actions/checkout@v2
 
       - name: 'Run FOSSA Scan'
         uses: fossas/fossa-action@v1.1.0
         with:
-          api-key: ${{secrets.FOSSA_API_KEY}}
+          api-key: ${{ steps.fetch_key.outputs.key }}
 
       - name: 'Run FOSSA Test'
         uses: fossas/fossa-action@v1.1.0
         with:
-          api-key: ${{secrets.FOSSA_API_KEY}}
+          api-key: ${{ steps.fetch_key.outputs.key }}
           run-tests: true
