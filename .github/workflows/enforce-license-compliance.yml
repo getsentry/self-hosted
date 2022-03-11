@@ -20,7 +20,7 @@ jobs:
           # to set it in one place in case we ever do need to roll it. 🤷
 
           curl -O https://raw.githubusercontent.com/getsentry/.github/main/.github/workflows/FOSSA_API_KEY
-          echo '::set-output name=key::$(cat FOSSA_API_KEY | grep -v #)'
+          echo "::set-output name=key::$(cat FOSSA_API_KEY | grep -v '#')"
 
       - name: 'Checkout Code'
         uses: actions/checkout@v2
