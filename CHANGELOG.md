@@ -1,5 +1,17 @@
 # Changelog
 
+## 22.3.0
+
+### Various fixes & improvements
+
+- Run CI every night (#1334) by @aminvakil
+- Docker-Compose: Avoid setting hostname to '' (#1365) by @glensc
+- meta(gha): Deploy workflow enforce-license-compliance.yml (#1375) by @chadwhitacre
+- ci: Change stale GitHub workflow to run once a day (#1371) by @kamilogorek
+- ci: Temporary fix for interactive prompt on createuser (#1370) by @BYK
+- meta(gha): Deploy workflow enforce-license-compliance.yml (#1347) by @chadwhitacre
+- Add SaaS nudge to README (#1327) by @chadwhitacre
+
 ## 22.2.0
 
 ### Various fixes & improvements
