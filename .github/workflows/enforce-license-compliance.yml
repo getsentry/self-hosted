@@ -8,6 +8,7 @@ on:
 
 jobs:
   enforce-license-compliance:
+    if: github.repository_owner == 'getsentry'
     runs-on: ubuntu-latest
     steps:
       - name: 'Fetch FOSSA_API_KEY'
