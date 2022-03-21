@@ -2,7 +2,7 @@ if [[ "$MINIMIZE_DOWNTIME" ]]; then
   echo "${_group}Waiting for Sentry to start ..."
 
   # Start the whole setup, except nginx and relay.
-  $dc up -d --remove-orphans $($dc config --services | grep -v -E '^(nginx|relay)$')
+  $dc up --no-recreate -d --remove-orphans $($dc config --services | grep -v -E '^(nginx|relay)$')
   $dc restart relay
   $dc exec -T nginx nginx -s reload
 
