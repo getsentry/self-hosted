@@ -12,3 +12,5 @@ jobs:
     steps:
       - name: 'Enforce License Compliance'
         uses: getsentry/action-enforce-license-compliance@main
+        with:
+          fossa_api_key: ${{ secrets.FOSSA_API_KEY }}
