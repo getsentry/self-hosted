@@ -1,5 +1,15 @@
 # Changelog
 
+## 22.4.0
+
+### Various fixes & improvements
+
+- Use better API key when available (#1408) by @chadwhitacre
+- Use a custom action (#1407) by @chadwhitacre
+- Add some debug logging (#1340) by @chadwhitacre
+- meta(gha): Deploy workflow enforce-license-compliance.yml (#1388) by @chadwhitacre
+- Turn off containers under old name as well (#1384) by @chadwhitacre
+
 ## 22.3.0
 
 ### Various fixes & improvements
