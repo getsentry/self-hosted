@@ -1,5 +1,7 @@
 # Self-Hosted Sentry 22.3.0
 
+foo
+
 Official bootstrap for running your own [Sentry](https://sentry.io/) with [Docker](https://www.docker.com/).
 
 ## Requirements
