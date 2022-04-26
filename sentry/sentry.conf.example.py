@@ -4,7 +4,7 @@
 from sentry.conf.server import *  # NOQA
 
 
-# Generously adapted from pynetlinux: https://git.io/JJmga
+# Generously adapted from pynetlinux: https://github.com/rlisagor/pynetlinux/blob/e3f16978855c6649685f0c43d4c3fcf768427ae5/pynetlinux/ifconfig.py#L197-L223
 def get_internal_network():
     import ctypes
     import fcntl
@@ -187,7 +187,7 @@ SENTRY_WEB_PORT = 9000
 SENTRY_WEB_OPTIONS = {
     "http": "%s:%s" % (SENTRY_WEB_HOST, SENTRY_WEB_PORT),
     "protocol": "uwsgi",
-    # This is needed in order to prevent https://git.io/fj7Lw
+    # This is needed in order to prevent https://github.com/getsentry/sentry/blob/c6f9660e37fcd9c1bbda8ff4af1dcfd0442f5155/src/sentry/services/http.py#L70
     "uwsgi-socket": None,
     "so-keepalive": True,
     # Keep this between 15s-75s as that's what Relay supports

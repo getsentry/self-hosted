@@ -42,7 +42,7 @@ IS_KVM=$(docker run --rm busybox grep -c 'Common KVM processor' /proc/cpuinfo ||
 if [[ "$IS_KVM" -eq 0 ]]; then
   SUPPORTS_SSE42=$(docker run --rm busybox grep -c sse4_2 /proc/cpuinfo || :)
   if [[ "$SUPPORTS_SSE42" -eq 0 ]]; then
-    echo "FAIL: The CPU your machine is running on does not support the SSE 4.2 instruction set, which is required for one of the services Sentry uses (Clickhouse). See https://git.io/JvLDt for more info."
+    echo "FAIL: The CPU your machine is running on does not support the SSE 4.2 instruction set, which is required for one of the services Sentry uses (Clickhouse). See https://github.com/getsentry/self-hosted/issues/340 for more info."
     exit 1
   fi
 fi
