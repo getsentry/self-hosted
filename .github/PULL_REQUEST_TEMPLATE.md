@@ -7,11 +7,17 @@
 
 <!--
 
-  The following applies to third-party contributors.
-  Sentry employees and contractors can delete or ignore.
+  Sentry employees and contractors can delete or ignore the following.
 
 -->
 
 ----
 
-By submitting this pull request, I confirm that Sentry can use, modify, copy, and redistribute this contribution, under Sentry's choice of terms.
+## Legal Boilerplate
+
+Look, I get it. The entity doing business as "Sentry" was incorporated in the
+State of Delaware in 2015 as Functional Software, Inc. and is gonna need some
+rights from me in order to utilize my contributions in this here PR. So here's
+the deal: I retain all rights, title and interest in and to my contributions,
+and by keeping this boilerplate intact I confirm that Sentry can use, modify,
+copy, and redistribute my contributions, under Sentry's choice of terms.
