@@ -21,7 +21,8 @@ mail.host: 'smtp'
 
 
 # The email address to send on behalf of
-# mail.from: 'root@localhost'
+# mail.from: 'root@localhost' or ...
+# mail.from: 'System Administrator <root@localhost>'
 
 # The mailing list namespace for emails sent by this Sentry server.
 # This should be a domain you own (often the same domain as the domain
