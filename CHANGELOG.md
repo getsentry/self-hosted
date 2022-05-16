@@ -1,5 +1,14 @@
 # Changelog
 
+## 22.5.0
+
+### Various fixes & improvements
+
+- ref: reset user to root for installation (#1469) by @asottile-sentry
+- Document From email display name (#1446) by @chadwhitacre
+- Bring in CLA Lite (#1439) by @chadwhitacre
+- fix: replace git.io links with redirect targets (#1430) by @asottile-sentry
+
 ## 22.4.0
 
 ### Various fixes & improvements
