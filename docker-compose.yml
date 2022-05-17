@@ -322,7 +322,6 @@ services:
       context: ./cron
       args:
         BASE_IMAGE: "$SENTRY_IMAGE"
-    entrypoint: "/entrypoint.sh"
     command: '"0 0 * * * gosu sentry sentry cleanup --days $SENTRY_EVENT_RETENTION_DAYS"'
   nginx:
     <<: *restart_policy
