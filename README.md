@@ -46,7 +46,7 @@ Sentry comes with a cleanup cron job that prunes events older than `90 days` by 
 
 If you want to install a specific release of Sentry, use the tags/releases on this repo.
 
-We continously push the Docker image for each commit made into [Sentry](https://github.com/getsentry/sentry), and other services such as [Snuba](https://github.com/getsentry/snuba) or [Symbolicator](https://github.com/getsentry/symbolicator) to [our Docker Hub](https://hub.docker.com/u/getsentry) and tag the latest version on master as `:nightly`. This is also usually what we have on sentry.io and what the install script uses. You can use a custom Sentry image, such as a modified version that you have built on your own, or simply a specific commit hash by setting the `SENTRY_IMAGE` environment variable to that image name before running `./install.sh`:
+We continuously push the Docker image for each commit made into [Sentry](https://github.com/getsentry/sentry), and other services such as [Snuba](https://github.com/getsentry/snuba) or [Symbolicator](https://github.com/getsentry/symbolicator) to [our Docker Hub](https://hub.docker.com/u/getsentry) and tag the latest version on master as `:nightly`. This is also usually what we have on sentry.io and what the install script uses. You can use a custom Sentry image, such as a modified version that you have built on your own, or simply a specific commit hash by setting the `SENTRY_IMAGE` environment variable to that image name before running `./install.sh`:
 
 ```shell
 SENTRY_IMAGE=getsentry/sentry:83b1380 ./install.sh
@@ -63,7 +63,3 @@ sudo SENTRY_IMAGE=us.gcr.io/sentryio/sentry:83b1380 ./install.sh
 ```
 
 Where you replace `83b1380` with the sha you want to use.
-
-[build-status-image]: https://github.com/getsentry/self-hosted/workflows/test/badge.svg
-[build-status-url]: https://github.com/getsentry/self-hosted/actions?query=workflow%3Atest+branch%3Amaster+event%3Apush
-
