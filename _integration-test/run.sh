@@ -132,3 +132,8 @@ source ./custom-ca-roots/setup.sh
 $dcr --no-deps web python3 /etc/sentry/test-custom-ca-roots.py
 source ./custom-ca-roots/teardown.sh
 echo "${_endgroup}"
+
+echo "${_group}Ensure customizations work"
+$dcr web bash -c "if [ ! -e /created-by-enhance-image ]; then exit 1; fi"
+$dcr web python -c "import ldap"
+echo "${_endgroup}"

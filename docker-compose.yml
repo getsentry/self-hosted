@@ -16,7 +16,11 @@ x-healthcheck-defaults: &healthcheck_defaults
   start_period: 10s
 x-sentry-defaults: &sentry_defaults
   <<: *restart_policy
-  image: "$SENTRY_IMAGE"
+  image: sentry-self-hosted-local
+  build:
+    context: ./sentry
+    args:
+      - SENTRY_IMAGE
   depends_on:
     redis:
       <<: *depends_on-healthy
@@ -321,7 +325,7 @@ services:
     build:
       context: ./cron
       args:
-        BASE_IMAGE: "$SENTRY_IMAGE"
+        BASE_IMAGE: sentry-self-hosted-local
     entrypoint: "/entrypoint.sh"
     command: '"0 0 * * * gosu sentry sentry cleanup --days $SENTRY_EVENT_RETENTION_DAYS"'
   nginx:

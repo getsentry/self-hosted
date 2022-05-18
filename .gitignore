@@ -80,6 +80,7 @@ data/
 sentry/sentry.conf.py
 sentry/config.yml
 sentry/*.bak
+sentry/enhance-image.sh
 sentry/requirements.txt
 relay/credentials.json
 relay/config.yml
