@@ -1,1 +1,1 @@
-# Add plugins here
+# sentry/requirements.txt is deprecated, use sentry/enhance-image.sh
