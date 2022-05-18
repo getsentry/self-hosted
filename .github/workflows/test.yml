@@ -58,8 +58,7 @@ jobs:
           sudo chmod +x "${{ matrix.compose_path }}/docker-compose"
 
       - name: Integration Test
-        run: |
-          ./test.sh
+        run: ./integration-test.sh
 
       - name: Inspect failure
         if: failure()

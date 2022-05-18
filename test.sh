@@ -1,21 +1,6 @@
 #!/usr/bin/env bash
-set -ex
+set -e
 
-echo "Testing initial install"
-./install.sh
+# This file runs in https://github.com/getsentry/sentry/blob/fe4795f5eae9e0d7c33e0ecb736c9d1369535eca/docker/cloudbuild.yaml#L59
+
 ./_integration-test/run.sh
-./_integration-test/ensure-customizations-not-present.sh
-
-echo "Make customizations"
-cat <<EOT > sentry/enhance-image.sh
-#!/bin/bash
-touch /created-by-enhance-image
-apt-get update
-apt-get install -y gcc libsasl2-dev python-dev libldap2-dev libssl-dev
-EOT
-printf "python-ldap" > sentry/requirements.txt
-
-echo "Testing in-place upgrade and customizations"
-./install.sh --minimize-downtime
-./_integration-test/run.sh
-./_integration-test/ensure-customizations-work.sh
