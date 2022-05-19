@@ -30,7 +30,7 @@ By default, there exists no `.env.custom` file. In this case, you can manually a
 
 Please keep in mind to check the `.env` file for changes, when you perform an upgrade of Sentry, so that you can adjust your `.env.custom` accordingly, if required.
 
-### Install plugins
+### Enhance Sentry image
 
 To install plugins and their dependencies or make other modifications to the Sentry base image,
 copy `sentry/enhance-image.example.sh` to `sentry/enhance-image.sh` and add necessary steps there.
