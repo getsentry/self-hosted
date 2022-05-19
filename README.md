@@ -32,7 +32,11 @@ Please keep in mind to check the `.env` file for changes, when you perform an up
 
 ### Install plugins
 
-To install plugins and their dependencies or make other modifications to the Sentry base image, add them to `sentry/enhance-image.sh` and run `./install.sh`.
+To install plugins and their dependencies or make other modifications to the Sentry base image,
+copy `sentry/enhance-image.example.sh` to `sentry/enhance-image.sh` and add necessary steps there.
+For example, you can use `apt-get` to install dependencies and use `pip` to install plugins.
+
+After making modifications to `sentry/enhance-image.sh`, run `./install.sh` again to apply them.
 
 ## Tips & Tricks
 
