@@ -58,15 +58,7 @@ jobs:
           sudo chmod +x "${{ matrix.compose_path }}/docker-compose"
 
       - name: Integration Test
-        run: |
-          echo "Testing initial install"
-          ./install.sh
-          ./_integration-test/run.sh
-          echo "Testing in-place upgrade"
-          # Also test plugin installation here
-          echo "sentry-auth-oidc" >> sentry/requirements.txt
-          ./install.sh --minimize-downtime
-          ./_integration-test/run.sh
+        run: ./integration-test.sh
 
       - name: Inspect failure
         if: failure()
