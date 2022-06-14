@@ -12,7 +12,7 @@ x-healthcheck-defaults: &healthcheck_defaults
   # https://github.com/getsentry/self-hosted/issues/1000
   interval: "$HEALTHCHECK_INTERVAL"
   timeout: "$HEALTHCHECK_TIMEOUT"
-  retries: "$HEALTHCHECK_RETRIES"
+  retries: $HEALTHCHECK_RETRIES
   start_period: 10s
 x-sentry-defaults: &sentry_defaults
   <<: *restart_policy
@@ -97,7 +97,7 @@ services:
   smtp:
     <<: *restart_policy
     image: tianon/exim4
-    hostname: ${SENTRY_MAIL_HOST:-}
+    hostname: "${SENTRY_MAIL_HOST:-}"
     volumes:
       - "sentry-smtp:/var/spool/exim4"
       - "sentry-smtp-log:/var/log/exim4"
