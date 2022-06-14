@@ -338,6 +338,7 @@ services:
         read_only: true
         source: ./nginx
         target: /etc/nginx
+      - sentry-nginx-cache:/var/cache/nginx
     depends_on:
       - web
       - relay
@@ -380,6 +381,7 @@ volumes:
   # These store ephemeral data that needn't persist across restarts.
   sentry-secrets:
   sentry-smtp:
+  sentry-nginx-cache:
   sentry-zookeeper-log:
   sentry-kafka-log:
   sentry-smtp-log:
