@@ -1,5 +1,14 @@
 # Changelog
 
+## 22.6.0
+
+### Various fixes & improvements
+
+- fix "services.web.healthcheck.retries must be a number" (#1482) by @yuval1986
+- Add volume for nginx cache (#1511) by @glensc
+- snuba: New subscriptions infrastucture rollout (#1507) by @lynnagara
+- Ease modification of base image (#1479) by @spawnia
+
 ## 22.5.0
 
 ### Various fixes & improvements
