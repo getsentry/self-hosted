@@ -190,7 +190,7 @@ services:
       test: ["CMD-SHELL", "nc -z localhost 9092"]
   clickhouse:
     <<: *restart_policy
-    image: "yandex/clickhouse-server:20.3.9.70"
+    image: "altinity/clickhouse-server:21.6.1.6734-testing-arm"
     ulimits:
       nofile:
         soft: 262144
