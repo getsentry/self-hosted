@@ -15,6 +15,7 @@ on:
     - cron: "0 18 15 * *"
 jobs:
   release:
+    if: github.repository_owner == 'getsentry'
     runs-on: ubuntu-latest
     name: "Release a new version"
     steps:
