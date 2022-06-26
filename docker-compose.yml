@@ -211,7 +211,7 @@ services:
       test:
         [
           "CMD-SHELL",
-          "wget -nv -t1 --spider 'http://localhost:8123/' || exit 1",
+          "http_proxy='' wget -nv -t1 --spider 'http://localhost:8123/' || exit 1",
         ]
       interval: 3s
       timeout: 600s
