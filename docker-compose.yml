@@ -211,6 +211,9 @@ services:
       test:
         [
           "CMD-SHELL",
+          # Manually override any http_proxy envvar that might be set, because
+          # this wget does not support no_proxy. See:
+          # https://github.com/getsentry/self-hosted/issues/1537
           "http_proxy='' wget -nv -t1 --spider 'http://localhost:8123/' || exit 1",
         ]
       interval: 3s
