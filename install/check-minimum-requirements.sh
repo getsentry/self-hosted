@@ -13,7 +13,7 @@ fi
 echo "Found Docker version $DOCKER_VERSION"
 
 COMPOSE_VERSION=$($dc_base version --short)
-if [[ "$(ver $COMPOSE_VERSION)" -lt "$(ver $MIN_COMPOSE_VERSION)" ]]; then
+if [[ "$(ver ${COMPOSE_VERSION//v})" -lt "$(ver $MIN_COMPOSE_VERSION)" ]]; then
   echo "FAIL: Expected minimum $dc_base version to be $MIN_COMPOSE_VERSION but found $COMPOSE_VERSION"
   exit 1
 fi
