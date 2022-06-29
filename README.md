@@ -24,11 +24,11 @@ Please visit [our documentation](https://develop.sentry.dev/self-hosted/) for ev
 
 ### Customize DotEnv (.env) file
 
-Environment specific configurations can be done in the `.env.custom` file. It will be located in the root directory of the Sentry installation.
+Environment specific configurations can be done in the `.env.custom` file. It will be located in the root directory of the Sentry installation, and if it exists then `.env` will be ignored entirely.
 
 By default, there exists no `.env.custom` file. In this case, you can manually add this file by copying the `.env` file to a new `.env.custom` file and adjust your settings in the `.env.custom` file.
 
-Please keep in mind to check the `.env` file for changes, when you perform an upgrade of Sentry, so that you can adjust your `.env.custom` accordingly, if required.
+Please keep in mind to check the `.env` file for changes, when you perform an upgrade of Sentry, so that you can adjust your `.env.custom` accordingly, if required, as `.env` is ignored entirely if `.env.custom` is present.
 
 ### Enhance Sentry image
 
