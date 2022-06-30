@@ -2,18 +2,18 @@ echo "${_group}Checking minimum requirements ..."
 
 source "$(dirname $0)/_min-requirements.sh"
 
-# Check the version of $1 is greater than $2 using sort. Note: versions must be stripped of "v"
-function vergt () { printf "%s\n%s" $1 $2 | sort --version-sort --check --unique --reverse; }
+# Check the version of $1 is greater than or equal to $2 using sort. Note: versions must be stripped of "v"
+function vergte () { printf "%s\n%s" $1 $2 | sort --version-sort --check=quiet --reverse; }
 
 DOCKER_VERSION=$(docker version --format '{{.Server.Version}}')
-if [[ "$(vergt ${DOCKER_VERSION//v} $MIN_DOCKER_VERSION)" ]]; then
+if [[ "$(vergte ${DOCKER_VERSION//v} $MIN_DOCKER_VERSION)" ]]; then
   echo "FAIL: Expected minimum docker version to be $MIN_DOCKER_VERSION but found $DOCKER_VERSION"
   exit 1
 fi
 echo "Found Docker version $DOCKER_VERSION"
 
 COMPOSE_VERSION=$($dc_base version --short)
-if [[ "$(vergt ${COMPOSE_VERSION//v} $MIN_COMPOSE_VERSION)" ]]; then
+if [[ "$(vergte ${COMPOSE_VERSION//v} $MIN_COMPOSE_VERSION)" ]]; then
   echo "FAIL: Expected minimum $dc_base version to be $MIN_COMPOSE_VERSION but found $COMPOSE_VERSION"
   exit 1
 fi
