@@ -12,9 +12,8 @@ if [[ "$(ver $DOCKER_VERSION)" -lt "$(ver $MIN_DOCKER_VERSION)" ]]; then
 fi
 echo "Found Docker version $DOCKER_VERSION"
 
-# See https://github.com/getsentry/self-hosted/issues/1132#issuecomment-982823712 ff. for regex testing.
-COMPOSE_VERSION=$($dc_base version | head -n1 | sed -E 's/^.* version:? v?([0-9.]+),?.*$/\1/')
-if [[ "$(ver $COMPOSE_VERSION)" -lt "$(ver $MIN_COMPOSE_VERSION)" ]]; then
+COMPOSE_VERSION=$($dc_base version --short)
+if [[ "$(ver ${COMPOSE_VERSION//v})" -lt "$(ver $MIN_COMPOSE_VERSION)" ]]; then
   echo "FAIL: Expected minimum $dc_base version to be $MIN_COMPOSE_VERSION but found $COMPOSE_VERSION"
   exit 1
 fi
