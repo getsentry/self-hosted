@@ -14,11 +14,11 @@ echo "${_group}Detecting Docker platform"
 # See https://github.com/docker/cli/issues/3286 for the Docker bug.
 
 if [[ "$(docker info --format '{{.Architecture}}')" = "x86_64" ]]; then
-    DOCKER_PLATFORM="linux/amd64"
-    CLICKHOUSE_IMAGE="yandex/clickhouse-server:20.3.9.70"
+    export DOCKER_PLATFORM="linux/amd64"
+    export CLICKHOUSE_IMAGE="yandex/clickhouse-server:20.3.9.70"
 else
-    DOCKER_PLATFORM="linux/arm64"
-    CLICKHOUSE_IMAGE="altinity/clickhouse-server:20.10.1.4844-testing-arm"
+    export DOCKER_PLATFORM="linux/arm64"
+    export CLICKHOUSE_IMAGE="altinity/clickhouse-server:20.10.1.4844-testing-arm"
 fi
 echo "Detected Docker platform is $DOCKER_PLATFORM"
 
