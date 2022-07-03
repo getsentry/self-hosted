@@ -264,7 +264,7 @@ services:
       context: ./cron
       args:
         BASE_IMAGE: "$SNUBA_IMAGE"
-    command: '"*/5 * * * * gosu snuba snuba cleanup --storage errors --dry-run False"'
+    command: '"*/5 * * * * /usr/local/bin/gosu snuba snuba cleanup --storage errors --dry-run False"'
   snuba-transactions-cleanup:
     <<: *snuba_defaults
     image: snuba-cleanup-self-hosted-local
@@ -272,7 +272,7 @@ services:
       context: ./cron
       args:
         BASE_IMAGE: "$SNUBA_IMAGE"
-    command: '"*/5 * * * * gosu snuba snuba cleanup --storage transactions --dry-run False"'
+    command: '"*/5 * * * * /usr/local/bin/gosu snuba snuba cleanup --storage transactions --dry-run False"'
   symbolicator:
     <<: *restart_policy
     image: "$SYMBOLICATOR_IMAGE"
@@ -290,7 +290,7 @@ services:
       context: ./cron
       args:
         BASE_IMAGE: "$SYMBOLICATOR_IMAGE"
-    command: '"55 23 * * * gosu symbolicator symbolicator cleanup"'
+    command: '"55 23 * * * /usr/local/bin/gosu symbolicator symbolicator cleanup"'
     volumes:
       - "sentry-symbolicator:/data"
   web:
@@ -330,7 +330,7 @@ services:
       args:
         BASE_IMAGE: sentry-self-hosted-local
     entrypoint: "/entrypoint.sh"
-    command: '"0 0 * * * gosu sentry sentry cleanup --days $SENTRY_EVENT_RETENTION_DAYS"'
+    command: '"0 0 * * * /usr/local/bin/gosu sentry sentry cleanup --days $SENTRY_EVENT_RETENTION_DAYS"'
   nginx:
     <<: *restart_policy
     ports:
