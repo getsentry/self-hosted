@@ -18,7 +18,7 @@ x-sentry-defaults: &sentry_defaults
   <<: *restart_policy
   image: sentry-self-hosted-local
   # Set the platform to build for linux/arm64 when needed on Apple silicon Macs.
-  platform: ${DOCKER_PLATFORM}
+  platform: ${DOCKER_PLATFORM:-}
   build:
     context: ./sentry
     args:
@@ -192,7 +192,12 @@ services:
       test: ["CMD-SHELL", "nc -z localhost 9092"]
   clickhouse:
     <<: *restart_policy
-    image: "$CLICKHOUSE_IMAGE"
+    image: clickhouse-self-hosted-local
+    build:
+      context:
+        ./clickhouse
+      args:
+        BASE_IMAGE: "${CLICKHOUSE_IMAGE:-}"
     ulimits:
       nofile:
         soft: 262144
