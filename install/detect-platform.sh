@@ -13,12 +13,17 @@ echo "${_group}Detecting Docker platform"
 # linux/amd64 by default due to virtualization.
 # See https://github.com/docker/cli/issues/3286 for the Docker bug.
 
-if [[ "$(docker info --format '{{.Architecture}}')" = "x86_64" ]]; then
+DOCKER_ARCH=$(docker info --format '{{.Architecture}}')
+
+if [[ "$DOCKER_ARCH" = "x86_64" ]]; then
     export DOCKER_PLATFORM="linux/amd64"
     export CLICKHOUSE_IMAGE="yandex/clickhouse-server:20.3.9.70"
-else
+elif [[ "$DOCKER_ARCH" = "aarch64" ]]; then
     export DOCKER_PLATFORM="linux/arm64"
     export CLICKHOUSE_IMAGE="altinity/clickhouse-server:20.10.1.4844-testing-arm"
+else
+    echo "FAIL: Unsupported docker architecture $DOCKER_ARCH."
+    exit 1
 fi
 echo "Detected Docker platform is $DOCKER_PLATFORM"
 

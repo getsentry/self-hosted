@@ -6,6 +6,12 @@ source "$(dirname $0)/_min-requirements.sh"
 function ver () { echo "$@" | awk -F. '{ printf("%d%03d%03d", $1,$2,$3); }'; }
 
 DOCKER_VERSION=$(docker version --format '{{.Server.Version}}')
+
+if [[ -z "$DOCKER_VERSION" ]]; then
+  echo "FAIL: Unable to get docker version, is the docker daemon running?"
+  exit 1
+fi
+
 if [[ "$(ver $DOCKER_VERSION)" -lt "$(ver $MIN_DOCKER_VERSION)" ]]; then
   echo "FAIL: Expected minimum docker version to be $MIN_DOCKER_VERSION but found $DOCKER_VERSION"
   exit 1
