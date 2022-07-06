@@ -10,11 +10,11 @@ body:
     validations:
       required: true
   - type: input
-    id: operating_system
+    id: cpu_architecture
     attributes:
-      label: Operating System
-      placeholder: Debian 11 ← should look like this (check /etc/os-release)
-      description: What operating system are you running self-hosted on?
+      label: CPU Architecture
+      placeholder: x86_64 ← should look like this (docker info --format '{{.Architecture}}')
+      description: What cpu architecture are you running self-hosted on?
     validations:
       required: true
   - type: input
