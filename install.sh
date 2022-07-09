@@ -11,6 +11,7 @@ source "$(dirname $0)/install/_lib.sh"  # does a `cd .../install/`, among other 
 
 # Pre-flight. No impact yet.
 source parse-cli.sh
+source detect-platform.sh
 source dc-detect-version.sh
 source error-handling.sh
 source check-latest-commit.sh
