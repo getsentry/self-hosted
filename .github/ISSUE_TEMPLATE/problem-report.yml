@@ -2,11 +2,37 @@ name: 🐞 Problem Report
 description: Tell us about something that's not working the way you expect.
 body:
   - type: input
-    id: version
+    id: self_hosted_version
     attributes:
-      label: Version
+      label: Self-Hosted Version
       placeholder: 21.7.0 ← should look like this (check the footer)
       description: What version of self-hosted Sentry are you running?
+    validations:
+      required: true
+  - type: input
+    id: cpu_architecture
+    attributes:
+      label: CPU Architecture
+      placeholder: x86_64 ← should look like this (docker info --format '{{.Architecture}}')
+      description: What cpu architecture are you running self-hosted on?
+    validations:
+      required: true
+  - type: input
+    id: docker_version
+    attributes:
+      label: Docker Version
+      placeholder: 20.10.16 ← should look like this (docker --version)
+      description: What version of docker are you using to run self-hosted?
+    validations:
+      required: true
+  - type: input
+    id: docker_compose_version
+    attributes:
+      label: Docker Compose Version
+      placeholder: 2.6.0 ← should look like this (docker compose --version)
+      description: |
+        What version of docker-compose are you using to run self-hosted?
+        You need to use docker-compose --version if you are running < v2.0.0.
     validations:
       required: true
   - type: textarea
