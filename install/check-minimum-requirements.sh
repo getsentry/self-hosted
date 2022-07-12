@@ -2,24 +2,25 @@ echo "${_group}Checking minimum requirements ..."
 
 source "$(dirname $0)/_min-requirements.sh"
 
-# Compare dot-separated strings - function below is inspired by https://stackoverflow.com/a/37939589/808368
-function ver () { echo "$@" | awk -F. '{ printf("%d%03d%03d", $1,$2,$3); }'; }
+# Check the version of $1 is greater than or equal to $2 using sort. Note: versions must be stripped of "v"
+function vergte () { printf "%s\n%s" $1 $2 | sort --version-sort --check=quiet --reverse; }
+
+
 
 DOCKER_VERSION=$(docker version --format '{{.Server.Version}}')
-
 if [[ -z "$DOCKER_VERSION" ]]; then
   echo "FAIL: Unable to get docker version, is the docker daemon running?"
   exit 1
 fi
 
-if [[ "$(ver $DOCKER_VERSION)" -lt "$(ver $MIN_DOCKER_VERSION)" ]]; then
+if [[ "$(vergte ${DOCKER_VERSION//v} $MIN_DOCKER_VERSION)" ]]; then
   echo "FAIL: Expected minimum docker version to be $MIN_DOCKER_VERSION but found $DOCKER_VERSION"
   exit 1
 fi
 echo "Found Docker version $DOCKER_VERSION"
 
 COMPOSE_VERSION=$($dc_base version --short)
-if [[ "$(ver ${COMPOSE_VERSION//v})" -lt "$(ver $MIN_COMPOSE_VERSION)" ]]; then
+if [[ "$(vergte ${COMPOSE_VERSION//v} $MIN_COMPOSE_VERSION)" ]]; then
   echo "FAIL: Expected minimum $dc_base version to be $MIN_COMPOSE_VERSION but found $COMPOSE_VERSION"
   exit 1
 fi
