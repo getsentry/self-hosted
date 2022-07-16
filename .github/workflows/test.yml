@@ -54,10 +54,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Setup docker on macOS
-        if: ${{ startsWith(matrix.os, 'macos-') }}
-        uses: docker-practice/actions-setup-docker@v1
-
       - name: Get Compose
         run: |
           # Always remove `docker compose` support as that's the newer version
