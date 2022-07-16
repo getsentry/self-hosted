@@ -26,20 +26,27 @@ jobs:
         run: find ./ -type f -name "*-test.sh" -exec "./{}" \;
 
   integration-test:
-    runs-on: ubuntu-20.04
+    runs-on: ${{ matrix.os }}
     name: "integration test"
     strategy:
       fail-fast: false
       matrix:
         include:
           # Disabled due to https://github.com/getsentry/self-hosted/issues/1415
-          # - compose_version: "1.28.0"
+          # - os: "ubuntu-20.04"
+          #   compose_version: "1.28.0"
           #   compose_path: "/usr/local/bin"
-          # - compose_version: "1.29.2"
+          # - os: "ubuntu-20.04"
+          #   compose_version: "1.29.2"
           #   compose_path: "/usr/local/bin"
-          - compose_version: "v2.0.1"
+          - os: "ubuntu-20.04"
+            compose_version: "v2.0.1"
             compose_path: "/usr/local/lib/docker/cli-plugins"
-          - compose_version: "v2.7.0"
+          - os: "ubuntu-20.04"
+            compose_version: "v2.7.0"
+            compose_path: "/usr/local/lib/docker/cli-plugins"
+          - os: "macos-11"
+            compose_version: "v2.7.0"
             compose_path: "/usr/local/lib/docker/cli-plugins"
     env:
       COMPOSE_PROJECT_NAME: self-hosted-${{ strategy.job-index }}
