@@ -59,6 +59,7 @@ jobs:
         uses: docker-practice/actions-setup-docker@v1
 
       - name: Get Compose
+        if: ${{ startsWith(matrix.os, 'ubuntu-') }}
         run: |
           # Always remove `docker compose` support as that's the newer version
           # and comes installed by default nowadays.
