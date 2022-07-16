@@ -58,6 +58,10 @@ jobs:
         if: ${{ startsWith(matrix.os, 'macos-') }}
         uses: docker-practice/actions-setup-docker@v1
 
+      - name: Install coreutils on macOS
+        if: ${{ startsWith(matrix.os, 'macos-') }}
+        run: brew install coreutils
+
       - name: Get Compose
         if: ${{ startsWith(matrix.os, 'ubuntu-') }}
         run: |
