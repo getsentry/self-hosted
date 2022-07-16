@@ -54,7 +54,16 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
+      - name: Install Docker on macos
+        if: ${{ startsWith(matrix.os, 'macos-') }}
+        run: |
+          curl -OL https://desktop.docker.com/mac/main/arm64/Docker.dmg
+          sudo hdiutil attach Docker.dmg
+          sudo /Volumes/Docker/Docker.app/Contents/MacOS/install
+          sudo hdiutil detach /Volumes/Docker
+
       - name: Get Compose
+        if: ${{ startsWith(matrix.os, 'ubuntu-') }}
         run: |
           # Always remove `docker compose` support as that's the newer version
           # and comes installed by default nowadays.
