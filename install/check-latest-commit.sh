@@ -9,7 +9,9 @@ if [[ -d "../.git" && "${SKIP_COMMIT_CHECK:-0}" != 1 ]]; then
     fi
   fi
 else
-  echo "skipped"
+  # Require a git checkout to avoid permissions issues ref https://github.com/getsentry/self-hosted/issues/1532
+  echo "Detected sources not from git checkout. Please clone the repository instead of downloading a ZIP."
+  exit 1
 fi
 
 echo "${_endgroup}"
