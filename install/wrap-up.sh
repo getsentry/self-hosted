@@ -2,7 +2,12 @@ if [[ "$MINIMIZE_DOWNTIME" ]]; then
   echo "${_group}Waiting for Sentry to start ..."
 
   # Start the whole setup, except nginx and relay.
+if [[ "$(vergte ${COMPOSE_VERSION//v} '2.2.4')" ]]; then
   $dc up --no-recreate -d --remove-orphans $($dc config --services | grep -v -E '^(nginx|relay)$')
+  echo "As you're using docker-compose >= 2.2.4 we have added --no-recreate to your docker compose up command."
+  echo "If you're facing any problem, please report to https://github.com/getsentry/self-hosted/issues/1294"
+else
+  $dc up -d --remove-orphans $($dc config --services | grep -v -E '^(nginx|relay)$')
   $dc restart relay
   $dc exec -T nginx nginx -s reload
 
