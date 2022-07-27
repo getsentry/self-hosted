@@ -10,6 +10,7 @@ else
   $dc up -d --remove-orphans $($dc config --services | grep -v -E '^(nginx|relay)$')
   $dc restart relay
   $dc exec -T nginx nginx -s reload
+fi
 
   docker run --rm --network="${COMPOSE_PROJECT_NAME}_default" alpine ash \
     -c 'while [[ "$(wget -T 1 -q -O- http://web:9000/_health/)" != "ok" ]]; do sleep 0.5; done'
