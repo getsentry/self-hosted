@@ -1,5 +1,9 @@
 # Changelog
 
+## 22.8.0
+
+- No documented changes.
+
 ## 22.7.0
 
 ### Various fixes & improvements
