@@ -4,9 +4,43 @@ test "${DEBUG:-}" && set -x
 # Override any user-supplied umask that could cause problems, see #1222
 umask 002
 
+
+
 # Thanks to https://unix.stackexchange.com/a/145654/108960
 log_file="sentry_install_log-`date +'%Y-%m-%d_%H-%M-%S'`.txt"
 exec &> >(tee -a "$log_file")
+
+# Sentry SaaS uses stock Yandex ClickHouse, but they don't provide images that
+# support ARM, which is relevant especially for Apple M1 laptops, Sentry's
+# standard developer environment. As a workaround, we use an altinity image
+# targeting ARM.
+#
+# See https://github.com/getsentry/self-hosted/issues/1385#issuecomment-1101824274
+#
+# Images built on ARM also need to be tagged to use linux/arm64 on Apple
+# silicon Macs to work around an issue where they are built for
+# linux/amd64 by default due to virtualization.
+# See https://github.com/docker/cli/issues/3286 for the Docker bug.
+
+export DOCKER_ARCH=$(docker info --format '{{.Architecture}}')
+
+if [[ "$DOCKER_ARCH" = "x86_64" ]]; then
+    export DOCKER_PLATFORM="linux/amd64"
+    export CLICKHOUSE_IMAGE="yandex/clickhouse-server:20.3.9.70"
+elif [[ "$DOCKER_ARCH" = "aarch64" ]]; then
+    export DOCKER_PLATFORM="linux/arm64"
+    export CLICKHOUSE_IMAGE="altinity/clickhouse-server:21.6.1.6734-testing-arm"
+else
+    echo "FAIL: Unsupported docker architecture $DOCKER_ARCH."
+    exit 1
+fi
+echo "Detected Docker platform is $DOCKER_PLATFORM"
+
+function send_event {
+  # TODO: get sentry-cli images published
+  #docker run --rm -v $(pwd):/work -e SENTRY_DSN=$SENTRY_DSN getsentry/sentry-cli send-event -m $1 --logfile $log_file
+  sentry-cli send-event --no-environ -m "$1"
+}
 
 # Work from /install/ for install.sh, project root otherwise
 if [[ "$(basename $0)" = "install.sh"  ]]; then
