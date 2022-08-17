@@ -39,7 +39,7 @@ jobs:
           #   compose_path: "/usr/local/bin"
           - compose_version: "v2.0.1"
             compose_path: "/usr/local/lib/docker/cli-plugins"
-          - compose_version: "v2.2.3"
+          - compose_version: "v2.7.0"
             compose_path: "/usr/local/lib/docker/cli-plugins"
     env:
       COMPOSE_PROJECT_NAME: self-hosted-${{ strategy.job-index }}
