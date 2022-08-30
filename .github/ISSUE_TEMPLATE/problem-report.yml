@@ -13,16 +13,20 @@ body:
     id: cpu_architecture
     attributes:
       label: CPU Architecture
-      placeholder: x86_64 ← should look like this (docker info --format '{{.Architecture}}')
-      description: What cpu architecture are you running self-hosted on?
+      placeholder: x86_64 ← should look like this
+      description: |
+        What cpu architecture are you running self-hosted on?
+        e.g: (docker info --format '{{.Architecture}}')
     validations:
       required: true
   - type: input
     id: docker_version
     attributes:
       label: Docker Version
-      placeholder: 20.10.16 ← should look like this (docker --version)
-      description: What version of docker are you using to run self-hosted?
+      placeholder: 20.10.16 ← should look like this 
+      description: |
+        What version of docker are you using to run self-hosted?
+        e.g: (docker --version)
     validations:
       required: true
   - type: input
@@ -56,11 +60,14 @@ body:
     id: actual
     attributes:
       label: Actual Result
-      description: Logs? Screenshots? Yes, please.
+      description: |
+        Logs? Screenshots? Yes, please.
+        e.g.:
+          - latest install logs: `ls -1 sentry_install_log-*.txt | tail -1 | xargs cat`
+          - `docker compose logs` output
       placeholder: |-
         e.g.:
-        - latest install logs: `ls -1 sentry_install_log-*.txt | tail -1 | xargs cat`
-        - `docker compose logs` output
+        - logs output
     validations:
       required: true
   - type: markdown
