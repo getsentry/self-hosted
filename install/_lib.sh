@@ -4,8 +4,6 @@ test "${DEBUG:-}" && set -x
 # Override any user-supplied umask that could cause problems, see #1222
 umask 002
 
-
-
 # Thanks to https://unix.stackexchange.com/a/145654/108960
 log_file="sentry_install_log-`date +'%Y-%m-%d_%H-%M-%S'`.txt"
 exec &> >(tee -a "$log_file")
@@ -37,9 +35,18 @@ fi
 echo "Detected Docker platform is $DOCKER_PLATFORM"
 
 function send_event {
-  # TODO: get sentry-cli images published
-  #docker run --rm -v $(pwd):/work -e SENTRY_DSN=$SENTRY_DSN getsentry/sentry-cli send-event -m $1 --logfile $log_file
-  sentry-cli send-event --no-environ -m "$1"
+  if [[ $DOCKER_PLATFORM == "linux/amd64" ]]; then
+    local sentry_cli="docker run --rm -v \$(pwd):/work -e SENTRY_DSN=$SENTRY_DSN getsentry/sentry-cli"
+  else
+    if ! command -v sentry-cli &> /dev/null; then
+        echo "sentry-cli could not be found, please install it"
+        exit 1
+    fi
+    local sentry_cli=sentry-cli
+  fi
+  command pushd .. > /dev/null
+  $sentry_cli send-event --no-environ -f "$1" -m "$2" --logfile $log_file
+  command popd > /dev/null
 }
 
 # Work from /install/ for install.sh, project root otherwise
