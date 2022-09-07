@@ -1,8 +1,8 @@
 echo "${_group}Setting up error handling ..."
 
-export SENTRY_DSN='https://afa81b4b7c634e318b0ec138abb2645f@self-hosted.getsentry.net/2'
+export SENTRY_DSN='https://19555c489ded4769978daae92f2346ca@self-hosted.getsentry.net/3'
 export SENTRY_ORG=sentry
-export SENTRY_PROJECT=dogfooding
+export SENTRY_PROJECT=installer
 
 if [[ -f .reporterrors ]]; then
   if [[ "$(cat .reporterrors)" == "yes" ]]; then
@@ -13,9 +13,11 @@ if [[ -f .reporterrors ]]; then
 else
   echo "Would you like to opt-in to error monitoring for the Sentry installer?"
   echo "This helps us catch and fix errors when installing Sentry."
-  echo "We may retain your OS username, IP address, and installer log, for 30 days."
-  echo "Your information is solely used for error monitoring of the installer."
+  echo "We may collect and retain your OS username, IP address, and installer log, for 30 days."
+  echo "Your information is solely used to improve the installer and is subject to our privacy policy[1]."
   echo "You may change your preference at any time by deleting the '.reporterrors' file."
+  echo
+  echo "[1] https://sentry.io/privacy/"
   select yn in "Yes" "No"; do
       case $yn in
           Yes ) export REPORT_ERRORS=1; echo "yes" > .reporterrors; break;;
