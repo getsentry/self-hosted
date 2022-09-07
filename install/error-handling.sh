@@ -56,7 +56,7 @@ cleanup () {
           local src=${BASH_SOURCE[$i]}
           local lineno=${BASH_LINENO[$i-1]}
           local funcname=${FUNCNAME[$i]}
-          printf -v traceback '%s\n' "$traceback${indent//a/-}>$src:$funcname:$lineno"
+          printf -v traceback '%s\n' "$traceback${indent//a/-}> $src:$funcname:$lineno"
       done
     fi
     echo "$traceback"
