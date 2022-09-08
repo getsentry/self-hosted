@@ -19,8 +19,8 @@ function send_event {
   command popd > /dev/null
 }
 
-if [[ -f .reporterrors ]]; then
-  if [[ "$(cat .reporterrors)" == "yes" ]]; then
+if [[ -f ../.reporterrors ]]; then
+  if [[ "$(cat ../.reporterrors)" == "yes" ]]; then
     export REPORT_ERRORS=1
   else
     export REPORT_ERRORS=0
@@ -35,8 +35,8 @@ else
   echo "[1] https://sentry.io/privacy/"
   select yn in "Yes" "No"; do
       case $yn in
-          Yes ) export REPORT_ERRORS=1; echo "yes" > .reporterrors; break;;
-          No ) export REPORT_ERRORS=0; echo "no" > .reporterrors; break;;
+          Yes ) export REPORT_ERRORS=1; echo "yes" > ../.reporterrors; break;;
+          No ) export REPORT_ERRORS=0; echo "no" > ../.reporterrors; break;;
       esac
   done
 fi
