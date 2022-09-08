@@ -49,9 +49,10 @@ jobs:
       
       - name: Install previous major version for testing upgrade
         run: |
+          OLD_SHA=$(git rev-parse HEAD)
           git checkout $(git describe --tags --abbrev=0)
           ./install.sh
-          git checkout master
+          git checkout $OLD_SHA
 
       - name: Get Compose
         run: |
