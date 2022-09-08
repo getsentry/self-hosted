@@ -11,8 +11,8 @@ source "$(dirname $0)/install/_lib.sh"  # does a `cd .../install/`, among other 
 
 # Pre-flight. No impact yet.
 source parse-cli.sh
-source dc-detect-version.sh
 source detect-platform.sh
+source dc-detect-version.sh
 source error-handling.sh
 # We set the trap at the top level so that we get better tracebacks.
 trap_with_arg cleanup ERR INT TERM EXIT
