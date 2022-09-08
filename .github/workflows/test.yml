@@ -46,6 +46,12 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+      
+      - name: Install previous major version for testing upgrade
+        run: |
+          git checkout $(gh api repos/getsentry/self-hosted/releases | jq -r '.[0]["tag_name"]')
+          ./install.sh
+          git checkout master
 
       - name: Get Compose
         run: |
