@@ -1,7 +1,7 @@
 echo "${_group}Setting up error handling ..."
 
 export SENTRY_DSN='https://19555c489ded4769978daae92f2346ca@self-hosted.getsentry.net/3'
-export SENTRY_ORG=sentry
+export SENTRY_ORG=self-hosted
 export SENTRY_PROJECT=installer
 
 function send_event {
