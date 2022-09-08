@@ -4,6 +4,21 @@ export SENTRY_DSN='https://19555c489ded4769978daae92f2346ca@self-hosted.getsentr
 export SENTRY_ORG=sentry
 export SENTRY_PROJECT=installer
 
+function send_event {
+  if [[ $DOCKER_PLATFORM == "linux/amd64" ]]; then
+    local sentry_cli="docker run --rm -v \$(pwd):/work -e SENTRY_DSN=$SENTRY_DSN getsentry/sentry-cli"
+  else
+    if ! command -v sentry-cli &> /dev/null; then
+        echo "sentry-cli could not be found, please install it"
+        exit 1
+    fi
+    local sentry_cli=sentry-cli
+  fi
+  command pushd .. > /dev/null
+  $sentry_cli send-event --no-environ -f "$1" -m "$2" --logfile $log_file
+  command popd > /dev/null
+}
+
 if [[ -f .reporterrors ]]; then
   if [[ "$(cat .reporterrors)" == "yes" ]]; then
     export REPORT_ERRORS=1
