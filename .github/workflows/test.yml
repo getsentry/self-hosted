@@ -49,7 +49,7 @@ jobs:
       
       - name: Install previous major version for testing upgrade
         run: |
-          git checkout $(gh api repos/getsentry/self-hosted/releases | jq -r '.[0]["tag_name"]')
+          git checkout $(git describe --tags --abbrev=0)
           ./install.sh
           git checkout master
 
