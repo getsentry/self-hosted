@@ -40,7 +40,7 @@ else
   echo "(Btw, we send this to our own self-hosted Sentry instance, not to Sentry SaaS,"
   echo "so that we can be in this together.)"
   echo
-  echo "Here's the info we may collect:"
+  echo "Here's the info we may collect in order to help us improve the installer:"
   echo
   echo "  - OS username"
   echo "  - IP address"
@@ -55,18 +55,8 @@ else
   do
     read -p "y or n? " yn
     case $yn in
-      y | yes | 1)
-        export REPORT_ERRORS=1
-        echo "yes" > $reporterrors
-        echo
-        echo -n "Thank you."
-        ;;
-      n | no | 0)
-        export REPORT_ERRORS=0
-        echo "no" > $reporterrors
-        echo
-        echo -n "Understood."
-        ;;
+      y | yes | 1) export REPORT_ERRORS=1; echo "yes" > $reporterrors; echo; echo -n "Thank you.";;
+      n | no | 0) export REPORT_ERRORS=0; echo "no" > $reporterrors; echo; echo -n "Understood.";;
       *) yn="";;
     esac
   done
