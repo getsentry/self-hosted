@@ -6,7 +6,7 @@ export SENTRY_PROJECT=installer
 
 function send_event {
   if [[ $DOCKER_PLATFORM == "linux/amd64" ]]; then
-    local sentry_cli="docker run --platform linux/amd64 --rm -v $basedir:/work -e SENTRY_DSN=$SENTRY_DSN getsentry/sentry-cli"
+    local sentry_cli="docker run --platform linux/amd64 --rm -v $basedir:/work -e SENTRY_ORG=$SENTRY_ORG -e SENTRY_PROJECT=$SENTRY_PROJECT -e SENTRY_DSN=$SENTRY_DSN getsentry/sentry-cli"
   else
     if ! command -v sentry-cli &> /dev/null; then
         echo "sentry-cli could not be found, please install it"
