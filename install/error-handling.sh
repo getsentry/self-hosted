@@ -88,12 +88,12 @@ trap_with_arg() {
 DID_CLEAN_UP=0
 # the cleanup function will be the exit point
 cleanup () {
+  local retcode=$?
   local cmd="${BASH_COMMAND}"
   if [[ "$DID_CLEAN_UP" -eq 1 ]]; then
     return 0;
   fi
   DID_CLEAN_UP=1
-  local retcode=$?
   if [[ "$1" != "EXIT" ]]; then
     set +o xtrace
     printf -v err '%s' "Error in ${BASH_SOURCE[1]}:${BASH_LINENO[0]}."
