@@ -6,7 +6,6 @@ source "$(dirname $0)/../install/_lib.sh"
 source ../install/dc-detect-version.sh
 
 echo "${_group}Setting up variables and helpers ..."
-echo no > .reporterrors
 export SENTRY_TEST_HOST="${SENTRY_TEST_HOST:-http://localhost:9000}"
 TEST_USER='test@example.com'
 TEST_PASS='test123TEST'
