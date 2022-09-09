@@ -55,19 +55,19 @@ else
   do
     read -p "y or n? " yn
     case $yn in
-        y | yes | 1)
-          export REPORT_ERRORS=1
-          echo "yes" > $reporterrors
-          echo
-          echo -n "Thank you."
-          ;;
-        n | no | 0)
-          export REPORT_ERRORS=0
-          echo "no" > $reporterrors
-          echo
-          echo -n "Understood."
-          ;;
-        *) yn="";;
+      y | yes | 1)
+        export REPORT_ERRORS=1
+        echo "yes" > $reporterrors
+        echo
+        echo -n "Thank you."
+        ;;
+      n | no | 0)
+        export REPORT_ERRORS=0
+        echo "no" > $reporterrors
+        echo
+        echo -n "Understood."
+        ;;
+      *) yn="";;
     esac
   done
 
