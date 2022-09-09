@@ -19,26 +19,62 @@ function send_event {
   command popd > /dev/null
 }
 
-if [[ -f ../.reporterrors ]]; then
-  if [[ "$(cat ../.reporterrors)" == "yes" ]]; then
+reporterrors="$basedir/.reporterrors"
+if [[ -f $reporterrors ]]; then
+  echo -n "Found a .reporterrors file. What does it say? "
+  cat $reporterrors
+  if [[ "$(cat $reporterrors)" == "yes" ]]; then
     export REPORT_ERRORS=1
   else
     export REPORT_ERRORS=0
   fi
 else
-  echo "Would you like to opt-in to error monitoring for the Sentry installer?"
-  echo "This helps us catch and fix errors when installing Sentry."
-  echo "We may collect and retain your OS username, IP address, and installer log, for 30 days."
-  echo "Your information is solely used to improve the installer and is subject to our privacy policy[1]."
-  echo "You may change your preference at any time by deleting the '.reporterrors' file."
   echo
-  echo "[1] https://sentry.io/privacy/"
-  select yn in "Yes" "No"; do
-      case $yn in
-          Yes ) export REPORT_ERRORS=1; echo "yes" > ../.reporterrors; break;;
-          No ) export REPORT_ERRORS=0; echo "no" > ../.reporterrors; break;;
-      esac
+  echo "Hey, so ... we would love to find out when you hit an issue with this here"
+  echo "installer you are running. Turns out there is an app for that, called Sentry."
+  echo "Are you okay with us sending info to Sentry when you run this installer?"
+  echo
+  echo "  y / yes / 1"
+  echo "  n / no / 0"
+  echo
+  echo "(Btw, we send this to our own self-hosted Sentry instance, not to Sentry SaaS,"
+  echo "so that we can be in this together.)"
+  echo
+  echo "Here's the info we may collect:"
+  echo
+  echo "  - OS username"
+  echo "  - IP address"
+  echo "  - install log"
+  echo "  - performance data"
+  echo
+  echo "Thirty (30) day retention. No marketing. Privacy policy at sentry.io/privacy."
+  echo
+
+  yn=""
+  until [ ! -z "$yn" ]
+  do
+    read -p "y or n? " yn
+    case $yn in
+        y | yes | 1)
+          export REPORT_ERRORS=1
+          echo "yes" > $reporterrors
+          echo
+          echo -n "Thank you."
+          ;;
+        n | no | 0)
+          export REPORT_ERRORS=0
+          echo "no" > $reporterrors
+          echo
+          echo -n "Understood."
+          ;;
+        *) yn="";;
+    esac
   done
+
+  echo " Your answer is cached in '.reporterrors', remove it to see this"
+  echo "prompt again."
+  echo
+  sleep 5
 fi
 
 # Courtesy of https://stackoverflow.com/a/2183063/90297
