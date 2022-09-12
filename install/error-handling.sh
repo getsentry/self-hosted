@@ -3,6 +3,7 @@ echo "${_group}Setting up error handling ..."
 export SENTRY_DSN='https://19555c489ded4769978daae92f2346ca@self-hosted.getsentry.net/3'
 export SENTRY_ORG=self-hosted
 export SENTRY_PROJECT=installer
+export REPORT_ERRORS=0
 
 function check_for_linux_amd64 {
   # This is the only platform for which we have a build of sentry-cli.
