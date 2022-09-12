@@ -4,12 +4,28 @@ export SENTRY_DSN='https://19555c489ded4769978daae92f2346ca@self-hosted.getsentr
 export SENTRY_ORG=self-hosted
 export SENTRY_PROJECT=installer
 
+function check_for_linux_amd64 {
+  # This is the only platform for which we have a build of sentry-cli.
+  # I guess this could theoretically be dynamic (try to fetch a build).
+  test $DOCKER_PLATFORM == "linux/amd64"
+}
+function check_for_sentry_cli {
+  command -v sentry-cli &> /dev/null
+}
+function check_for_reportability {
+  # I'm sure this isn't the most terse syntax, but it's the one I could get to work.
+  if check_for_linux_amd64 || check_for_sentry_cli; then return 0; else return 1; fi
+}
+
 function send_event {
-  if [[ $DOCKER_PLATFORM == "linux/amd64" ]]; then
+  if check_for_linux_amd64; then
     local sentry_cli="docker run --platform linux/amd64 --rm -v $basedir:/work -e SENTRY_ORG=$SENTRY_ORG -e SENTRY_PROJECT=$SENTRY_PROJECT -e SENTRY_DSN=$SENTRY_DSN getsentry/sentry-cli"
   else
-    if ! command -v sentry-cli &> /dev/null; then
-        echo "sentry-cli could not be found, please install it"
+    if ! check_for_sentry_cli; then
+        echo "If you would like to report this error to Sentry, please install sentry-cli and rerun:"
+        echo
+        echo "  https://docs.sentry.io/product/cli/installation/"
+        echo
         exit 1
     fi
     local sentry_cli=sentry-cli
@@ -25,10 +41,15 @@ if [[ -f $reporterrors ]]; then
   cat $reporterrors
   if [[ "$(cat $reporterrors)" == "yes" ]]; then
     export REPORT_ERRORS=1
+    if ! check_for_reportability; then
+      echo "Sadly we don't have sentry-cli. Install it first in order to report errors:"
+      echo
+      echo "  https://docs.sentry.io/product/cli/installation/"
+    fi
   else
     export REPORT_ERRORS=0
   fi
-else
+else if check_for_reportability; then
   echo
   echo "Hey, so ... we would love to find out when you hit an issue with this here"
   echo "installer you are running. Turns out there is an app for that, called Sentry."
@@ -65,7 +86,7 @@ else
   echo "prompt again."
   echo
   sleep 5
-fi
+fi; fi
 
 # Courtesy of https://stackoverflow.com/a/2183063/90297
 trap_with_arg() {
