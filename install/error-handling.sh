@@ -13,6 +13,14 @@ function send_event {
 }
 
 reporterrors="$basedir/.reporterrors"
+echo
+echo "Testing prompt..."
+echo
+response=""
+until [ ! -z "$response" ]
+do
+  read -p "response: " $response
+done
 if [[ -f $reporterrors ]]; then
   echo -n "Found a .reporterrors file. What does it say? "
   cat $reporterrors
