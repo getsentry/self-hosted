@@ -7,8 +7,8 @@ steps:
       - "-c"
       - |
         git clone https://github.com/getsentry/self-hosted.git
-        echo HEAD
-        git checkout HEAD
+        echo $BRANCH_NAME
+        git checkout $BRANCH_NAME
         echo 'no' > self-hosted/.reporterrors
         echo '{"version": "3.4", "networks":{"default":{"external":{"name":"cloudbuild"}}}}' > self-hosted/docker-compose.override.yml
     timeout: 60s
