@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -e
+set -eE
 
 # Pre-pre-flight? 🤷
 if [[ -n "$MSYSTEM" ]]; then
@@ -14,6 +14,8 @@ source parse-cli.sh
 source detect-platform.sh
 source dc-detect-version.sh
 source error-handling.sh
+# We set the trap at the top level so that we get better tracebacks.
+trap_with_arg cleanup ERR INT TERM EXIT
 source check-latest-commit.sh
 source check-minimum-requirements.sh
 
