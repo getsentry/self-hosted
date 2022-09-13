@@ -5,32 +5,8 @@ export SENTRY_ORG=self-hosted
 export SENTRY_PROJECT=installer
 export REPORT_ERRORS=0
 
-function check_for_linux_amd64 {
-  # This is the only platform for which we have a build of sentry-cli.
-  # I guess this could theoretically be dynamic (try to fetch a build).
-  test $DOCKER_PLATFORM == "linux/amd64"
-}
-function check_for_sentry_cli {
-  command -v sentry-cli &> /dev/null
-}
-function check_for_reportability {
-  # I'm sure this isn't the most terse syntax, but it's the one I could get to work.
-  if check_for_linux_amd64 || check_for_sentry_cli; then return 0; else return 1; fi
-}
-
 function send_event {
-  if check_for_linux_amd64; then
-    local sentry_cli="docker run --platform linux/amd64 --rm -v $basedir:/work -e SENTRY_ORG=$SENTRY_ORG -e SENTRY_PROJECT=$SENTRY_PROJECT -e SENTRY_DSN=$SENTRY_DSN getsentry/sentry-cli"
-  else
-    if ! check_for_sentry_cli; then
-        echo "If you would like to report this error to Sentry, please install sentry-cli and rerun:"
-        echo
-        echo "  https://docs.sentry.io/product/cli/installation/"
-        echo
-        exit 1
-    fi
-    local sentry_cli=sentry-cli
-  fi
+  local sentry_cli="docker run --rm -v $basedir:/work -e SENTRY_ORG=$SENTRY_ORG -e SENTRY_PROJECT=$SENTRY_PROJECT -e SENTRY_DSN=$SENTRY_DSN getsentry/sentry-cli"
   command pushd .. > /dev/null
   $sentry_cli send-event --no-environ -f "$1" -m "$2" --logfile $log_file
   command popd > /dev/null
@@ -42,11 +18,6 @@ if [[ -f $reporterrors ]]; then
   cat $reporterrors
   if [[ "$(cat $reporterrors)" == "yes" ]]; then
     export REPORT_ERRORS=1
-    if ! check_for_reportability; then
-      echo "Sadly we don't have sentry-cli. Install it first in order to report errors:"
-      echo
-      echo "  https://docs.sentry.io/product/cli/installation/"
-    fi
   else
     export REPORT_ERRORS=0
   fi
