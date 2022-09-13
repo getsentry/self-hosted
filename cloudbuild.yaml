@@ -7,7 +7,6 @@ steps:
       - "-c"
       - |
         git clone https://github.com/getsentry/self-hosted.git
-        echo 'no' > self-hosted/.reporterrors
         echo '{"version": "3.4", "networks":{"default":{"external":{"name":"cloudbuild"}}}}' > self-hosted/docker-compose.override.yml
     timeout: 60s
   - name: "gcr.io/$PROJECT_ID/docker-compose"
