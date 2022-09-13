@@ -21,7 +21,7 @@ if [[ -f $reporterrors ]]; then
   else
     export REPORT_ERRORS=0
   fi
-else if check_for_reportability; then
+else
   echo
   echo "Hey, so ... we would love to find out when you hit an issue with this here"
   echo "installer you are running. Turns out there is an app for that, called Sentry."
@@ -58,7 +58,7 @@ else if check_for_reportability; then
   echo "prompt again."
   echo
   sleep 5
-fi; fi
+fi
 
 # Courtesy of https://stackoverflow.com/a/2183063/90297
 trap_with_arg() {
