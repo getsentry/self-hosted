@@ -60,6 +60,14 @@ else
   sleep 5
 fi
 
+# Make sure we can use sentry-cli if we need it.
+if [ "$REPORT_ERRORS" == 1 ]; then
+  if ! docker pull getsentry/sentry-cli:latest; then
+    echo "Failed to pull sentry-cli, won't report errors after all."
+    export REPORT_ERRORS=0
+  fi;
+fi;
+
 # Courtesy of https://stackoverflow.com/a/2183063/90297
 trap_with_arg() {
   func="$1" ; shift
