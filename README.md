@@ -14,7 +14,7 @@ Official bootstrap for running your own [Sentry](https://sentry.io/) with [Docke
 
 ### Installation
 
-To get started with all the defaults, simply clone the repo and run `./install.sh` in your local check-out. Sentry uses Python 3 by default since December 4th, 2020 and Sentry 21.1.0 is the last version to support Python 2.
+To get started with all the defaults, simply clone the repo and run `./install.sh` in your local check-out. Please also read the section below about monitoring. Sentry uses Python 3 by default since December 4th, 2020 and Sentry 21.1.0 is the last version to support Python 2.
 
 During the install, a prompt will ask if you want to create a user account. If you require that the install not be blocked by the prompt, run `./install.sh --skip-user-prompt`.
 
@@ -65,3 +65,18 @@ sudo SENTRY_IMAGE=us.gcr.io/sentryio/sentry:83b1380 ./install.sh
 ```
 
 Where you replace `83b1380` with the sha you want to use.
+
+### Self-Hosted Monitoring
+
+We'd love to catch errors in self-hosted so you don't run into them, and so we can fix them faster! When you run `./install.sh`, you will be prompted to select whether to opt in or out of our monitoring. If you opt into our monitoring, we will send information to our own self-hosted Sentry instance for development and debugging purposes. We may collect:
+
+- OS username
+- IP address
+- install log
+- runtime errors in Sentry
+- performance data
+
+Thirty (30) day retention. No marketing. Privacy policy at sentry.io/privacy.
+
+Starting with the 22.10.0 release in October, we will require those running the Sentry installer to choose to opt in or out. If you are running the installer under automation, you may want to set `REPORT_SELF_HOSTED_ISSUES` or pass `--(no-)report-self-hosted-issues` to the installer accordingly.
+
