@@ -47,7 +47,7 @@ if [[ -z "${REPORT_SELF_HOSTED_ISSUES:-}" ]]; then
     echo "  --report-self-hosted-issues"
     echo "  --no-report-self-hosted-issues"
     echo
-    echo "or the REPORT_SELF_HOSTED_ISSUES environment variable:"
+    echo "or set the REPORT_SELF_HOSTED_ISSUES environment variable:"
     echo
     echo "  REPORT_SELF_HOSTED_ISSUES=1 to send data"
     echo "  REPORT_SELF_HOSTED_ISSUES=0 to not send data"
@@ -95,7 +95,7 @@ if [[ -z "${REPORT_SELF_HOSTED_ISSUES:-}" ]]; then
     echo "  --report-self-hosted-issues"
     echo "  --no-report-self-hosted-issues"
     echo
-    echo "or the REPORT_SELF_HOSTED_ISSUES environment variable:"
+    echo "or set the REPORT_SELF_HOSTED_ISSUES environment variable:"
     echo
     echo "  REPORT_SELF_HOSTED_ISSUES=1 to send data"
     echo "  REPORT_SELF_HOSTED_ISSUES=0 to not send data"
