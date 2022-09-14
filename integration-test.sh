@@ -4,6 +4,7 @@ set -ex
 echo "Reset customizations"
 rm -f sentry/enhance-image.sh
 rm -f sentry/requirements.txt
+export REPORT_SELF_HOSTED_ISSUES=0
 
 echo "Testing initial install"
 ./install.sh
