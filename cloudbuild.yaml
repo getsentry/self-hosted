@@ -19,7 +19,7 @@ steps:
       - "-e"
       - "-c"
       - |
-        ./install.sh
+        ./install.sh --no-report-self-hosted-issues
     timeout: 600s
 
     # The point is to run the tests that get run in sentry and snuba, to avoid

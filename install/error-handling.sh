@@ -3,7 +3,6 @@ echo "${_group}Setting up error handling ..."
 export SENTRY_DSN='https://19555c489ded4769978daae92f2346ca@self-hosted.getsentry.net/3'
 export SENTRY_ORG=self-hosted
 export SENTRY_PROJECT=installer
-export REPORT_ERRORS=0
 
 function send_event {
   local sentry_cli="docker run --rm -v $basedir:/work -e SENTRY_ORG=$SENTRY_ORG -e SENTRY_PROJECT=$SENTRY_PROJECT -e SENTRY_DSN=$SENTRY_DSN getsentry/sentry-cli"
@@ -12,55 +11,56 @@ function send_event {
   command popd > /dev/null
 }
 
-reporterrors="$basedir/.reporterrors"
-if [[ -f $reporterrors ]]; then
-  echo -n "Found a .reporterrors file. What does it say? "
-  cat $reporterrors
-  if [[ "$(cat $reporterrors)" == "yes" ]]; then
-    export REPORT_ERRORS=1
-  else
-    export REPORT_ERRORS=0
-  fi
-else
+if [[ -z "${REPORT_SELF_HOSTED_ISSUES:-}" ]]; then
   if [[ $PROMPTABLE == "0" ]]; then
     echo
-    echo "Hey, so ... we would love to find out when you hit an issue with this here"
-    echo "installer you are running. Turns out there is an app for that, called Sentry."
-    echo "Would you be willing to let us automatically send data to Sentry from this "
-    echo "installer? If so, add this to your automation:"
+    echo "Hey, so ... we would love to automatically find out about issues with your"
+    echo "Sentry instance so that we can improve the product. Turns out there is an app"
+    echo "for that, called Sentry. Would you be willing to let us automatically send data"
+    echo "about your instance upstream to Sentry for development and debugging purposes?"
+    echo "If so, rerun with:"
     echo
-    echo "  echo yes > /path/to/sentry/.reporterrors"
+    echo "  ./install.sh --report-self-hosted-issues"
+    echo
+    echo "      or"
+    echo
+    echo "  REPORT_SELF_HOSTED_ISSUES=1 ./install.sh"
     echo
     echo "(Btw, we send this to our own self-hosted Sentry instance, not to Sentry SaaS,"
     echo "so that we can be in this together.)"
     echo
-    echo "Here's the info we may collect in order to help us improve the installer:"
+    echo "Here's the info we may collect:"
     echo
     echo "  - OS username"
     echo "  - IP address"
     echo "  - install log"
+    echo "  - runtime errors"
     echo "  - performance data"
     echo
     echo "Thirty (30) day retention. No marketing. Privacy policy at sentry.io/privacy."
     echo
-    echo "For now we are defaulting to not sending data, but our plan is to hard-require"
-    echo "a choice from you starting in version 22.10.0, because let's be honest, none of"
-    echo "you will act on this otherwise. To avoid disruption you can use one of these"
-    echo "flags:"
+    echo "For now we are defaulting to not reporting upstream, but our plan is to"
+    echo "hard-require a choice from you starting in version 22.10.0, because let's be"
+    echo "honest, none of you will act on this otherwise. To avoid disruption you can use"
+    echo "one of these flags:"
     echo
-    echo "  echo no > /path/to/sentry/.reporterrors"
+    echo "  --report-self-hosted-issues"
+    echo "  --no-report-self-hosted-issues"
     echo
-    echo "We'll probably also add an env var and/or CLI flag before then, too. See:"
+    echo "or set the REPORT_SELF_HOSTED_ISSUES environment variable:"
     echo
-    echo "  https://github.com/getsentry/team-ospo/issues/36"
+    echo "  REPORT_SELF_HOSTED_ISSUES=1 to send data"
+    echo "  REPORT_SELF_HOSTED_ISSUES=0 to not send data"
     echo
     echo "Thanks for using Sentry."
     echo
+    export REPORT_SELF_HOSTED_ISSUES=0  # opt-in for now
   else
     echo
-    echo "Hey, so ... we would love to find out when you hit an issue with this here"
-    echo "installer you are running. Turns out there is an app for that, called Sentry."
-    echo "Are you okay with us sending info to Sentry when you run this installer?"
+    echo "Hey, so ... we would love to automatically find out about issues with your"
+    echo "Sentry instance so that we can improve the product. Turns out there is an app"
+    echo "for that, called Sentry. Would you be willing to let us automatically send data"
+    echo "about your instance upstream to Sentry for development and debugging purposes?"
     echo
     echo "  y / yes / 1"
     echo "  n / no / 0"
@@ -68,11 +68,12 @@ else
     echo "(Btw, we send this to our own self-hosted Sentry instance, not to Sentry SaaS,"
     echo "so that we can be in this together.)"
     echo
-    echo "Here's the info we may collect in order to help us improve the installer:"
+    echo "Here's the info we may collect:"
     echo
     echo "  - OS username"
     echo "  - IP address"
     echo "  - install log"
+    echo "  - runtime errors"
     echo "  - performance data"
     echo
     echo "Thirty (30) day retention. No marketing. Privacy policy at sentry.io/privacy."
@@ -83,24 +84,31 @@ else
     do
       read -p "y or n? " yn
       case $yn in
-        y | yes | 1) export REPORT_ERRORS=1; echo "yes" > $reporterrors; echo; echo -n "Thank you.";;
-        n | no | 0) export REPORT_ERRORS=0; echo "no" > $reporterrors; echo; echo -n "Understood.";;
+        y | yes | 1) export REPORT_SELF_HOSTED_ISSUES=1; echo; echo -n "Thank you.";;
+        n | no | 0) export REPORT_SELF_HOSTED_ISSUES=0; echo; echo -n "Understood.";;
         *) yn="";;
       esac
     done
 
-    echo " Your answer is cached in '.reporterrors', remove it to see this"
-    echo "prompt again."
+    echo " To avoid this prompt in the future, use one of these flags:"
+    echo
+    echo "  --report-self-hosted-issues"
+    echo "  --no-report-self-hosted-issues"
+    echo
+    echo "or set the REPORT_SELF_HOSTED_ISSUES environment variable:"
+    echo
+    echo "  REPORT_SELF_HOSTED_ISSUES=1 to send data"
+    echo "  REPORT_SELF_HOSTED_ISSUES=0 to not send data"
     echo
     sleep 5
   fi
 fi
 
 # Make sure we can use sentry-cli if we need it.
-if [ "$REPORT_ERRORS" == 1 ]; then
+if [ "$REPORT_SELF_HOSTED_ISSUES" == 1 ]; then
   if ! docker pull getsentry/sentry-cli:latest; then
-    echo "Failed to pull sentry-cli, won't report errors after all."
-    export REPORT_ERRORS=0
+    echo "Failed to pull sentry-cli, won't report to Sentry after all."
+    export REPORT_SELF_HOSTED_ISSUES=0
   fi;
 fi;
 
@@ -139,7 +147,7 @@ cleanup () {
     fi
     echo "$traceback"
 
-    if [ "$REPORT_ERRORS" == 1 ]; then
+    if [ "$REPORT_SELF_HOSTED_ISSUES" == 1 ]; then
       local traceback_hash=$(echo -n $traceback | docker run --rm busybox md5sum | cut -d' ' -f1)
       send_event "$traceback_hash" "$cmd_exit"
     fi
