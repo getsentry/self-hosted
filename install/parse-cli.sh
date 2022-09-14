@@ -18,6 +18,13 @@ Options:
                           branch of a \`self-hosted\` Git working copy.
  --skip-user-creation   Skip the initial user creation prompt (ideal for non-
                           interactive installs).
+ --report-self-hosted-issues
+                        Report error and performance data about your self-hosted
+                          instance upstream to Sentry. See sentry.io/privacy for
+                          our privacy policy.
+ --no-report-self-hosted-issues
+                        Do not report error and performance data about your
+                          self-hosted instance upstream to Sentry.
 EOF
 }
 
@@ -33,6 +40,7 @@ fi
 SKIP_USER_CREATION="${SKIP_USER_CREATION:-}"
 MINIMIZE_DOWNTIME="${MINIMIZE_DOWNTIME:-}"
 SKIP_COMMIT_CHECK="${SKIP_COMMIT_CHECK:-}"
+REPORT_SELF_HOSTED_ISSUES="${REPORT_SELF_HOSTED_ISSUES:-}"
 
 while (( $# )); do
   case "$1" in
@@ -44,6 +52,8 @@ while (( $# )); do
     --skip-user-creation) SKIP_USER_CREATION=1;;
     --minimize-downtime) MINIMIZE_DOWNTIME=1;;
     --skip-commit-check) SKIP_COMMIT_CHECK=1;;
+    --report-self-hosted-issues) REPORT_SELF_HOSTED_ISSUES=1;;
+    --no-report-self-hosted-issues) REPORT_SELF_HOSTED_ISSUES=0;;
     --) ;;
     *) echo "Unexpected argument: $1. Use --help for usage information."; exit 1;;
   esac
