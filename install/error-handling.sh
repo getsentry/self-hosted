@@ -43,9 +43,10 @@ else
     echo
     echo "Thirty (30) day retention. No marketing. Privacy policy at sentry.io/privacy."
     echo
-    echo "For now we are defaulting to opt-out, but our plan is to hard-require a choice"
-    echo "from you starting in version 22.12.0, because let's be honest, none of you will"
-    echo "act on this otherwise. To avoid disruption you can:"
+    echo "For now we are defaulting to not sending data, but our plan is to hard-require"
+    echo "a choice from you starting in version 22.10.0, because let's be honest, none of"
+    echo "you will act on this otherwise. To avoid disruption you can use one of these"
+    echo "flags:"
     echo
     echo "  echo no > /path/to/sentry/.reporterrors"
     echo
