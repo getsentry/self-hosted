@@ -22,42 +22,77 @@ if [[ -f $reporterrors ]]; then
     export REPORT_ERRORS=0
   fi
 else
-  echo
-  echo "Hey, so ... we would love to find out when you hit an issue with this here"
-  echo "installer you are running. Turns out there is an app for that, called Sentry."
-  echo "Are you okay with us sending info to Sentry when you run this installer?"
-  echo
-  echo "  y / yes / 1"
-  echo "  n / no / 0"
-  echo
-  echo "(Btw, we send this to our own self-hosted Sentry instance, not to Sentry SaaS,"
-  echo "so that we can be in this together.)"
-  echo
-  echo "Here's the info we may collect in order to help us improve the installer:"
-  echo
-  echo "  - OS username"
-  echo "  - IP address"
-  echo "  - install log"
-  echo "  - performance data"
-  echo
-  echo "Thirty (30) day retention. No marketing. Privacy policy at sentry.io/privacy."
-  echo
+  if [[ $PROMPTABLE == "0" ]]; then
+    echo
+    echo "Hey, so ... we would love to find out when you hit an issue with this here"
+    echo "installer you are running. Turns out there is an app for that, called Sentry."
+    echo "Would you be willing to let us automatically send data to Sentry from this "
+    echo "installer? If so, add this to your automation:"
+    echo
+    echo "  echo yes > /path/to/sentry/.reporterrors"
+    echo
+    echo "(Btw, we send this to our own self-hosted Sentry instance, not to Sentry SaaS,"
+    echo "so that we can be in this together.)"
+    echo
+    echo "Here's the info we may collect in order to help us improve the installer:"
+    echo
+    echo "  - OS username"
+    echo "  - IP address"
+    echo "  - install log"
+    echo "  - performance data"
+    echo
+    echo "Thirty (30) day retention. No marketing. Privacy policy at sentry.io/privacy."
+    echo
+    echo "For now we are defaulting to opt-out, but our plan is to hard-require a choice"
+    echo "from you starting in version 22.12.0, because let's be honest, none of you will"
+    echo "act on this otherwise. To avoid disruption you can:"
+    echo
+    echo "  echo no > /path/to/sentry/.reporterrors"
+    echo
+    echo "We'll probably also add an env var and/or CLI flag before then, too. See:"
+    echo
+    echo "  https://github.com/getsentry/team-ospo/issues/36"
+    echo
+    echo "Thanks for using Sentry."
+    echo
+  else
+    echo
+    echo "Hey, so ... we would love to find out when you hit an issue with this here"
+    echo "installer you are running. Turns out there is an app for that, called Sentry."
+    echo "Are you okay with us sending info to Sentry when you run this installer?"
+    echo
+    echo "  y / yes / 1"
+    echo "  n / no / 0"
+    echo
+    echo "(Btw, we send this to our own self-hosted Sentry instance, not to Sentry SaaS,"
+    echo "so that we can be in this together.)"
+    echo
+    echo "Here's the info we may collect in order to help us improve the installer:"
+    echo
+    echo "  - OS username"
+    echo "  - IP address"
+    echo "  - install log"
+    echo "  - performance data"
+    echo
+    echo "Thirty (30) day retention. No marketing. Privacy policy at sentry.io/privacy."
+    echo
 
-  yn=""
-  until [ ! -z "$yn" ]
-  do
-    read -p "y or n? " yn
-    case $yn in
-      y | yes | 1) export REPORT_ERRORS=1; echo "yes" > $reporterrors; echo; echo -n "Thank you.";;
-      n | no | 0) export REPORT_ERRORS=0; echo "no" > $reporterrors; echo; echo -n "Understood.";;
-      *) yn="";;
-    esac
-  done
+    yn=""
+    until [ ! -z "$yn" ]
+    do
+      read -p "y or n? " yn
+      case $yn in
+        y | yes | 1) export REPORT_ERRORS=1; echo "yes" > $reporterrors; echo; echo -n "Thank you.";;
+        n | no | 0) export REPORT_ERRORS=0; echo "no" > $reporterrors; echo; echo -n "Understood.";;
+        *) yn="";;
+      esac
+    done
 
-  echo " Your answer is cached in '.reporterrors', remove it to see this"
-  echo "prompt again."
-  echo
-  sleep 5
+    echo " Your answer is cached in '.reporterrors', remove it to see this"
+    echo "prompt again."
+    echo
+    sleep 5
+  fi
 fi
 
 # Make sure we can use sentry-cli if we need it.
