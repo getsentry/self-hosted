@@ -1,5 +1,20 @@
 # Changelog
 
+## 22.9.0
+
+### Various fixes & improvements
+
+- Fix traceback hash for error monitoring (#1700) by @hubertdeng123
+- Add section about error monitoring to the README (#1699) by @ethanhs
+- Switch from .reporterrors file to flag + envvar (#1697) by @chadwhitacre
+- Rename flag to --skip-user-creation (#1696) by @chadwhitacre
+- Default to not sending data to Sentry for now (#1695) by @chadwhitacre
+- fix(e2e tests): Pull branch that initially triggers gcp build for PRs (#1694) by @hubertdeng123
+- fix(e2e tests): Add .reporterrors file for GCP run of e2e tests (#1691) by @hubertdeng123
+- Error monitoring of the self-hosted installer (#1679) by @ethanhs
+- added docker commands in the description (#1673) by @victorelec14
+- Use docker-compose 2.7.0 instead of 2.2.3 in CI (#1591) by @aminvakil
+
 ## 22.8.0
 
 - No documented changes.
