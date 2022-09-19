@@ -6,10 +6,6 @@ if [[ -n "$MINIMIZE_DOWNTIME" ]]; then
 else
   # Clean up old stuff and ensure nothing is working while we install/update
   $dc down -t $STOP_TIMEOUT --rmi local --remove-orphans
-
-  # Back-compat with old project name
-  COMPOSE_PROJECT_NAME=sentry_onpremise \
-    $dc down -t $STOP_TIMEOUT --rmi local --remove-orphans
 fi
 
 echo "${_endgroup}"
