@@ -19,7 +19,7 @@ function send_envelope() {
   fi
   # If we haven't sent the envelope file, make it and send to Sentry
   # The format is documented at https://develop.sentry.dev/sdk/envelopes/
-  # Grab length of file, needed for the envelope header to send an attachment
+  # Grab length of log file, needed for the envelope header to send an attachment
   local file_length=$(stat -f %z < "$basedir/$log_file")
   # Add header for initial envelope information
   echo '{"event_id":"'$event_hash'","dsn":"'$SENTRY_DSN'"}' > $envelope_file_path
