@@ -12,32 +12,31 @@ function send_event {
 }
 
 
-function create_envelope() {
-  local cli_output=$1;
-  # Get the UUID of event
-  local event_fingerprint=${cli_output#Event dispatched: };
-  # The event_id is the UUID without dashes
-  local event_id=${event_fingerprint//-/};
-  local envelope_file="/tmp/sentry-envelope-${event_id}"
-  # If the envelope file exists, we've already sent it, so we are done
-  if [[ -f envelope_file ]]; then
+function send_envelope() {
+  # Use traceback hash as the UUID since it is 32 characters long
+  local traceback_hash=$1
+  local traceback=$2
+  # escape traceback for quotes so that we are sending valid json
+  local traceback_escaped="${traceback//\"/\\\"}"
+  local envelope_file="sentry-envelope-${traceback_hash}"
+  local envelope_file_path="$basedir/$envelope_file"
+  # If the envelope file exists, we've already sent it, delete it now
+  if [[ -f envelope_file_path ]]; then
+    rm $envelope_file_path
     return;
   fi
   # If we haven't sent the envelope file, make it and send to Sentry
   # The format is documented at https://develop.sentry.dev/sdk/envelopes/
-  # Get length of file, needed for the envelope header
-  local file_length=$(wc -c < $log_file);
-  echo $(jq -n \
-    --arg event_id "$event_id" \
-    --arg dsn "$SENTRY_DSN" \
-    '{"event_id": $event_id, "dsn": $dsn}' \
-  ) > $envelope_file;
-  echo $(jq -n \
-    --arg length "$file_length" \
-    --arg filename "$log_file" \
-    '{"type": "attachment", "length": $length, "content_type": "text/plain", "filename": $filename}' \
-  ) >> $envelope_file;
-  cat $log_file >> $envelope_file;
+  # Get length of file, needed for the envelope header. This is in number of characters since ▶ takes up 2 bytes and is not supported
+  local file_length=$(stat -f %z < "$basedir/$log_file")
+  echo '{"event_id":"'$traceback_hash'","dsn":"'$SENTRY_DSN'"}' >> $envelope_file_path
+  echo '{"type":"event"}' >> $envelope_file_path
+  echo '{"message":"'$traceback_escaped'","level":"error"}' >> $envelope_file_path
+  echo '{"type":"attachment","length":'$file_length',"content_type":"text/plain","filename":"install_log.txt"}' >> $envelope_file_path
+  cat "$basedir/$log_file" >> $envelope_file_path
+  local sentry_cli="docker run --rm -v $basedir:/work -e SENTRY_ORG=$SENTRY_ORG -e SENTRY_PROJECT=$SENTRY_PROJECT -e SENTRY_DSN=$SENTRY_DSN getsentry/sentry-cli"
+  $sentry_cli send-envelope $envelope_file
+  rm $envelope_file_path
 }
 
 if [[ -z "${REPORT_SELF_HOSTED_ISSUES:-}" ]]; then
@@ -178,8 +177,7 @@ cleanup () {
 
     if [ "$REPORT_SELF_HOSTED_ISSUES" == 1 ]; then
       local traceback_hash=$(echo -n $traceback | docker run -i --rm busybox md5sum | cut -d' ' -f1)
-      local cli_output=$(send_event "$traceback_hash" "$cmd_exit")
-      create_envelope $cli_output
+      send_envelope "$traceback_hash" "$cmd_exit"
     fi
 
     if [[ -n "$MINIMIZE_DOWNTIME" ]]; then
