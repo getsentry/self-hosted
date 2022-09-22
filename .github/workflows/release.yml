@@ -31,3 +31,17 @@ jobs:
           version: ${{ github.event.inputs.version }}
           force: ${{ github.event.inputs.force }}
           calver: true
+      - name: Create new release in Self-hosted Sentry
+        run: |
+          curl -sL https://sentry.io/get-cli/ | bash
+          # Create new Sentry release
+          export SENTRY_DSN='https://19555c489ded4769978daae92f2346ca@self-hosted.getsentry.net/3'
+          export SENTRY_ORG=self-hosted
+          export SENTRY_PROJECT=installer
+          export SENTRY_RELEASE=$(sentry-cli releases propose-version)
+          sentry-cli releases new -p $SENTRY_PROJECT $SENTRY_RELEASE
+          sentry-cli releases set-commits --auto $SENTRY_RELEASE
+          sentry-cli releases finalize $SENTRY_RELEASE
+
+          # Create new deploy for this Sentry release
+          sentry-cli releases deploys $SENTRY_RELEASE new -e production
