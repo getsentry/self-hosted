@@ -4,11 +4,35 @@ export SENTRY_DSN='https://19555c489ded4769978daae92f2346ca@self-hosted.getsentr
 export SENTRY_ORG=self-hosted
 export SENTRY_PROJECT=installer
 
-function send_event {
-  local sentry_cli="docker run --rm -v $basedir:/work -e SENTRY_ORG=$SENTRY_ORG -e SENTRY_PROJECT=$SENTRY_PROJECT -e SENTRY_DSN=$SENTRY_DSN getsentry/sentry-cli"
-  command pushd .. > /dev/null
-  $sentry_cli send-event --no-environ -f "$1" -m "$2" --logfile $log_file
-  command popd > /dev/null
+function send_envelope() {
+  # Use traceback hash as the UUID since it is 32 characters long
+  local event_hash=$1
+  local traceback=$2
+  # escape traceback for quotes so that we are sending valid json
+  local traceback_escaped="${traceback//\"/\\\"}"
+  local envelope_file="sentry-envelope-${event_hash}"
+  local envelope_file_path="/tmp/$envelope_file"
+  # If the envelope file exists, we've already sent it
+  if [[ -f $envelope_file_path ]]; then
+    echo "Looks like you've already sent this error to us, we're on it :)"
+    return;
+  fi
+  # If we haven't sent the envelope file, make it and send to Sentry
+  # The format is documented at https://develop.sentry.dev/sdk/envelopes/
+  # Grab length of log file, needed for the envelope header to send an attachment
+  local file_length=$(stat -f %z < "$basedir/$log_file")
+  # Add header for initial envelope information
+  echo '{"event_id":"'$event_hash'","dsn":"'$SENTRY_DSN'"}' > $envelope_file_path
+  # Add header to specify the event type of envelope to be sent
+  echo '{"type":"event"}' >> $envelope_file_path
+  # Add traceback message to event
+  echo '{"message":"'$traceback_escaped'","level":"error"}' >> $envelope_file_path
+  # Add attachment to the event
+  echo '{"type":"attachment","length":'$file_length',"content_type":"text/plain","filename":"install_log.txt"}' >> $envelope_file_path
+  cat "$basedir/$log_file" >> $envelope_file_path
+  # Send envelope
+  local sentry_cli="docker run --rm -v /tmp:/work -e SENTRY_ORG=$SENTRY_ORG -e SENTRY_PROJECT=$SENTRY_PROJECT -e SENTRY_DSN=$SENTRY_DSN getsentry/sentry-cli"
+  $sentry_cli send-envelope $envelope_file
 }
 
 if [[ -z "${REPORT_SELF_HOSTED_ISSUES:-}" ]]; then
@@ -148,8 +172,8 @@ cleanup () {
     echo "$traceback"
 
     if [ "$REPORT_SELF_HOSTED_ISSUES" == 1 ]; then
-      local traceback_hash=$(echo -n $traceback | docker run -i --rm busybox md5sum | cut -d' ' -f1)
-      send_event "$traceback_hash" "$cmd_exit"
+      local event_hash=$(echo -n "$cmd_exit $traceback" | docker run -i --rm busybox md5sum | cut -d' ' -f1)
+      send_envelope "$event_hash" "$cmd_exit"
     fi
 
     if [[ -n "$MINIMIZE_DOWNTIME" ]]; then
