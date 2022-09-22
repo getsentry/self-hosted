@@ -33,17 +33,16 @@ jobs:
       #     calver: true
       - name: Create new release in Self-hosted Sentry
         env:
-          SENTRY_LOG_LEVEL: debug
           SENTRY_DSN: 'https://19555c489ded4769978daae92f2346ca@self-hosted.getsentry.net/3'
           SENTRY_ORG: self-hosted
           SENTRY_PROJECT: installer
           SENTRY_URL: https://self-hosted.getsentry.net/
           SENTRY_AUTH_TOKEN: ${{ secrets.SELF_HOSTED_RELEASE_TOKEN }}
+          SENTRY_RELEASE: ${{ github.event.inputs.version }}
         run: |
           curl -sL https://sentry.io/get-cli/ | bash
 
           # Create new Sentry release
-          export SENTRY_RELEASE=$(sentry-cli releases propose-version)
           sentry-cli --auth-token $SENTRY_AUTH_TOKEN releases new -p $SENTRY_PROJECT $SENTRY_RELEASE
           sentry-cli --auth-token $SENTRY_AUTH_TOKEN releases set-commits --auto $SENTRY_RELEASE
           sentry-cli --auth-token $SENTRY_AUTH_TOKEN releases finalize $SENTRY_RELEASE
