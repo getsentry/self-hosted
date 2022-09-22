@@ -12,7 +12,7 @@ function send_envelope() {
   local traceback_escaped="${traceback//\"/\\\"}"
   local envelope_file="sentry-envelope-${event_hash}"
   local envelope_file_path="/tmp/$envelope_file"
-  # If the envelope file exists, we've already sent it, delete it now
+  # If the envelope file exists, we've already sent it
   if [[ -f $envelope_file_path ]]; then
     echo "Looks like you've already sent this error to us, we're on it :)"
     return;
@@ -30,7 +30,7 @@ function send_envelope() {
   # Add attachment to the event
   echo '{"type":"attachment","length":'$file_length',"content_type":"text/plain","filename":"install_log.txt"}' >> $envelope_file_path
   cat "$basedir/$log_file" >> $envelope_file_path
-  # Send envelope and cleanup temporary file
+  # Send envelope
   local sentry_cli="docker run --rm -v /tmp:/work -e SENTRY_ORG=$SENTRY_ORG -e SENTRY_PROJECT=$SENTRY_PROJECT -e SENTRY_DSN=$SENTRY_DSN getsentry/sentry-cli"
   $sentry_cli send-envelope $envelope_file
 }
