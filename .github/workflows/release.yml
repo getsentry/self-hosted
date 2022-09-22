@@ -23,14 +23,14 @@ jobs:
         with:
           token: ${{ secrets.GH_RELEASE_PAT }}
           fetch-depth: 0
-      # - name: Prepare release
-      #   uses: getsentry/action-prepare-release@v1
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GH_RELEASE_PAT }}
-      #   with:
-      #     version: ${{ github.event.inputs.version }}
-      #     force: ${{ github.event.inputs.force }}
-      #     calver: true
+      - name: Prepare release
+        uses: getsentry/action-prepare-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_RELEASE_PAT }}
+        with:
+          version: ${{ github.event.inputs.version }}
+          force: ${{ github.event.inputs.force }}
+          calver: true
       - name: Create new release in Self-hosted Sentry
         env:
           SENTRY_DSN: 'https://19555c489ded4769978daae92f2346ca@self-hosted.getsentry.net/3'
