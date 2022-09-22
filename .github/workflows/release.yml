@@ -37,6 +37,7 @@ jobs:
           SENTRY_DSN: 'https://19555c489ded4769978daae92f2346ca@self-hosted.getsentry.net/3'
           SENTRY_ORG: self-hosted
           SENTRY_PROJECT: installer
+          SENTRY_URL: https://self-hosted.getsentry.net/
           SENTRY_AUTH_TOKEN: ${{ secrets.SELF_HOSTED_RELEASE_TOKEN }}
         run: |
           curl -sL https://sentry.io/get-cli/ | bash
