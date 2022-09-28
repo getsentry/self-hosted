@@ -1,20 +1,23 @@
 #!/usr/bin/env bash
 source "$(dirname $0)/_test_setup.sh"
 
-expected=7
-count() {
-  docker volume ls --quiet | grep '^sentry-.*' | wc -l
-}
-
-# Maybe they exist prior, maybe they don't. Script is idempotent.
-
-before=$(count)
-test $before -eq 0 || test $before -eq $expected
+expected_volumes="
+sentry-clickhouse
+sentry-data
+sentry-kafka
+sentry-postgres
+sentry-redis
+sentry-symbolicator
+sentry-zookeeper
+"
 
 source create-docker-volumes.sh
 source create-docker-volumes.sh
 source create-docker-volumes.sh
 
-test $(count) -eq $expected
+docker_volumes=$(docker volume ls --quiet | grep '^sentry-.*')
+for expected_volume in $expected_volumes; do
+  [[ "$docker_volumes" =~ "$expected_volume" ]] || exit 1
+done
 
 report_success
