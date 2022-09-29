@@ -32,7 +32,7 @@ export REPORT_SELF_HOSTED_ISSUES=0
 export MINIMIZE_DOWNTIME=''
 export dc=':'
 CLEANUP_RESPONSE=$(cleanup ERROR)
-test "$CLEANUP_RESPONSE" == 'Error in ./install/error-handling-test.sh:34.
+test "$CLEANUP_RESPONSE" == 'Error in ./_unit-test/error-handling-test.sh:34.
 '\''local cmd="${BASH_COMMAND}"'\'' exited with status 0
 
 Cleaning up...'
@@ -42,7 +42,7 @@ echo "Testing cleanup while minimizing downtime"
 export REPORT_SELF_HOSTED_ISSUES=0
 export MINIMIZE_DOWNTIME=1
 CLEANUP_RESPONSE=$(cleanup ERROR)
-test "$CLEANUP_RESPONSE" == 'Error in ./install/error-handling-test.sh:44.
+test "$CLEANUP_RESPONSE" == 'Error in ./_unit-test/error-handling-test.sh:44.
 '\''local cmd="${BASH_COMMAND}"'\'' exited with status 0
 
 *NOT* cleaning up, to clean your environment run "docker compose stop".'
