@@ -22,7 +22,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Unit Tests
-        working-directory: install
+        working-directory: _unit-test
         run: find ./ -type f -name "*-test.sh" -exec "./{}" \;
 
   integration-test:
