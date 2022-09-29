@@ -42,7 +42,7 @@ fi
 
 # Make sure they mean it.
 if [ "${FORCE_CLEAN:-}" == "1" ]; then
-  echo "☠️  Seeing FORCE=1, forcing."
+  echo "☠️  Seeing FORCE=1, forcing cleanup."
   echo
 else
   confirm "☠️  Warning! 😳 This is highly destructive! 😱 Are you sure you wish to proceed?"
