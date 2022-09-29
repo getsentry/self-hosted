@@ -2,6 +2,7 @@
 source "$(dirname $0)/_test_setup.sh"
 source dc-detect-version.sh
 
+# using _file format for these variables since there is a creds defined in dc-detect-version.sh
 cfg_file="../relay/config.yml"
 creds_file="../relay/credentials.json"
 
