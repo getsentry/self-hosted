@@ -37,7 +37,7 @@ send_event() {
   echo '{"type":"attachment","length":'$file_length',"content_type":"text/plain","filename":"install_log.txt"}' >> $envelope_file_path
   cat "$basedir/$log_file" >> $envelope_file_path
   # Send envelope
-  send_event $envelope_file
+  send_envelope $envelope_file
 }
 
 if [[ -z "${REPORT_SELF_HOSTED_ISSUES:-}" ]]; then
