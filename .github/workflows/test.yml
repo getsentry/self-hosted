@@ -22,8 +22,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Unit Tests
-        working-directory: install
-        run: find ./ -type f -name "*-test.sh" -exec "./{}" \;
+        run: ./unit-test.sh
 
   integration-test:
     runs-on: ubuntu-20.04
