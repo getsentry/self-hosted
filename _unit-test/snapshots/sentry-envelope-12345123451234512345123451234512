@@ -1,0 +1,5 @@
+{"event_id":"12345123451234512345123451234512","dsn":"https://19555c489ded4769978daae92f2346ca@self-hosted.getsentry.net/3"}
+{"type":"event"}
+{"message":"Test exited with status 1","level":"error"}
+{"type":"attachment","length":10,"content_type":"text/plain","filename":"install_log.txt"}
+Test Logs
