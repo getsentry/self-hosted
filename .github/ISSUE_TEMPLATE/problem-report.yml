@@ -70,6 +70,13 @@ body:
         - logs output
     validations:
       required: true
+  - type: textarea
+    id: event_id
+    attributes:
+      label: Event ID
+      description: |
+        If you opted into sending errors to our error monitoring and the error has an event ID, enter it here!
+      placeholder: c2d85058-d3b0-4d85-a509-e2ba965845d7 
   - type: markdown
     attributes:
       value: |-
