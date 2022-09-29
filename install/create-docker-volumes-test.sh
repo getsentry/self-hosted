@@ -18,7 +18,7 @@ sentry-zookeeper"
 
 before=$(get_volumes)
 
-test "$before" == "" || test "$before" == $expected_volumes
+test "$before" == "" || test "$before" == "$expected_volumes"
 
 source create-docker-volumes.sh
 source create-docker-volumes.sh
