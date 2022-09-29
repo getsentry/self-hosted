@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-source "$(dirname $0)/_test_setup.sh" && set -ex
+source "$(dirname $0)/_test_setup.sh"
 
 export REPORT_SELF_HOSTED_ISSUES=1
 
