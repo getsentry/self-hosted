@@ -3,7 +3,7 @@ echo "${_group}Checking minimum requirements ..."
 source "$(dirname $0)/_min-requirements.sh"
 
 # Check the version of $1 is greater than or equal to $2 using sort. Note: versions must be stripped of "v"
-function vergte () { printf "%s\n%s" $1 $2 | sort --version-sort --check=quiet --reverse; }
+function vergte () { printf "%s\n%s" $1 $2 | sort --version-sort --check=quiet --reverse; echo $?; }
 
 
 
