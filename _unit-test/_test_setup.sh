@@ -1,5 +1,5 @@
 set -euo pipefail
-source "$(dirname $0)/_lib.sh"
+source "$(dirname $0)/../install/_lib.sh"
 
 rm -rf /tmp/sentry-self-hosted-test-sandbox.*
 _SANDBOX="$(mktemp -d /tmp/sentry-self-hosted-test-sandbox.XXX)"
