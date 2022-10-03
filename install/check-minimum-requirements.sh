@@ -7,8 +7,9 @@ function vergte () { printf "%s\n%s" $1 $2 | sort --version-sort --check=quiet -
 
 
 
-DOCKER_VERSION=$(docker version --format '{{.Server.Version}}')
-if [[ -z "$DOCKER_VERSION" ]]; then
+if [[ $(docker version --format '{{.Server.Version}}') ]]; then
+  DOCKER_VERSION=$(docker version --format '{{.Server.Version}}')
+else
   echo "FAIL: Unable to get docker version, is the docker daemon running?"
   exit 1
 fi
