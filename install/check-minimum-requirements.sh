@@ -7,9 +7,8 @@ function vergte () { printf "%s\n%s" $1 $2 | sort --version-sort --check=quiet -
 
 
 
-if [[ $(docker version --format '{{.Server.Version}}') ]]; then
-  DOCKER_VERSION=$(docker version --format '{{.Server.Version}}')
-else
+DOCKER_VERSION=$(docker version --format '{{.Server.Version}}' || echo '')
+if [[ -z "$DOCKER_VERSION" ]]; then
   echo "FAIL: Unable to get docker version, is the docker daemon running?"
   exit 1
 fi
@@ -20,9 +19,8 @@ if [[ "$(vergte ${DOCKER_VERSION//v} $MIN_DOCKER_VERSION)" ]]; then
 fi
 echo "Found Docker version $DOCKER_VERSION"
 
-if [[ $($dc_base version --short) ]]; then
-  COMPOSE_VERSION=$($dc_base version --short)
-else
+COMPOSE_VERSION=$($dc_base version --short || echo '')
+if [[ -z "$COMPOSE_VERSION" ]]; then
   echo "FAIL: Docker compose is required to run self-hosted"
   exit 1
 fi
