@@ -14,8 +14,8 @@ function install_wal2json {
   if [[ $WAL2JSON_VERSION == "latest" ]]; then
     VERSION=$(
       docker_curl https://api.github.com/repos/getsentry/wal2json/releases/latest |
-      grep '"tag_name":' |
-      sed -E 's/.*"([^"]+)".*/\1/'
+        grep '"tag_name":' |
+        sed -E 's/.*"([^"]+)".*/\1/'
     )
 
     if [[ ! $VERSION ]]; then
@@ -31,7 +31,7 @@ function install_wal2json {
     mkdir -p "../postgres/wal2json/$VERSION"
     docker_curl -L \
       "https://github.com/getsentry/wal2json/releases/download/$VERSION/$FILE_NAME" \
-      > "../postgres/wal2json/$VERSION/$FILE_NAME"
+      >"../postgres/wal2json/$VERSION/$FILE_NAME"
   fi
   cp "../postgres/wal2json/$VERSION/$FILE_NAME" "$FILE_TO_USE"
 }

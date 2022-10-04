@@ -20,7 +20,7 @@ function wrap_up {
     echo ""
     echo "You're all done! Run the following command to get Sentry running:"
     echo ""
-    if [[ "${_ENV}" =~ ".env.custom" ]]; then
+    if [[ ${_ENV} =~ ".env.custom" ]]; then
       echo "  $dc_base --env-file ${_ENV} up -d"
     else
       echo "  $dc_base up -d"

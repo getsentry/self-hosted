@@ -4,7 +4,7 @@ RELAY_CONFIG_YML="../relay/config.yml"
 RELAY_CREDENTIALS_JSON="../relay/credentials.json"
 
 function create_relay_credentials {
-  if [[ -f "$RELAY_CREDENTIALS_JSON" ]]; then
+  if [[ -f $RELAY_CREDENTIALS_JSON ]]; then
     echo "$RELAY_CREDENTIALS_JSON already exists, skipped creation."
   else
 
@@ -25,7 +25,7 @@ function create_relay_credentials {
 
     $dc pull relay
     creds="$dcr --no-deps -T relay credentials"
-    $creds generate --stdout > "$RELAY_CREDENTIALS_JSON".tmp
+    $creds generate --stdout >"$RELAY_CREDENTIALS_JSON".tmp
     mv "$RELAY_CREDENTIALS_JSON".tmp "$RELAY_CREDENTIALS_JSON"
     if ! grep -q Credentials <($creds show); then
       # Let's fail early if creds failed, to make debugging easier.

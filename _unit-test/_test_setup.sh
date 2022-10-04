@@ -31,16 +31,16 @@ setup() {
     local filestatus="$(cut -f1 -d' ' <(echo $line))"
 
     case $filestatus in
-      D)
-        rm "$_SANDBOX/$filepath"
-        ;;
-      A | M | AM | ??)
-        ln -sf "$(realpath $filepath)" "$_SANDBOX/$filepath"
-        ;;
-      **)
-        echo "Wuh? $line"
-        exit 77
-        ;;
+    D)
+      rm "$_SANDBOX/$filepath"
+      ;;
+    A | M | AM | ??)
+      ln -sf "$(realpath $filepath)" "$_SANDBOX/$filepath"
+      ;;
+    **)
+      echo "Wuh? $line"
+      exit 77
+      ;;
     esac
   done
 

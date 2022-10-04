@@ -1,6 +1,5 @@
 echo "${_group}Detecting Docker platform"
 
-
 # Sentry SaaS uses stock Yandex ClickHouse, but they don't provide images that
 # support ARM, which is relevant especially for Apple M1 laptops, Sentry's
 # standard developer environment. As a workaround, we use an altinity image
@@ -15,10 +14,10 @@ echo "${_group}Detecting Docker platform"
 
 export DOCKER_ARCH=$(docker info --format '{{.Architecture}}')
 
-if [[ "$DOCKER_ARCH" = "x86_64" ]]; then
+if [[ $DOCKER_ARCH == "x86_64" ]]; then
   export DOCKER_PLATFORM="linux/amd64"
   export CLICKHOUSE_IMAGE="yandex/clickhouse-server:20.3.9.70"
-elif [[ "$DOCKER_ARCH" = "aarch64" ]]; then
+elif [[ $DOCKER_ARCH == "aarch64" ]]; then
   export DOCKER_PLATFORM="linux/arm64"
   export CLICKHOUSE_IMAGE="altinity/clickhouse-server:21.6.1.6734-testing-arm"
 else

@@ -9,7 +9,7 @@ source geoip.sh
 diff -rub $mmdb $mmdb.empty
 
 # Doesn't clobber existing, though.
-echo GARBAGE > $mmdb
+echo GARBAGE >$mmdb
 source geoip.sh
 test "$(cat $mmdb)" = "GARBAGE"
 

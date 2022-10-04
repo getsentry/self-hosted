@@ -1,7 +1,7 @@
 echo "${_group}Turning things off ..."
 
 function turn_things_off {
-  if [[ -n "$MINIMIZE_DOWNTIME" ]]; then
+  if [[ -n $MINIMIZE_DOWNTIME ]]; then
     # Stop everything but relay and nginx
     $dc rm -fsv $($dc config --services | grep -v -E '^(nginx|relay)$')
   else

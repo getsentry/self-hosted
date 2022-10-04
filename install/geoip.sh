@@ -8,7 +8,7 @@ install_geoip() {
   local result='Done'
 
   echo "Setting up IP address geolocation ..."
-  if [[ ! -f "$mmdb" ]]; then
+  if [[ ! -f $mmdb ]]; then
     echo -n "Installing (empty) IP address geolocation database ... "
     cp "$mmdb.empty" "$mmdb"
     echo "done."
@@ -16,7 +16,7 @@ install_geoip() {
     echo "IP address geolocation database already exists."
   fi
 
-  if [[ ! -f "$conf" ]]; then
+  if [[ ! -f $conf ]]; then
     echo "IP address geolocation is not configured for updates."
     echo "See https://develop.sentry.dev/self-hosted/geolocation/ for instructions."
     result='Error'

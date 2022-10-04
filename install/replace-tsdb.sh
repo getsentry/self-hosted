@@ -2,8 +2,8 @@ echo "${_group}Replacing TSDB ..."
 
 replace_tsdb() {
   if (
-    [[ -f "$SENTRY_CONFIG_PY" ]] &&
-    ! grep -xq 'SENTRY_TSDB = "sentry.tsdb.redissnuba.RedisSnubaTSDB"' "$SENTRY_CONFIG_PY"
+    [[ -f $SENTRY_CONFIG_PY ]] &&
+      ! grep -xq 'SENTRY_TSDB = "sentry.tsdb.redissnuba.RedisSnubaTSDB"' "$SENTRY_CONFIG_PY"
   ); then
     # Do NOT indent the following string as it would be reflected in the end result,
     # breaking the final config file. See getsentry/self-hosted#624.

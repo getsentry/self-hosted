@@ -10,7 +10,7 @@ function update_docker_images {
   $dc pull -q --ignore-pull-failures 2>&1 | grep -v -- -self-hosted-local || true
 
   # We may not have the set image on the repo (local images) so allow fails
-  docker pull ${SENTRY_IMAGE} || true;
+  docker pull ${SENTRY_IMAGE} || true
 }
 
 update_docker_images

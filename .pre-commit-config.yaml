@@ -1,0 +1,13 @@
+- repo: local
+  hooks:
+    # Based on https://github.com/scop/pre-commit-shfmt/blob/main/.pre-commit-hooks.yaml
+    # Customized to also work on ARM, and give diff for CI
+    - id: shfmt
+      name: shfmt
+      description: Format shell source code
+      language: docker_image
+      entry: --net none mvdan/shfmt:v3.5.1
+      args: [-w, -s, -d]
+      types: [shell]
+      stages: [commit, merge-commit, push, manual]
+      types_or: [sh, bash]
