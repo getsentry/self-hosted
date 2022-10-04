@@ -7,24 +7,24 @@ Usage: $0 [options]
 Install Sentry with \`docker compose\`.
 
 Options:
-  -h, --help             Show this message and exit.
-  --minimize-downtime    EXPERIMENTAL: try to keep accepting events for as long
-              as possible while upgrading. This will disable cleanup
-              on error, and might leave your installation in a
-              partially upgraded state. This option might not reload
-              all configuration, and is only meant for in-place
-              upgrades.
-  --skip-commit-check    Skip the check for the latest commit when on the master
-              branch of a \`self-hosted\` Git working copy.
-  --skip-user-creation   Skip the initial user creation prompt (ideal for non-
-              interactive installs).
-  --report-self-hosted-issues
-            Report error and performance data about your self-hosted
-              instance upstream to Sentry. See sentry.io/privacy for
-              our privacy policy.
-  --no-report-self-hosted-issues
-            Do not report error and performance data about your
-              self-hosted instance upstream to Sentry.
+ -h, --help             Show this message and exit.
+ --minimize-downtime    EXPERIMENTAL: try to keep accepting events for as long
+                          as possible while upgrading. This will disable cleanup
+                          on error, and might leave your installation in a
+                          partially upgraded state. This option might not reload
+                          all configuration, and is only meant for in-place
+                          upgrades.
+ --skip-commit-check    Skip the check for the latest commit when on the master
+                          branch of a \`self-hosted\` Git working copy.
+ --skip-user-creation   Skip the initial user creation prompt (ideal for non-
+                          interactive installs).
+ --report-self-hosted-issues
+                        Report error and performance data about your self-hosted
+                          instance upstream to Sentry. See sentry.io/privacy for
+                          our privacy policy.
+ --no-report-self-hosted-issues
+                        Do not report error and performance data about your
+                          self-hosted instance upstream to Sentry.
 EOF
 }
 
@@ -44,18 +44,18 @@ REPORT_SELF_HOSTED_ISSUES="${REPORT_SELF_HOSTED_ISSUES:-}"
 
 while (( $# )); do
   case "$1" in
-  -h | --help) show_help; exit;;
-  --no-user-prompt) SKIP_USER_CREATION=1;
-    depwarn "--no-user-prompt flag" "--skip-user-creation";;
-  --skip-user-prompt) SKIP_USER_CREATION=1;
-    depwarn "--skip-user-prompt flag" "--skip-user-creation";;
-  --skip-user-creation) SKIP_USER_CREATION=1;;
-  --minimize-downtime) MINIMIZE_DOWNTIME=1;;
-  --skip-commit-check) SKIP_COMMIT_CHECK=1;;
-  --report-self-hosted-issues) REPORT_SELF_HOSTED_ISSUES=1;;
-  --no-report-self-hosted-issues) REPORT_SELF_HOSTED_ISSUES=0;;
-  --) ;;
-  *) echo "Unexpected argument: $1. Use --help for usage information."; exit 1;;
+    -h | --help) show_help; exit;;
+    --no-user-prompt) SKIP_USER_CREATION=1;
+      depwarn "--no-user-prompt flag" "--skip-user-creation";;
+    --skip-user-prompt) SKIP_USER_CREATION=1;
+      depwarn "--skip-user-prompt flag" "--skip-user-creation";;
+    --skip-user-creation) SKIP_USER_CREATION=1;;
+    --minimize-downtime) MINIMIZE_DOWNTIME=1;;
+    --skip-commit-check) SKIP_COMMIT_CHECK=1;;
+    --report-self-hosted-issues) REPORT_SELF_HOSTED_ISSUES=1;;
+    --no-report-self-hosted-issues) REPORT_SELF_HOSTED_ISSUES=0;;
+    --) ;;
+    *) echo "Unexpected argument: $1. Use --help for usage information."; exit 1;;
   esac
   shift
 done
