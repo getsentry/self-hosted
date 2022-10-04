@@ -25,7 +25,7 @@ if [[ -z "$COMPOSE_VERSION" ]]; then
   exit 1
 fi
 
-if [[ "$(vergte ${COMPOSE_VERSION//v} $MIN_COMPOSE_VERSION)" ]]; then
+if [[ "$(vergte ${COMPOSE_VERSION//v} $MIN_COMPOSE_VERSION)" -eq 1 ]]; then
   echo "FAIL: Expected minimum $dc_base version to be $MIN_COMPOSE_VERSION but found $COMPOSE_VERSION"
   exit 1
 fi
