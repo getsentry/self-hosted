@@ -7,7 +7,8 @@ export SENTRY_PROJECT=installer
 send_envelope() {
   # Send envelope
   local sentry_cli="docker run --rm -v /tmp:/work -e SENTRY_ORG=$SENTRY_ORG -e SENTRY_PROJECT=$SENTRY_PROJECT -e SENTRY_DSN=$SENTRY_DSN getsentry/sentry-cli"
-  $sentry_cli send-envelope $envelope_file
+  #$sentry_cli send-envelope $envelope_file
+  cat $envelope_file
 }
 
 send_event() {
@@ -155,41 +156,41 @@ cleanup () {
   local retcode=$?
   local cmd="${BASH_COMMAND}"
   if [[ "$DID_CLEAN_UP" -eq 1 ]]; then
-    return 0;
+  return 0;
   fi
   DID_CLEAN_UP=1
   if [[ "$1" != "EXIT" ]]; then
-    set +o xtrace
-    printf -v err '%s' "Error in ${BASH_SOURCE[1]}:${BASH_LINENO[0]}."
-    printf -v cmd_exit '%s' "'$cmd' exited with status $retcode"
-    printf '%s\n%s\n' "$err" "$cmd_exit"
-    local stack_depth=${#FUNCNAME[@]}
-    local traceback=""
-    if [ $stack_depth -gt 2 ]; then
-      for ((i=$(($stack_depth - 1)),j=1;i>0;i--,j++)); do
-          local indent="$(yes a | head -$j | tr -d '\n')"
-          local src=${BASH_SOURCE[$i]}
-          local lineno=${BASH_LINENO[$i-1]}
-          local funcname=${FUNCNAME[$i]}
-          printf -v traceback '%s\n' "$traceback${indent//a/-}> $src:$funcname:$lineno"
-      done
-    fi
-    echo "$traceback"
+  set +o xtrace
+  printf -v err '%s' "Error in ${BASH_SOURCE[1]}:${BASH_LINENO[0]}."
+  printf -v cmd_exit '%s' "'$cmd' exited with status $retcode"
+  printf '%s\n%s\n' "$err" "$cmd_exit"
+  local stack_depth=${#FUNCNAME[@]}
+  local traceback=""
+  if [ $stack_depth -gt 2 ]; then
+    for ((i=$(($stack_depth - 1)),j=1;i>0;i--,j++)); do
+      local indent="$(yes a | head -$j | tr -d '\n')"
+      local src=${BASH_SOURCE[$i]}
+      local lineno=${BASH_LINENO[$i-1]}
+      local funcname=${FUNCNAME[$i]}
+      printf -v traceback '%s\n' "$traceback${indent//a/-}> $src:$funcname:$lineno"
+    done
+  fi
+  echo "$traceback"
 
-    if [ "$REPORT_SELF_HOSTED_ISSUES" == 1 ]; then
-      local event_hash=$(echo -n "$cmd_exit $traceback" | docker run -i --rm busybox md5sum | cut -d' ' -f1)
-      send_event "$event_hash" "$cmd_exit"
-    fi
+  if [ "$REPORT_SELF_HOSTED_ISSUES" == 1 ]; then
+    local event_hash=$(echo -n "$cmd_exit $traceback" | docker run -i --rm busybox md5sum | cut -d' ' -f1)
+    send_event "$event_hash" "$cmd_exit"
+  fi
 
-    if [[ -n "$MINIMIZE_DOWNTIME" ]]; then
-      echo "*NOT* cleaning up, to clean your environment run \"docker compose stop\"."
-    else
-      echo "Cleaning up..."
-    fi
+  if [[ -n "$MINIMIZE_DOWNTIME" ]]; then
+    echo "*NOT* cleaning up, to clean your environment run \"docker compose stop\"."
+  else
+    echo "Cleaning up..."
+  fi
   fi
 
   if [[ -z "$MINIMIZE_DOWNTIME" ]]; then
-    $dc stop -t $STOP_TIMEOUT &> /dev/null
+  $dc stop -t $STOP_TIMEOUT &> /dev/null
   fi
 }
 
