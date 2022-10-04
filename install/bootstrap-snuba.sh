@@ -1,6 +1,10 @@
 echo "${_group}Bootstrapping and migrating Snuba ..."
 
-$dcr snuba-api bootstrap --no-migrate --force
-$dcr snuba-api migrations migrate --force
+function bootstrap_snuba {
+  $dcr snuba-api bootstrap --no-migrate --force
+  $dcr snuba-api migrations migrate --force
+}
+
+bootstrap_snuba
 
 echo "${_endgroup}"

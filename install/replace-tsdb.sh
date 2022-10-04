@@ -2,8 +2,8 @@ echo "${_group}Replacing TSDB ..."
 
 replace_tsdb() {
   if (
-    [[ -f "$SENTRY_CONFIG_PY" ]] &&
-    ! grep -xq 'SENTRY_TSDB = "sentry.tsdb.redissnuba.RedisSnubaTSDB"' "$SENTRY_CONFIG_PY"
+  [[ -f "$SENTRY_CONFIG_PY" ]] &&
+  ! grep -xq 'SENTRY_TSDB = "sentry.tsdb.redissnuba.RedisSnubaTSDB"' "$SENTRY_CONFIG_PY"
   ); then
     # Do NOT indent the following string as it would be reflected in the end result,
     # breaking the final config file. See getsentry/self-hosted#624.
@@ -24,8 +24,8 @@ SENTRY_TSDB_OPTIONS = {\"switchover_timestamp\": $(date +%s) + (90 * 24 * 3600)}
       sed -i -e "s/^SENTRY_TSDB = .*$/${tsdb_settings}/g" "$SENTRY_CONFIG_PY" || true
 
       if grep -xq 'SENTRY_TSDB = "sentry.tsdb.redissnuba.RedisSnubaTSDB"' "$SENTRY_CONFIG_PY"; then
-        echo "Migrated TSDB to Snuba. Old configuration file backed up to $SENTRY_CONFIG_PY.bak"
-        return
+      echo "Migrated TSDB to Snuba. Old configuration file backed up to $SENTRY_CONFIG_PY.bak"
+      return
       fi
 
       echo "Failed to automatically migrate TSDB. Reverting..."
