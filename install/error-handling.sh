@@ -21,21 +21,21 @@ send_event() {
   # If the envelope file exists, we've already sent it
   if [[ -f $envelope_file_path ]]; then
     echo "Looks like you've already sent this error to us, we're on it :)"
-    return;
+    return
   fi
   # If we haven't sent the envelope file, make it and send to Sentry
   # The format is documented at https://develop.sentry.dev/sdk/envelopes/
   # Grab length of log file, needed for the envelope header to send an attachment
-  local file_length=$(wc -c < "$basedir/$log_file" | awk '{print $1}')
+  local file_length=$(wc -c <"$basedir/$log_file" | awk '{print $1}')
   # Add header for initial envelope information
-  echo '{"event_id":"'$event_hash'","dsn":"'$SENTRY_DSN'"}' > $envelope_file_path
+  echo '{"event_id":"'$event_hash'","dsn":"'$SENTRY_DSN'"}' >$envelope_file_path
   # Add header to specify the event type of envelope to be sent
-  echo '{"type":"event"}' >> $envelope_file_path
+  echo '{"type":"event"}' >>$envelope_file_path
   # Add traceback message to event
-  echo '{"message":"'$traceback_escaped'","level":"error"}' >> $envelope_file_path
+  echo '{"message":"'$traceback_escaped'","level":"error"}' >>$envelope_file_path
   # Add attachment to the event
-  echo '{"type":"attachment","length":'$file_length',"content_type":"text/plain","filename":"install_log.txt"}' >> $envelope_file_path
-  cat "$basedir/$log_file" >> $envelope_file_path
+  echo '{"type":"attachment","length":'$file_length',"content_type":"text/plain","filename":"install_log.txt"}' >>$envelope_file_path
+  cat "$basedir/$log_file" >>$envelope_file_path
   # Send envelope
   send_envelope $envelope_file
 }
@@ -83,7 +83,7 @@ if [[ -z "${REPORT_SELF_HOSTED_ISSUES:-}" ]]; then
     echo
     echo "Thanks for using Sentry."
     echo
-    export REPORT_SELF_HOSTED_ISSUES=0  # opt-in for now
+    export REPORT_SELF_HOSTED_ISSUES=0 # opt-in for now
   else
     echo
     echo "Hey, so ... we would love to automatically find out about issues with your"
@@ -109,13 +109,20 @@ if [[ -z "${REPORT_SELF_HOSTED_ISSUES:-}" ]]; then
     echo
 
     yn=""
-    until [ ! -z "$yn" ]
-    do
+    until [ ! -z "$yn" ]; do
       read -p "y or n? " yn
       case $yn in
-        y | yes | 1) export REPORT_SELF_HOSTED_ISSUES=1; echo; echo -n "Thank you.";;
-        n | no | 0) export REPORT_SELF_HOSTED_ISSUES=0; echo; echo -n "Understood.";;
-        *) yn="";;
+      y | yes | 1)
+        export REPORT_SELF_HOSTED_ISSUES=1
+        echo
+        echo -n "Thank you."
+        ;;
+      n | no | 0)
+        export REPORT_SELF_HOSTED_ISSUES=0
+        echo
+        echo -n "Understood."
+        ;;
+      *) yn="" ;;
       esac
     done
 
@@ -138,24 +145,25 @@ if [ "$REPORT_SELF_HOSTED_ISSUES" == 1 ]; then
   if ! docker pull getsentry/sentry-cli:latest; then
     echo "Failed to pull sentry-cli, won't report to Sentry after all."
     export REPORT_SELF_HOSTED_ISSUES=0
-  fi;
-fi;
+  fi
+fi
 
 # Courtesy of https://stackoverflow.com/a/2183063/90297
 trap_with_arg() {
-  func="$1" ; shift
-  for sig ; do
+  func="$1"
+  shift
+  for sig; do
     trap "$func $sig" "$sig"
   done
 }
 
 DID_CLEAN_UP=0
 # the cleanup function will be the exit point
-cleanup () {
+cleanup() {
   local retcode=$?
   local cmd="${BASH_COMMAND}"
   if [[ "$DID_CLEAN_UP" -eq 1 ]]; then
-    return 0;
+    return 0
   fi
   DID_CLEAN_UP=1
   if [[ "$1" != "EXIT" ]]; then
@@ -166,12 +174,12 @@ cleanup () {
     local stack_depth=${#FUNCNAME[@]}
     local traceback=""
     if [ $stack_depth -gt 2 ]; then
-      for ((i=$(($stack_depth - 1)),j=1;i>0;i--,j++)); do
-          local indent="$(yes a | head -$j | tr -d '\n')"
-          local src=${BASH_SOURCE[$i]}
-          local lineno=${BASH_LINENO[$i-1]}
-          local funcname=${FUNCNAME[$i]}
-          printf -v traceback '%s\n' "$traceback${indent//a/-}> $src:$funcname:$lineno"
+      for ((i = $(($stack_depth - 1)), j = 1; i > 0; i--, j++)); do
+        local indent="$(yes a | head -$j | tr -d '\n')"
+        local src=${BASH_SOURCE[$i]}
+        local lineno=${BASH_LINENO[$i - 1]}
+        local funcname=${FUNCNAME[$i]}
+        printf -v traceback '%s\n' "$traceback${indent//a/-}> $src:$funcname:$lineno"
       done
     fi
     echo "$traceback"
@@ -189,7 +197,7 @@ cleanup () {
   fi
 
   if [[ -z "$MINIMIZE_DOWNTIME" ]]; then
-    $dc stop -t $STOP_TIMEOUT &> /dev/null
+    $dc stop -t $STOP_TIMEOUT &>/dev/null
   fi
 }
 

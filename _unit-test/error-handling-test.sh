@@ -13,7 +13,7 @@ send_envelope() {
 export -f send_envelope
 echo "Testing initial send_event"
 export log_file="test_log.txt"
-echo "Test Logs" > "$basedir/$log_file"
+echo "Test Logs" >"$basedir/$log_file"
 SEND_EVENT_RESPONSE=$(send_event "12345123451234512345123451234512" "Test exited with status 1")
 rm "$basedir/$log_file"
 test "$SEND_EVENT_RESPONSE" == 'Test Sending sentry-envelope-12345123451234512345123451234512'

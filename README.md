@@ -79,4 +79,3 @@ We'd love to catch errors in self-hosted so you don't run into them, and so we c
 Thirty (30) day retention. No marketing. Privacy policy at sentry.io/privacy.
 
 Starting with the 22.10.0 release in October, we will require those running the Sentry installer to choose to opt in or out. If you are running the installer under automation, you may want to set `REPORT_SELF_HOSTED_ISSUES` or pass `--(no-)report-self-hosted-issues` to the installer accordingly.
-

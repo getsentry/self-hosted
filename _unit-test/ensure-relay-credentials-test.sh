@@ -17,8 +17,8 @@ test -f $creds_file
 test "$(jq -r 'keys[2]' $creds_file)" = "secret_key"
 
 # If the files exist we don't touch it.
-echo GARBAGE > $cfg_file
-echo MOAR GARBAGE > $creds_file
+echo GARBAGE >$cfg_file
+echo MOAR GARBAGE >$creds_file
 source ensure-relay-credentials.sh
 test "$(cat $cfg_file)" = "GARBAGE"
 test "$(cat $creds_file)" = "MOAR GARBAGE"

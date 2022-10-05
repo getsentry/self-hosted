@@ -13,14 +13,13 @@ cd "$(dirname $0)"
 
 source install/dc-detect-version.sh
 
-function confirm () {
+function confirm() {
   read -p "$1 [y/n] " confirmation
   if [ "$confirmation" != "y" ]; then
     echo "Canceled. 😅"
     exit
   fi
 }
-
 
 # If we have a version given, validate it.
 # ----------------------------------------
@@ -32,7 +31,7 @@ function confirm () {
 version="${1:-}"
 if [ -n "$version" ]; then
   set +e
-  git rev-parse --verify --quiet "refs/tags/$version" > /dev/null
+  git rev-parse --verify --quiet "refs/tags/$version" >/dev/null
   if [ $? -gt 0 ]; then
     echo "Bad version: $version"
     exit
@@ -54,9 +53,9 @@ $dc down --volumes --remove-orphans --rmi local
 
 # Remove any remaining (likely external) volumes with name matching 'sentry-.*'.
 for volume in $(docker volume list --format '{{ .Name }}' | grep '^sentry-'); do
-  docker volume remove $volume > /dev/null \
-    && echo "Removed volume: $volume" \
-    || echo "Skipped volume: $volume"
+  docker volume remove $volume >/dev/null &&
+    echo "Removed volume: $volume" ||
+    echo "Skipped volume: $volume"
 done
 
 # If we have a version given, switch to it.

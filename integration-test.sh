@@ -12,14 +12,14 @@ echo "Testing initial install"
 ./_integration-test/ensure-customizations-not-present.sh
 
 echo "Make customizations"
-cat <<EOT > sentry/enhance-image.sh
+cat <<EOT >sentry/enhance-image.sh
 #!/bin/bash
 touch /created-by-enhance-image
 apt-get update
 apt-get install -y gcc libsasl2-dev python-dev libldap2-dev libssl-dev
 EOT
 chmod +x sentry/enhance-image.sh
-printf "python-ldap" > sentry/requirements.txt
+printf "python-ldap" >sentry/requirements.txt
 
 echo "Testing in-place upgrade and customizations"
 ./install.sh --minimize-downtime
