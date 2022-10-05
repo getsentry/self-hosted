@@ -7,7 +7,7 @@
       description: Format shell source code
       language: docker_image
       entry: --net none mvdan/shfmt:v3.5.1
-      args: [-w, -s, -d]
+      args: [-w, -d]
       files: .*\.sh
       stages: [commit, merge-commit, push, manual]
 
