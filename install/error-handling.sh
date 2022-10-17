@@ -41,96 +41,51 @@ send_event() {
 }
 
 if [[ -z "${REPORT_SELF_HOSTED_ISSUES:-}" ]]; then
-  if [[ $PROMPTABLE == "0" ]]; then
-    echo
-    echo "Hey, so ... we would love to automatically find out about issues with your"
-    echo "Sentry instance so that we can improve the product. Turns out there is an app"
-    echo "for that, called Sentry. Would you be willing to let us automatically send data"
-    echo "about your instance upstream to Sentry for development and debugging purposes?"
-    echo "If so, rerun with:"
-    echo
-    echo "  ./install.sh --report-self-hosted-issues"
-    echo
-    echo "      or"
-    echo
-    echo "  REPORT_SELF_HOSTED_ISSUES=1 ./install.sh"
-    echo
-    echo "(Btw, we send this to our own self-hosted Sentry instance, not to Sentry SaaS,"
-    echo "so that we can be in this together.)"
-    echo
-    echo "Here's the info we may collect:"
-    echo
-    echo "  - OS username"
-    echo "  - IP address"
-    echo "  - install log"
-    echo "  - runtime errors"
-    echo "  - performance data"
-    echo
-    echo "Thirty (30) day retention. No marketing. Privacy policy at sentry.io/privacy."
-    echo
-    echo "For now we are defaulting to not reporting upstream, but our plan is to"
-    echo "hard-require a choice from you starting in version 22.10.0, because let's be"
-    echo "honest, none of you will act on this otherwise. To avoid disruption you can use"
-    echo "one of these flags:"
-    echo
-    echo "  --report-self-hosted-issues"
-    echo "  --no-report-self-hosted-issues"
-    echo
-    echo "or set the REPORT_SELF_HOSTED_ISSUES environment variable:"
-    echo
-    echo "  REPORT_SELF_HOSTED_ISSUES=1 to send data"
-    echo "  REPORT_SELF_HOSTED_ISSUES=0 to not send data"
-    echo
-    echo "Thanks for using Sentry."
-    echo
-    export REPORT_SELF_HOSTED_ISSUES=0  # opt-in for now
-  else
-    echo
-    echo "Hey, so ... we would love to automatically find out about issues with your"
-    echo "Sentry instance so that we can improve the product. Turns out there is an app"
-    echo "for that, called Sentry. Would you be willing to let us automatically send data"
-    echo "about your instance upstream to Sentry for development and debugging purposes?"
-    echo
-    echo "  y / yes / 1"
-    echo "  n / no / 0"
-    echo
-    echo "(Btw, we send this to our own self-hosted Sentry instance, not to Sentry SaaS,"
-    echo "so that we can be in this together.)"
-    echo
-    echo "Here's the info we may collect:"
-    echo
-    echo "  - OS username"
-    echo "  - IP address"
-    echo "  - install log"
-    echo "  - runtime errors"
-    echo "  - performance data"
-    echo
-    echo "Thirty (30) day retention. No marketing. Privacy policy at sentry.io/privacy."
-    echo
+  echo
+  echo "Hey, so ... we would love to automatically find out about issues with your"
+  echo "Sentry instance so that we can improve the product. Turns out there is an app"
+  echo "for that, called Sentry. Would you be willing to let us automatically send data"
+  echo "about your instance upstream to Sentry for development and debugging purposes?"
+  echo
+  echo "  y / yes / 1"
+  echo "  n / no / 0"
+  echo
+  echo "(Btw, we send this to our own self-hosted Sentry instance, not to Sentry SaaS,"
+  echo "so that we can be in this together.)"
+  echo
+  echo "Here's the info we may collect:"
+  echo
+  echo "  - OS username"
+  echo "  - IP address"
+  echo "  - install log"
+  echo "  - runtime errors"
+  echo "  - performance data"
+  echo
+  echo "Thirty (30) day retention. No marketing. Privacy policy at sentry.io/privacy."
+  echo
 
-    yn=""
-    until [ ! -z "$yn" ]
-    do
-      read -p "y or n? " yn
-      case $yn in
-        y | yes | 1) export REPORT_SELF_HOSTED_ISSUES=1; echo; echo -n "Thank you.";;
-        n | no | 0) export REPORT_SELF_HOSTED_ISSUES=0; echo; echo -n "Understood.";;
-        *) yn="";;
-      esac
-    done
+  yn=""
+  until [ ! -z "$yn" ]
+  do
+    read -p "y or n? " yn
+    case $yn in
+      y | yes | 1) export REPORT_SELF_HOSTED_ISSUES=1; echo; echo -n "Thank you.";;
+      n | no | 0) export REPORT_SELF_HOSTED_ISSUES=0; echo; echo -n "Understood.";;
+      *) yn="";;
+    esac
+  done
 
-    echo " To avoid this prompt in the future, use one of these flags:"
-    echo
-    echo "  --report-self-hosted-issues"
-    echo "  --no-report-self-hosted-issues"
-    echo
-    echo "or set the REPORT_SELF_HOSTED_ISSUES environment variable:"
-    echo
-    echo "  REPORT_SELF_HOSTED_ISSUES=1 to send data"
-    echo "  REPORT_SELF_HOSTED_ISSUES=0 to not send data"
-    echo
-    sleep 5
-  fi
+  echo " To avoid this prompt in the future, use one of these flags:"
+  echo
+  echo "  --report-self-hosted-issues"
+  echo "  --no-report-self-hosted-issues"
+  echo
+  echo "or set the REPORT_SELF_HOSTED_ISSUES environment variable:"
+  echo
+  echo "  REPORT_SELF_HOSTED_ISSUES=1 to send data"
+  echo "  REPORT_SELF_HOSTED_ISSUES=0 to not send data"
+  echo
+  sleep 5
 fi
 
 # Make sure we can use sentry-cli if we need it.
