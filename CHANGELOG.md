@@ -1,5 +1,21 @@
 # Changelog
 
+## 22.10.0
+
+### Various fixes & improvements
+
+- Split post process forwarders (#1759) by @chadwhitacre
+- Revert "Enforce error reporting for self-hosted" (#1755) by @hubertdeng123
+- Enforce error reporting for self-hosted (#1753) by @hubertdeng123
+- ref: Remove unused scripts and code (#1710) by @BYK
+- Check to see if docker compose exists, else error out (#1733) by @hubertdeng123
+- Fix minimum version requirements for docker and docker compose (#1732) by @hubertdeng123
+- Factor out clean and use it in unit-test (#1731) by @chadwhitacre
+- Reorganize unit test layout (#1729) by @hubertdeng123
+- Request event ID in issue template (#1723) by @ethanhs
+- Tag releases with sentry-cli (#1718) by @hubertdeng123
+- Send full logs as an attachment to our dogfood instance (#1715) by @hubertdeng123
+
 ## 22.9.0
 
 ### Various fixes & improvements
