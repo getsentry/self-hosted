@@ -319,10 +319,14 @@ services:
   ingest-consumer:
     <<: *sentry_defaults
     command: run ingest-consumer --all-consumer-types
-  post-process-forwarder:
+  post-process-forwarder-errors:
+      <<: *sentry_defaults
+      # Increase `--commit-batch-size 1` below to deal with high-load environments.
+      command: run post-process-forwarder --commit-batch-size 1 --entity errors
+
+  post-process-forwarder-transactions:
     <<: *sentry_defaults
-    # Increase `--commit-batch-size 1` below to deal with high-load environments.
-    command: run post-process-forwarder --commit-batch-size 1
+    command: run post-process-forwarder --commit-batch-size 1 --entity transactions --commit-log-topic=snuba-transactions-commit-log --synchronize-commit-group transactions_group
   subscription-consumer-events:
     <<: *sentry_defaults
     command: run query-subscription-consumer --commit-batch-size 1 --topic events-subscription-results
