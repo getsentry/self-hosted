@@ -42,16 +42,16 @@ jobs:
         run: |
           if [[ -n SENTRY_RELEASE ]]; then
             # Our releases are on 15th of each month so go back 14 days (a fortnight)
-            DATE_PART=$(date -d ''-1 fortnight'' +''%y.%-m'')
+            DATE_PART=$(date -d '-1 fortnight' '+%y.%-m')
             declare -i PATCH_VERSION=0
             while gh api --silent "repos/:owner/:repo/git/ref/tags/$DATE_PART.$PATCH_VERSION" 2>/dev/null; do
               PATCH_VERSION+=1
             done
             echo "RELEASE_VERSION=${DATE_PART}.${PATCH_VERSION}" >> $GITHUB_ENV;
-            curl -sL https://sentry.io/get-cli/ | bash
           else
             echo "RELEASE_VERSION=SENTRY_RELEASE" >> $GITHUB_ENV
           fi
+          curl -sL https://sentry.io/get-cli/ | bash
 
           # Create new Sentry release
           sentry-cli --auth-token $SENTRY_AUTH_TOKEN releases new -p $SENTRY_PROJECT $RELEASE_VERSION
