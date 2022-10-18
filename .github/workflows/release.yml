@@ -41,4 +41,4 @@ jobs:
           SENTRY_AUTH_TOKEN: ${{ secrets.SELF_HOSTED_RELEASE_TOKEN }}
         with:
           environment: production
-          version: {{ env.RELEASE_VERSION }}
+          version: ${{ env.RELEASE_VERSION }}
