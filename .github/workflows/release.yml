@@ -47,7 +47,7 @@ jobs:
             while gh api --silent "repos/:owner/:repo/git/ref/tags/$DATE_PART.$PATCH_VERSION" 2>/dev/null; do
               PATCH_VERSION+=1
             done
-            echo "RELEASE_VERSION=${{DATE_PART}}.${{PATCH_VERSION}}" >> $GITHUB_ENV;
+            echo "RELEASE_VERSION=${DATE_PART}.${PATCH_VERSION}" >> $GITHUB_ENV;
             curl -sL https://sentry.io/get-cli/ | bash
           else
             echo "RELEASE_VERSION=SENTRY_RELEASE" >> $GITHUB_ENV
