@@ -32,31 +32,13 @@ jobs:
       #     force: ${{ github.event.inputs.force }}
       #     calver: true
       - name: Create new release in self-hosted Sentry
+        uses: getsentry/action-release@v1
         env:
-          SENTRY_DSN: 'https://19555c489ded4769978daae92f2346ca@self-hosted.getsentry.net/3'
+          # SENTRY_DSN: 'https://19555c489ded4769978daae92f2346ca@self-hosted.getsentry.net/3'
           SENTRY_ORG: self-hosted
           SENTRY_PROJECT: installer
           SENTRY_URL: https://self-hosted.getsentry.net/
           SENTRY_AUTH_TOKEN: ${{ secrets.SELF_HOSTED_RELEASE_TOKEN }}
-          SENTRY_RELEASE: ${{ github.event.inputs.version }}
-        run: |
-          if [[ -n SENTRY_RELEASE ]]; then
-            # Our releases are on 15th of each month so go back 14 days (a fortnight)
-            DATE_PART=$(date -d '-1 fortnight' '+%y.%-m')
-            declare -i PATCH_VERSION=0
-            while gh api --silent "repos/:owner/:repo/git/ref/tags/$DATE_PART.$PATCH_VERSION" 2>/dev/null; do
-              PATCH_VERSION+=1
-            done
-            RELEASE_VERSION=${DATE_PART}.${PATCH_VERSION}
-          else
-            RELEASE_VERSION=SENTRY_RELEASE
-          fi
-          curl -sL https://sentry.io/get-cli/ | bash
-
-          # Create new Sentry release
-          sentry-cli --auth-token $SENTRY_AUTH_TOKEN releases new -p $SENTRY_PROJECT $RELEASE_VERSION
-          sentry-cli --auth-token $SENTRY_AUTH_TOKEN releases set-commits --auto $RELEASE_VERSION
-          sentry-cli --auth-token $SENTRY_AUTH_TOKEN releases finalize $RELEASE_VERSION
-
-          # Create new deploy for this Sentry release
-          sentry-cli --auth-token $SENTRY_AUTH_TOKEN releases deploys $RELEASE_VERSION new -e production
+        with:
+          environment: production
+          version: {{ env.RELEASE_VERSION }}
