@@ -34,7 +34,6 @@ jobs:
       - name: Create new release in self-hosted Sentry
         uses: getsentry/action-release@v1
         env:
-          # SENTRY_DSN: 'https://19555c489ded4769978daae92f2346ca@self-hosted.getsentry.net/3'
           SENTRY_ORG: self-hosted
           SENTRY_PROJECT: installer
           SENTRY_URL: https://self-hosted.getsentry.net/
@@ -42,3 +41,4 @@ jobs:
         with:
           environment: production
           version: ${{ env.RELEASE_VERSION }}
+          ignore_empty: true
