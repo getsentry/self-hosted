@@ -33,7 +33,9 @@ jobs:
           force: ${{ github.event.inputs.force }}
           calver: true
         outputs:
-          release-version: ${{ env.RELEASE_VERSION }}
+          release-version:
+            description: "Release version"
+            value: ${{ env.RELEASE_VERSION }}
       - name: Create new release in self-hosted Sentry
         uses: getsentry/action-release@v1
         env:
