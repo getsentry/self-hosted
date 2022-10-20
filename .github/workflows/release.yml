@@ -40,6 +40,10 @@ jobs:
     name: Create release on self-hosted dogfood instance
     needs: release
     steps:
+      - uses: actions/checkout@v2
+        with:
+          token: ${{ secrets.GH_RELEASE_PAT }}
+          fetch-depth: 0
       - uses: getsentry/action-release@v1
         env:
           SENTRY_ORG: self-hosted
