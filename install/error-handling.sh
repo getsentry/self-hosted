@@ -175,8 +175,8 @@ cleanup () {
       done
     fi
     echo "$traceback"
-
-    if [ "$REPORT_SELF_HOSTED_ISSUES" == 1 ]; then
+    echo "$1"
+    if [[ "$REPORT_SELF_HOSTED_ISSUES" == 1 && "$1" != "INT" ]]; then
       local event_hash=$(echo -n "$cmd_exit $traceback" | docker run -i --rm busybox md5sum | cut -d' ' -f1)
       send_event "$event_hash" "$cmd_exit"
     fi
