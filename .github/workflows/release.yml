@@ -32,8 +32,8 @@ jobs:
           version: ${{ github.event.inputs.version }}
           force: ${{ github.event.inputs.force }}
           calver: true
-      outputs:
-        release-version: ${{ env.RELEASE_VERSION }}
+    outputs:
+      release-version: ${{ env.RELEASE_VERSION }}
   dogfood-release:
     if: github.repository_owner == 'getsentry'
     runs-on: ubuntu-latest
