@@ -1,0 +1,24 @@
+- repo: local
+  hooks:
+    # Based on https://github.com/scop/pre-commit-shfmt/blob/main/.pre-commit-hooks.yaml
+    # Customized to also work on ARM, and give diff for CI on failure.
+    - id: shfmt
+      name: shfmt
+      description: Format shell source code
+      language: docker_image
+      entry: --net none mvdan/shfmt:v3.5.1
+      args: [-w, -d]
+      files: .*\.sh
+      stages: [commit, merge-commit, push, manual]
+
+- repo: https://github.com/pre-commit/pre-commit-hooks
+  rev: v4.3.0
+  hooks:
+  - id: check-case-conflict
+  - id: check-executables-have-shebangs
+    exclude: ^(install/|_unit-test/_test_setup.sh)
+  - id: check-merge-conflict
+  - id: check-symlinks
+  - id: end-of-file-fixer
+  - id: trailing-whitespace
+  - id: check-yaml

@@ -1,6 +1,6 @@
 steps:
   - name: "gcr.io/$PROJECT_ID/docker-compose"
-    id: clone-and-configure 
+    id: clone-and-configure
     entrypoint: "bash"
     args:
       - "-e"
@@ -10,7 +10,7 @@ steps:
         echo '{"version": "3.4", "networks":{"default":{"external":{"name":"cloudbuild"}}}}' > self-hosted/docker-compose.override.yml
     timeout: 60s
   - name: "gcr.io/$PROJECT_ID/docker-compose"
-    id: install 
+    id: install
     waitFor:
       - clone-and-configure
     dir: self-hosted
@@ -30,7 +30,7 @@ steps:
   - name: "gcr.io/$PROJECT_ID/docker-compose"
     id: e2e-test
     waitFor:
-      - install 
+      - install
     dir: self-hosted
     entrypoint: "bash"
     args:

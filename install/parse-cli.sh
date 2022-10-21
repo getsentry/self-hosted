@@ -42,20 +42,30 @@ MINIMIZE_DOWNTIME="${MINIMIZE_DOWNTIME:-}"
 SKIP_COMMIT_CHECK="${SKIP_COMMIT_CHECK:-}"
 REPORT_SELF_HOSTED_ISSUES="${REPORT_SELF_HOSTED_ISSUES:-}"
 
-while (( $# )); do
+while (($#)); do
   case "$1" in
-    -h | --help) show_help; exit;;
-    --no-user-prompt) SKIP_USER_CREATION=1;
-      depwarn "--no-user-prompt flag" "--skip-user-creation";;
-    --skip-user-prompt) SKIP_USER_CREATION=1;
-      depwarn "--skip-user-prompt flag" "--skip-user-creation";;
-    --skip-user-creation) SKIP_USER_CREATION=1;;
-    --minimize-downtime) MINIMIZE_DOWNTIME=1;;
-    --skip-commit-check) SKIP_COMMIT_CHECK=1;;
-    --report-self-hosted-issues) REPORT_SELF_HOSTED_ISSUES=1;;
-    --no-report-self-hosted-issues) REPORT_SELF_HOSTED_ISSUES=0;;
-    --) ;;
-    *) echo "Unexpected argument: $1. Use --help for usage information."; exit 1;;
+  -h | --help)
+    show_help
+    exit
+    ;;
+  --no-user-prompt)
+    SKIP_USER_CREATION=1
+    depwarn "--no-user-prompt flag" "--skip-user-creation"
+    ;;
+  --skip-user-prompt)
+    SKIP_USER_CREATION=1
+    depwarn "--skip-user-prompt flag" "--skip-user-creation"
+    ;;
+  --skip-user-creation) SKIP_USER_CREATION=1 ;;
+  --minimize-downtime) MINIMIZE_DOWNTIME=1 ;;
+  --skip-commit-check) SKIP_COMMIT_CHECK=1 ;;
+  --report-self-hosted-issues) REPORT_SELF_HOSTED_ISSUES=1 ;;
+  --no-report-self-hosted-issues) REPORT_SELF_HOSTED_ISSUES=0 ;;
+  --) ;;
+  *)
+    echo "Unexpected argument: $1. Use --help for usage information."
+    exit 1
+    ;;
   esac
   shift
 done
