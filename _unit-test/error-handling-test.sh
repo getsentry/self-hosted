@@ -14,7 +14,7 @@ export -f send_envelope
 echo "Testing initial send_event"
 export log_file="test_log.txt"
 echo "Test Logs" >"$basedir/$log_file"
-SEND_EVENT_RESPONSE=$(send_event "12345123451234512345123451234512" "Test exited with status 1")
+SEND_EVENT_RESPONSE=$(send_event "12345123451234512345123451234512" "Test exited with status 1" "{\"ignore\": \"me\"}")
 rm "$basedir/$log_file"
 test "$SEND_EVENT_RESPONSE" == 'Test Sending sentry-envelope-12345123451234512345123451234512'
 ENVELOPE_CONTENTS=$(cat /tmp/sentry-envelope-12345123451234512345123451234512)
@@ -22,7 +22,7 @@ test "$ENVELOPE_CONTENTS" == "$(cat "$basedir/_unit-test/snapshots/sentry-envelo
 echo "Pass."
 
 echo "Testing send_event duplicate"
-SEND_EVENT_RESPONSE=$(send_event "12345123451234512345123451234512" "Test exited with status 1")
+SEND_EVENT_RESPONSE=$(send_event "12345123451234512345123451234512" "Test exited with status 1" "{\"ignore\": \"me\"}")
 test "$SEND_EVENT_RESPONSE" == "Looks like you've already sent this error to us, we're on it :)"
 echo "Pass."
 rm '/tmp/sentry-envelope-12345123451234512345123451234512'
