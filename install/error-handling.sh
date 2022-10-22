@@ -14,13 +14,12 @@ send_envelope() {
 
 generate_breadcrumb_json() {
   # Based on https://stackoverflow.com/a/1521498
-  while IFS="" read -r line || [ -n "$line" ]
-  do
+  while IFS="" read -r line || [ -n "$line" ]; do
     jq -n -c --arg message "$line" \
-             --arg category log \
-             --arg level info \
-             '$ARGS.named'
-  done < $log_path
+      --arg category log \
+      --arg level info \
+      '$ARGS.named'
+  done <$log_path
 }
 
 send_event() {
@@ -43,11 +42,11 @@ send_event() {
 
   # Add header for initial envelope information
   jq -n -c --arg event_id "$event_hash" \
-             --arg dsn "$SENTRY_DSN" \
-             '$ARGS.named' > $envelope_file_path
+    --arg dsn "$SENTRY_DSN" \
+    '$ARGS.named' >$envelope_file_path
   # Add header to specify the event type of envelope to be sent
-  echo '{"type":"event"}' >> $envelope_file_path
-  
+  echo '{"type":"event"}' >>$envelope_file_path
+
   # Next we construct the meat of the event payload, which we build up
   # inside out using jq
   # See https://develop.sentry.dev/sdk/event-payloads/
@@ -61,19 +60,21 @@ send_event() {
   # but first we need to make the stacktrace which goes in the exception payload
   frames=$(echo "$traceback_json" | jq -s -c)
   stacktrace=$(jq -n -c --argjson frames $frames '$ARGS.named')
-  exception=$(jq -n -c --arg "type" Error \
-                       --arg value "$traceback" \
-                       --argjson stacktrace $stacktrace \
-                       '$ARGS.named'
+  exception=$(
+    jq -n -c --arg "type" Error \
+      --arg value "$traceback" \
+      --argjson stacktrace $stacktrace \
+      '$ARGS.named'
   )
-  event_body=$(jq -n -c --arg level error \
-                        --argjson exception "{\"values\":[$exception]}" \
-                        --argjson breadcrumbs "{\"values\": $breadcrumbs}" \
-                        '$ARGS.named'
+  event_body=$(
+    jq -n -c --arg level error \
+      --argjson exception "{\"values\":[$exception]}" \
+      --argjson breadcrumbs "{\"values\": $breadcrumbs}" \
+      '$ARGS.named'
   )
-  echo "$event_body" >> $envelope_file_path
+  echo "$event_body" >>$envelope_file_path
   # Add attachment to the event
-  echo '{"type":"attachment","length":'$file_length',"content_type":"text/plain","filename":"install_log.txt"}' >> $envelope_file_path
+  echo '{"type":"attachment","length":'$file_length',"content_type":"text/plain","filename":"install_log.txt"}' >>$envelope_file_path
   cat $log_path >>$envelope_file_path
   # Send envelope
   send_envelope $envelope_file
@@ -214,18 +215,19 @@ cleanup() {
     local traceback=""
     local traceback_json=""
     if [ $stack_depth -gt 2 ]; then
-      for ((i=$(($stack_depth - 1)),j=1;i>0;i--,j++)); do
-          local indent="$(yes a | head -$j | tr -d '\n')"
-          local src=${BASH_SOURCE[$i]}
-          local lineno=${BASH_LINENO[$i-1]}
-          local funcname=${FUNCNAME[$i]}
-          JSON=$(jq -n -c --arg filename $src \
-                          --arg "function" $funcname \
-                          --arg lineno "$lineno" \
-                          '{"filename": $filename, "function": $function, "lineno": $lineno|tonumber}'
-          )
-          printf -v traceback_json '%s\n' "$traceback_json$JSON"
-          printf -v traceback '%s\n' "$traceback${indent//a/-}> $src:$funcname:$lineno"
+      for ((i = $(($stack_depth - 1)), j = 1; i > 0; i--, j++)); do
+        local indent="$(yes a | head -$j | tr -d '\n')"
+        local src=${BASH_SOURCE[$i]}
+        local lineno=${BASH_LINENO[$i - 1]}
+        local funcname=${FUNCNAME[$i]}
+        JSON=$(
+          jq -n -c --arg filename $src \
+            --arg "function" $funcname \
+            --arg lineno "$lineno" \
+            '{"filename": $filename, "function": $function, "lineno": $lineno|tonumber}'
+        )
+        printf -v traceback_json '%s\n' "$traceback_json$JSON"
+        printf -v traceback '%s\n' "$traceback${indent//a/-}> $src:$funcname:$lineno"
       done
     fi
     echo "$traceback"
