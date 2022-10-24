@@ -25,7 +25,7 @@ generate_breadcrumb_json() {
 send_event() {
   # Use traceback hash as the UUID since it is 32 characters long
   local event_hash=$1
-  local traceback=$2
+  local error_message=$2
   local traceback_json=$3
   local envelope_file="sentry-envelope-${event_hash}"
   local envelope_file_path="/tmp/$envelope_file"
@@ -62,7 +62,7 @@ send_event() {
   stacktrace=$(jq -n -c --argjson frames $frames '$ARGS.named')
   exception=$(
     jq -n -c --arg "type" Error \
-      --arg value "$traceback" \
+      --arg value "$error_message" \
       --argjson stacktrace $stacktrace \
       '$ARGS.named'
   )
