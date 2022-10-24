@@ -74,7 +74,14 @@ send_event() {
   )
   echo "$event_body" >>$envelope_file_path
   # Add attachment to the event
-  echo '{"type":"attachment","length":'$file_length',"content_type":"text/plain","filename":"install_log.txt"}' >>$envelope_file_path
+  attachment=$(
+    jq -n -c --arg "type" attachment \
+      --arg length $file_length \
+      --arg content_type "text/plain" \
+      --arg filename install_log.txt
+    '$ARGS.named'
+  )
+  echo "$attachment" >>$envelope_file_path
   cat $log_path >>$envelope_file_path
   # Send envelope
   send_envelope $envelope_file
