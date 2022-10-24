@@ -78,8 +78,8 @@ send_event() {
     jq -n -c --arg "type" attachment \
       --arg length $file_length \
       --arg content_type "text/plain" \
-      --arg filename install_log.txt
-    '$ARGS.named'
+      --arg filename install_log.txt \
+      '$ARGS.named'
   )
   echo "$attachment" >>$envelope_file_path
   cat $log_path >>$envelope_file_path
