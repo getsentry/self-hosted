@@ -79,7 +79,7 @@ send_event() {
       --arg length $file_length \
       --arg content_type "text/plain" \
       --arg filename install_log.txt \
-      '$ARGS.named'
+      '{"type": $type,"length": $length|tonumber,"content_type": $content_type,"filename": $filename}'
   )
   echo "$attachment" >>$envelope_file_path
   cat $log_path >>$envelope_file_path
