@@ -170,6 +170,7 @@ cleanup() {
   DID_CLEAN_UP=1
   if [[ "$1" != "EXIT" ]]; then
     set +o xtrace
+    # Save the error message that comes from the last line of the log file
     error_msg=$(tail -n 1 "$basedir/$log_file")
     printf -v err '%s' "Error in ${BASH_SOURCE[1]}:${BASH_LINENO[0]}."
     printf -v cmd_exit '%s' "'$cmd' exited with status $retcode"
@@ -189,6 +190,7 @@ cleanup() {
             --arg lineno "$lineno" \
             '{"filename": $filename, "function": $function, "lineno": $lineno|tonumber}'
         )
+        # If we're in the stacktrace of the file we failed on, we can add a context line with the command run that failed
         if [[ $i -eq 1 ]]; then
           JSON="{\"context_line\": \"$cmd\", ${JSON:1}"
           echo $JSON
