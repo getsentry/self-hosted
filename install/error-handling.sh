@@ -59,11 +59,11 @@ send_event() {
   # https://develop.sentry.dev/sdk/event-payloads/exception/
   # but first we need to make the stacktrace which goes in the exception payload
   frames=$(echo "$traceback_json" | jq -s -c)
-  stacktrace=$(jq -n -c --argjson frames $frames '$ARGS.named')
+  stacktrace=$(jq -n -c --argjson frames "$frames" '$ARGS.named')
   exception=$(
     jq -n -c --arg "type" Error \
       --arg value "$error_message" \
-      --argjson stacktrace $stacktrace \
+      --argjson stacktrace "$stacktrace" \
       '$ARGS.named'
   )
   event_body=$(
@@ -170,6 +170,7 @@ cleanup() {
   DID_CLEAN_UP=1
   if [[ "$1" != "EXIT" ]]; then
     set +o xtrace
+    error_msg=$(tail -n 1 "$basedir/$log_file")
     printf -v err '%s' "Error in ${BASH_SOURCE[1]}:${BASH_LINENO[0]}."
     printf -v cmd_exit '%s' "'$cmd' exited with status $retcode"
     printf '%s\n%s\n' "$err" "$cmd_exit"
@@ -188,6 +189,10 @@ cleanup() {
             --arg lineno "$lineno" \
             '{"filename": $filename, "function": $function, "lineno": $lineno|tonumber}'
         )
+        if [[ $i -eq 1 ]]; then
+          JSON="{\"context_line\": \"$cmd\", ${JSON:1}"
+          echo $JSON
+        fi
         printf -v traceback_json '%s\n' "$traceback_json$JSON"
         printf -v traceback '%s\n' "$traceback${indent//a/-}> $src:$funcname:$lineno"
       done
@@ -197,7 +202,7 @@ cleanup() {
     # Only send event when report issues flag is set and if trap signal is not INT (ctrl+c)
     if [[ "$REPORT_SELF_HOSTED_ISSUES" == 1 && "$1" != "INT" ]]; then
       local event_hash=$(echo -n "$cmd_exit $traceback" | docker run -i --rm busybox md5sum | cut -d' ' -f1)
-      send_event "$event_hash" "$cmd_exit" "$traceback_json"
+      send_event "$event_hash" "$error_msg" "$traceback_json"
     fi
 
     if [[ -n "$MINIMIZE_DOWNTIME" ]]; then
