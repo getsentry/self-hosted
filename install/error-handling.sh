@@ -193,7 +193,6 @@ cleanup() {
         # If we're in the stacktrace of the file we failed on, we can add a context line with the command run that failed
         if [[ $i -eq 1 ]]; then
           JSON="{\"context_line\": \"$cmd\", ${JSON:1}"
-          echo $JSON
         fi
         printf -v traceback_json '%s\n' "$traceback_json$JSON"
         printf -v traceback '%s\n' "$traceback${indent//a/-}> $src:$funcname:$lineno"
