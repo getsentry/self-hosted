@@ -48,12 +48,12 @@ send_event() {
   # Add header to specify the event type of envelope to be sent
   echo '{"type":"event"}' >>$envelope_file_path
 
-  # First we construct the meat of the event payload, which we build up
+  # Next we construct the meat of the event payload, which we build up
   # inside out using jq
   # See https://develop.sentry.dev/sdk/event-payloads/
   # for details about the event payload
 
-  # Next we need the exception payload
+  # Then we need the exception payload
   # https://develop.sentry.dev/sdk/event-payloads/exception/
   # but first we need to make the stacktrace which goes in the exception payload
   frames=$(echo "$traceback_json" | jq -s -c)
