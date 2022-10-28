@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 source "$(dirname $0)/_test_setup.sh"
-set -ex
 
 export REPORT_SELF_HOSTED_ISSUES=1
 
