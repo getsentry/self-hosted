@@ -6,6 +6,7 @@ export SENTRY_PROJECT=installer
 
 jq="docker run --rm -i sentry-self-hosted-jq-local"
 sentry_cli="docker run --rm -v /tmp:/work -e SENTRY_ORG=$SENTRY_ORG -e SENTRY_PROJECT=$SENTRY_PROJECT -e SENTRY_DSN=$SENTRY_DSN getsentry/sentry-cli"
+log_path="$basedir/$log_file"
 
 send_envelope() {
   # Send envelope
@@ -25,11 +26,11 @@ generate_breadcrumb_json() {
 send_event() {
   # Use traceback hash as the UUID since it is 32 characters long
   local event_hash=$1
-  local error_message=$2
+  local error_msg=$2
   local traceback_json=$3
+  local breadcrumbs=$4
   local envelope_file="sentry-envelope-${event_hash}"
   local envelope_file_path="/tmp/$envelope_file"
-  local log_path="$basedir/$log_file"
   # If the envelope file exists, we've already sent it
   if [[ -f $envelope_file_path ]]; then
     echo "Looks like you've already sent this error to us, we're on it :)"
@@ -47,14 +48,11 @@ send_event() {
   # Add header to specify the event type of envelope to be sent
   echo '{"type":"event"}' >>$envelope_file_path
 
-  # Next we construct the meat of the event payload, which we build up
+  # First we construct the meat of the event payload, which we build up
   # inside out using jq
   # See https://develop.sentry.dev/sdk/event-payloads/
   # for details about the event payload
 
-  # First, create the breadcrumb payload
-  # https://develop.sentry.dev/sdk/event-payloads/breadcrumbs/
-  breadcrumbs=$(generate_breadcrumb_json | jq -s -c)
   # Next we need the exception payload
   # https://develop.sentry.dev/sdk/event-payloads/exception/
   # but first we need to make the stacktrace which goes in the exception payload
@@ -62,7 +60,7 @@ send_event() {
   stacktrace=$(jq -n -c --argjson frames "$frames" '$ARGS.named')
   exception=$(
     jq -n -c --arg "type" Error \
-      --arg value "$error_message" \
+      --arg value "$error_msg" \
       --argjson stacktrace "$stacktrace" \
       '$ARGS.named'
   )
@@ -171,7 +169,11 @@ cleanup() {
   if [[ "$1" != "EXIT" ]]; then
     set +o xtrace
     # Save the error message that comes from the last line of the log file
-    error_msg=$(tail -n 1 "$basedir/$log_file")
+    error_msg=$(tail -n 1 "$log_path")
+    # Create the breadcrumb payload now before stacktrace is printed
+    # https://develop.sentry.dev/sdk/event-payloads/breadcrumbs/
+    # Use sed to remove the last line, that is reported through the error message
+    breadcrumbs=$(generate_breadcrumb_json $error_msg | sed '$d' | jq -s -c)
     printf -v err '%s' "Error in ${BASH_SOURCE[1]}:${BASH_LINENO[0]}."
     printf -v cmd_exit '%s' "'$cmd' exited with status $retcode"
     printf '%s\n%s\n' "$err" "$cmd_exit"
@@ -192,7 +194,11 @@ cleanup() {
         )
         # If we're in the stacktrace of the file we failed on, we can add a context line with the command run that failed
         if [[ $i -eq 1 ]]; then
-          JSON="{\"context_line\": \"$cmd\", ${JSON:1}"
+          JSON=$(
+            jq -n -c --arg cmd "$cmd" \
+              --argjson json "$JSON" \
+              '$json + {"context_line": $cmd}'
+          )
         fi
         printf -v traceback_json '%s\n' "$traceback_json$JSON"
         printf -v traceback '%s\n' "$traceback${indent//a/-}> $src:$funcname:$lineno"
@@ -203,7 +209,7 @@ cleanup() {
     # Only send event when report issues flag is set and if trap signal is not INT (ctrl+c)
     if [[ "$REPORT_SELF_HOSTED_ISSUES" == 1 && "$1" != "INT" ]]; then
       local event_hash=$(echo -n "$cmd_exit $traceback" | docker run -i --rm busybox md5sum | cut -d' ' -f1)
-      send_event "$event_hash" "$error_msg" "$traceback_json"
+      send_event "$event_hash" "$error_msg" "$traceback_json" "$breadcrumbs"
     fi
 
     if [[ -n "$MINIMIZE_DOWNTIME" ]]; then
