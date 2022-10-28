@@ -173,7 +173,7 @@ cleanup() {
     # Create the breadcrumb payload now before stacktrace is printed
     # https://develop.sentry.dev/sdk/event-payloads/breadcrumbs/
     # Use sed to remove the last line, that is reported through the error message
-    breadcrumbs=$(generate_breadcrumb_json $error_msg | sed '$d' | jq -s -c)
+    breadcrumbs=$(generate_breadcrumb_json | sed '$d' | jq -s -c)
     printf -v err '%s' "Error in ${BASH_SOURCE[1]}:${BASH_LINENO[0]}."
     printf -v cmd_exit '%s' "'$cmd' exited with status $retcode"
     printf '%s\n%s\n' "$err" "$cmd_exit"
