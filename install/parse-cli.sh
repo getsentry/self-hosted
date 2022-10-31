@@ -18,6 +18,9 @@ Options:
                           branch of a \`self-hosted\` Git working copy.
  --skip-user-creation   Skip the initial user creation prompt (ideal for non-
                           interactive installs).
+ --skip-requirements    Skip checking that your environment meets the minimum
+                          requirements to run Sentry. Only do this if you know
+                          what you are doing.
  --report-self-hosted-issues
                         Report error and performance data about your self-hosted
                           instance upstream to Sentry. See sentry.io/privacy for
@@ -41,6 +44,7 @@ SKIP_USER_CREATION="${SKIP_USER_CREATION:-}"
 MINIMIZE_DOWNTIME="${MINIMIZE_DOWNTIME:-}"
 SKIP_COMMIT_CHECK="${SKIP_COMMIT_CHECK:-}"
 REPORT_SELF_HOSTED_ISSUES="${REPORT_SELF_HOSTED_ISSUES:-}"
+SKIP_REQUIREMENTS="${SKIP_REQUIREMENTS:-}"
 
 while (($#)); do
   case "$1" in
@@ -61,6 +65,7 @@ while (($#)); do
   --skip-commit-check) SKIP_COMMIT_CHECK=1 ;;
   --report-self-hosted-issues) REPORT_SELF_HOSTED_ISSUES=1 ;;
   --no-report-self-hosted-issues) REPORT_SELF_HOSTED_ISSUES=0 ;;
+  --skip-requirements) SKIP_REQUIREMENTS=1 ;;
   --) ;;
   *)
     echo "Unexpected argument: $1. Use --help for usage information."
