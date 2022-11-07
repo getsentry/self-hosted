@@ -6,7 +6,6 @@ export SENTRY_PROJECT=installer
 
 jq="docker run --rm -i sentry-self-hosted-jq-local"
 sentry_cli="docker run --rm -v /tmp:/work -e SENTRY_ORG=$SENTRY_ORG -e SENTRY_PROJECT=$SENTRY_PROJECT -e SENTRY_DSN=$SENTRY_DSN getsentry/sentry-cli"
-log_path="$basedir/$log_file"
 
 send_envelope() {
   # Send envelope
@@ -20,7 +19,7 @@ generate_breadcrumb_json() {
       --arg category log \
       --arg level info \
       '$ARGS.named'
-  done <$log_path
+  done <$log_file
 }
 
 send_event() {
@@ -39,7 +38,7 @@ send_event() {
   # If we haven't sent the envelope file, make it and send to Sentry
   # The format is documented at https://develop.sentry.dev/sdk/envelopes/
   # Grab length of log file, needed for the envelope header to send an attachment
-  local file_length=$(wc -c <$log_path | awk '{print $1}')
+  local file_length=$(wc -c <$log_file | awk '{print $1}')
 
   # Add header for initial envelope information
   jq -n -c --arg event_id "$event_hash" \
@@ -80,7 +79,7 @@ send_event() {
       '{"type": $type,"length": $length|tonumber,"content_type": $content_type,"filename": $filename}'
   )
   echo "$attachment" >>$envelope_file_path
-  cat $log_path >>$envelope_file_path
+  cat $log_file >>$envelope_file_path
   # Send envelope
   send_envelope $envelope_file
 }
@@ -169,7 +168,7 @@ cleanup() {
   if [[ "$1" != "EXIT" ]]; then
     set +o xtrace
     # Save the error message that comes from the last line of the log file
-    error_msg=$(tail -n 1 "$log_path")
+    error_msg=$(tail -n 1 "$log_file")
     # Create the breadcrumb payload now before stacktrace is printed
     # https://develop.sentry.dev/sdk/event-payloads/breadcrumbs/
     # Use sed to remove the last line, that is reported through the error message

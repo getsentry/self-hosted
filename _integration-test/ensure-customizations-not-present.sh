@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
 set -ex
 
-source "$(dirname $0)/../install/_lib.sh"
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+source "$SCRIPT_DIR/../install/_lib.sh"
 
-source ../install/dc-detect-version.sh
+source "$PROJECT_ROOT/install/dc-detect-version.sh"
 
 # Negated version of ensure-customizations-work.sh, make changes in sync
 echo "${_group}Ensure customizations not present"

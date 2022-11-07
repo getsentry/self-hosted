@@ -1,5 +1,7 @@
 set -euo pipefail
-source "$(dirname $0)/../install/_lib.sh"
+
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+source "$SCRIPT_DIR/../install/_lib.sh"
 
 rm -rf /tmp/sentry-self-hosted-test-sandbox.*
 _SANDBOX="$(mktemp -d /tmp/sentry-self-hosted-test-sandbox.XXX)"
@@ -13,7 +15,7 @@ teardown() {
 }
 
 setup() {
-  cd ..
+  cd "$PROJECT_ROOT"
 
   # Clone the local repo into a temp dir. FWIW `git clone --local` breaks for
   # me because it depends on hard-linking, which doesn't work across devices,

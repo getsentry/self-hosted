@@ -7,29 +7,30 @@ if [[ -n "$MSYSTEM" ]]; then
   exit 1
 fi
 
-source "$(dirname $0)/install/_lib.sh" # does a `cd .../install/`, among other things
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+source "$SCRIPT_DIR/install/_lib.sh"
 
 # Pre-flight. No impact yet.
-source parse-cli.sh
-source detect-platform.sh
-source dc-detect-version.sh
-source error-handling.sh
+source "$PROJECT_ROOT/install/parse-cli.sh"
+source "$PROJECT_ROOT/install/detect-platform.sh"
+source "$PROJECT_ROOT/install/dc-detect-version.sh"
+source "$PROJECT_ROOT/install/error-handling.sh"
 # We set the trap at the top level so that we get better tracebacks.
 trap_with_arg cleanup ERR INT TERM EXIT
-source check-latest-commit.sh
-source check-minimum-requirements.sh
+source "$PROJECT_ROOT/install/check-latest-commit.sh"
+source "$PROJECT_ROOT/install/check-minimum-requirements.sh"
 
 # Let's go! Start impacting things.
-source turn-things-off.sh
-source create-docker-volumes.sh
-source ensure-files-from-examples.sh
-source ensure-relay-credentials.sh
-source generate-secret-key.sh
-source update-docker-images.sh
-source build-docker-images.sh
-source install-wal2json.sh
-source bootstrap-snuba.sh
-source create-kafka-topics.sh
-source set-up-and-migrate-database.sh
-source geoip.sh
-source wrap-up.sh
+source "$PROJECT_ROOT/install/turn-things-off.sh"
+source "$PROJECT_ROOT/install/create-docker-volumes.sh"
+source "$PROJECT_ROOT/install/ensure-files-from-examples.sh"
+source "$PROJECT_ROOT/install/ensure-relay-credentials.sh"
+source "$PROJECT_ROOT/install/generate-secret-key.sh"
+source "$PROJECT_ROOT/install/update-docker-images.sh"
+source "$PROJECT_ROOT/install/build-docker-images.sh"
+source "$PROJECT_ROOT/install/install-wal2json.sh"
+source "$PROJECT_ROOT/install/bootstrap-snuba.sh"
+source "$PROJECT_ROOT/install/create-kafka-topics.sh"
+source "$PROJECT_ROOT/install/set-up-and-migrate-database.sh"
+source "$PROJECT_ROOT/install/geoip.sh"
+source "$PROJECT_ROOT/install/wrap-up.sh"

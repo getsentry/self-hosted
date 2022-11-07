@@ -1,30 +1,22 @@
 set -euo pipefail
 test "${DEBUG:-}" && set -x
 
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+PROJECT_ROOT="$( dirname "$SCRIPT_DIR" )"
+
 # Override any user-supplied umask that could cause problems, see #1222
 umask 002
 
 # Thanks to https://unix.stackexchange.com/a/145654/108960
-log_file="sentry_install_log-$(date +'%Y-%m-%d_%H-%M-%S').txt"
+log_file="$PROJECT_ROOT/sentry_install_log-$(date +'%Y-%m-%d_%H-%M-%S').txt"
 exec &> >(tee -a "$log_file")
-
-# Work from /install/ for install.sh, project root otherwise
-if [[ "$(basename $0)" = "install.sh" ]]; then
-  cd "$(dirname $0)/install/"
-else
-  cd "$(dirname $0)" # assume we're a test script or some such
-fi
 
 # Allow `.env` overrides using the `.env.custom` file.
 # We pass this to docker compose in a couple places.
-basedir="$(
-  cd ..
-  pwd -P
-)" # realpath is missing on stock macOS
-if [[ -f "$basedir/.env.custom" ]]; then
-  _ENV="$basedir/.env.custom"
+if [[ -f "$PROJECT_ROOT/.env.custom" ]]; then
+  _ENV="$PROJECT_ROOT/.env.custom"
 else
-  _ENV="$basedir/.env"
+  _ENV="$PROJECT_ROOT/.env"
 fi
 
 # Read .env for default values with a tip o' the hat to https://stackoverflow.com/a/59831605/90297
@@ -49,8 +41,9 @@ function ensure_file_from_example {
     # sed from https://stackoverflow.com/a/25123013/90297
   fi
 }
-SENTRY_CONFIG_PY='../sentry/sentry.conf.py'
-SENTRY_CONFIG_YML='../sentry/config.yml'
+
+SENTRY_CONFIG_PY="$PROJECT_ROOT/sentry/sentry.conf.py"
+SENTRY_CONFIG_YML="$PROJECT_ROOT/sentry/config.yml"
 
 # Increase the default 10 second SIGTERM timeout
 # to ensure celery queues are properly drained

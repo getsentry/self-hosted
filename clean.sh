@@ -9,9 +9,8 @@ if [ -n "${DEBUG:-}" ]; then
   set -x
 fi
 
-cd "$(dirname $0)"
-
-source install/dc-detect-version.sh
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+source "$SCRIPT_DIR/install/dc-detect-version.sh"
 
 function confirm() {
   read -p "$1 [y/n] " confirmation
