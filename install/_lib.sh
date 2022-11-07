@@ -2,7 +2,7 @@ set -euo pipefail
 test "${DEBUG:-}" && set -x
 
 SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
-PROJECT_ROOT="$( dirname "$SCRIPT_DIR" )"
+PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
 
 # Override any user-supplied umask that could cause problems, see #1222
 umask 002
