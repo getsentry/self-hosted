@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -ex
 
-SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
 source "$SCRIPT_DIR/../install/_lib.sh"
 
 source "$PROJECT_ROOT/install/dc-detect-version.sh"

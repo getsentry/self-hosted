@@ -7,7 +7,7 @@ if [[ -n "$MSYSTEM" ]]; then
   exit 1
 fi
 
-SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
 source "$SCRIPT_DIR/install/_lib.sh"
 
 # Pre-flight. No impact yet.

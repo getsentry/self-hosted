@@ -1,6 +1,6 @@
 set -euo pipefail
 
-SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
 source "$SCRIPT_DIR/../install/_lib.sh"
 
 rm -rf /tmp/sentry-self-hosted-test-sandbox.*
