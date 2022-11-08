@@ -38,7 +38,7 @@ export dc=':'
 echo "Test Logs" >"$log_file"
 CLEANUP_RESPONSE=$(cleanup ERROR)
 rm "$log_file"
-test "$CLEANUP_RESPONSE" == 'Error in ./_unit-test/error-handling-test.sh:37.
+test "$CLEANUP_RESPONSE" == 'Error in ./_unit-test/error-handling-test.sh:24.
 '\''local cmd="${BASH_COMMAND}"'\'' exited with status 0
 
 Cleaning up...'
