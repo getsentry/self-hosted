@@ -1,7 +1,6 @@
 echo "${_group}Checking minimum requirements ..."
 
-SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
-source "$SCRIPT_DIR/_min-requirements.sh"
+source install/_min-requirements.sh
 
 # Check the version of $1 is greater than or equal to $2 using sort. Note: versions must be stripped of "v"
 function vergte() {

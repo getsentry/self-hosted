@@ -1,9 +1,6 @@
 #!/bin/bash
 set -eu
 
-SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
-cd "$SCRIPT_DIR/.."
-
 OLD_VERSION="$1"
 NEW_VERSION="$2"
 

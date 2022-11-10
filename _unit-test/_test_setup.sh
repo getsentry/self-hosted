@@ -1,7 +1,8 @@
 set -euo pipefail
 
-SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
-source "$SCRIPT_DIR/../install/_lib.sh"
+source install/_lib.sh
+
+_ORIGIN=$(pwd)
 
 rm -rf /tmp/sentry-self-hosted-test-sandbox.*
 _SANDBOX="$(mktemp -d /tmp/sentry-self-hosted-test-sandbox.XXX)"
@@ -12,15 +13,14 @@ report_success() {
 
 teardown() {
   test "${DEBUG:-}" || rm -rf "$_SANDBOX"
+  cd "$_ORIGIN"
 }
 
 setup() {
-  cd "$PROJECT_ROOT"
-
   # Clone the local repo into a temp dir. FWIW `git clone --local` breaks for
   # me because it depends on hard-linking, which doesn't work across devices,
   # and I happen to have my workspace and /tmp on separate devices.
-  git -c advice.detachedHead=false clone --depth=1 "file://$(pwd)" "$_SANDBOX"
+  git -c advice.detachedHead=false clone --depth=1 "file://$_ORIGIN" "$_SANDBOX"
 
   # Now propagate any local changes from the working copy to the sandbox. This
   # provides a pretty nice dev experience: edit the files in the working copy,
@@ -46,7 +46,7 @@ setup() {
     esac
   done
 
-  cd "$_SANDBOX/install"
+  cd "$_SANDBOX"
 
   trap teardown EXIT
 }

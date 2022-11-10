@@ -1,10 +1,8 @@
 #!/usr/bin/env bash
 set -ex
 
-SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
-source "$SCRIPT_DIR/../install/_lib.sh"
-
-source "$PROJECT_ROOT/install/dc-detect-version.sh"
+source install/_lib.sh
+source install/dc-detect-version.sh
 
 echo "${_group}Setting up variables and helpers ..."
 export SENTRY_TEST_HOST="${SENTRY_TEST_HOST:-http://localhost:9000}"
@@ -132,7 +130,7 @@ echo '------------------------------------------'
 echo "${_endgroup}"
 
 echo "${_group}Test custom CAs work ..."
-source "$PROJECT_ROOT/_integration-test/custom-ca-roots/setup.sh"
+source _integration-test/custom-ca-roots/setup.sh
 $dcr --no-deps web python3 /etc/sentry/test-custom-ca-roots.py
-source "$PROJECT_ROOT/_integration-test/custom-ca-roots/teardown.sh"
+source _integration-test/custom-ca-roots/teardown.sh
 echo "${_endgroup}"

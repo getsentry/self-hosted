@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
-FORCE_CLEAN=1 "$(dirname $0)/clean.sh"
+
+FORCE_CLEAN=1 "./clean.sh"
 fail=0
-for test_file in ./_unit-test/*-test.sh; do
+for test_file in _unit-test/*-test.sh; do
   echo "🙈 Running $test_file ..."
   $test_file
   if [ $? != 0 ]; then

@@ -1,6 +1,6 @@
 echo "${_group}Downloading and installing wal2json ..."
 
-WAL2JSON_DIR="$PROJECT_ROOT/postgres/wal2json"
+WAL2JSON_DIR=postgres/wal2json
 FILE_TO_USE="$WAL2JSON_DIR/wal2json.so"
 ARCH=$(uname -m)
 FILE_NAME="wal2json-Linux-$ARCH-glibc.so"

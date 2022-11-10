@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
-SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
-source "$SCRIPT_DIR/_test_setup.sh"
+source _unit-test/_test_setup.sh
 
 get_volumes() {
   # If grep returns no strings, we still want to return without error
@@ -22,9 +21,9 @@ before=$(get_volumes)
 
 test "$before" == "" || test "$before" == "$expected_volumes"
 
-source "$PROJECT_ROOT/install/create-docker-volumes.sh"
-source "$PROJECT_ROOT/install/create-docker-volumes.sh"
-source "$PROJECT_ROOT/install/create-docker-volumes.sh"
+source install/create-docker-volumes.sh
+source install/create-docker-volumes.sh
+source install/create-docker-volumes.sh
 
 after=$(get_volumes)
 test "$after" == "$expected_volumes"

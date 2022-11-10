@@ -6,7 +6,7 @@ echo ""
 $dc build --build-arg "http_proxy=${http_proxy:-}" --build-arg "https_proxy=${https_proxy:-}" --build-arg "no_proxy=${no_proxy:-}" --force-rm web
 $dc build --build-arg "http_proxy=${http_proxy:-}" --build-arg "https_proxy=${https_proxy:-}" --build-arg "no_proxy=${no_proxy:-}" --force-rm
 # Used in error-handling.sh for error envelope payloads
-docker build -t sentry-self-hosted-jq-local "$PROJECT_ROOT/jq"
+docker build -t sentry-self-hosted-jq-local jq
 echo ""
 echo "Docker images built."
 

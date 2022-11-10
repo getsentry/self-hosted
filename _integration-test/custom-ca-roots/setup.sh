@@ -1,8 +1,8 @@
 set -e
-export COMPOSE_FILE="$PROJECT_ROOT/docker-compose.yml:$PROJECT_ROOT/_integration-test/custom-ca-roots/docker-compose.test.yml"
+export COMPOSE_FILE=docker-compose.yml:_integration-test/custom-ca-roots/docker-compose.test.yml
 
-TEST_NGINX_CONF_PATH="$PROJECT_ROOT/_integration-test/custom-ca-roots/nginx"
-CUSTOM_CERTS_PATH="$PROJECT_ROOT/certificates"
+TEST_NGINX_CONF_PATH=_integration-test/custom-ca-roots/nginx
+CUSTOM_CERTS_PATH=certificates
 
 # generate tightly constrained CA
 # NB: `-addext` requires LibreSSL 3.1.0+, or OpenSSL (brew install openssl)
@@ -40,6 +40,6 @@ openssl req -x509 -newkey rsa:2048 -nodes -days 1 -keyout $TEST_NGINX_CONF_PATH/
 
 # openssl x509 -in nginx/fake.test.crt -text -noout
 
-cp "$PROJECT_ROOT/_integration-test/custom-ca-roots/test.py" "$PROJECT_ROOT/sentry/test-custom-ca-roots.py"
+cp _integration-test/custom-ca-roots/test.py sentry/test-custom-ca-roots.py
 
 $dc up -d fixture-custom-ca-roots

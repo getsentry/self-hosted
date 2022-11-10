@@ -1,11 +1,10 @@
 #!/usr/bin/env bash
 
-SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
-source "$SCRIPT_DIR/_test_setup.sh"
+source _unit-test/_test_setup.sh
 
 export REPORT_SELF_HOSTED_ISSUES=1
 
-source "$PROJECT_ROOT/install/error-handling.sh"
+source install/error-handling.sh
 
 # mock send_envelope
 send_envelope() {
@@ -14,7 +13,7 @@ send_envelope() {
 
 export -f send_envelope
 echo "Testing initial send_event"
-export log_file="$PROJECT_ROOT/test_log.txt"
+export log_file=test_log.txt
 echo "Test Logs" >"$log_file"
 echo "Error Msg" >>"$log_file"
 breadcrumbs=$(generate_breadcrumb_json | sed '$d' | jq -s -c)
@@ -22,7 +21,7 @@ SEND_EVENT_RESPONSE=$(send_event "12345123451234512345123451234512" "Test exited
 rm "$log_file"
 test "$SEND_EVENT_RESPONSE" == 'Test Sending sentry-envelope-12345123451234512345123451234512'
 ENVELOPE_CONTENTS=$(cat /tmp/sentry-envelope-12345123451234512345123451234512)
-test "$ENVELOPE_CONTENTS" == "$(cat "$PROJECT_ROOT/_unit-test/snapshots/sentry-envelope-12345123451234512345123451234512")"
+test "$ENVELOPE_CONTENTS" == "$(cat _unit-test/snapshots/sentry-envelope-12345123451234512345123451234512)"
 echo "Pass."
 
 echo "Testing send_event duplicate"
@@ -38,7 +37,7 @@ export dc=':'
 echo "Test Logs" >"$log_file"
 CLEANUP_RESPONSE=$(cleanup ERROR)
 rm "$log_file"
-test "$CLEANUP_RESPONSE" == 'Error in ./_unit-test/error-handling-test.sh:24.
+test "$CLEANUP_RESPONSE" == 'Error in ./_unit-test/error-handling-test.sh:38.
 '\''local cmd="${BASH_COMMAND}"'\'' exited with status 0
 
 Cleaning up...'
@@ -50,7 +49,7 @@ export MINIMIZE_DOWNTIME=1
 echo "Test Logs" >"$log_file"
 CLEANUP_RESPONSE=$(cleanup ERROR)
 rm "$log_file"
-test "$CLEANUP_RESPONSE" == 'Error in ./_unit-test/error-handling-test.sh:49.
+test "$CLEANUP_RESPONSE" == 'Error in ./_unit-test/error-handling-test.sh:50.
 '\''local cmd="${BASH_COMMAND}"'\'' exited with status 0
 
 *NOT* cleaning up, to clean your environment run "docker compose stop".'

@@ -1,22 +1,19 @@
 set -euo pipefail
 test "${DEBUG:-}" && set -x
 
-SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
-PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
-
 # Override any user-supplied umask that could cause problems, see #1222
 umask 002
 
 # Thanks to https://unix.stackexchange.com/a/145654/108960
-log_file="$PROJECT_ROOT/sentry_install_log-$(date +'%Y-%m-%d_%H-%M-%S').txt"
+log_file=sentry_install_log-$(date +'%Y-%m-%d_%H-%M-%S').txt
 exec &> >(tee -a "$log_file")
 
 # Allow `.env` overrides using the `.env.custom` file.
 # We pass this to docker compose in a couple places.
-if [[ -f "$PROJECT_ROOT/.env.custom" ]]; then
-  _ENV="$PROJECT_ROOT/.env.custom"
+if [[ -f .env.custom ]]; then
+  _ENV=.env.custom
 else
-  _ENV="$PROJECT_ROOT/.env"
+  _ENV=.env
 fi
 
 # Read .env for default values with a tip o' the hat to https://stackoverflow.com/a/59831605/90297
@@ -42,8 +39,8 @@ function ensure_file_from_example {
   fi
 }
 
-SENTRY_CONFIG_PY="$PROJECT_ROOT/sentry/sentry.conf.py"
-SENTRY_CONFIG_YML="$PROJECT_ROOT/sentry/config.yml"
+SENTRY_CONFIG_PY=sentry/sentry.conf.py
+SENTRY_CONFIG_YML=sentry/config.yml
 
 # Increase the default 10 second SIGTERM timeout
 # to ensure celery queues are properly drained

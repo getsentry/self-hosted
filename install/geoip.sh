@@ -1,8 +1,8 @@
 echo "${_group}Setting up GeoIP integration ..."
 
 install_geoip() {
-  local mmdb="$PROJECT_ROOT/geoip/GeoLite2-City.mmdb"
-  local conf="$PROJECT_ROOT/geoip/GeoIP.conf"
+  local mmdb=geoip/GeoLite2-City.mmdb
+  local conf=geoip/GeoIP.conf
   local result='Done'
 
   echo "Setting up IP address geolocation ..."
