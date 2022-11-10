@@ -15,7 +15,7 @@ test ! -f $creds_file
 source install/ensure-relay-credentials.sh
 test -f $cfg_file
 test -f $creds_file
-test "$(jq -r 'keys[2]' $creds_file)" = "secret_key"
+test "$(jq -r 'keys[2]' "$creds_file")" = "secret_key"
 
 # If the files exist we don't touch it.
 echo GARBAGE >$cfg_file

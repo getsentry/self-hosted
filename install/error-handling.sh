@@ -43,9 +43,9 @@ send_event() {
   # Add header for initial envelope information
   jq -n -c --arg event_id "$event_hash" \
     --arg dsn "$SENTRY_DSN" \
-    '$ARGS.named' >$envelope_file_path
+    '$ARGS.named' >"$envelope_file_path"
   # Add header to specify the event type of envelope to be sent
-  echo '{"type":"event"}' >>$envelope_file_path
+  echo '{"type":"event"}' >>"$envelope_file_path"
 
   # Next we construct the meat of the event payload, which we build up
   # inside out using jq
@@ -73,7 +73,7 @@ send_event() {
   # Add attachment to the event
   attachment=$(
     jq -n -c --arg "type" attachment \
-      --arg length $file_length \
+      --arg length "$file_length" \
       --arg content_type "text/plain" \
       --arg filename install_log.txt \
       '{"type": $type,"length": $length|tonumber,"content_type": $content_type,"filename": $filename}'
@@ -186,8 +186,8 @@ cleanup() {
         local lineno=${BASH_LINENO[$i - 1]}
         local funcname=${FUNCNAME[$i]}
         JSON=$(
-          jq -n -c --arg filename $src \
-            --arg "function" $funcname \
+          jq -n -c --arg filename "$src" \
+            --arg "function" "$funcname" \
             --arg lineno "$lineno" \
             '{"filename": $filename, "function": $function, "lineno": $lineno|tonumber}'
         )
