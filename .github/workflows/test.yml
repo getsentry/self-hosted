@@ -14,6 +14,19 @@ defaults:
   run:
     shell: bash
 jobs:
+  e2e-test:
+    runs-on: ubuntu-20.04
+    name: "Sentry self-hosted end-to-end tests"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          path: self-hosted
+      - name: End to end tests
+        uses: getsentry/action-self-hosted-e2e-tests@65bc43c42d9cab6fbddcdb1b747f9534a8a834f9
+        with:
+          project_name: self-hosted
+
   unit-test:
     runs-on: ubuntu-20.04
     name: "unit tests"
