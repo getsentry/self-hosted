@@ -36,7 +36,7 @@ export MINIMIZE_DOWNTIME=''
 export dc=':'
 echo "Test Logs" >"$log_file"
 CLEANUP_RESPONSE=$(cleanup ERROR)
-rm "$log_file" && echo "$CLEANUP_RESPONSE"
+rm "$log_file"
 test "$CLEANUP_RESPONSE" == 'Error in _unit-test/error-handling-test.sh:38.
 '\''local cmd="${BASH_COMMAND}"'\'' exited with status 0
 
@@ -48,7 +48,7 @@ export REPORT_SELF_HOSTED_ISSUES=0
 export MINIMIZE_DOWNTIME=1
 echo "Test Logs" >"$log_file"
 CLEANUP_RESPONSE=$(cleanup ERROR)
-rm "$log_file" && echo "$CLEANUP_RESPONSE"
+rm "$log_file"
 test "$CLEANUP_RESPONSE" == 'Error in _unit-test/error-handling-test.sh:50.
 '\''local cmd="${BASH_COMMAND}"'\'' exited with status 0
 
