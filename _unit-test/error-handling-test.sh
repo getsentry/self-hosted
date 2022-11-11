@@ -37,6 +37,11 @@ export dc=':'
 echo "Test Logs" >"$log_file"
 CLEANUP_RESPONSE=$(cleanup ERROR)
 rm "$log_file"
+echo "$CLEANUP_RESPONSE"
+echo 'Error in ./_unit-test/error-handling-test.sh:38.
+'\''local cmd="${BASH_COMMAND}"'\'' exited with status 0
+
+Cleaning up...'
 test "$CLEANUP_RESPONSE" == 'Error in ./_unit-test/error-handling-test.sh:38.
 '\''local cmd="${BASH_COMMAND}"'\'' exited with status 0
 
@@ -48,6 +53,11 @@ export REPORT_SELF_HOSTED_ISSUES=0
 export MINIMIZE_DOWNTIME=1
 echo "Test Logs" >"$log_file"
 CLEANUP_RESPONSE=$(cleanup ERROR)
+echo "$CLEANUP_RESPONSE"
+echo 'Error in ./_unit-test/error-handling-test.sh:50.
+'\''local cmd="${BASH_COMMAND}"'\'' exited with status 0
+
+*NOT* cleaning up, to clean your environment run "docker compose stop".'
 rm "$log_file"
 test "$CLEANUP_RESPONSE" == 'Error in ./_unit-test/error-handling-test.sh:50.
 '\''local cmd="${BASH_COMMAND}"'\'' exited with status 0
