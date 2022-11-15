@@ -14,7 +14,6 @@ send_envelope() {
 }
 
 generate_breadcrumb_json() {
-  # Based on https://stackoverflow.com/a/1521498
   cat $log_path | $jq -R -c 'split("\n") | {"message": (.[0]//""), "category": "log", "level": "info"}'
 }
 
