@@ -15,12 +15,7 @@ send_envelope() {
 
 generate_breadcrumb_json() {
   # Based on https://stackoverflow.com/a/1521498
-  while IFS="" read -r line || [ -n "$line" ]; do
-    $jq -n -c --arg message "$line" \
-      --arg category log \
-      --arg level info \
-      '$ARGS.named'
-  done <$log_path
+  cat $log_path | $jq -R -c 'split("\n") | {"message": (.[0]//""), "category": "log", "level": "info"}'
 }
 
 send_event() {
