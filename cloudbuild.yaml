@@ -3,10 +3,12 @@ steps:
     id: clone-and-configure
     entrypoint: "bash"
     args:
+      # $BRANCH_NAME and $_HEAD_REPO_URL usage is documented here
+      # https://cloud.google.com/build/docs/configuring-builds/substitute-variable-values
       - "-e"
       - "-c"
       - |
-        git clone -b $BRANCH_NAME https://github.com/getsentry/self-hosted.git
+        git clone -b $BRANCH_NAME $_HEAD_REPO_URL
         echo '{"version": "3.4", "networks":{"default":{"external":{"name":"cloudbuild"}}}}' > self-hosted/docker-compose.override.yml
     timeout: 60s
   - name: "gcr.io/$PROJECT_ID/docker-compose"
