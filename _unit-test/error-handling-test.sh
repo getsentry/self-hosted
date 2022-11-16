@@ -15,7 +15,7 @@ echo "Testing initial send_event"
 export log_path="$basedir/test_log.txt"
 echo "Test Logs" >"$log_path"
 echo "Error Msg" >>"$log_path"
-breadcrumbs=$(generate_breadcrumb_json | sed '$d' | jq -s -c)
+breadcrumbs=$(generate_breadcrumb_json | sed '$d' | $jq -s -c)
 SEND_EVENT_RESPONSE=$(send_event "12345123451234512345123451234512" "Test exited with status 1" "{\"ignore\": \"me\"}" "$breadcrumbs")
 rm "$log_path"
 test "$SEND_EVENT_RESPONSE" == 'Test Sending sentry-envelope-12345123451234512345123451234512'
