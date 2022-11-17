@@ -14,13 +14,7 @@ send_envelope() {
 }
 
 generate_breadcrumb_json() {
-  # Based on https://stackoverflow.com/a/1521498
-  while IFS="" read -r line || [ -n "$line" ]; do
-    jq -n -c --arg message "$line" \
-      --arg category log \
-      --arg level info \
-      '$ARGS.named'
-  done <$log_path
+  cat $log_path | $jq -R -c 'split("\n") | {"message": (.[0]//""), "category": "log", "level": "info"}'
 }
 
 send_event() {
@@ -42,7 +36,7 @@ send_event() {
   local file_length=$(wc -c <$log_path | awk '{print $1}')
 
   # Add header for initial envelope information
-  jq -n -c --arg event_id "$event_hash" \
+  $jq -n -c --arg event_id "$event_hash" \
     --arg dsn "$SENTRY_DSN" \
     '$ARGS.named' >$envelope_file_path
   # Add header to specify the event type of envelope to be sent
@@ -56,16 +50,16 @@ send_event() {
   # Then we need the exception payload
   # https://develop.sentry.dev/sdk/event-payloads/exception/
   # but first we need to make the stacktrace which goes in the exception payload
-  frames=$(echo "$traceback_json" | jq -s -c)
-  stacktrace=$(jq -n -c --argjson frames "$frames" '$ARGS.named')
+  frames=$(echo "$traceback_json" | $jq -s -c)
+  stacktrace=$($jq -n -c --argjson frames "$frames" '$ARGS.named')
   exception=$(
-    jq -n -c --arg "type" Error \
+    $jq -n -c --arg "type" Error \
       --arg value "$error_msg" \
       --argjson stacktrace "$stacktrace" \
       '$ARGS.named'
   )
   event_body=$(
-    jq -n -c --arg level error \
+    $jq -n -c --arg level error \
       --argjson exception "{\"values\":[$exception]}" \
       --argjson breadcrumbs "{\"values\": $breadcrumbs}" \
       '$ARGS.named'
@@ -73,7 +67,7 @@ send_event() {
   echo "$event_body" >>$envelope_file_path
   # Add attachment to the event
   attachment=$(
-    jq -n -c --arg "type" attachment \
+    $jq -n -c --arg "type" attachment \
       --arg length $file_length \
       --arg content_type "text/plain" \
       --arg filename install_log.txt \
@@ -173,7 +167,7 @@ cleanup() {
     # Create the breadcrumb payload now before stacktrace is printed
     # https://develop.sentry.dev/sdk/event-payloads/breadcrumbs/
     # Use sed to remove the last line, that is reported through the error message
-    breadcrumbs=$(generate_breadcrumb_json | sed '$d' | jq -s -c)
+    breadcrumbs=$(generate_breadcrumb_json | sed '$d' | $jq -s -c)
     printf -v err '%s' "Error in ${BASH_SOURCE[1]}:${BASH_LINENO[0]}."
     printf -v cmd_exit '%s' "'$cmd' exited with status $retcode"
     printf '%s\n%s\n' "$err" "$cmd_exit"
@@ -187,7 +181,7 @@ cleanup() {
         local lineno=${BASH_LINENO[$i - 1]}
         local funcname=${FUNCNAME[$i]}
         JSON=$(
-          jq -n -c --arg filename $src \
+          $jq -n -c --arg filename $src \
             --arg "function" $funcname \
             --arg lineno "$lineno" \
             '{"filename": $filename, "function": $function, "lineno": $lineno|tonumber}'
@@ -195,7 +189,7 @@ cleanup() {
         # If we're in the stacktrace of the file we failed on, we can add a context line with the command run that failed
         if [[ $i -eq 1 ]]; then
           JSON=$(
-            jq -n -c --arg cmd "$cmd" \
+            $jq -n -c --arg cmd "$cmd" \
               --argjson json "$JSON" \
               '$json + {"context_line": $cmd}'
           )
