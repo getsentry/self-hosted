@@ -8,4 +8,4 @@ RUN set -x \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/*
 
-CMD ["jq"]
+ENTRYPOINT ["jq"]

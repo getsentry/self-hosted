@@ -1,5 +1,20 @@
 # Changelog
 
+## 22.11.0
+
+### Various fixes & improvements
+
+- Fix jq usage (#1814) by @ethanhs
+- Try adding end to end tests using new action (#1806) by @ethanhs
+- Add context line, error msg to envelope (#1784) by @hubertdeng123
+- Update to actions/checkoutv3 to address upcoming github deprecations (#1792) by @mattgauntseo-sentry
+- ref: upgrade actions/setup-python to avoid set-output deprecation (#1789) by @asottile-sentry
+- Enforce error reporting (#1777) by @hubertdeng123
+- Upload end of log as breadcrumbs, use exceptions and stacktrace (#1775) by @ethanhs
+- Fix sentry release for dogfood instance (#1768) by @hubertdeng123
+- Add pre-commit config (#1738) by @ethanhs
+- Do not send event on INT signal (#1773) by @hubertdeng123
+
 ## 22.10.0
 
 ### Various fixes & improvements

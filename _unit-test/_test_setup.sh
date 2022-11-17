@@ -7,6 +7,9 @@ _ORIGIN=$(pwd)
 rm -rf /tmp/sentry-self-hosted-test-sandbox.*
 _SANDBOX="$(mktemp -d /tmp/sentry-self-hosted-test-sandbox.XXX)"
 
+source "$basedir/install/detect-platform.sh"
+docker build -t sentry-self-hosted-jq-local --platform=$DOCKER_PLATFORM "$basedir/jq"
+
 report_success() {
   echo "$(basename $0) - Success 👍"
 }
