@@ -17,9 +17,6 @@ source error-handling.sh
 # We set the trap at the top level so that we get better tracebacks.
 trap_with_arg cleanup ERR INT TERM EXIT
 source check-latest-commit.sh
-if [[ ! "$SKIP_REQUIREMENTS" -eq 1 ]]; then
-  source check-minimum-requirements.sh
-fi
 
 # Let's go! Start impacting things.
 source turn-things-off.sh
