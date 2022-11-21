@@ -17,6 +17,7 @@ source error-handling.sh
 # We set the trap at the top level so that we get better tracebacks.
 trap_with_arg cleanup ERR INT TERM EXIT
 source check-latest-commit.sh
+source check-minimum-requirements.sh
 
 # Let's go! Start impacting things.
 source turn-things-off.sh
