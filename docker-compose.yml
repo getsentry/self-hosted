@@ -190,6 +190,9 @@ services:
     healthcheck:
       <<: *healthcheck_defaults
       test: ["CMD-SHELL", "nc -z localhost 9092"]
+      interval: 3s
+      timeout: 600s
+      retries: 200
   clickhouse:
     <<: *restart_policy
     image: clickhouse-self-hosted-local
