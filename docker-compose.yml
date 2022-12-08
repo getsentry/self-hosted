@@ -190,6 +190,9 @@ services:
     healthcheck:
       <<: *healthcheck_defaults
       test: ["CMD-SHELL", "nc -z localhost 9092"]
+      interval: 10s
+      timeout: 10s
+      retries: 30
   clickhouse:
     <<: *restart_policy
     image: clickhouse-self-hosted-local
@@ -223,9 +226,9 @@ services:
           # https://github.com/getsentry/self-hosted/issues/1537
           "http_proxy='' wget -nv -t1 --spider 'http://localhost:8123/' || exit 1",
         ]
-      interval: 3s
-      timeout: 600s
-      retries: 200
+      interval: 10s
+      timeout: 10s
+      retries: 30
   geoipupdate:
     image: "maxmindinc/geoipupdate:v4.7.1"
     # Override the entrypoint in order to avoid using envvars for config.
