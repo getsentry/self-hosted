@@ -240,6 +240,8 @@ SENTRY_OPTIONS["mail.from"] = f"sentry@{SENTRY_OPTIONS['mail.list-namespace']}"
 # Features #
 ############
 
+# To see a full list of features, please check out https://github.com/getsentry/sentry/blob/master/src/sentry/conf/server.py
+
 SENTRY_FEATURES["projects:sample-events"] = False
 SENTRY_FEATURES.update(
     {
