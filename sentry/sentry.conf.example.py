@@ -246,6 +246,7 @@ SENTRY_FEATURES.update(
         feature: True
         for feature in (
             "organizations:discover",
+            "organizations:dynamic-sampling",
             "organizations:events",
             "organizations:global-views",
             "organizations:incidents",
