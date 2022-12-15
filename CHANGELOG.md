@@ -1,5 +1,17 @@
 # Changelog
 
+## 22.12.0
+
+### Various fixes & improvements
+
+- Build each service image individually (#1858) by @ethanhs
+- Set higher kafka healthcheck timeout and fix clickhouse timeout (#1855) by @ethanhs
+- Add --skip-sse42-requirements to install.sh and enable SKIP_SSE42_REQUIREMENTS override (#1790) by @erinaceous
+- Fix commit-log-topic parameter configuration problem (#1817) by @klboke
+- Add .idea to .gitignore (#1803) by @spawnia
+- Add USE_X_FORWARDED_HOST to example config (#1804) by @crinjes
+- (fix): Fix contributor PR e2e tests (#1820) by @hubertdeng123
+
 ## 22.11.0
 
 ### Various fixes & improvements
