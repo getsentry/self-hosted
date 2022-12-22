@@ -11,12 +11,16 @@ docker_curl() {
 }
 
 if [[ $WAL2JSON_VERSION == "latest" ]]; then
-  VERSION=$(
-    docker_curl https://api.github.com/repos/getsentry/wal2json/releases/latest |
-      grep '"tag_name":' |
-      sed -E 's/.*"([^"]+)".*/\1/'
-  )
-
+  # Retry up to 3 times, with 10 seconds between each attempt.
+  for i in {0..30..10}; do
+    sleep $i
+    if LATEST=$(docker_curl https://api.github.com/repos/getsentry/wal2json/releases/latest); then
+      VERSION=$(echo $LATEST | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
+    else
+      echo "Failed to get latest wal2json version, retrying in 6 seconds..."
+      echo $LATEST
+    fi
+  done
   if [[ ! $VERSION ]]; then
     echo "Cannot find wal2json latest version"
     exit 1
