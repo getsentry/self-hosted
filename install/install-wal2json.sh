@@ -7,20 +7,22 @@ FILE_NAME="wal2json-Linux-$ARCH-glibc.so"
 docker_curl() {
   # The environment variables can be specified in lower case or upper case.
   # The lower case version has precedence. http_proxy is an exception as it is only available in lower case.
-  docker run --rm -e http_proxy -e https_proxy -e HTTPS_PROXY -e no_proxy -e NO_PROXY curlimages/curl:7.77.0 "$@"
+  docker run --rm -e http_proxy -e https_proxy -e HTTPS_PROXY -e no_proxy -e NO_PROXY curlimages/curl:7.77.0 \
+    --connect-timeout 5 \
+    --max-time 10 \
+    --retry 5 \
+    --retry-delay 0 \
+    --retry-max-time 60 \
+    "$@"
 }
 
 if [[ $WAL2JSON_VERSION == "latest" ]]; then
   # Retry up to 3 times, with 10 seconds between each attempt.
-  for i in {0..30..10}; do
-    sleep $i
-    if LATEST=$(docker_curl https://api.github.com/repos/getsentry/wal2json/releases/latest); then
-      VERSION=$(echo $LATEST | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
-    else
-      echo "Failed to get latest wal2json version, retrying in 6 seconds..."
-      echo $LATEST
-    fi
-  done
+  VERSION=$(
+    docker_curl https://api.github.com/repos/getsentry/wal2json/releases/latest |
+      grep '"tag_name":' |
+      sed -E 's/.*"([^"]+)".*/\1/'
+  )
   if [[ ! $VERSION ]]; then
     echo "Cannot find wal2json latest version"
     exit 1
