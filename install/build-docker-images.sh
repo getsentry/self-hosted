@@ -7,8 +7,6 @@ $dc build --build-arg "http_proxy=${http_proxy:-}" --build-arg "https_proxy=${ht
 for service in "$($dc config --services)"; do
   $dc build --build-arg "http_proxy=${http_proxy:-}" --build-arg "https_proxy=${https_proxy:-}" --build-arg "no_proxy=${no_proxy:-}" --force-rm $service
 done
-# Used in error-handling.sh for error envelope payloads
-docker build -t sentry-self-hosted-jq-local --platform=$DOCKER_PLATFORM $basedir/jq
 echo ""
 echo "Docker images built."
 
