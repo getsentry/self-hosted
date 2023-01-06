@@ -3,6 +3,9 @@ source "$(dirname $0)/_test_setup.sh"
 
 export REPORT_SELF_HOSTED_ISSUES=1
 
+# This is set up in dc-detect-version.sh, but for
+# our purposes we don't care about proxies.
+dbuild="docker build"
 source error-handling.sh
 
 # mock send_envelope
