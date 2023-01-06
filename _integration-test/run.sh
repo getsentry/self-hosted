@@ -135,3 +135,10 @@ source ./custom-ca-roots/setup.sh
 $dcr --no-deps web python3 /etc/sentry/test-custom-ca-roots.py
 source ./custom-ca-roots/teardown.sh
 echo "${_endgroup}"
+
+for service in $(docker compose ps --format json | jq -r '.[]| select(.State != "running") | .Service'); do
+  # geoipupdate is not set up, so we can safely ignore it, it will fail if not configured.
+  if [[ $service != "geoipupdate" ]]; then
+    echo "ERROR: Service $service has failed after the integration tests!"
+  fi
+done
