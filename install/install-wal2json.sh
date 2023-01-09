@@ -18,7 +18,7 @@ docker_curl() {
 if [[ $WAL2JSON_VERSION == "latest" ]]; then
   docker_curl https://api.github.com/repos/getsentry/wal2json/releases/latest >wal2json.json
   echo "====================================================="
-  cat wal2json.son
+  cat wal2json.json
   echo "====================================================="
   VERSION=$(grep '"tag_name":' wal2json.json | sed -E 's/.*"([^"]+)".*/\1/')
   if [[ ! $VERSION ]]; then
