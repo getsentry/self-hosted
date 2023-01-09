@@ -17,8 +17,16 @@ docker_curl() {
 
 if [[ $WAL2JSON_VERSION == "latest" ]]; then
   # Hard-code this. Super-hacky. We were curling the GitHub API here but
-  # hitting rate limits in CI. This library hasn't seen a new release for
-  # a year and a half at time of writing.
+  # hitting rate limits in CI. This library hasn't seen a new release for a
+  # year and a half at time of writing.
+  #
+  # If you're reading this do us a favor and go check:
+  #
+  #   https://github.com/getsentry/wal2json/releases
+  #
+  # If there's a new release can you update this please? If not maybe subscribe
+  # for notifications on the repo with "Watch > Custom > Releases". Together we
+  # can make a difference.
   VERSION=0.0.2
 else
   VERSION=$WAL2JSON_VERSION
