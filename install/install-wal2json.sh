@@ -16,7 +16,7 @@ docker_curl() {
 }
 
 if [[ $WAL2JSON_VERSION == "latest" ]]; then
-  docker_curl https://api.github.com/repos/getsentry/wal2json/releases/latest > wal2json.json
+  docker_curl https://api.github.com/repos/getsentry/wal2json/releases/latest >wal2json.json
   cat "====================================================="
   cat wal2json.son
   cat "====================================================="
