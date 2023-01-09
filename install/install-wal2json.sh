@@ -16,15 +16,10 @@ docker_curl() {
 }
 
 if [[ $WAL2JSON_VERSION == "latest" ]]; then
-  docker_curl https://api.github.com/repos/getsentry/wal2json/releases/latest >wal2json.json
-  echo "====================================================="
-  cat wal2json.json
-  echo "====================================================="
-  VERSION=$(grep '"tag_name":' wal2json.json | sed -E 's/.*"([^"]+)".*/\1/')
-  if [[ ! $VERSION ]]; then
-    echo "Cannot find wal2json latest version"
-    exit 1
-  fi
+  # Hard-code this. Super-hacky. We were curling the GitHub API here but
+  # hitting rate limits in CI. This library hasn't seen a new release for
+  # a year and a half at time of writing.
+  VERSION=0.0.2
 else
   VERSION=$WAL2JSON_VERSION
 fi
