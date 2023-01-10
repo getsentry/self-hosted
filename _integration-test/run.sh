@@ -143,6 +143,7 @@ for service in $(echo "$SERVICES_NOT_RUNNING" | jq -r '.Service'); do
   if [[ $service != "geoipupdate" ]]; then
     echo "ERROR: Service $service has failed after the integration tests!"
     service_failures=true
+    docker compose logs $service
   fi
 done
 
