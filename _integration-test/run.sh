@@ -137,7 +137,8 @@ source ./custom-ca-roots/teardown.sh
 echo "${_endgroup}"
 
 service_failures=false
-for service in $(docker compose ps --format json | jq -r '.[]| select(.State != "running") | .Service'); do
+SERVICES_NOT_RUNNING=$(docker compose ps --format json | jq -r '.[]| select(.State != "running")')
+for service in $(echo "$SERVICES_NOT_RUNNING" | jq -r '.Service'); do
   # geoipupdate runs once at startup, and should always exit.
   if [[ $service != "geoipupdate" ]]; then
     echo "ERROR: Service $service has failed after the integration tests!"
@@ -146,7 +147,7 @@ for service in $(docker compose ps --format json | jq -r '.[]| select(.State != 
 done
 
 if [[ $service_failures ]]; then
-  $dc ps
+  echo "$SERVICES_NOT_RUNNING"
   echo "One or more services failed, exiting..."
   exit 1
 fi
