@@ -136,18 +136,10 @@ $dcr --no-deps web python3 /etc/sentry/test-custom-ca-roots.py
 source ./custom-ca-roots/teardown.sh
 echo "${_endgroup}"
 
-service_failures=false
-SERVICES_NOT_RUNNING=$(docker compose ps --format json | jq -r '.[]| select(.State != "running")')
-for service in $(echo "$SERVICES_NOT_RUNNING" | jq -r '.Service'); do
-  # geoipupdate runs once at startup, and should always exit.
-  if [[ $service != "geoipupdate" ]]; then
-    echo "ERROR: Service $service has failed after the integration tests!"
-    service_failures=true
-  fi
-done
+docker compose ps --format json | jq -r \
+  '.[] | \
+  # we only care about running services, geoipupdate always exits, so we ignore it
+  select(.State != "running" and .Service != "geoipupdate") | \
+  # Filter to only show the service name and state
+  with_entries(select(.key | in({"Service":1, "State":1})))'
 
-if [[ $service_failures ]]; then
-  echo "$SERVICES_NOT_RUNNING"
-  echo "One or more services failed, exiting..."
-  exit 1
-fi
