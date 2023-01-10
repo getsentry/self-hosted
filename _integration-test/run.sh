@@ -136,10 +136,15 @@ $dcr --no-deps web python3 /etc/sentry/test-custom-ca-roots.py
 source ./custom-ca-roots/teardown.sh
 echo "${_endgroup}"
 
-docker compose ps --format json | jq -r \
+COMPOSE_PS_OUTPUT=$(docker compose ps --format json | jq -r \
   '.[] | \
-  # we only care about running services, geoipupdate always exits, so we ignore it
+  # we only care about running services. geoipupdate always exits, so we ignore it \
   select(.State != "running" and .Service != "geoipupdate") | \
-  # Filter to only show the service name and state
-  with_entries(select(.key | in({"Service":1, "State":1})))'
+  # Filter to only show the service name and state \
+  with_entries(select(.key | in({"Service":1, "State":1})))')
 
+if [[ "$COMPOSE_PS_OUTPUT" ]]; then
+  echo "Services failed, oh no!"
+  echo "$COMPOSE_PS_OUTPUT"
+  exit 1
+fi
