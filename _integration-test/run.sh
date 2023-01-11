@@ -147,6 +147,6 @@ COMPOSE_PS_OUTPUT=$(docker compose ps --format json | jq -r \
 
 if [[ "$COMPOSE_PS_OUTPUT" ]]; then
   echo "Services failed, oh no!"
-  echo "$COMPOSE_PS_OUTPUT" | jq -rs '["Service","State"], ["--","------"], (.[]|[.Service, .State]) | @tsv'
+  echo "$COMPOSE_PS_OUTPUT" | jq -rs '["Service","State"], ["-------","-----"], (.[]|[.Service, .State]) | @tsv'
   exit 1
 fi
