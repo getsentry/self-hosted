@@ -140,9 +140,9 @@ SENTRY_PROJECT="${SENTRY_PROJECT:-native}"
 SENTRY_TEAM="${SENTRY_TEAM:-sentry}"
 # First set up a new project if it doesn't exist already
 PROJECT_JSON=$($jq -n -c --arg name "$SENTRY_PROJECT" --arg slug "$SENTRY_PROJECT" '$ARGS.named')
-NATIVE_PROJECT=$(sentry_api_request "api/0/teams/$SENTRY_ORG/$SENTRY_TEAM/projects/" | $jq '.[]|select(.slug == "'"$SENTRY_PROJECT"'")|.slug')
-if [ -z "${NATIVE_PROJECT}" ]; then
-  sentry_api_request "api/0/teams/$SENTRY_ORG/$SENTRY_TEAM/projects/" -X POST -H 'Content-Type: application/json' --data "$PROJECT_JSON"
+NATIVE_PROJECT_ID=$(sentry_api_request "api/0/teams/$SENTRY_ORG/$SENTRY_TEAM/projects/" | $jq '.[]|select(.slug == "'"$SENTRY_PROJECT"'")|.id')
+if [ -z "${NATIVE_PROJECT_ID}" ]; then
+  NATIVE_PROJECT_ID=$(sentry_api_request "api/0/teams/$SENTRY_ORG/$SENTRY_TEAM/projects/" -X POST -H 'Content-Type: application/json' --data "$PROJECT_JSON" | $jq '.[]|select(.slug == "'"$SENTRY_PROJECT"'")|.id')
 fi
 # Set up sentry-cli command
 SCOPES=$(jq -n -c --argjson scopes '["event:admin", "event:read", "member:read", "org:read", "team:read", "project:read", "project:write", "team:write"]' '$ARGS.named')
@@ -152,7 +152,6 @@ SENTRY_DSN=$(sentry_api_request "api/0/projects/sentry/native/keys/" | $jq -r '.
 SENTRY_URL="$SENTRY_TEST_HOST" sentry-cli upload-dif --org "$SENTRY_ORG" --project "$SENTRY_PROJECT" --auth-token "$SENTRY_AUTH_TOKEN" windows.sym
 # Get public key for minidump upload
 PUBLIC_KEY=$(sentry_api_request "api/0/projects/sentry/native/keys/" | $jq -r '.[0].public')
-NATIVE_PROJECT_ID=$(sentry_api_request "api/0/projects/" | $jq -r '.[] | select(.slug == "'"$SENTRY_PROJECT"'")| .id')
 # Upload the minidump to be processed, this returns the event ID of the crash dump
 EVENT_ID=$(sentry_api_request "api/$NATIVE_PROJECT_ID/minidump/?sentry_key=$PUBLIC_KEY" -X POST -F 'upload_file_minidump=@windows.dmp' | sed 's/\-//g')
 # We have to wait for the item to be processed
