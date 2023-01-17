@@ -143,9 +143,7 @@ PROJECT_JSON=$($jq -n -c --arg name "$SENTRY_PROJECT" --arg slug "$SENTRY_PROJEC
 NATIVE_PROJECT_ID=$(sentry_api_request "api/0/teams/$SENTRY_ORG/$SENTRY_TEAM/projects/" | $jq -r '.[]|select(.slug == "'"$SENTRY_PROJECT"'")|.id')
 if [ -z "${NATIVE_PROJECT_ID}" ]; then
   # TODO(ethanhs): This seems to error even though it works... not clear why
-  set +x
-  NATIVE_PROJECT_ID=$(sentry_api_request "api/0/teams/$SENTRY_ORG/$SENTRY_TEAM/projects/" -X POST -H 'Content-Type: application/json' --data "$PROJECT_JSON" | $jq -r '.id')
-  set -x
+  NATIVE_PROJECT_ID=$(sentry_api_request "api/0/teams/$SENTRY_ORG/$SENTRY_TEAM/projects/" -X POST -H 'Content-Type: application/json' --data "$PROJECT_JSON" | $jq -r '. // null | .id')
 fi
 # Set up sentry-cli command
 SCOPES=$(jq -n -c --argjson scopes '["event:admin", "event:read", "member:read", "org:read", "team:read", "project:read", "project:write", "team:write"]' '$ARGS.named')
