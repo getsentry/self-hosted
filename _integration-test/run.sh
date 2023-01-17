@@ -5,6 +5,11 @@ source "$(dirname $0)/../install/_lib.sh"
 
 source ../install/dc-detect-version.sh
 
+
+$dbuild -t sentry-self-hosted-jq-local $basedir/jq
+
+jq="docker run --rm -i sentry-self-hosted-jq-local"
+
 echo "${_group}Setting up variables and helpers ..."
 export SENTRY_TEST_HOST="${SENTRY_TEST_HOST:-http://localhost:9000}"
 TEST_USER='test@example.com'
@@ -51,7 +56,7 @@ echo "${_endgroup}"
 
 echo "${_group}Running tests ..."
 get_csrf_token() { awk '$6 == "sc" { print $7 }' $COOKIE_FILE; }
-sentry_api_request() { curl -s -H 'Accept: application/json; charset=utf-8' -H "Referer: $SENTRY_TEST_HOST" -H 'Content-Type: application/json' -H "X-CSRFToken: $(get_csrf_token)" -b "$COOKIE_FILE" -c "$COOKIE_FILE" "$SENTRY_TEST_HOST/api/0/$1" ${@:2}; }
+sentry_api_request() { curl -s -H 'Accept: application/json; charset=utf-8' -H "Referer: $SENTRY_TEST_HOST" -H 'Content-Type: application/json' -H "X-CSRFToken: $(get_csrf_token)" -b "$COOKIE_FILE" -c "$COOKIE_FILE" "$SENTRY_TEST_HOST/$1" ${@:2}; }
 
 login() {
   INITIAL_AUTH_REDIRECT=$(curl -sL -o /dev/null $SENTRY_TEST_HOST -w %{url_effective})
@@ -85,9 +90,9 @@ echo "${_endgroup}"
 
 echo "${_group}Running moar tests !!!"
 # Set up initial/required settings (InstallWizard request)
-sentry_api_request "internal/options/?query=is:required" -X PUT --data '{"mail.use-tls":false,"mail.username":"","mail.port":25,"system.admin-email":"ben@byk.im","mail.password":"","system.url-prefix":"'"$SENTRY_TEST_HOST"'","auth.allow-registration":false,"beacon.anonymous":true}' >/dev/null
+sentry_api_request "api/0/internal/options/?query=is:required" -X PUT --data '{"mail.use-tls":false,"mail.username":"","mail.port":25,"system.admin-email":"ben@byk.im","mail.password":"","system.url-prefix":"'"$SENTRY_TEST_HOST"'","auth.allow-registration":false,"beacon.anonymous":true}' >/dev/null
 
-SENTRY_DSN=$(sentry_api_request "projects/sentry/internal/keys/" | awk 'BEGIN { RS=",|:{\n"; FS="\""; } $2 == "public" && $4 ~ "^http" { print $4; exit; }')
+SENTRY_DSN=$(sentry_api_request "api/0/projects/sentry/internal/keys/" | $jq -r '.[0].dsn.public')
 # We ignore the protocol and the host as we already know those
 DSN_PIECES=($(echo $SENTRY_DSN | sed -ne 's|^https\{0,1\}://\([0-9a-z]\{1,\}\)@[^/]\{1,\}/\([0-9]\{1,\}\)$|\1 \2|p' | tr ' ' '\n'))
 SENTRY_KEY=${DSN_PIECES[0]}
@@ -101,7 +106,7 @@ TEST_EVENT_ID=$(
 echo "Creating test event..."
 curl -sf --data '{"event_id": "'"$TEST_EVENT_ID"'","level":"error","message":"a failure","extra":{"object":"42"}}' -H 'Content-Type: application/json' -H "X-Sentry-Auth: Sentry sentry_version=7, sentry_key=$SENTRY_KEY, sentry_client=test-bash/0.1" "$SENTRY_TEST_HOST/api/$PROJECT_ID/store/" -o /dev/null
 
-EVENT_PATH="projects/sentry/internal/events/$TEST_EVENT_ID/"
+EVENT_PATH="api/0/projects/sentry/internal/events/$TEST_EVENT_ID/"
 export -f sentry_api_request get_csrf_token
 export SENTRY_TEST_HOST COOKIE_FILE EVENT_PATH
 printf "Getting the test event back"
@@ -128,6 +133,43 @@ $dc ps -a | tee debug.log | grep -E -e '\-cleanup\s+running\s+' -e '\-cleanup[_-
 echo '------------------------------------------'
 cat debug.log
 echo '------------------------------------------'
+echo "${_endgroup}"
+
+echo "${_group}Test symbolicator works ..."
+SENTRY_ORG="${SENTRY_ORG:-sentry}"
+SENTRY_PROJECT="${SENTRY_PROJECT:-native}"
+SENTRY_TEAM="${SENTRY_TEAM:-sentry}"
+# First set up a new project if it doesn't exist already
+PROJECT_JSON=$($jq -n -c --arg name "$SENTRY_PROJECT" --arg slug "$SENTRY_PROJECT" '$ARGS.named')
+NATIVE_PROJECT=$(sentry_api_request "api/0/teams/$SENTRY_ORG/$SENTRY_TEAM/projects/" | $jq '.[]|select(.slug == "'"$SENTRY_PROJECT"'")|.slug')
+if [ -z "${NATIVE_PROJECT}" ]; then
+  sentry_api_request "api/0/teams/$SENTRY_ORG/$SENTRY_TEAM/projects/" -X POST -H 'Content-Type: application/json' --data "$PROJECT_JSON"
+fi
+# Set up sentry-cli command
+SCOPES=$(jq -n -c --argjson scopes '["event:admin", "event:read", "member:read", "org:read", "team:read", "project:read", "project:write", "team:write"]' '$ARGS.named')
+SENTRY_AUTH_TOKEN=$(sentry_api_request "api/0/api-tokens/" -X POST --data "$SCOPES" | $jq -r '.token')
+SENTRY_DSN=$(sentry_api_request "api/0/projects/sentry/native/keys/" | $jq -r '.[0].dsn.secret')
+# Then upload the symbols to that project (note the container mounts pwd to /work)
+SENTRY_URL="$SENTRY_TEST_HOST" sentry-cli upload-dif --org "$SENTRY_ORG" --project "$SENTRY_PROJECT" --auth-token "$SENTRY_AUTH_TOKEN" windows.sym
+# Get public key for minidump upload
+PUBLIC_KEY=$(sentry_api_request "api/0/projects/sentry/native/keys/" | $jq -r '.[0].public')
+NATIVE_PROJECT_ID=$(sentry_api_request "api/0/projects/" | $jq -r '.[] | select(.slug == "'"$SENTRY_PROJECT"'")| .id')
+# Upload the minidump to be processed, this returns the event ID of the crash dump
+EVENT_ID=$(sentry_api_request "api/$NATIVE_PROJECT_ID/minidump/?sentry_key=$PUBLIC_KEY" -X POST -F 'upload_file_minidump=@windows.dmp' | sed 's/\-//g')
+# We have to wait for the item to be processed
+for i in {0..60..10}; do
+  EVENT_PROCESSED=$(sentry_api_request "api/0/projects/$SENTRY_ORG/$SENTRY_PROJECT/events/" | jq -r '.[]|select(.id == "'"$EVENT_ID"'")|.id')
+  if [ -z "$EVENT_PROCESSED" ]; then
+    sleep $i
+  else
+    break
+  fi
+done
+if [ -z "$EVENT_PROCESSED" ]; then
+  echo "Hm, the event $EVENT_ID didn't exist... listing events that do exist:"
+  sentry_api_request "api/0/projects/$SENTRY_ORG/$SENTRY_PROJECT/events/" | $jq .
+  exit 1
+fi
 echo "${_endgroup}"
 
 echo "${_group}Test custom CAs work ..."
