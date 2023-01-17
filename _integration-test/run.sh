@@ -7,8 +7,6 @@ source ../install/dc-detect-version.sh
 
 $dbuild -t sentry-self-hosted-jq-local $basedir/jq
 
-jq="docker run --rm -i sentry-self-hosted-jq-local"
-
 echo "${_group}Setting up variables and helpers ..."
 export SENTRY_TEST_HOST="${SENTRY_TEST_HOST:-http://localhost:9000}"
 TEST_USER='test@example.com'
@@ -91,7 +89,7 @@ echo "${_group}Running moar tests !!!"
 # Set up initial/required settings (InstallWizard request)
 sentry_api_request "api/0/internal/options/?query=is:required" -X PUT --data '{"mail.use-tls":false,"mail.username":"","mail.port":25,"system.admin-email":"ben@byk.im","mail.password":"","system.url-prefix":"'"$SENTRY_TEST_HOST"'","auth.allow-registration":false,"beacon.anonymous":true}' >/dev/null
 
-SENTRY_DSN=$(sentry_api_request "api/0/projects/sentry/internal/keys/" | $jq -r '.[0].dsn.public')
+SENTRY_DSN=$(sentry_api_request "api/0/projects/sentry/internal/keys/" | jq -r '.[0].dsn.public')
 # We ignore the protocol and the host as we already know those
 DSN_PIECES=($(echo $SENTRY_DSN | sed -ne 's|^https\{0,1\}://\([0-9a-z]\{1,\}\)@[^/]\{1,\}/\([0-9]\{1,\}\)$|\1 \2|p' | tr ' ' '\n'))
 SENTRY_KEY=${DSN_PIECES[0]}
@@ -139,20 +137,20 @@ SENTRY_ORG="${SENTRY_ORG:-sentry}"
 SENTRY_PROJECT="${SENTRY_PROJECT:-native}"
 SENTRY_TEAM="${SENTRY_TEAM:-sentry}"
 # First set up a new project if it doesn't exist already
-PROJECT_JSON=$($jq -n -c --arg name "$SENTRY_PROJECT" --arg slug "$SENTRY_PROJECT" '$ARGS.named')
-NATIVE_PROJECT_ID=$(sentry_api_request "api/0/teams/$SENTRY_ORG/$SENTRY_TEAM/projects/" | $jq -r '.[]|select(.slug == "'"$SENTRY_PROJECT"'")|.id')
+PROJECT_JSON=$(jq -n -c --arg name "$SENTRY_PROJECT" --arg slug "$SENTRY_PROJECT" '$ARGS.named')
+NATIVE_PROJECT_ID=$(sentry_api_request "api/0/teams/$SENTRY_ORG/$SENTRY_TEAM/projects/" | jq -r '.[]|select(.slug == "'"$SENTRY_PROJECT"'")|.id')
 if [ -z "${NATIVE_PROJECT_ID}" ]; then
   # TODO(ethanhs): This seems to error even though it works... not clear why
-  NATIVE_PROJECT_ID=$(sentry_api_request "api/0/teams/$SENTRY_ORG/$SENTRY_TEAM/projects/" -X POST -H 'Content-Type: application/json' --data "$PROJECT_JSON" | $jq -r '. // null | .id')
+  NATIVE_PROJECT_ID=$(sentry_api_request "api/0/teams/$SENTRY_ORG/$SENTRY_TEAM/projects/" -X POST -H 'Content-Type: application/json' --data "$PROJECT_JSON" | jq -r '. // null | .id')
 fi
 # Set up sentry-cli command
 SCOPES=$(jq -n -c --argjson scopes '["event:admin", "event:read", "member:read", "org:read", "team:read", "project:read", "project:write", "team:write"]' '$ARGS.named')
-SENTRY_AUTH_TOKEN=$(sentry_api_request "api/0/api-tokens/" -X POST --data "$SCOPES" | $jq -r '.token')
-SENTRY_DSN=$(sentry_api_request "api/0/projects/sentry/native/keys/" | $jq -r '.[0].dsn.secret')
+SENTRY_AUTH_TOKEN=$(sentry_api_request "api/0/api-tokens/" -X POST --data "$SCOPES" | jq -r '.token')
+SENTRY_DSN=$(sentry_api_request "api/0/projects/sentry/native/keys/" | jq -r '.[0].dsn.secret')
 # Then upload the symbols to that project (note the container mounts pwd to /work)
 SENTRY_URL="$SENTRY_TEST_HOST" sentry-cli upload-dif --org "$SENTRY_ORG" --project "$SENTRY_PROJECT" --auth-token "$SENTRY_AUTH_TOKEN" windows.sym
 # Get public key for minidump upload
-PUBLIC_KEY=$(sentry_api_request "api/0/projects/sentry/native/keys/" | $jq -r '.[0].public')
+PUBLIC_KEY=$(sentry_api_request "api/0/projects/sentry/native/keys/" | jq -r '.[0].public')
 # Upload the minidump to be processed, this returns the event ID of the crash dump
 EVENT_ID=$(sentry_api_request "api/$NATIVE_PROJECT_ID/minidump/?sentry_key=$PUBLIC_KEY" -X POST -F 'upload_file_minidump=@windows.dmp' | sed 's/\-//g')
 # We have to wait for the item to be processed
@@ -166,7 +164,7 @@ for i in {0..60..10}; do
 done
 if [ -z "$EVENT_PROCESSED" ]; then
   echo "Hm, the event $EVENT_ID didn't exist... listing events that do exist:"
-  sentry_api_request "api/0/projects/$SENTRY_ORG/$SENTRY_PROJECT/events/" | $jq .
+  sentry_api_request "api/0/projects/$SENTRY_ORG/$SENTRY_PROJECT/events/" | jq .
   exit 1
 fi
 echo "${_endgroup}"
