@@ -5,7 +5,6 @@ source "$(dirname $0)/../install/_lib.sh"
 
 source ../install/dc-detect-version.sh
 
-
 $dbuild -t sentry-self-hosted-jq-local $basedir/jq
 
 jq="docker run --rm -i sentry-self-hosted-jq-local"
