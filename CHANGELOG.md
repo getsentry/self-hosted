@@ -1,5 +1,17 @@
 # Changelog
 
+## 23.1.0
+
+### Various fixes & improvements
+
+- ci: Check health of services after running integration tests and fix snuba-replacer (#1897) by @ethanhs
+- Add wal2json debugging (#1906) by @chadwhitacre
+- Pick up CI bugfix (#1905) by @chadwhitacre
+- ref: Move jq build to error-handling.sh, and use proxy config (#1895) by @ethanhs
+- fix(CI): use default curl retry mechanism for wal2json install (#1890) by @volokluev
+- ref: Retry wal2json download in installer (#1881) by @ethanhs
+- ci: Remove GCB and update Github Action SHA (#1880) by @ethanhs
+
 ## 22.12.0
 
 ### Various fixes & improvements
