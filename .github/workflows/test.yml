@@ -68,6 +68,8 @@ jobs:
           sudo mkdir -p "${{ matrix.compose_path }}"
           sudo curl -L https://github.com/docker/compose/releases/download/${{ matrix.compose_version }}/docker-compose-`uname -s`-`uname -m` -o "${{ matrix.compose_path }}/docker-compose"
           sudo chmod +x "${{ matrix.compose_path }}/docker-compose"
+      - name: Install sentry-cli
+        run: curl -sL https://sentry.io/get-cli/ | sh
 
       - name: Integration Test
         run: ./integration-test.sh
