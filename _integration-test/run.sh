@@ -140,9 +140,9 @@ SENTRY_PROJECT="${SENTRY_PROJECT:-native}"
 SENTRY_TEAM="${SENTRY_TEAM:-sentry}"
 # First set up a new project if it doesn't exist already
 PROJECT_JSON=$($jq -n -c --arg name "$SENTRY_PROJECT" --arg slug "$SENTRY_PROJECT" '$ARGS.named')
-NATIVE_PROJECT_ID=$(sentry_api_request "api/0/teams/$SENTRY_ORG/$SENTRY_TEAM/projects/" | $jq '.[]|select(.slug == "'"$SENTRY_PROJECT"'")|.id')
+NATIVE_PROJECT_ID=$(sentry_api_request "api/0/teams/$SENTRY_ORG/$SENTRY_TEAM/projects/" | $jq -r '.[]|select(.slug == "'"$SENTRY_PROJECT"'")|.id')
 if [ -z "${NATIVE_PROJECT_ID}" ]; then
-  NATIVE_PROJECT_ID=$(sentry_api_request "api/0/teams/$SENTRY_ORG/$SENTRY_TEAM/projects/" -X POST -H 'Content-Type: application/json' --data "$PROJECT_JSON")
+  NATIVE_PROJECT_ID=$(sentry_api_request "api/0/teams/$SENTRY_ORG/$SENTRY_TEAM/projects/" -X POST -H 'Content-Type: application/json' --data "$PROJECT_JSON" | $jq -r '.id')
 fi
 # Set up sentry-cli command
 SCOPES=$(jq -n -c --argjson scopes '["event:admin", "event:read", "member:read", "org:read", "team:read", "project:read", "project:write", "team:write"]' '$ARGS.named')
