@@ -131,6 +131,7 @@ echo '------------------------------------------'
 echo "${_endgroup}"
 
 echo "${_group}Test symbolicator works ..."
+$dc stop symbolicator
 SENTRY_ORG="${SENTRY_ORG:-sentry}"
 SENTRY_PROJECT="${SENTRY_PROJECT:-native}"
 SENTRY_TEAM="${SENTRY_TEAM:-sentry}"
