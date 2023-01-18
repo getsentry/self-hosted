@@ -4,6 +4,9 @@ source _unit-test/_test_setup.sh
 
 export REPORT_SELF_HOSTED_ISSUES=1
 
+# This is set up in dc-detect-version.sh, but for
+# our purposes we don't care about proxies.
+dbuild="docker build"
 source install/error-handling.sh
 
 # mock send_envelope
@@ -37,7 +40,7 @@ export dc=':'
 echo "Test Logs" >"$log_file"
 CLEANUP_RESPONSE=$(cleanup ERROR)
 rm "$log_file"
-test "$CLEANUP_RESPONSE" == 'Error in _unit-test/error-handling-test.sh:38.
+test "$CLEANUP_RESPONSE" == 'Error in _unit-test/error-handling-test.sh:41.
 '\''local cmd="${BASH_COMMAND}"'\'' exited with status 0
 
 Cleaning up...'
@@ -49,7 +52,7 @@ export MINIMIZE_DOWNTIME=1
 echo "Test Logs" >"$log_file"
 CLEANUP_RESPONSE=$(cleanup ERROR)
 rm "$log_file"
-test "$CLEANUP_RESPONSE" == 'Error in _unit-test/error-handling-test.sh:50.
+test "$CLEANUP_RESPONSE" == 'Error in _unit-test/error-handling-test.sh:53.
 '\''local cmd="${BASH_COMMAND}"'\'' exited with status 0
 
 *NOT* cleaning up, to clean your environment run "docker compose stop".'
