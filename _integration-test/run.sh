@@ -50,14 +50,14 @@ echo "${_endgroup}"
 
 echo "${_group}Running tests ..."
 get_csrf_token() { awk '$6 == "sc" { print $7 }' $COOKIE_FILE; }
-sentry_api_request() { curl -s -H 'Accept: application/json; charset=utf-8' -H "Referer: $SENTRY_TEST_HOST" -H 'Content-Type: application/json' -H "X-CSRFToken: $(get_csrf_token)" -b "$COOKIE_FILE" -c "$COOKIE_FILE" "$SENTRY_TEST_HOST/$1" ${@:2}; }
+sentry_api_request() { curl -s -H 'Accept: application/json; charset=utf-8' -H "Referer: $SENTRY_TEST_HOST" -H 'Content-Type: application/json' -H "X-CSRFToken: $(get_csrf_token)" -b "$COOKIE_FILE" -c "$COOKIE_FILE" "$SENTRY_TEST_HOST/$1" "${@:2}"; }
 
 login() {
   INITIAL_AUTH_REDIRECT=$(curl -sL -o /dev/null $SENTRY_TEST_HOST -w %{url_effective})
   if [ "$INITIAL_AUTH_REDIRECT" != "$SENTRY_TEST_HOST/auth/login/sentry/" ]; then
     echo "Initial /auth/login/ redirect failed, exiting..."
     echo "$INITIAL_AUTH_REDIRECT"
-    exit -1
+    exit 1
   fi
 
   CSRF_TOKEN_FOR_LOGIN=$(curl $SENTRY_TEST_HOST -sL -c "$COOKIE_FILE" | awk -F "['\"]" '
@@ -77,7 +77,7 @@ declare -a LOGIN_TEST_STRINGS=(
 )
 for i in "${LOGIN_TEST_STRINGS[@]}"; do
   echo "Testing '$i'..."
-  echo "$LOGIN_RESPONSE" | grep "$i[,}]" >&/dev/null
+  echo "$LOGIN_RESPONSE" | grep "${i}[,}]" >&/dev/null
   echo "Pass."
 done
 echo "${_endgroup}"
@@ -116,7 +116,7 @@ declare -a EVENT_TEST_STRINGS=(
 )
 for i in "${EVENT_TEST_STRINGS[@]}"; do
   echo "Testing '$i'..."
-  echo "$EVENT_RESPONSE" | grep "$i[,}]" >&/dev/null
+  echo "$EVENT_RESPONSE" | grep "${i}[,}]" >&/dev/null
   echo "Pass."
 done
 echo "${_endgroup}"
@@ -153,7 +153,7 @@ EVENT_ID=$(sentry_api_request "api/$NATIVE_PROJECT_ID/minidump/?sentry_key=$PUBL
 for i in {0..60..10}; do
   EVENT_PROCESSED=$(sentry_api_request "api/0/projects/$SENTRY_ORG/$SENTRY_PROJECT/events/" | jq -r '.[]|select(.id == "'"$EVENT_ID"'")|.id')
   if [ -z "$EVENT_PROCESSED" ]; then
-    sleep $i
+    sleep "$i"
   else
     break
   fi
