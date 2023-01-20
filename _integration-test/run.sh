@@ -144,11 +144,11 @@ SCOPES=$(jq -n -c --argjson scopes '["event:admin", "event:read", "member:read",
 SENTRY_AUTH_TOKEN=$(sentry_api_request "api/0/api-tokens/" -X POST --data "$SCOPES" | jq -r '.token')
 SENTRY_DSN=$(sentry_api_request "api/0/projects/sentry/native/keys/" | jq -r '.[0].dsn.secret')
 # Then upload the symbols to that project (note the container mounts pwd to /work)
-SENTRY_URL="$SENTRY_TEST_HOST" sentry-cli upload-dif --org "$SENTRY_ORG" --project "$SENTRY_PROJECT" --auth-token "$SENTRY_AUTH_TOKEN" windows.sym
+SENTRY_URL="$SENTRY_TEST_HOST" sentry-cli upload-dif --org "$SENTRY_ORG" --project "$SENTRY_PROJECT" --auth-token "$SENTRY_AUTH_TOKEN" _integration-test/windows.sym
 # Get public key for minidump upload
 PUBLIC_KEY=$(sentry_api_request "api/0/projects/sentry/native/keys/" | jq -r '.[0].public')
 # Upload the minidump to be processed, this returns the event ID of the crash dump
-EVENT_ID=$(sentry_api_request "api/$NATIVE_PROJECT_ID/minidump/?sentry_key=$PUBLIC_KEY" -X POST -F 'upload_file_minidump=@windows.dmp' | sed 's/\-//g')
+EVENT_ID=$(sentry_api_request "api/$NATIVE_PROJECT_ID/minidump/?sentry_key=$PUBLIC_KEY" -X POST -F 'upload_file_minidump=@_integration-test/windows.dmp' | sed 's/\-//g')
 # We have to wait for the item to be processed
 for i in {0..60..10}; do
   EVENT_PROCESSED=$(sentry_api_request "api/0/projects/$SENTRY_ORG/$SENTRY_PROJECT/events/" | jq -r '.[]|select(.id == "'"$EVENT_ID"'")|.id')
