@@ -1,5 +1,11 @@
 # Changelog
 
+## 23.1.1
+
+### Various fixes & improvements
+
+- ci: Add test for symbolicator pipeline (#1916) by @ethanhs
+
 ## 23.1.0
 
 ### Various fixes & improvements
