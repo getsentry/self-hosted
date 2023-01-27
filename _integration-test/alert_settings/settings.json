@@ -15,10 +15,11 @@
     ],
     "filters": [
         {
-            "id": "sentry.rules.filters.latest_release.LatestReleaseFilter"
+            "targetType": "Unassigned",
+            "id": "sentry.rules.filters.assigned_to.AssignedToFilter"
         }
     ],
-    "name": "test-alert-2",
+    "name": "test-alert",
     "frequency": 1440,
     "owner": "team:1"
 }

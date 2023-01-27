@@ -128,7 +128,7 @@ echo "${_endgroup}"
 
 echo "${_group}Checking alert fired for internal project"
 echo "Checking that the event fired the alert"
-sentry_api_request "api/0/organizations/sentry/combined-rules/?expand=latestIncident&expand=lastTriggered&sort=incident_status&sort=date_triggered&team=myteams&team=unassigned" | jq '.[] | select(.name == "alert-test") | .lastTriggered'
+sentry_api_request "api/0/organizations/sentry/combined-rules/?expand=latestIncident&expand=lastTriggered&sort=incident_status&sort=date_triggered&team=myteams&team=unassigned" | jq '.[] | select(.name == "test-alert") | .lastTriggered'
 echo "Checking that we tried sending an email to the user"
 $dc logs smtp | grep -E -e "dnslookup for ${TEST_USER}"
 echo "${_endgroup}"
