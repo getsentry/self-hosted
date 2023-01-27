@@ -1,0 +1,24 @@
+{
+    "actionMatch": "all",
+    "filterMatch": "any",
+    "actions": [
+        {
+            "targetType": "Team",
+            "id": "sentry.mail.actions.NotifyEmailAction",
+            "targetIdentifier": "1"
+        }
+    ],
+    "conditions": [
+        {
+            "id": "sentry.rules.conditions.first_seen_event.FirstSeenEventCondition"
+        }
+    ],
+    "filters": [
+        {
+            "id": "sentry.rules.filters.latest_release.LatestReleaseFilter"
+        }
+    ],
+    "name": "test-alert-2",
+    "frequency": 1440,
+    "owner": "team:1"
+}

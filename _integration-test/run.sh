@@ -83,6 +83,10 @@ for i in "${LOGIN_TEST_STRINGS[@]}"; do
 done
 echo "${_endgroup}"
 
+echo "${_group}Setting up alerts for the internal project"
+sentry_api_request "api/0/projects/sentry/internal/rules/?duplicateRule=false&wizardV3=true" -X POST -d @./alert_settings/settings.json | jq '.actions'
+echo "${_endgroup}"
+
 echo "${_group}Running moar tests !!!"
 # Set up initial/required settings (InstallWizard request)
 sentry_api_request "api/0/internal/options/?query=is:required" -X PUT --data '{"mail.use-tls":false,"mail.username":"","mail.port":25,"system.admin-email":"ben@byk.im","mail.password":"","system.url-prefix":"'"$SENTRY_TEST_HOST"'","auth.allow-registration":false,"beacon.anonymous":true}' >/dev/null
@@ -120,6 +124,13 @@ for i in "${EVENT_TEST_STRINGS[@]}"; do
   echo "$EVENT_RESPONSE" | grep "$i[,}]" >&/dev/null
   echo "Pass."
 done
+echo "${_endgroup}"
+
+echo "${_group}Checking alert fired for internal project"
+echo "Checking that the event fired the alert"
+sentry_api_request "api/0/organizations/sentry/combined-rules/?expand=latestIncident&expand=lastTriggered&sort=incident_status&sort=date_triggered&team=myteams&team=unassigned" | jq '.[] | select(.name == "alert-test") | .lastTriggered'
+echo "Checking that we tried sending an email to the user"
+$dc logs smtp | grep -E -e "dnslookup for ${TEST_USER}"
 echo "${_endgroup}"
 
 echo "${_group}Ensure cleanup crons are working ..."
