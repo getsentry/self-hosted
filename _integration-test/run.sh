@@ -130,7 +130,7 @@ cat debug.log
 echo '------------------------------------------'
 echo "${_endgroup}"
 
-echo "${_group}Setting up alerts for the internal project"
+echo "${_group}Setting up alerts for a new project called native"
 # First set up a new project if it doesn't exist already
 SENTRY_ORG="${SENTRY_ORG:-sentry}"
 SENTRY_TEAM="${SENTRY_TEAM:-sentry}"
@@ -139,6 +139,9 @@ PROJECT_JSON=$(jq -n -c --arg name "$SENTRY_PROJECT" --arg slug "$SENTRY_PROJECT
 NATIVE_PROJECT_ID=$(sentry_api_request "api/0/teams/$SENTRY_ORG/$SENTRY_TEAM/projects/" | jq -r '.[]|select(.slug == "'"$SENTRY_PROJECT"'")|.id')
 if [ -z "${NATIVE_PROJECT_ID}" ]; then
   NATIVE_PROJECT_ID=$(sentry_api_request "api/0/teams/$SENTRY_ORG/$SENTRY_TEAM/projects/" -X POST --data "$PROJECT_JSON" | jq -r '. // null | .id')
+  if [ -z "${NATIVE_PROJECT_ID}" ]; then
+    sentry_api_request "api/0/teams/$SENTRY_ORG/$SENTRY_TEAM/projects/" -X POST --data "$PROJECT_JSON" | jq
+  fi
 fi
 sentry_api_request "api/0/projects/$SENTRY_TEAM/$SENTRY_PROJECT/rules/?duplicateRule=false&wizardV3=true" -X POST -d @./alert_settings/settings.json | jq '.actions'
 echo "${_endgroup}"
