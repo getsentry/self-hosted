@@ -83,10 +83,6 @@ for i in "${LOGIN_TEST_STRINGS[@]}"; do
 done
 echo "${_endgroup}"
 
-echo "${_group}Setting up alerts for the internal project"
-sentry_api_request "api/0/projects/sentry/internal/rules/?duplicateRule=false&wizardV3=true" -X POST -d @./alert_settings/settings.json | jq '.actions'
-echo "${_endgroup}"
-
 echo "${_group}Running moar tests !!!"
 # Set up initial/required settings (InstallWizard request)
 sentry_api_request "api/0/internal/options/?query=is:required" -X PUT --data '{"mail.use-tls":false,"mail.username":"","mail.port":25,"system.admin-email":"ben@byk.im","mail.password":"","system.url-prefix":"'"$SENTRY_TEST_HOST"'","auth.allow-registration":false,"beacon.anonymous":true}' >/dev/null
@@ -109,7 +105,7 @@ EVENT_PATH="api/0/projects/sentry/internal/events/$TEST_EVENT_ID/"
 export -f sentry_api_request get_csrf_token
 export SENTRY_TEST_HOST COOKIE_FILE EVENT_PATH
 printf "Getting the test event back"
-timeout 60 bash -c 'until $(sentry_api_request "$EVENT_PATH" -Isf -X GET -o /dev/null); do printf '.'; sleep 0.5; done'
+timeout 90 bash -c 'until $(sentry_api_request "$EVENT_PATH" -Isf -X GET -o /dev/null); do printf '.'; sleep 0.5; done'
 echo " got it!"
 
 EVENT_RESPONSE=$(sentry_api_request "$EVENT_PATH")
@@ -126,13 +122,6 @@ for i in "${EVENT_TEST_STRINGS[@]}"; do
 done
 echo "${_endgroup}"
 
-echo "${_group}Checking alert fired for internal project"
-echo "Checking that the event fired the alert"
-sentry_api_request "api/0/organizations/sentry/combined-rules/?expand=latestIncident&expand=lastTriggered&sort=incident_status&sort=date_triggered&team=myteams&team=unassigned" | jq '.[] | select(.name == "test-alert") | .lastTriggered'
-echo "Checking that we tried sending an email to the user"
-$dc logs smtp | grep -E -e "dnslookup for ${TEST_USER}"
-echo "${_endgroup}"
-
 echo "${_group}Ensure cleanup crons are working ..."
 $dc ps -a | tee debug.log | grep -E -e '\-cleanup\s+running\s+' -e '\-cleanup[_-].+\s+Up\s+'
 # to debug https://github.com/getsentry/self-hosted/issues/1171
@@ -141,16 +130,20 @@ cat debug.log
 echo '------------------------------------------'
 echo "${_endgroup}"
 
-echo "${_group}Test symbolicator works ..."
-SENTRY_ORG="${SENTRY_ORG:-sentry}"
-SENTRY_PROJECT="${SENTRY_PROJECT:-native}"
-SENTRY_TEAM="${SENTRY_TEAM:-sentry}"
+echo "${_group}Setting up alerts for the internal project"
 # First set up a new project if it doesn't exist already
+SENTRY_ORG="${SENTRY_ORG:-sentry}"
+SENTRY_TEAM="${SENTRY_TEAM:-sentry}"
+SENTRY_PROJECT="${SENTRY_PROJECT:-native}"
 PROJECT_JSON=$(jq -n -c --arg name "$SENTRY_PROJECT" --arg slug "$SENTRY_PROJECT" '$ARGS.named')
 NATIVE_PROJECT_ID=$(sentry_api_request "api/0/teams/$SENTRY_ORG/$SENTRY_TEAM/projects/" | jq -r '.[]|select(.slug == "'"$SENTRY_PROJECT"'")|.id')
 if [ -z "${NATIVE_PROJECT_ID}" ]; then
   NATIVE_PROJECT_ID=$(sentry_api_request "api/0/teams/$SENTRY_ORG/$SENTRY_TEAM/projects/" -X POST --data "$PROJECT_JSON" | jq -r '. // null | .id')
 fi
+sentry_api_request "api/0/projects/$SENTRY_TEAM/$SENTRY_PROJECT/rules/?duplicateRule=false&wizardV3=true" -X POST -d @./alert_settings/settings.json | jq '.actions'
+echo "${_endgroup}"
+
+echo "${_group}Test symbolicator works ..."
 # Set up sentry-cli command
 SCOPES=$(jq -n -c --argjson scopes '["event:admin", "event:read", "member:read", "org:read", "team:read", "project:read", "project:write", "team:write"]' '$ARGS.named')
 SENTRY_AUTH_TOKEN=$(sentry_api_request "api/0/api-tokens/" -X POST --data "$SCOPES" | jq -r '.token')
@@ -175,6 +168,13 @@ if [ -z "$EVENT_PROCESSED" ]; then
   sentry_api_request "api/0/projects/$SENTRY_ORG/$SENTRY_PROJECT/events/" | jq .
   exit 1
 fi
+echo "${_endgroup}"
+
+echo "${_group}Checking alert fired for internal project"
+echo "Checking that the event fired the alert"
+sentry_api_request "api/0/organizations/sentry/combined-rules/?expand=latestIncident&expand=lastTriggered&sort=incident_status&sort=date_triggered&team=myteams&team=unassigned" | jq '.[] | select(.name == "test-alert") | .lastTriggered'
+echo "Checking that we tried sending an email to the user"
+$dc logs smtp | grep -E -e "dnslookup for ${TEST_USER}"
 echo "${_endgroup}"
 
 echo "${_group}Test custom CAs work ..."
