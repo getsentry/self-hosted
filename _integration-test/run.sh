@@ -155,6 +155,9 @@ SENTRY_DSN=$(sentry_api_request "api/0/projects/sentry/native/keys/" | jq -r '.[
 SENTRY_URL="$SENTRY_TEST_HOST" sentry-cli upload-dif --org "$SENTRY_ORG" --project "$SENTRY_PROJECT" --auth-token "$SENTRY_AUTH_TOKEN" windows.sym
 # Get public key for minidump upload
 PUBLIC_KEY=$(sentry_api_request "api/0/projects/sentry/native/keys/" | jq -r '.[0].public')
+# Turn off post-process snuba tasks to test failure
+$dc stop post-process-forwarder-errors
+$dc stop post-process-forwarder-transactions
 # Upload the minidump to be processed, this returns the event ID of the crash dump
 EVENT_ID=$(sentry_api_request "api/$NATIVE_PROJECT_ID/minidump/?sentry_key=$PUBLIC_KEY" -X POST -F 'upload_file_minidump=@windows.dmp' | sed 's/\-//g')
 # We have to wait for the item to be processed
