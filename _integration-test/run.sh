@@ -154,7 +154,7 @@ SENTRY_AUTH_TOKEN=$(sentry_api_request "api/0/api-tokens/" -X POST --data "$SCOP
 sleep 10
 SENTRY_DSN=$(sentry_api_request "api/0/projects/sentry/native/keys/" | jq -r '.[0].dsn.secret')
 # Then upload the symbols to that project (note the container mounts pwd to /work)
-SENTRY_URL="$SENTRY_TEST_HOST" sentry-cli upload-dif --org "$SENTRY_ORG" --project "$SENTRY_PROJECT" --auth-token "$SENTRY_AUTH_TOKEN" windows.sym --log-level=debug
+SENTRY_URL="$SENTRY_TEST_HOST" sentry-cli upload-dif --org "$SENTRY_ORG" --project "$SENTRY_PROJECT" --auth-token "$SENTRY_AUTH_TOKEN" windows.sym --log-level=debug --wait
 # Get public key for minidump upload
 PUBLIC_KEY=$(sentry_api_request "api/0/projects/sentry/native/keys/" | jq -r '.[0].public')
 # Upload the minidump to be processed, this returns the event ID of the crash dump
