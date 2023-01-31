@@ -152,6 +152,8 @@ SCOPES=$(jq -n -c --argjson scopes '["event:admin", "event:read", "member:read",
 SENTRY_AUTH_TOKEN=$(sentry_api_request "api/0/api-tokens/" -X POST --data "$SCOPES" | jq -r '.token')
 # wait to make sure the new token and keys have been generated
 sleep 10
+$dc stop post-process-forwarder-errors
+$dc stop post-process-forwarder-transactions
 SENTRY_DSN=$(sentry_api_request "api/0/projects/sentry/native/keys/" | jq -r '.[0].dsn.secret')
 # Then upload the symbols to that project (note the container mounts pwd to /work)
 SENTRY_URL="$SENTRY_TEST_HOST" sentry-cli upload-dif --org "$SENTRY_ORG" --project "$SENTRY_PROJECT" --auth-token "$SENTRY_AUTH_TOKEN" windows.sym --log-level=debug
@@ -175,9 +177,9 @@ if [ -z "$EVENT_PROCESSED" ]; then
 fi
 echo "${_endgroup}"
 
-echo "${_group}Checking alert fired for internal project"
+echo "${_group}Checking alert fired for native project"
 echo "Checking that the event fired the alert"
-sentry_api_request "api/0/organizations/sentry/combined-rules/?expand=latestIncident&expand=lastTriggered&sort=incident_status&sort=date_triggered&team=myteams&team=unassigned" | jq '.[] | select(.name == "test-alert") | .lastTriggered'
+sentry_api_request "api/0/organizations/sentry/combined-rules/?expand=latestIncident&expand=lastTriggered&sort=incident_status&sort=date_triggered&team=myteams&team=unassigned" | jq -e '.[] | select(.name == "test-alert") | .lastTriggered'
 echo "Checking that we tried sending an email to the user"
 $dc logs smtp | grep -E -e "dnslookup for ${TEST_USER}"
 echo "${_endgroup}"
