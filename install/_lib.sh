@@ -41,12 +41,18 @@ fi
 # A couple of the config files are referenced from other subscripts, so they
 # get vars, while multiple subscripts call ensure_file_from_example.
 function ensure_file_from_example {
-  if [[ -f "$1" ]]; then
-    echo "$1 already exists, skipped creation."
+  target="$1"
+  if [[ -f "$target" ]]; then
+    echo "$target already exists, skipped creation."
   else
-    echo "Creating $1..."
-    cp -n $(echo "$1" | sed 's/\.[^.]*$/.example&/') "$1"
     # sed from https://stackoverflow.com/a/25123013/90297
+    example="$(echo "$target" | sed 's/\.[^.]*$/.example&/')"
+    if [[ ! -f "$example" ]]; then
+      echo "Oops! Where did $example go? 🤨 We need it in order to create $target."
+      exit
+    fi
+    echo "Creating $target ..."
+    cp -n "$example" "$target"
   fi
 }
 SENTRY_CONFIG_PY='../sentry/sentry.conf.py'
