@@ -49,7 +49,7 @@ function ensure_file_from_example {
     example="$(echo "$target" | sed 's/\.[^.]*$/.example&/')"
     if [[ ! -f "$example" ]]; then
       echo "Oops! Where did $example go? 🤨 We need it in order to create $target."
-      exit 42
+      exit
     fi
     echo "Creating $target ..."
     cp -n "$example" "$target"
