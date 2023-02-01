@@ -47,7 +47,7 @@ function ensure_file_from_example {
   else
     # sed from https://stackoverflow.com/a/25123013/90297
     example="$(echo "$target" | sed 's/\.[^.]*$/.example&/')"
-    if [[ -f "$example" ]]; then
+    if [[ ! -f "$example" ]]; then
       echo "Oops! Where did $example go? 🤨 We need it in order to create $target."
       exit
     fi
