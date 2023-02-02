@@ -78,7 +78,7 @@ releasefile.cache-path: '/data/releasefile-cache'
 #   secret_key: 'XXXXXXX'
 #   bucket_name: 's3-bucket-name'
 
-system.upload-url-prefix: 'http://web:9000'
+system.upload-url-prefix: 'http://localhost:9000'
 system.internal-url-prefix: 'http://web:9000'
 symbolicator.enabled: true
 symbolicator.options:
