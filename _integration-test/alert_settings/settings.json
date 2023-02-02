@@ -10,7 +10,7 @@
     ],
     "conditions": [
         {
-            "id": "sentry.rules.conditions.first_seen_event.FirstSeenEventCondition"
+            "id": "sentry.rules.conditions.every_event.EveryEventCondition"
         }
     ],
     "filters": [],
