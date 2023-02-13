@@ -1,3 +1,4 @@
+repos:
 - repo: local
   hooks:
     # Based on https://github.com/scop/pre-commit-shfmt/blob/main/.pre-commit-hooks.yaml
