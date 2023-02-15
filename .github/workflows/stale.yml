@@ -5,6 +5,7 @@ on:
   workflow_dispatch:
 jobs:
   stale:
+    if: github.repository_owner == 'getsentry'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/stale@87c2b794b9b47a9bec68ae03c01aeb572ffebdb1
