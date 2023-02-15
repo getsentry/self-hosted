@@ -1,5 +1,15 @@
 # Changelog
 
+## 23.2.0
+
+### Various fixes & improvements
+
+- Run lock issues/PRs only on getsentry (#1966) by @aminvakil
+- Updates Redis to 6.2.10 (#1937) by @danielhartnell
+- Handle missing example files gracefully (#1950) by @chadwhitacre
+- Fix post-release.sh for `git pull` (#1938) by @BYK
+- Manually change 23.1.1 to nightly (#1936) by @hubertdeng123
+
 ## 23.1.1
 
 ### Various fixes & improvements
