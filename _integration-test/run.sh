@@ -1,9 +1,8 @@
 #!/usr/bin/env bash
 set -ex
 
-source "$(dirname $0)/../install/_lib.sh"
-
-source ../install/dc-detect-version.sh
+source install/_lib.sh
+source install/dc-detect-version.sh
 
 echo "${_group}Setting up variables and helpers ..."
 export SENTRY_TEST_HOST="${SENTRY_TEST_HOST:-http://localhost:9000}"
@@ -51,14 +50,14 @@ echo "${_endgroup}"
 
 echo "${_group}Running tests ..."
 get_csrf_token() { awk '$6 == "sc" { print $7 }' $COOKIE_FILE; }
-sentry_api_request() { curl -s -H 'Accept: application/json; charset=utf-8' -H "Referer: $SENTRY_TEST_HOST" -H 'Content-Type: application/json' -H "X-CSRFToken: $(get_csrf_token)" -b "$COOKIE_FILE" -c "$COOKIE_FILE" "$SENTRY_TEST_HOST/$1" ${@:2}; }
+sentry_api_request() { curl -s -H 'Accept: application/json; charset=utf-8' -H "Referer: $SENTRY_TEST_HOST" -H 'Content-Type: application/json' -H "X-CSRFToken: $(get_csrf_token)" -b "$COOKIE_FILE" -c "$COOKIE_FILE" "$SENTRY_TEST_HOST/$1" "${@:2}"; }
 
 login() {
   INITIAL_AUTH_REDIRECT=$(curl -sL -o /dev/null $SENTRY_TEST_HOST -w %{url_effective})
   if [ "$INITIAL_AUTH_REDIRECT" != "$SENTRY_TEST_HOST/auth/login/sentry/" ]; then
     echo "Initial /auth/login/ redirect failed, exiting..."
     echo "$INITIAL_AUTH_REDIRECT"
-    exit -1
+    exit 1
   fi
 
   CSRF_TOKEN_FOR_LOGIN=$(curl $SENTRY_TEST_HOST -sL -c "$COOKIE_FILE" | awk -F "['\"]" '
@@ -78,7 +77,7 @@ declare -a LOGIN_TEST_STRINGS=(
 )
 for i in "${LOGIN_TEST_STRINGS[@]}"; do
   echo "Testing '$i'..."
-  echo "$LOGIN_RESPONSE" | grep "$i[,}]" >&/dev/null
+  echo "$LOGIN_RESPONSE" | grep "${i}[,}]" >&/dev/null
   echo "Pass."
 done
 echo "${_endgroup}"
@@ -117,7 +116,7 @@ declare -a EVENT_TEST_STRINGS=(
 )
 for i in "${EVENT_TEST_STRINGS[@]}"; do
   echo "Testing '$i'..."
-  echo "$EVENT_RESPONSE" | grep "$i[,}]" >&/dev/null
+  echo "$EVENT_RESPONSE" | grep "${i}[,}]" >&/dev/null
   echo "Pass."
 done
 echo "${_endgroup}"
@@ -145,16 +144,16 @@ SCOPES=$(jq -n -c --argjson scopes '["event:admin", "event:read", "member:read",
 SENTRY_AUTH_TOKEN=$(sentry_api_request "api/0/api-tokens/" -X POST --data "$SCOPES" | jq -r '.token')
 SENTRY_DSN=$(sentry_api_request "api/0/projects/sentry/native/keys/" | jq -r '.[0].dsn.secret')
 # Then upload the symbols to that project (note the container mounts pwd to /work)
-SENTRY_URL="$SENTRY_TEST_HOST" sentry-cli upload-dif --org "$SENTRY_ORG" --project "$SENTRY_PROJECT" --auth-token "$SENTRY_AUTH_TOKEN" windows.sym
+SENTRY_URL="$SENTRY_TEST_HOST" sentry-cli upload-dif --org "$SENTRY_ORG" --project "$SENTRY_PROJECT" --auth-token "$SENTRY_AUTH_TOKEN" _integration-test/windows.sym
 # Get public key for minidump upload
 PUBLIC_KEY=$(sentry_api_request "api/0/projects/sentry/native/keys/" | jq -r '.[0].public')
 # Upload the minidump to be processed, this returns the event ID of the crash dump
-EVENT_ID=$(sentry_api_request "api/$NATIVE_PROJECT_ID/minidump/?sentry_key=$PUBLIC_KEY" -X POST -F 'upload_file_minidump=@windows.dmp' | sed 's/\-//g')
+EVENT_ID=$(sentry_api_request "api/$NATIVE_PROJECT_ID/minidump/?sentry_key=$PUBLIC_KEY" -X POST -F 'upload_file_minidump=@_integration-test/windows.dmp' | sed 's/\-//g')
 # We have to wait for the item to be processed
 for i in {0..60..10}; do
   EVENT_PROCESSED=$(sentry_api_request "api/0/projects/$SENTRY_ORG/$SENTRY_PROJECT/events/" | jq -r '.[]|select(.id == "'"$EVENT_ID"'")|.id')
   if [ -z "$EVENT_PROCESSED" ]; then
-    sleep $i
+    sleep "$i"
   else
     break
   fi
@@ -167,9 +166,9 @@ fi
 echo "${_endgroup}"
 
 echo "${_group}Test custom CAs work ..."
-source ./custom-ca-roots/setup.sh
+source _integration-test/custom-ca-roots/setup.sh
 $dcr --no-deps web python3 /etc/sentry/test-custom-ca-roots.py
-source ./custom-ca-roots/teardown.sh
+source _integration-test/custom-ca-roots/teardown.sh
 echo "${_endgroup}"
 
 # Table formatting based on https://stackoverflow.com/a/39144364

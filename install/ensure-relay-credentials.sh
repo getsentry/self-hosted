@@ -1,7 +1,7 @@
 echo "${_group}Ensuring Relay credentials ..."
 
-RELAY_CONFIG_YML="../relay/config.yml"
-RELAY_CREDENTIALS_JSON="../relay/credentials.json"
+RELAY_CONFIG_YML=relay/config.yml
+RELAY_CREDENTIALS_JSON=relay/credentials.json
 
 ensure_file_from_example $RELAY_CONFIG_YML
 

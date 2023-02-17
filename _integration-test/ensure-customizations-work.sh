@@ -1,9 +1,8 @@
 #!/usr/bin/env bash
 set -ex
 
-source "$(dirname $0)/../install/_lib.sh"
-
-source ../install/dc-detect-version.sh
+source install/_lib.sh
+source install/dc-detect-version.sh
 
 # Negated version of ensure-customizations-not-present.sh, make changes in sync
 echo "${_group}Ensure customizations work"

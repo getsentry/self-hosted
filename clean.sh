@@ -9,8 +9,6 @@ if [ -n "${DEBUG:-}" ]; then
   set -x
 fi
 
-cd "$(dirname $0)"
-
 source install/dc-detect-version.sh
 
 function confirm() {

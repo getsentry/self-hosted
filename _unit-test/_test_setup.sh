@@ -1,11 +1,14 @@
 set -euo pipefail
-source "$(dirname $0)/../install/_lib.sh"
+
+source install/_lib.sh
+
+_ORIGIN=$(pwd)
 
 rm -rf /tmp/sentry-self-hosted-test-sandbox.*
 _SANDBOX="$(mktemp -d /tmp/sentry-self-hosted-test-sandbox.XXX)"
 
-source "$basedir/install/detect-platform.sh"
-docker build -t sentry-self-hosted-jq-local --platform=$DOCKER_PLATFORM "$basedir/jq"
+source install/detect-platform.sh
+docker build -t sentry-self-hosted-jq-local --platform="$DOCKER_PLATFORM" jq
 
 report_success() {
   echo "$(basename $0) - Success 👍"
@@ -13,15 +16,14 @@ report_success() {
 
 teardown() {
   test "${DEBUG:-}" || rm -rf "$_SANDBOX"
+  cd "$_ORIGIN"
 }
 
 setup() {
-  cd ..
-
   # Clone the local repo into a temp dir. FWIW `git clone --local` breaks for
   # me because it depends on hard-linking, which doesn't work across devices,
   # and I happen to have my workspace and /tmp on separate devices.
-  git -c advice.detachedHead=false clone --depth=1 "file://$(pwd)" "$_SANDBOX"
+  git -c advice.detachedHead=false clone --depth=1 "file://$_ORIGIN" "$_SANDBOX"
 
   # Now propagate any local changes from the working copy to the sandbox. This
   # provides a pretty nice dev experience: edit the files in the working copy,
@@ -47,7 +49,7 @@ setup() {
     esac
   done
 
-  cd "$_SANDBOX/install"
+  cd "$_SANDBOX"
 
   trap teardown EXIT
 }

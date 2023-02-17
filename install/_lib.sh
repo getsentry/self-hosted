@@ -5,26 +5,15 @@ test "${DEBUG:-}" && set -x
 umask 002
 
 # Thanks to https://unix.stackexchange.com/a/145654/108960
-log_file="sentry_install_log-$(date +'%Y-%m-%d_%H-%M-%S').txt"
+log_file=sentry_install_log-$(date +'%Y-%m-%d_%H-%M-%S').txt
 exec &> >(tee -a "$log_file")
-
-# Work from /install/ for install.sh, project root otherwise
-if [[ "$(basename $0)" = "install.sh" ]]; then
-  cd "$(dirname $0)/install/"
-else
-  cd "$(dirname $0)" # assume we're a test script or some such
-fi
 
 # Allow `.env` overrides using the `.env.custom` file.
 # We pass this to docker compose in a couple places.
-basedir="$(
-  cd ..
-  pwd -P
-)" # realpath is missing on stock macOS
-if [[ -f "$basedir/.env.custom" ]]; then
-  _ENV="$basedir/.env.custom"
+if [[ -f .env.custom ]]; then
+  _ENV=.env.custom
 else
-  _ENV="$basedir/.env"
+  _ENV=.env
 fi
 
 # Read .env for default values with a tip o' the hat to https://stackoverflow.com/a/59831605/90297
@@ -55,8 +44,9 @@ function ensure_file_from_example {
     cp -n "$example" "$target"
   fi
 }
-SENTRY_CONFIG_PY='../sentry/sentry.conf.py'
-SENTRY_CONFIG_YML='../sentry/config.yml'
+
+SENTRY_CONFIG_PY=sentry/sentry.conf.py
+SENTRY_CONFIG_YML=sentry/config.yml
 
 # Increase the default 10 second SIGTERM timeout
 # to ensure celery queues are properly drained

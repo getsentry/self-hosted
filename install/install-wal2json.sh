@@ -1,6 +1,7 @@
 echo "${_group}Downloading and installing wal2json ..."
 
-FILE_TO_USE="../postgres/wal2json/wal2json.so"
+WAL2JSON_DIR=postgres/wal2json
+FILE_TO_USE="$WAL2JSON_DIR/wal2json.so"
 ARCH=$(uname -m)
 FILE_NAME="wal2json-Linux-$ARCH-glibc.so"
 
@@ -32,13 +33,13 @@ else
   VERSION=$WAL2JSON_VERSION
 fi
 
-mkdir -p ../postgres/wal2json
-if [ ! -f "../postgres/wal2json/$VERSION/$FILE_NAME" ]; then
-  mkdir -p "../postgres/wal2json/$VERSION"
+mkdir -p "$WAL2JSON_DIR"
+if [ ! -f "$WAL2JSON_DIR/$VERSION/$FILE_NAME" ]; then
+  mkdir -p "$WAL2JSON_DIR/$VERSION"
   docker_curl -L \
     "https://github.com/getsentry/wal2json/releases/download/$VERSION/$FILE_NAME" \
-    >"../postgres/wal2json/$VERSION/$FILE_NAME"
+    >"$WAL2JSON_DIR/$VERSION/$FILE_NAME"
 fi
-cp "../postgres/wal2json/$VERSION/$FILE_NAME" "$FILE_TO_USE"
+cp "$WAL2JSON_DIR/$VERSION/$FILE_NAME" "$FILE_TO_USE"
 
 echo "${_endgroup}"
