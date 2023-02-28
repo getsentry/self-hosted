@@ -171,6 +171,28 @@ $dcr --no-deps web python3 /etc/sentry/test-custom-ca-roots.py
 source _integration-test/custom-ca-roots/teardown.sh
 echo "${_endgroup}"
 
+echo "${_group}Test that replays work ..."
+echo "Creating test replay..."
+TEST_REPLAY_ID=$(
+  export LC_ALL=C
+  head /dev/urandom | tr -dc "a-f0-9" | head -c 32
+)
+TIME_IN_SECONDS=$(date +%s)
+curl -sf --data '{"event_id":"'"$TEST_REPLAY_ID"'","sdk":{"name":"sentry.javascript.browser","version":"7.38.0"}}
+{"type":"replay_event"}
+{"type":"replay_event","replay_start_timestamp":$TIME_IN_SECONDS,"timestamp":$TIME_IN_SECONDS,"error_ids":[],"trace_ids":[],"urls":["example.com"],"replay_id":"'"$TEST_REPLAY_ID"'","segment_id":0,"replay_type":"session","event_id":"'"$TEST_REPLAY_ID"'","environment":"production","sdk":{"name":"sentry.javascript.browser","version":"7.38.0"},"request":{"url":"example.com","headers":{"platform":"javascript","contexts":{"replay":{"session_sample_rate":1,"error_sample_rate":1}}}
+{"type":"replay_recording","length":19}
+{"segment_id":0}
+[]' -H 'Content-Type: application/json' -H "X-Sentry-Auth: Sentry sentry_version=7, sentry_key=$SENTRY_KEY, sentry_client=test-bash/0.1" "$SENTRY_TEST_HOST/api/$PROJECT_ID/envelope/" -o /dev/null
+
+printf "Getting the test replay back"
+REPLAY_SEGMENT_PATH="api/0/projects/sentry/internal/replays/$TEST_EVENT_ID/recording-segments/?download"
+REPLAY_EVENT_PATH="api/0/projects/sentry/internal/replays/$TEST_EVENT_ID/"
+timeout 60 bash -c 'until $(sentry_api_request "$REPLAY_EVENT_PATH" -Isf -X GET -o /dev/null); do printf '.'; sleep 0.5; done'
+timeout 60 bash -c 'until $(sentry_api_request "$REPLAY_SEGMENT_PATH" -Isf -X GET -o /dev/null); do printf '.'; sleep 0.5; done'
+echo " got it!"
+echo "${_endgroup}"
+
 # Table formatting based on https://stackoverflow.com/a/39144364
 COMPOSE_PS_OUTPUT=$(docker compose ps --format json | jq -r \
   '.[] |
