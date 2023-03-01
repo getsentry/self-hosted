@@ -189,12 +189,12 @@ printf "Getting the test replay back"
 REPLAY_SEGMENT_PATH="api/0/projects/sentry/internal/replays/$TEST_REPLAY_ID/recording-segments/?download"
 REPLAY_EVENT_PATH="api/0/projects/sentry/internal/replays/$TEST_REPLAY_ID/"
 
+# try to request the replay for 30 seconds
 for i in {1..30}; do
   REPLAY_EVENT_PROCESSED=$(sentry_api_request "$REPLAY_EVENT_PATH" -X GET | jq -r '.data.id')
   REPLAY_RECORDING_PROCESSED=$(sentry_api_request "$REPLAY_SEGMENT_PATH" -X GET | jq .)
   if ! [ $REPLAY_EVENT_PROCESSED = $TEST_REPLAY_ID ] || [ -z "$REPLAY_RECORDING_PROCESSED" ]; then
-    echo $i
-    sleep $i
+    sleep 1
   else
     break
   fi
