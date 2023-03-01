@@ -179,6 +179,7 @@ TEST_REPLAY_ID=$(
   head /dev/urandom | tr -dc "a-f0-9" | head -c 32
 )
 TIME_IN_SECONDS=$(date +%s)
+# send a replay
 curl -sf --data '{"event_id":"'"$TEST_REPLAY_ID"'","sdk":{"name":"sentry.javascript.react","version":"7.31.1"}}
 {"type":"replay_event"}
 {"type":"replay_event","replay_start_timestamp":"'"$TIME_IN_SECONDS"'","timestamp":"'"$TIME_IN_SECONDS"'","error_ids":[],"trace_ids":[],"urls":["http://example.com/"],"replay_id":"'"$TEST_REPLAY_ID"'","segment_id":0,"replay_type":"session","event_id":"'"$TEST_REPLAY_ID"'","environment":"production","sdk":{"integrations":["InboundFilters","FunctionToString","TryCatch","Breadcrumbs","GlobalHandlers","LinkedErrors","Dedupe","HttpContext","Replay"],"version":"7.31.1","name":"sentry.javascript.react"},"sdkProcessingMetadata":{},"request":{"url":"http://example.com/","headers":{"User-Agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36"}},"platform":"javascript","tags":{"sessionSampleRate":1,"errorSampleRate":1}}
