@@ -171,7 +171,6 @@ $dcr --no-deps web python3 /etc/sentry/test-custom-ca-roots.py
 source _integration-test/custom-ca-roots/teardown.sh
 echo "${_endgroup}"
 
-
 echo "${_group}Test that replays work ..."
 echo "Creating test replay..."
 
@@ -180,9 +179,9 @@ TEST_REPLAY_ID=$(
   head /dev/urandom | tr -dc "a-f0-9" | head -c 32
 )
 TIME_IN_SECONDS=$(date +%s)
-curl -sf --data '{"event_id":"'"$TEST_REPLAY_ID"'","sent_at":"2023-03-01T01:30:41.610Z","sdk":{"name":"sentry.javascript.react","version":"7.31.1"}}
+curl -sf --data '{"event_id":"'"$TEST_REPLAY_ID"'","sdk":{"name":"sentry.javascript.react","version":"7.31.1"}}
 {"type":"replay_event"}
-{"type":"replay_event","replay_start_timestamp":"'"$TIME_IN_SECONDS"'","timestamp":"'"$TIME_IN_SECONDS"'","error_ids":[],"trace_ids":[],"urls":["http://localhost:3000/"],"replay_id":"'"$TEST_REPLAY_ID"'","segment_id":0,"replay_type":"session","event_id":"'"$TEST_REPLAY_ID"'","environment":"production","sdk":{"integrations":["InboundFilters","FunctionToString","TryCatch","Breadcrumbs","GlobalHandlers","LinkedErrors","Dedupe","HttpContext","Replay"],"version":"7.31.1","name":"sentry.javascript.react"},"sdkProcessingMetadata":{},"request":{"url":"http://localhost:3000/","headers":{"User-Agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36"}},"platform":"javascript","tags":{"sessionSampleRate":1,"errorSampleRate":1}}
+{"type":"replay_event","replay_start_timestamp":"'"$TIME_IN_SECONDS"'","timestamp":"'"$TIME_IN_SECONDS"'","error_ids":[],"trace_ids":[],"urls":["http://example.com/"],"replay_id":"'"$TEST_REPLAY_ID"'","segment_id":0,"replay_type":"session","event_id":"'"$TEST_REPLAY_ID"'","environment":"production","sdk":{"integrations":["InboundFilters","FunctionToString","TryCatch","Breadcrumbs","GlobalHandlers","LinkedErrors","Dedupe","HttpContext","Replay"],"version":"7.31.1","name":"sentry.javascript.react"},"sdkProcessingMetadata":{},"request":{"url":"http://example.com/","headers":{"User-Agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36"}},"platform":"javascript","tags":{"sessionSampleRate":1,"errorSampleRate":1}}
 {"type":"replay_recording","length":19}
 {"segment_id":0}
 []' -H 'Content-Type: application/json' -H "X-Sentry-Auth: Sentry sentry_version=7, sentry_key=$SENTRY_KEY, sentry_client=test-bash/0.1" "$SENTRY_TEST_HOST/api/$PROJECT_ID/envelope/" -o /dev/null
@@ -193,20 +192,15 @@ REPLAY_EVENT_PATH="api/0/projects/sentry/internal/replays/$TEST_REPLAY_ID/"
 for i in {1..30}; do
   REPLAY_EVENT_PROCESSED=$(sentry_api_request "$REPLAY_EVENT_PATH" -X GET | jq -r '.data.id')
   REPLAY_RECORDING_PROCESSED=$(sentry_api_request "$REPLAY_SEGMENT_PATH" -X GET | jq .)
-  if  ! [ $REPLAY_EVENT_PROCESSED = $TEST_REPLAY_ID ] || [ -z $REPLAY_RECORDING_PROCESSED ]; then
+  if ! [ $REPLAY_EVENT_PROCESSED = $TEST_REPLAY_ID ] || [ -z "$REPLAY_RECORDING_PROCESSED" ]; then
     echo $i
     sleep $i
   else
     break
   fi
 done
-
-
-# timeout 60 bash -c 'until $(sentry_api_request "$REPLAY_EVENT_PATH" -X GET ); do printf '.'; sleep 0.5; done'
-# timeout 60 bash -c 'until $(sentry_api_request "$REPLAY_SEGMENT_PATH" -X GET ); do printf '.'; sleep 0.5; done'
 echo " got it!"
 echo "${_endgroup}"
-
 
 # Table formatting based on https://stackoverflow.com/a/39144364
 COMPOSE_PS_OUTPUT=$(docker compose ps --format json | jq -r \
