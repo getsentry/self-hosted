@@ -2,7 +2,12 @@
 set -e
 
 if [ "$(ls -A /usr/local/share/ca-certificates/)" ]; then
-  update-ca-certificates
+  # for backups, let's redirect the console output to avoid it being written to backup file
+  if [[ $SENTRY_BACKUP == true ]]; then
+    update-ca-certificates >/dev/null
+  else
+    update-ca-certificates
+  fi
 fi
 
 if [ -e /etc/sentry/requirements.txt ]; then
