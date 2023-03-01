@@ -197,8 +197,7 @@ services:
     <<: *restart_policy
     image: clickhouse-self-hosted-local
     build:
-      context:
-        ./clickhouse
+      context: ./clickhouse
       args:
         BASE_IMAGE: "${CLICKHOUSE_IMAGE:-}"
     ulimits:
@@ -218,8 +217,7 @@ services:
       # You might want to change this to a higher value (and ensure your host has enough memory)
       MAX_MEMORY_USAGE_RATIO: 0.3
     healthcheck:
-      test:
-        [
+      test: [
           "CMD-SHELL",
           # Manually override any http_proxy envvar that might be set, because
           # this wget does not support no_proxy. See:
@@ -329,13 +327,12 @@ services:
     <<: *sentry_defaults
     command: run ingest-replay-recordings
   post-process-forwarder-errors:
-      <<: *sentry_defaults
-      # Increase `--commit-batch-size 1` below to deal with high-load environments.
-      command: run post-process-forwarder --commit-batch-size 1 --entity errors
+    <<: *sentry_defaults
+    command: run post-process-forwarder --entity errors
 
   post-process-forwarder-transactions:
     <<: *sentry_defaults
-    command: run post-process-forwarder --commit-batch-size 1 --entity transactions --commit-log-topic=snuba-transactions-commit-log --synchronize-commit-group transactions_group
+    command: run post-process-forwarder --entity transactions --commit-log-topic=snuba-transactions-commit-log --synchronize-commit-group transactions_group
   subscription-consumer-events:
     <<: *sentry_defaults
     command: run query-subscription-consumer --commit-batch-size 1 --topic events-subscription-results
