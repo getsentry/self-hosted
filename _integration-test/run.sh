@@ -197,9 +197,14 @@ for i in {1..30}; do
   if [ ! "$REPLAY_EVENT_PROCESSED" = "$TEST_REPLAY_ID" ] || [ -z "$REPLAY_RECORDING_PROCESSED" ]; then
     sleep 1
   else
+    REPLAYS_PASSED=1
     break
   fi
 done
+if [ -z "$REPLAYS_PASSED" ]; then
+  echo "failed to ingest a replay"
+  exit 1
+fi
 echo " got it!"
 echo "${_endgroup}"
 
