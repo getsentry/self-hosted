@@ -132,6 +132,7 @@ echo "${_endgroup}"
 echo "${_group}Test custom CAs work ..."
 source _integration-test/custom-ca-roots/setup.sh
 $dcr --no-deps web python3 /etc/sentry/test-custom-ca-roots.py
+exit 1
 source _integration-test/custom-ca-roots/teardown.sh
 echo "${_endgroup}"
 
