@@ -325,6 +325,9 @@ services:
   ingest-consumer:
     <<: *sentry_defaults
     command: run ingest-consumer --all-consumer-types
+  ingest-replay-recordings:
+    <<: *sentry_defaults
+    command: run ingest-replay-recordings
   post-process-forwarder-errors:
       <<: *sentry_defaults
       # Increase `--commit-batch-size 1` below to deal with high-load environments.
