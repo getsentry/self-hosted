@@ -23,7 +23,7 @@ jobs:
         with:
           path: self-hosted
       - name: End to end tests
-        uses: getsentry/action-self-hosted-e2e-tests@711694d0081a834777ca9c77c3f4c322ce7b08c4
+        uses: getsentry/action-self-hosted-e2e-tests@77805295ebff8a603def5970e18743ded72cb304
         with:
           project_name: self-hosted
 
