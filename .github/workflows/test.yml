@@ -23,7 +23,7 @@ jobs:
         with:
           path: self-hosted
       - name: End to end tests
-        uses: getsentry/action-self-hosted-e2e-tests@711694d0081a834777ca9c77c3f4c322ce7b08c4
+        uses: getsentry/action-self-hosted-e2e-tests@77805295ebff8a603def5970e18743ded72cb304
         with:
           project_name: self-hosted
 
@@ -68,8 +68,6 @@ jobs:
           sudo mkdir -p "${{ matrix.compose_path }}"
           sudo curl -L https://github.com/docker/compose/releases/download/${{ matrix.compose_version }}/docker-compose-`uname -s`-`uname -m` -o "${{ matrix.compose_path }}/docker-compose"
           sudo chmod +x "${{ matrix.compose_path }}/docker-compose"
-      - name: Install sentry-cli
-        run: curl -sL https://sentry.io/get-cli/ | sh
 
       - name: Integration Test
         run: ./integration-test.sh
