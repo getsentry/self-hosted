@@ -14,6 +14,7 @@ $dc stop postgres
 sleep 5
 $dc rm -f -v postgres
 export SKIP_USER_CREATION=1
+source install/create-docker-volumes.sh
 source install/set-up-and-migrate-database.sh
 $dc up -d
 
