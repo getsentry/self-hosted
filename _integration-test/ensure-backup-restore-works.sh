@@ -6,7 +6,7 @@ source install/dc-detect-version.sh
 
 echo "${_group}Test that backup/restore works..."
 echo "Creating backup..."
-$dcr -v $(pwd)/sentry:/sentry-data/backup  --rm -T -e SENTRY_LOG_LEVEL=CRITICAL web export /sentry-data/backup/backup.json
+$dcr -v $(pwd)/sentry:/sentry-data/backup --rm -T -e SENTRY_LOG_LEVEL=CRITICAL web export /sentry-data/backup/backup.json
 test -f sentry/backup.json
 
 # bring postgres down and recreate the docker volume
