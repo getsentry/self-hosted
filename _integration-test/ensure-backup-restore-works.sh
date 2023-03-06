@@ -8,8 +8,8 @@ echo "${_group}Test that backup/restore works..."
 echo "Creating backup..."
 backup_path="$(pwd)/sentry/backup"
 mkdir -p $backup_path
-# Docker was giving me permissioning issues when trying to create this file and write to it even after
-# Instead, try creating the empty file and then give everyone write access to the backup file
+# Docker was giving me permissioning issues when trying to create this file and write to it even after giving read + write access
+# to group and owner. Instead, try creating the empty file and then give everyone write access to the backup file
 touch $backup_path/backup.json
 chmod 666 $backup_path/backup.json
 $dcr -v $backup_path:/sentry-data/backup -T -e SENTRY_LOG_LEVEL=CRITICAL web export /sentry-data/backup/backup.json
