@@ -10,6 +10,7 @@ echo "Testing initial install"
 ./install.sh
 _integration-test/run.sh
 _integration-test/ensure-customizations-not-present.sh
+_integration-test/ensure-backup-restore-works.sh
 
 echo "Make customizations"
 cat <<EOT >sentry/enhance-image.sh
@@ -25,4 +26,4 @@ echo "Testing in-place upgrade and customizations"
 ./install.sh --minimize-downtime
 _integration-test/run.sh
 _integration-test/ensure-customizations-work.sh
-_integration-test/ensure-backuo-restore-works.sh
+_integration-test/ensure-backup-restore-works.sh
