@@ -10,6 +10,7 @@ echo "Creating backup..."
 # to group and owner. Instead, try creating the empty file and then give everyone write access to the backup file
 touch $(pwd)/sentry/backup.json
 chmod 666 $(pwd)/sentry/backup.json
+# Command here matches exactly what we have in our docs https://develop.sentry.dev/self-hosted/backup/#backup
 docker-compose run -v $(pwd)/sentry:/sentry-data/backup --rm -T -e SENTRY_LOG_LEVEL=CRITICAL web export /sentry-data/backup/backup.json
 # Check to make sure there is content in the file
 if [ ! -s "$(pwd)/sentry/backup.json" ]; then
