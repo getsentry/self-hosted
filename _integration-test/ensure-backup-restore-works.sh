@@ -30,4 +30,4 @@ docker-compose up -d
 echo "Importing backup..."
 docker-compose run --rm -T web import /etc/sentry/backup.json
 
-rm $(pwd)/sentry/backup/backup.json
+rm $(pwd)/sentry/backup.json
