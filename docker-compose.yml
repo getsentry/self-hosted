@@ -268,22 +268,6 @@ services:
   snuba-subscription-consumer-transactions:
     <<: *snuba_defaults
     command: subscriptions-scheduler-executor --dataset transactions --entity transactions --auto-offset-reset=latest --no-strict-offset-reset --consumer-group=snuba-transactions-subscriptions-consumers --followed-consumer-group=transactions_group --delay-seconds=60 --schedule-ttl=60 --stale-threshold-seconds=900
-  snuba-cleanup:
-    <<: *snuba_defaults
-    image: snuba-cleanup-self-hosted-local
-    build:
-      context: ./cron
-      args:
-        BASE_IMAGE: "$SNUBA_IMAGE"
-    command: '"*/5 * * * * snuba cleanup --storage errors --dry-run False"'
-  snuba-transactions-cleanup:
-    <<: *snuba_defaults
-    image: snuba-cleanup-self-hosted-local
-    build:
-      context: ./cron
-      args:
-        BASE_IMAGE: "$SNUBA_IMAGE"
-    command: '"*/5 * * * * snuba cleanup --storage transactions --dry-run False"'
   symbolicator:
     <<: *restart_policy
     image: "$SYMBOLICATOR_IMAGE"
