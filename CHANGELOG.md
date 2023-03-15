@@ -1,5 +1,24 @@
 # Changelog
 
+## 23.3.0
+
+### Various fixes & improvements
+
+- Remove ZooKeeper snapshot (#2020) by @dereckson
+- feat(snuba): Add snuba sessions subscription service (#2006) by @klboke
+- Add backup/restore integration tests (#2012) by @hubertdeng123
+- ref(snuba): Remove snuba-cleanup, snuba-transactions-cleanup jobs (#2003) by @klboke
+- ref(replays): Remove the session-replay-ui flag (#2010) by @ryan953
+- Remove broken replay integration test (#2011) by @hubertdeng123
+- Bump self-hosted-e2e-tests action commit sha (#2008) by @hubertdeng123
+- Revert symbolicator tests (#2004) by @hubertdeng123
+- post-process-forwarder: Update CLI command (#1999) by @lynnagara
+- feat(replays): add replays to self hosted (#1990) by @JoshFerge
+- Remove issue status helper automation (#1989) by @hubertdeng123
+- Add proxy buffer size config to fix Bad Gateway (#1984) by @SCjona
+- Reference paths relative to project root (#1800) by @spawnia
+- Run close stale issues/PRs only on getsentry (#1969) by @aminvakil
+
 ## 23.2.0
 
 ### Various fixes & improvements
