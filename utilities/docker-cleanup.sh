@@ -3,13 +3,9 @@
 # The purpose of this script is to make it easy to reset a local self-hosted
 # install to a clean state, optionally targeting a particular version.
 
-set -euo pipefail
-
 if [ -n "${DEBUG:-}" ]; then
   set -x
 fi
-
-source install/dc-detect-version.sh
 
 function confirm() {
   read -p "$1 [y/n] " confirmation
@@ -26,7 +22,6 @@ function confirm() {
 # the only refs where these component versions are pinned, so enforce that
 # we're targeting a valid tag here. Do this early in order to fail fast.
 
-version="${1:-}"
 if [ -n "$version" ]; then
   set +e
   git rev-parse --verify --quiet "refs/tags/$version" >/dev/null
