@@ -38,6 +38,8 @@ pip-log.txt
 pip-delete-this-directory.txt
 sentry_install_log*.txt
 sentry_clean_log*.txt
+sentry_restore_log*.txt
+sentry_backup_log*.txt
 
 # Unit test / coverage reports
 htmlcov/
