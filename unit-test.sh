@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-FORCE_CLEAN=1 "./utilities/clean.sh"
+FORCE_CLEAN=1 "./scripts/reset.sh"
 fail=0
 for test_file in _unit-test/*-test.sh; do
   echo "🙈 Running $test_file ..."
