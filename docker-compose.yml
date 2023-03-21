@@ -150,7 +150,7 @@ services:
         target: /opt/sentry/
   zookeeper:
     <<: *restart_policy
-    image: "confluentinc/cp-zookeeper:5.5.0"
+    image: "confluentinc/cp-zookeeper:5.5.13"
     environment:
       ZOOKEEPER_CLIENT_PORT: "2181"
       CONFLUENT_SUPPORT_METRICS_ENABLE: "false"
