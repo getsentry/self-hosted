@@ -1,5 +1,13 @@
 # Changelog
 
+## 23.3.1
+
+### Various fixes & improvements
+
+- Bump Kafka version to keep up with SaaS (#2037) by @chadwhitacre
+- Add Backup/restore scripts (#2029) by @hubertdeng123
+- Add opt in error monitoring to reset and clean scripts (#2021) by @hubertdeng123
+
 ## 23.3.0
 
 ### Various fixes & improvements
