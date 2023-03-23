@@ -86,7 +86,7 @@ x-snuba-defaults: &snuba_defaults
       <<: *depends_on-healthy
   image: "$SNUBA_IMAGE"
   environment:
-    SNUBA_SETTINGS: docker
+    SNUBA_SETTINGS: self_hosted
     CLICKHOUSE_HOST: clickhouse
     DEFAULT_BROKERS: "kafka:9092"
     REDIS_HOST: redis
