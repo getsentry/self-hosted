@@ -3,6 +3,15 @@
 
 from sentry.conf.server import *  # NOQA
 
+UNIT_SIZES={
+    "K": 1024,
+    "M": 1024**2,
+    "G": 1024**3,
+}
+def unit_text_to_bytes(text):
+    multiplier = UNIT_SIZES[text[-1]]
+    return float(text[:-1])*multiplier
+
 
 # Generously adapted from pynetlinux: https://github.com/rlisagor/pynetlinux/blob/e3f16978855c6649685f0c43d4c3fcf768427ae5/pynetlinux/ifconfig.py#L197-L223
 def get_internal_network():
@@ -108,7 +117,7 @@ CACHES = {
         "LOCATION": ["memcached:11211"],
         "TIMEOUT": 3600,
         "OPTIONS": {
-            "server_max_value_length": 1024 * 1024 * 25,
+            "server_max_value_length": unit_text_to_bytes(env("SENTRY_MAX_EXTERNAL_SOURCEMAP_SIZE", "1M")),
         },
     }
 }
