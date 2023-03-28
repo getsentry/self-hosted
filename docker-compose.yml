@@ -106,7 +106,7 @@ services:
   memcached:
     <<: *restart_policy
     image: "memcached:1.6.9-alpine"
-    command: "-I 25M"
+    command: ["-I", "25M"]
     healthcheck:
       <<: *healthcheck_defaults
       # From: https://stackoverflow.com/a/31877626/5155484
