@@ -6,8 +6,8 @@ from sentry.conf.server import *  # NOQA
 BYTE_MULTIPLIER = 1024
 UNITS = ("K", "M", "G")
 def unit_text_to_bytes(text):
-		unit = text[-1].upper()
-		power = UNITS.index(unit) + 1
+    unit = text[-1].upper()
+    power = UNITS.index(unit) + 1
     return float(text[:-1])*(BYTE_MULTIPLIER**power)
 
 
