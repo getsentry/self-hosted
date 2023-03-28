@@ -3,14 +3,12 @@
 
 from sentry.conf.server import *  # NOQA
 
-UNIT_SIZES={
-    "K": 1024,
-    "M": 1024**2,
-    "G": 1024**3,
-}
+BYTE_MULTIPLIER = 1024
+UNITS = ("K", "M", "G")
 def unit_text_to_bytes(text):
-    multiplier = UNIT_SIZES[text[-1]]
-    return float(text[:-1])*multiplier
+		unit = text[-1].upper()
+		power = UNITS.index(unit) + 1
+    return float(text[:-1])*(BYTE_MULTIPLIER**power)
 
 
 # Generously adapted from pynetlinux: https://github.com/rlisagor/pynetlinux/blob/e3f16978855c6649685f0c43d4c3fcf768427ae5/pynetlinux/ifconfig.py#L197-L223
