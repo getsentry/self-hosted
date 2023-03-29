@@ -70,6 +70,7 @@ x-sentry-defaults: &sentry_defaults
     # on the host system (or in the .env file)
     SENTRY_EVENT_RETENTION_DAYS:
     SENTRY_MAIL_HOST:
+    SENTRY_MAX_EXTERNAL_SOURCEMAP_SIZE:
   volumes:
     - "sentry-data:/data"
     - "./sentry:/etc/sentry"
@@ -106,6 +107,7 @@ services:
   memcached:
     <<: *restart_policy
     image: "memcached:1.6.9-alpine"
+    command: ["-I", "${SENTRY_MAX_EXTERNAL_SOURCEMAP_SIZE:-1M}"]
     healthcheck:
       <<: *healthcheck_defaults
       # From: https://stackoverflow.com/a/31877626/5155484
