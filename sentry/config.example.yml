@@ -89,6 +89,8 @@ transaction-events.force-disable-internal-project: true
 # GitHub Integration #
 ######################
 
+# Refer to https://develop.sentry.dev/integrations/github/ for setup instructions.
+
 # github-login.extended-permissions: ['repo']
 # github-app.id: GITHUB_APP_ID
 # github-app.name: 'GITHUB_APP_NAME'
