@@ -324,10 +324,10 @@ services:
     command: run post-process-forwarder --entity transactions --commit-log-topic=snuba-transactions-commit-log --synchronize-commit-group transactions_group
   subscription-consumer-events:
     <<: *sentry_defaults
-    command: run query-subscription-consumer --commit-batch-size 1 --topic events-subscription-results
+    command: run query-subscription-consumer --topic events-subscription-results
   subscription-consumer-transactions:
     <<: *sentry_defaults
-    command: run query-subscription-consumer --commit-batch-size 1 --topic transactions-subscription-results
+    command: run query-subscription-consumer --topic transactions-subscription-results
   sentry-cleanup:
     <<: *sentry_defaults
     image: sentry-cleanup-self-hosted-local
