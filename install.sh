@@ -30,6 +30,7 @@ source install/build-docker-images.sh
 source install/install-wal2json.sh
 source install/bootstrap-snuba.sh
 source install/create-kafka-topics.sh
+source install/upgrade-postgres.sh
 source install/set-up-and-migrate-database.sh
 source install/geoip.sh
 source install/wrap-up.sh

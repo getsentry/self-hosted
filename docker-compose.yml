@@ -126,7 +126,7 @@ services:
         hard: 10032
   postgres:
     <<: *restart_policy
-    image: "postgres:9.6"
+    image: "postgres:14"
     healthcheck:
       <<: *healthcheck_defaults
       # Using default user "postgres" from sentry/sentry.conf.example.py or value of POSTGRES_USER if provided
