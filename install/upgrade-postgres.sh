@@ -18,6 +18,28 @@ if [[ -n "$(docker volume ls -q --filter name=sentry-postgres)" && "$(docker run
     "cd /from ; cp -av . /to ; echo 'host all all all trust' >> /to/pg_hba.conf"
   # Finally, remove the new old volume as we are all in sentry-postgres now
   docker volume rm sentry-postgres-new
+  echo "Due to glibc change re-indexing"
+  echo "Starting up new PostgreSQL version"
+  $dc up -d postgres
+
+  # Wait for postgres
+  RETRIES=5
+  until docker exec sentry-self-hosted-postgres-1 psql -U postgres -c "select 1" > /dev/null 2>&1 || [ $RETRIES -eq 0 ]; do
+    echo "Waiting for postgres server, $((RETRIES--)) remaining attempts..."
+    sleep 1
+  done
+
+  # VOLUME_NAME is the same as container name
+  # Reindex all databases and their system catalogs which are not templates
+  DBS=$(docker exec sentry-self-hosted-postgres-1 psql -qAt -U postgres -c "select datname from pg_database  where datistemplate = false;")
+  for db in ${DBS}
+  do
+      echo "Re-indexing database: ${db}"
+      docker exec sentry-self-hosted-postgres-1 psql -qAt -U postgres -d ${db} -c "reindex system ${db}"
+      docker exec sentry-self-hosted-postgres-1 psql -qAt -U postgres -d ${db} -c "reindex database ${db};"
+  done
+
+  $dc down postgres
 fi
 
 echo "${_endgroup}"

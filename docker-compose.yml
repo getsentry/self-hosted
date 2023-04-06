@@ -18,7 +18,7 @@ x-sentry-defaults: &sentry_defaults
   <<: *restart_policy
   image: sentry-self-hosted-local
   # Set the platform to build for linux/arm64 when needed on Apple silicon Macs.
-  platform: ${DOCKER_PLATFORM:-}
+  # platform: ${DOCKER_PLATFORM:-}
   build:
     context: ./sentry
     args:
@@ -126,7 +126,7 @@ services:
         hard: 10032
   postgres:
     <<: *restart_policy
-    image: "postgres:14"
+    image: "ghcr.io/getsentry/image-mirror-library-postgres:14"
     healthcheck:
       <<: *healthcheck_defaults
       # Using default user "postgres" from sentry/sentry.conf.example.py or value of POSTGRES_USER if provided
