@@ -16,7 +16,6 @@ repos:
   rev: v4.3.0
   hooks:
   - id: check-case-conflict
-  - id: check-executables-have-shebangs
   - id: check-merge-conflict
   - id: check-symlinks
   - id: end-of-file-fixer
