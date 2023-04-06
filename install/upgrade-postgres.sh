@@ -39,7 +39,7 @@ if [[ -n "$(docker volume ls -q --filter name=sentry-postgres)" && "$(docker run
       docker exec sentry-self-hosted-postgres-1 psql -qAt -U postgres -d ${db} -c "reindex database ${db};"
   done
 
-  $dc down postgres
+  $dc stop postgres
 fi
 
 echo "${_endgroup}"
