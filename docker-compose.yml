@@ -126,6 +126,7 @@ services:
         hard: 10032
   postgres:
     <<: *restart_policy
+    # Using the same postgres image as Sentry dev for consistency purposes
     image: "ghcr.io/getsentry/image-mirror-library-postgres:14"
     healthcheck:
       <<: *healthcheck_defaults
