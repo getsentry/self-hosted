@@ -16,9 +16,9 @@ if [[ -n "$(docker volume ls -q --filter name=sentry-postgres)" && "$(docker run
   # doesn't do that automatically.
   docker run --rm -v sentry-postgres-new:/from -v sentry-postgres:/to alpine ash -c \
     "cd /from ; cp -av . /to ; echo 'host all all all trust' >> /to/pg_hba.conf"
-  # Finally, remove the new old volume as we are all in sentry-postgres now
+  # Finally, remove the new old volume as we are all in sentry-postgres now. For 
   docker volume rm sentry-postgres-new
-  echo "Due to glibc change re-indexing"
+  echo "Re-indexing due to glibc change, this may take a while..."
   echo "Starting up new PostgreSQL version"
   $dc up -d postgres
 
@@ -31,7 +31,7 @@ if [[ -n "$(docker volume ls -q --filter name=sentry-postgres)" && "$(docker run
 
   # VOLUME_NAME is the same as container name
   # Reindex all databases and their system catalogs which are not templates
-  DBS=$(docker exec sentry-self-hosted-postgres-1 psql -qAt -U postgres -c "select datname from pg_database  where datistemplate = false;")
+  DBS=$(docker exec sentry-self-hosted-postgres-1 psql -qAt -U postgres -c "SELECT datname FROM pg_database WHERE datistemplate = false;")
   for db in ${DBS}; do
     echo "Re-indexing database: ${db}"
     docker exec sentry-self-hosted-postgres-1 psql -qAt -U postgres -d ${db} -c "reindex system ${db}"
