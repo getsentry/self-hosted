@@ -16,7 +16,7 @@ if [[ -n "$(docker volume ls -q --filter name=sentry-postgres)" && "$(docker run
   # doesn't do that automatically.
   docker run --rm -v sentry-postgres-new:/from -v sentry-postgres:/to alpine ash -c \
     "cd /from ; cp -av . /to ; echo 'host all all all trust' >> /to/pg_hba.conf"
-  # Finally, remove the new old volume as we are all in sentry-postgres now. For 
+  # Finally, remove the new old volume as we are all in sentry-postgres now.
   docker volume rm sentry-postgres-new
   echo "Re-indexing due to glibc change, this may take a while..."
   echo "Starting up new PostgreSQL version"
