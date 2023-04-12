@@ -33,7 +33,7 @@ body:
     id: docker_compose_version
     attributes:
       label: Docker Compose Version
-      placeholder: 2.6.0 ← should look like this (docker compose --version)
+      placeholder: 2.6.0 ← should look like this (docker compose version)
       description: |
         What version of docker-compose are you using to run self-hosted?
         You need to use docker-compose --version if you are running < v2.0.0.
