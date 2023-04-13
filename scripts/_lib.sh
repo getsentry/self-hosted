@@ -34,8 +34,6 @@ function clean() {
     set -e
   fi
 
-  false "noooo"
-
   # Make sure they mean it.
   if [ "${FORCE_CLEAN:-}" == "1" ]; then
     echo "☠️  Seeing FORCE=1, forcing cleanup."
