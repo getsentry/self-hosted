@@ -1,5 +1,23 @@
 # Changelog
 
+## 23.4.0
+
+### Postgres 14 Upgrade
+
+We've now included an upgrade from Postgres 9.6 to 14.5 that will automatically be run via the `./install.sh` script.
+
+By: @hubertdeng123 (#2074)
+
+### Various fixes & improvements
+
+- Remove clean function testing line (#2082) by @hubertdeng123
+- Fix command to get docker compose version in problem report template (#2080) by @hubertdeng123
+- Tweak permissioning of backup file in backup script to read/write for all users (#2043) by @hubertdeng123
+- Remove commit-batch-size parameter (#2058) by @hubertdeng123
+- Support external sourcemaps bigger, than 1Mb (#2050) by @le0pard
+- Add github setup instructions to config.example.yml (#2051) by @tm1000
+- ref(snuba): Use snuba self-hosted settings (#2039) by @enochtangg
+
 ## 23.3.1
 
 ### Various fixes & improvements
