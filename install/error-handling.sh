@@ -93,7 +93,7 @@ if [[ -z "${REPORT_SELF_HOSTED_ISSUES:-}" ]]; then
   echo "(Btw, we send this to our own self-hosted Sentry instance, not to Sentry SaaS,"
   echo "so that we can be in this together.)"
   echo
-  echo "Here's the info we may collect:"
+  echo "Here's some info we may collect:"
   echo
   echo "  - OS username"
   echo "  - IP address"
