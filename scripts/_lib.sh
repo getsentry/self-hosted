@@ -62,11 +62,11 @@ function clean() {
 function backup() {
   touch $(pwd)/sentry/backup.json
   chmod 666 $(pwd)/sentry/backup.json
-  docker-compose run -v $(pwd)/sentry:/sentry-data/backup --rm -T -e SENTRY_LOG_LEVEL=CRITICAL web export /sentry-data/backup/backup.json
+  $dc run -v $(pwd)/sentry:/sentry-data/backup --rm -T -e SENTRY_LOG_LEVEL=CRITICAL web export /sentry-data/backup/backup.json
 }
 
 function restore() {
-  docker-compose run --rm -T web import /etc/sentry/backup.json
+  $dc run --rm -T web import /etc/sentry/backup.json
 }
 
 # Needed variables to source error-handling script
