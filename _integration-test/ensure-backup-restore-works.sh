@@ -11,8 +11,7 @@ echo "Creating backup..."
 touch $(pwd)/sentry/backup.json
 chmod 666 $(pwd)/sentry/backup.json
 # Command here matches exactly what we have in our docs https://develop.sentry.dev/self-hosted/backup/#backup
-docker-compose run -v $(pwd)/sentry:/sentry-data/backup --rm -T -e SENTRY_LOG_LEVEL=CRITICAL web export /sentry-data/backup/backup.json
-# Check to make sure there is content in the file
+source scripts/backup.sh # Check to make sure there is content in the file
 if [ ! -s "$(pwd)/sentry/backup.json" ]; then
   echo "Backup file is empty"
   exit 1
@@ -29,6 +28,6 @@ source install/set-up-and-migrate-database.sh
 docker-compose up -d
 
 echo "Importing backup..."
-docker-compose run --rm -T web import /etc/sentry/backup.json
+source scripts/restore.sh
 
 rm $(pwd)/sentry/backup.json
