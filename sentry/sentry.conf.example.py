@@ -291,3 +291,19 @@ GEOIP_PATH_MMDB = '/geoip/GeoLite2-City.mmdb'
 
 # BITBUCKET_CONSUMER_KEY = 'YOUR_BITBUCKET_CONSUMER_KEY'
 # BITBUCKET_CONSUMER_SECRET = 'YOUR_BITBUCKET_CONSUMER_SECRET'
+
+##############################################
+# Suggested Fix Feature / OpenAI Integration #
+##############################################
+
+# See https://docs.sentry.io/product/issues/issue-details/ai-suggested-solution/
+# for more information about the feature. Make sure the OpenAI's privacy policy is
+# aligned with your company.
+
+# Set the OPENAI_API_KEY on the .env or .env.custom file with a valid
+# OpenAI API key to turn on the feature.
+OPENAI_API_KEY = env("OPENAI_API_KEY", "")
+
+if OPENAI_API_KEY and not OPENAI_API_KEY.isspace():
+  SENTRY_FEATURES["organizations:open-ai-suggestion"] = True
+  SENTRY_FEATURES["organizations:open-ai-suggestion-new-design"] = True
