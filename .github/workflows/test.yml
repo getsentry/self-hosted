@@ -64,6 +64,8 @@ jobs:
           # Always remove `docker compose` support as that's the newer version
           # and comes installed by default nowadays.
           sudo rm -f "/usr/local/lib/docker/cli-plugins/docker-compose"
+          # Docker Compose v1 is installed here, remove it
+          sudo rm -f "/usr/local/bin/docker-compose"
           sudo rm -f "${{ matrix.compose_path }}/docker-compose"
           sudo mkdir -p "${{ matrix.compose_path }}"
           sudo curl -L https://github.com/docker/compose/releases/download/${{ matrix.compose_version }}/docker-compose-`uname -s`-`uname -m` -o "${{ matrix.compose_path }}/docker-compose"
