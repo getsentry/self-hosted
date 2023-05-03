@@ -306,4 +306,3 @@ OPENAI_API_KEY = env("OPENAI_API_KEY", "")
 
 if OPENAI_API_KEY and not OPENAI_API_KEY.isspace():
   SENTRY_FEATURES["organizations:open-ai-suggestion"] = True
-  SENTRY_FEATURES["organizations:open-ai-suggestion-new-design"] = True
