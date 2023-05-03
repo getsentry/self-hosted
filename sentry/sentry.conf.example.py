@@ -304,5 +304,5 @@ GEOIP_PATH_MMDB = '/geoip/GeoLite2-City.mmdb'
 # OpenAI API key to turn on the feature.
 OPENAI_API_KEY = env("OPENAI_API_KEY", "")
 
-if OPENAI_API_KEY and not OPENAI_API_KEY.isspace():
+if OPENAI_API_KEY:
   SENTRY_FEATURES["organizations:open-ai-suggestion"] = True
