@@ -313,7 +313,7 @@ if OPENAI_API_KEY:
 
 if "csp.middleware.CSPMiddleware" not in MIDDLEWARE:
     MIDDLEWARE = ("csp.middleware.CSPMiddleware",) + MIDDLEWARE
-CSP_REPORT_URI = "https://{your-sentry-installation}/api/{csp-project}/security/?sentry_key={sentry-key}"
+# CSP_REPORT_URI = "https://{your-sentry-installation}/api/{csp-project}/security/?sentry_key={sentry-key}"
 CSP_REPORT_ONLY = True
 
 # optional extra permissions
