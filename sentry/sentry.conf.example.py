@@ -306,3 +306,16 @@ OPENAI_API_KEY = env("OPENAI_API_KEY", "")
 
 if OPENAI_API_KEY:
   SENTRY_FEATURES["organizations:open-ai-suggestion"] = True
+
+##############################################
+# Content Security Policy settings
+##############################################
+
+if "csp.middleware.CSPMiddleware" not in MIDDLEWARE:
+    MIDDLEWARE = ("csp.middleware.CSPMiddleware",) + MIDDLEWARE
+# CSP_REPORT_URI = "https://{your-sentry-installation}/api/{csp-project}/security/?sentry_key={sentry-key}"
+CSP_REPORT_ONLY = True
+
+# optional extra permissions
+# https://django-csp.readthedocs.io/en/latest/configuration.html
+# CSP_SCRIPT_SRC += ["example.com"]
