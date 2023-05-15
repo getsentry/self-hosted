@@ -273,7 +273,7 @@ services:
     command: consumer --storage replays --auto-offset-reset=latest --max-batch-time-ms 750
   snuba-replacer:
     <<: *snuba_defaults
-    command: replacer --storage errors --auto-offset-reset=latest
+    command: replacer --storage errors --auto-offset-reset=latest --no-strict-offset-reset
   snuba-subscription-consumer-events:
     <<: *snuba_defaults
     command: subscriptions-scheduler-executor --dataset events --entity events --auto-offset-reset=latest --no-strict-offset-reset --consumer-group=snuba-events-subscriptions-consumers --followed-consumer-group=snuba-consumers --delay-seconds=60 --schedule-ttl=60 --stale-threshold-seconds=900
