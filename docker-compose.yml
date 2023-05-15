@@ -253,27 +253,27 @@ services:
   # Kafka consumer responsible for feeding events into Clickhouse
   snuba-consumer:
     <<: *snuba_defaults
-    command: consumer --storage errors --auto-offset-reset=latest --max-batch-time-ms 750
+    command: consumer --storage errors --auto-offset-reset=latest --max-batch-time-ms 750 --no-strict-offset-reset
   # Kafka consumer responsible for feeding outcomes into Clickhouse
   # Use --auto-offset-reset=earliest to recover up to 7 days of TSDB data
   # since we did not do a proper migration
   snuba-outcomes-consumer:
     <<: *snuba_defaults
-    command: consumer --storage outcomes_raw --auto-offset-reset=earliest --max-batch-time-ms 750
+    command: consumer --storage outcomes_raw --auto-offset-reset=earliest --max-batch-time-ms 750 --no-strict-offset-reset
   # Kafka consumer responsible for feeding session data into Clickhouse
   snuba-sessions-consumer:
     <<: *snuba_defaults
-    command: consumer --storage sessions_raw --auto-offset-reset=latest --max-batch-time-ms 750
+    command: consumer --storage sessions_raw --auto-offset-reset=latest --max-batch-time-ms 750 --no-strict-offset-reset
   # Kafka consumer responsible for feeding transactions data into Clickhouse
   snuba-transactions-consumer:
     <<: *snuba_defaults
-    command: consumer --storage transactions --consumer-group transactions_group --auto-offset-reset=latest --max-batch-time-ms 750
+    command: consumer --storage transactions --consumer-group transactions_group --auto-offset-reset=latest --max-batch-time-ms 750 --no-strict-offset-reset
   snuba-replays-consumer:
     <<: *snuba_defaults
-    command: consumer --storage replays --auto-offset-reset=latest --max-batch-time-ms 750
+    command: consumer --storage replays --auto-offset-reset=latest --max-batch-time-ms 750 --no-strict-offset-reset
   snuba-replacer:
     <<: *snuba_defaults
-    command: replacer --storage errors --auto-offset-reset=latest
+    command: replacer --storage errors --auto-offset-reset=latest --no-strict-offset-reset
   snuba-subscription-consumer-events:
     <<: *snuba_defaults
     command: subscriptions-scheduler-executor --dataset events --entity events --auto-offset-reset=latest --no-strict-offset-reset --consumer-group=snuba-events-subscriptions-consumers --followed-consumer-group=snuba-consumers --delay-seconds=60 --schedule-ttl=60 --stale-threshold-seconds=900
