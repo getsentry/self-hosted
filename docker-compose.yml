@@ -270,7 +270,7 @@ services:
     command: consumer --storage transactions --consumer-group transactions_group --auto-offset-reset=latest --max-batch-time-ms 750 --no-strict-offset-reset
   snuba-replays-consumer:
     <<: *snuba_defaults
-    command: consumer --storage replays --auto-offset-reset=latest --max-batch-time-ms 750
+    command: consumer --storage replays --auto-offset-reset=latest --max-batch-time-ms 750 --no-strict-offset-reset
   snuba-replacer:
     <<: *snuba_defaults
     command: replacer --storage errors --auto-offset-reset=latest --no-strict-offset-reset
