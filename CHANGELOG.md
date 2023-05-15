@@ -1,5 +1,20 @@
 # Changelog
 
+## 23.5.0
+
+### Various fixes & improvements
+
+- Add no strict offset reset options to consumers (#2144) by @hubertdeng123
+- Add settings for enabling CSP to config file (#2134) by @hubertdeng123
+- feat: add suggested fix feature (#2115) by @aldy505
+- adding ulimits for zookeeper, kafka, and web (#2123) by @jamincollins
+- Uninstall Docker Compose v1 from CI so it's not used for tests (#2114) by @hubertdeng123
+- Fixed docker compose issue in backup/restore (#2110) by @montaniasystemab
+- Enable upstream keepalive (#2099) by @otbutz
+- Bump commit sha for e2e test action (#2104) by @hubertdeng123
+- Use docker compose exec to account for differences in container names for Postgres upgrade (#2096) by @hubertdeng123
+- Change symbolicator to use CalVer for release (#2091) by @hubertdeng123
+
 ## 23.4.0
 
 ### Postgres 14 Upgrade
