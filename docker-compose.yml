@@ -396,6 +396,11 @@ services:
   vroom:
     <<: *restart_policy
     image: "$VROOM_IMAGE"
+    environment:
+      SENTRY_BUCKET_PROFILES:
+      SENTRY_SNUBA_HOST: "$SNUBA"
+    volumes:
+      - sentry-vroom:/var/lib/sentry-profiles
     depends_on:
       kafka:
         <<: *depends_on-healthy
@@ -414,6 +419,8 @@ volumes:
   sentry-clickhouse:
     external: true
   sentry-symbolicator:
+    external: true
+  sentry-vroom:
     external: true
 
   # These store ephemeral data that needn't persist across restarts.
