@@ -384,6 +384,12 @@ services:
         <<: *depends_on-healthy
       web:
         <<: *depends_on-healthy
+  vroom:
+    <<: *restart_policy
+    image: "VROOM_IMAGE"
+    depends_on:
+      kafka:
+        <<: *depends_on-healthy
 volumes:
   # These store application data that should persist across restarts.
   sentry-data:
