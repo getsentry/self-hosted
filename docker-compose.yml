@@ -283,6 +283,12 @@ services:
   snuba-subscription-consumer-transactions:
     <<: *snuba_defaults
     command: subscriptions-scheduler-executor --dataset transactions --entity transactions --auto-offset-reset=latest --no-strict-offset-reset --consumer-group=snuba-transactions-subscriptions-consumers --followed-consumer-group=transactions_group --delay-seconds=60 --schedule-ttl=60 --stale-threshold-seconds=900
+  snuba-profiling-profiles-consumer:
+    <<: *snuba_defaults
+    command: consumer --storage profiles --auto-offset-reset=latest --max-batch-time-ms 1000 --no-strict-offset-reset
+  snuba-profiling-functions-consumer:
+    <<: *snuba_defaults
+    command: consumer --storage functions --auto-offset-reset=latest --max-batch-time-ms 1000 --no-strict-offset-reset
   symbolicator:
     <<: *restart_policy
     image: "$SYMBOLICATOR_IMAGE"
