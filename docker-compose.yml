@@ -357,6 +357,9 @@ services:
         BASE_IMAGE: sentry-self-hosted-local
     entrypoint: "/entrypoint.sh"
     command: '"0 0 * * * gosu sentry sentry cleanup --days $SENTRY_EVENT_RETENTION_DAYS"'
+  ingest-profiles:
+    <<: *sentry_defaults
+    command: run ingest-profiles --no-strict-offset-reset
   nginx:
     <<: *restart_policy
     ports:
