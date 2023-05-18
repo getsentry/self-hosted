@@ -7,5 +7,6 @@ echo "Created $(docker volume create --name=sentry-postgres)."
 echo "Created $(docker volume create --name=sentry-redis)."
 echo "Created $(docker volume create --name=sentry-symbolicator)."
 echo "Created $(docker volume create --name=sentry-zookeeper)."
+echo "Created $(docker volume create --name=sentry-vroom)."
 
 echo "${_endgroup}"
