@@ -397,6 +397,8 @@ services:
     <<: *restart_policy
     image: "$VROOM_IMAGE"
     environment:
+      SENTRY_KAFKA_BROKERS_PROFILING: "kafka:9092"
+      SENTRY_KAFKA_BROKERS_OCCURRENCES: "kafka:9092"
       SENTRY_BUCKET_PROFILES:
       SENTRY_SNUBA_HOST: "$SNUBA"
     volumes:
