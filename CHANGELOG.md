@@ -1,5 +1,11 @@
 # Changelog
 
+## 23.5.1
+
+### Various fixes & improvements
+
+- fix(suggested-fix): key should be 'key', not 'token' (#2146) by @aldy505
+
 ## 23.5.0
 
 ### Various fixes & improvements
