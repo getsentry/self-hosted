@@ -335,6 +335,9 @@ services:
   ingest-replay-recordings:
     <<: *sentry_defaults
     command: run ingest-replay-recordings
+  ingest-profiles:
+    <<: *sentry_defaults
+    command: run ingest-profiles --no-strict-offset-reset
   post-process-forwarder-errors:
     <<: *sentry_defaults
     command: run post-process-forwarder --entity errors
@@ -357,9 +360,6 @@ services:
         BASE_IMAGE: sentry-self-hosted-local
     entrypoint: "/entrypoint.sh"
     command: '"0 0 * * * gosu sentry sentry cleanup --days $SENTRY_EVENT_RETENTION_DAYS"'
-  ingest-profiles:
-    <<: *sentry_defaults
-    command: run ingest-profiles --no-strict-offset-reset
   nginx:
     <<: *restart_policy
     ports:
