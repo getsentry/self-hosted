@@ -288,7 +288,7 @@ services:
     command: consumer --storage profiles --auto-offset-reset=latest --max-batch-time-ms 1000 --no-strict-offset-reset
   snuba-profiling-functions-consumer:
     <<: *snuba_defaults
-    command: consumer --storage functions --auto-offset-reset=latest --max-batch-time-ms 1000 --no-strict-offset-reset
+    command: consumer --storage functions_raw --auto-offset-reset=latest --max-batch-time-ms 1000 --no-strict-offset-reset
   symbolicator:
     <<: *restart_policy
     image: "$SYMBOLICATOR_IMAGE"
@@ -341,7 +341,6 @@ services:
   post-process-forwarder-errors:
     <<: *sentry_defaults
     command: run post-process-forwarder --entity errors
-
   post-process-forwarder-transactions:
     <<: *sentry_defaults
     command: run post-process-forwarder --entity transactions --commit-log-topic=snuba-transactions-commit-log --synchronize-commit-group transactions_group
@@ -424,7 +423,6 @@ volumes:
     external: true
   sentry-vroom:
     external: true
-
   # These store ephemeral data that needn't persist across restarts.
   sentry-secrets:
   sentry-smtp:
