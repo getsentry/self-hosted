@@ -15,14 +15,13 @@ sentry-kafka
 sentry-postgres
 sentry-redis
 sentry-symbolicator
-sentry-zookeeper"
+sentry-zookeeper
+sentry-vroom"
 
 before=$(get_volumes)
 
 test "$before" == "" || test "$before" == "$expected_volumes"
 
-source install/create-docker-volumes.sh
-source install/create-docker-volumes.sh
 source install/create-docker-volumes.sh
 
 after=$(get_volumes)
