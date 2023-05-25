@@ -135,6 +135,16 @@ $dcr --no-deps web python3 /etc/sentry/test-custom-ca-roots.py
 source _integration-test/custom-ca-roots/teardown.sh
 echo "${_endgroup}"
 
+echo "${_group}Test that profiling work ..."
+echo "Sending a test profile..."
+curl -sf --data @fixtures/envelope-with-profile.json -H 'Content-Type: application/json' -H "X-Sentry-Auth: Sentry sentry_version=7, sentry_key=$SENTRY_KEY, sentry_client=test-bash/0.1" "$SENTRY_TEST_HOST/api/$PROJECT_ID/envelope/" -o /dev/null
+
+printf "Getting the test profile back"
+PROFILE_PATH="api/0/projects/sentry/sentry/profiling/raw_profiles/e73aaf1f29b24812be60132f32d09f92/"
+timeout 60 bash -c 'until $(sentry_api_request "$PROFILE_PATH" -Isf -X GET -o /dev/null); do printf '.'; sleep 0.5; done'
+echo " got it!"
+echo "${_endgroup}"
+
 # Table formatting based on https://stackoverflow.com/a/39144364
 COMPOSE_PS_OUTPUT=$(docker compose ps --format json | jq -r \
   '.[] |
