@@ -137,7 +137,7 @@ echo "${_endgroup}"
 
 echo "${_group}Test that profiling work ..."
 echo "Sending a test profile..."
-curl -sf --data @$(git rev-parse --show-toplevel)/fixtures/envelope-with-profile.json -H 'Content-Type: application/json' -H "X-Sentry-Auth: Sentry sentry_version=7, sentry_key=$SENTRY_KEY, sentry_client=test-bash/0.1" "$SENTRY_TEST_HOST/api/$PROJECT_ID/envelope/" -o /dev/null
+curl -sf --data @$(git rev-parse --show-toplevel)/_integration-test/fixtures/envelope-with-profile.json -H 'Content-Type: application/json' -H "X-Sentry-Auth: Sentry sentry_version=7, sentry_key=$SENTRY_KEY, sentry_client=test-bash/0.1" "$SENTRY_TEST_HOST/api/$PROJECT_ID/envelope/" -o /dev/null
 
 printf "Getting the test profile back"
 PROFILE_PATH="api/0/projects/sentry/sentry/profiling/raw_profiles/e73aaf1f29b24812be60132f32d09f92/"
