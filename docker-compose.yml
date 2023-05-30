@@ -421,8 +421,9 @@ volumes:
     external: true
   sentry-symbolicator:
     external: true
+  # not being external will still persist data across restarts
+  # it won't persist if someone does a docker compose down -v
   sentry-vroom:
-    external: true
   # These store ephemeral data that needn't persist across restarts.
   sentry-secrets:
   sentry-smtp:

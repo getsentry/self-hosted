@@ -15,7 +15,6 @@ sentry-kafka
 sentry-postgres
 sentry-redis
 sentry-symbolicator
-sentry-vroom
 sentry-zookeeper"
 
 before=$(get_volumes)
