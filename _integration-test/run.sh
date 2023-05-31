@@ -137,10 +137,11 @@ echo "${_endgroup}"
 
 echo "${_group}Test that profiling work ..."
 echo "Sending a test profile..."
-curl -sf --data-binary @$(git rev-parse --show-toplevel)/_integration-test/fixtures/envelope-with-profile -H 'Content-Type: application/json' -H "X-Sentry-Auth: Sentry sentry_version=7, sentry_key=$SENTRY_KEY, sentry_client=test-bash/0.1" "$SENTRY_TEST_HOST/api/$PROJECT_ID/envelope/" -o /dev/null
+PROFILE_FIXTURE_PATH="$(git rev-parse --show-toplevel)/_integration-test/fixtures/envelope-with-profile"
+curl -sf --data-binary @$PROFILE_FIXTURE_PATH -H 'Content-Type: application/x-sentry-envelope' -H "X-Sentry-Auth: Sentry sentry_version=7, sentry_key=$SENTRY_KEY, sentry_client=test-bash/0.1" "$SENTRY_TEST_HOST/api/$PROJECT_ID/envelope/" -o /dev/null
 
 printf "Getting the test profile back"
-PROFILE_ID="$(jq -r -n --slurpfile profile _integration-test/fixtures/envelope-with-profile '$profile[4].event_id')"
+PROFILE_ID="$(jq -r -n --slurpfile profile $PROFILE_FIXTURE_PATH '$profile[4].event_id')"
 PROFILE_PATH="api/0/projects/sentry/sentry/profiling/raw_profiles/$PROFILE_ID/"
 timeout 60 bash -c 'until $(sentry_api_request "$PROFILE_PATH" -Isf -X GET -o /dev/null); do printf '.'; sleep 0.5; done'
 echo " got it!"
