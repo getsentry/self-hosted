@@ -52,6 +52,8 @@ x-sentry-defaults: &sentry_defaults
       <<: *depends_on-default
     symbolicator:
       <<: *depends_on-default
+    vroom:
+      <<: *depends_on-default
   entrypoint: "/etc/sentry/entrypoint.sh"
   command: ["run", "web"]
   environment:
