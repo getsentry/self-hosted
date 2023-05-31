@@ -60,6 +60,7 @@ x-sentry-defaults: &sentry_defaults
     PYTHONUSERBASE: "/data/custom-packages"
     SENTRY_CONF: "/etc/sentry"
     SNUBA: "http://snuba-api:1218"
+    VROOM: "http://vroom:8085"
     # Force everything to use the system CA bundle
     # This is mostly needed to support installing custom CA certs
     # This one is used by botocore
@@ -402,6 +403,8 @@ services:
       SENTRY_KAFKA_BROKERS_OCCURRENCES: "kafka:9092"
       SENTRY_BUCKET_PROFILES: file://localhost//var/lib/sentry-profiles
       SENTRY_SNUBA_HOST: "http://snuba-api:1218"
+    ports:
+      - "8085:8085/tcp"
     volumes:
       - sentry-vroom:/var/lib/sentry-profiles
     depends_on:
