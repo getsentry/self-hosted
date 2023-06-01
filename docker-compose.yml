@@ -342,6 +342,9 @@ services:
   subscription-consumer-transactions:
     <<: *sentry_defaults
     command: run query-subscription-consumer --topic transactions-subscription-results
+  subscription-consumer-sessions:
+    <<: *sentry_defaults
+    command: run query-subscription-consumer --topic sessions-subscription-results
   sentry-cleanup:
     <<: *sentry_defaults
     image: sentry-cleanup-self-hosted-local
