@@ -424,10 +424,12 @@ volumes:
     external: true
   sentry-symbolicator:
     external: true
-  # not being external will still persist data across restarts
-  # it won't persist if someone does a docker compose down -v
+  # This volume stores profiles and should be persisted.
+  # Not being external will still persist data across restarts.
+  # It won't persist if someone does a docker compose down -v.
   sentry-vroom:
   # These store ephemeral data that needn't persist across restarts.
+  # That said, volumes will be persisted across restarts until they are deleted.
   sentry-secrets:
   sentry-smtp:
   sentry-nginx-cache:
