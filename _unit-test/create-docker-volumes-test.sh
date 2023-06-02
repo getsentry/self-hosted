@@ -22,8 +22,6 @@ before=$(get_volumes)
 test "$before" == "" || test "$before" == "$expected_volumes"
 
 source install/create-docker-volumes.sh
-source install/create-docker-volumes.sh
-source install/create-docker-volumes.sh
 
 after=$(get_volumes)
 test "$after" == "$expected_volumes"

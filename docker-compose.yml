@@ -52,12 +52,15 @@ x-sentry-defaults: &sentry_defaults
       <<: *depends_on-default
     symbolicator:
       <<: *depends_on-default
+    vroom:
+      <<: *depends_on-default
   entrypoint: "/etc/sentry/entrypoint.sh"
   command: ["run", "web"]
   environment:
     PYTHONUSERBASE: "/data/custom-packages"
     SENTRY_CONF: "/etc/sentry"
     SNUBA: "http://snuba-api:1218"
+    VROOM: "http://vroom:8085"
     # Force everything to use the system CA bundle
     # This is mostly needed to support installing custom CA certs
     # This one is used by botocore
@@ -283,6 +286,12 @@ services:
   snuba-subscription-consumer-transactions:
     <<: *snuba_defaults
     command: subscriptions-scheduler-executor --dataset transactions --entity transactions --auto-offset-reset=latest --no-strict-offset-reset --consumer-group=snuba-transactions-subscriptions-consumers --followed-consumer-group=transactions_group --delay-seconds=60 --schedule-ttl=60 --stale-threshold-seconds=900
+  snuba-profiling-profiles-consumer:
+    <<: *snuba_defaults
+    command: consumer --storage profiles --auto-offset-reset=latest --max-batch-time-ms 1000 --no-strict-offset-reset
+  snuba-profiling-functions-consumer:
+    <<: *snuba_defaults
+    command: consumer --storage functions_raw --auto-offset-reset=latest --max-batch-time-ms 1000 --no-strict-offset-reset
   symbolicator:
     <<: *restart_policy
     image: "$SYMBOLICATOR_IMAGE"
@@ -329,10 +338,12 @@ services:
   ingest-replay-recordings:
     <<: *sentry_defaults
     command: run ingest-replay-recordings
+  ingest-profiles:
+    <<: *sentry_defaults
+    command: run ingest-profiles --no-strict-offset-reset
   post-process-forwarder-errors:
     <<: *sentry_defaults
     command: run post-process-forwarder --entity errors
-
   post-process-forwarder-transactions:
     <<: *sentry_defaults
     command: run post-process-forwarder --entity transactions --commit-log-topic=snuba-transactions-commit-log --synchronize-commit-group transactions_group
@@ -384,6 +395,19 @@ services:
         <<: *depends_on-healthy
       web:
         <<: *depends_on-healthy
+  vroom:
+    <<: *restart_policy
+    image: "$VROOM_IMAGE"
+    environment:
+      SENTRY_KAFKA_BROKERS_PROFILING: "kafka:9092"
+      SENTRY_KAFKA_BROKERS_OCCURRENCES: "kafka:9092"
+      SENTRY_BUCKET_PROFILES: file://localhost//var/lib/sentry-profiles
+      SENTRY_SNUBA_HOST: "http://snuba-api:1218"
+    volumes:
+      - sentry-vroom:/var/lib/sentry-profiles
+    depends_on:
+      kafka:
+        <<: *depends_on-healthy
 volumes:
   # These store application data that should persist across restarts.
   sentry-data:
@@ -400,8 +424,12 @@ volumes:
     external: true
   sentry-symbolicator:
     external: true
-
+  # This volume stores profiles and should be persisted.
+  # Not being external will still persist data across restarts.
+  # It won't persist if someone does a docker compose down -v.
+  sentry-vroom:
   # These store ephemeral data that needn't persist across restarts.
+  # That said, volumes will be persisted across restarts until they are deleted.
   sentry-secrets:
   sentry-smtp:
   sentry-nginx-cache:
