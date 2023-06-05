@@ -20,14 +20,14 @@ if [[ "$(vergte ${DOCKER_VERSION//v/} $MIN_DOCKER_VERSION)" -eq 1 ]]; then
 fi
 echo "Found Docker version $DOCKER_VERSION"
 
-COMPOSE_VERSION=$($dc_base version --short || echo '')
+COMPOSE_VERSION=$(docker compose version --short || echo '')
 if [[ -z "$COMPOSE_VERSION" ]]; then
   echo "FAIL: Docker compose is required to run self-hosted"
   exit 1
 fi
 
 if [[ "$(vergte ${COMPOSE_VERSION//v/} $MIN_COMPOSE_VERSION)" -eq 1 ]]; then
-  echo "FAIL: Expected minimum $dc_base version to be $MIN_COMPOSE_VERSION but found $COMPOSE_VERSION"
+  echo "FAIL: Expected minimum docker compose version to be $MIN_COMPOSE_VERSION but found $COMPOSE_VERSION"
   exit 1
 fi
 echo "Found Docker Compose version $COMPOSE_VERSION"
