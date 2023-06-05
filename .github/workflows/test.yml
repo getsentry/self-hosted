@@ -44,7 +44,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - compose_version: "v2.0.0"
+          - compose_version: "v2.0.1"
             compose_path: "/usr/local/lib/docker/cli-plugins"
           - compose_version: "v2.7.0"
             compose_path: "/usr/local/lib/docker/cli-plugins"
