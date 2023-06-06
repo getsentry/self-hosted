@@ -1,5 +1,9 @@
 # Changelog
 
+## 23.5.2
+
+- No documented changes.
+
 ## 23.5.1
 
 ### Various fixes & improvements
