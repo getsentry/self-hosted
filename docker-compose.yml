@@ -332,9 +332,15 @@ services:
   worker:
     <<: *sentry_defaults
     command: run worker
-  ingest-consumer:
+  events-consumer:
     <<: *sentry_defaults
-    command: run ingest-consumer --all-consumer-types
+    command: run ingest-consumer --consumer-type=events
+  attachments-consumer:
+    <<: *sentry_defaults
+    command: run ingest-consumer --consumer-type=attachments
+  transactions-consumer:
+    <<: *sentry_defaults
+    command: run ingest-consumer --consumer-type=transactions
   ingest-replay-recordings:
     <<: *sentry_defaults
     command: run ingest-replay-recordings
