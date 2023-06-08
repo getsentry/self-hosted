@@ -6,7 +6,7 @@ if [[ -n "${CI:-}" || "${SKIP_USER_CREATION:-0}" == 1 ]]; then
   echo "Did not prompt for user creation. Run the following command to create one"
   echo "yourself (recommended):"
   echo ""
-  echo "  docker compose run --rm web createuser"
+  echo "  $dc_base run --rm web createuser"
   echo ""
 else
   $dcr web upgrade
