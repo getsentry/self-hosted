@@ -334,19 +334,19 @@ services:
     command: run worker
   events-consumer:
     <<: *sentry_defaults
-    command: run ingest-consumer --consumer-type=events
+    command: run consumer ingest-events --consumer-group ingest-consumer
   attachments-consumer:
     <<: *sentry_defaults
-    command: run ingest-consumer --consumer-type=attachments
+    command: run consumer ingest-attachments --consumer-group ingest-consumer
   transactions-consumer:
     <<: *sentry_defaults
-    command: run ingest-consumer --consumer-type=transactions
+    command: run consumer ingest-transactions --consumer-group ingest-consumer
   ingest-replay-recordings:
     <<: *sentry_defaults
-    command: run ingest-replay-recordings
+    command: run consumer ingest-replay-recordings --consumer-group ingest-replay-recordings
   ingest-profiles:
     <<: *sentry_defaults
-    command: run ingest-profiles --no-strict-offset-reset
+    command: run consumer ingest-profiles --consumer-group ingest-profiles --no-strict-offset-reset
   post-process-forwarder-errors:
     <<: *sentry_defaults
     command: run post-process-forwarder --entity errors
@@ -355,10 +355,10 @@ services:
     command: run post-process-forwarder --entity transactions --commit-log-topic=snuba-transactions-commit-log --synchronize-commit-group transactions_group
   subscription-consumer-events:
     <<: *sentry_defaults
-    command: run query-subscription-consumer --topic events-subscription-results
+    command: run consumer events-subscription-results --consumer-group query-subscription-consumer
   subscription-consumer-transactions:
     <<: *sentry_defaults
-    command: run query-subscription-consumer --topic transactions-subscription-results
+    command: run consumer transactions-subscription-results --consumer-group query-subscription-consumer
   sentry-cleanup:
     <<: *sentry_defaults
     image: sentry-cleanup-self-hosted-local
