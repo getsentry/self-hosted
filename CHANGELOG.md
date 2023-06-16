@@ -1,5 +1,11 @@
 # Changelog
 
+## 23.6.1
+
+### Various fixes & improvements
+
+- Fix bump version script (#2207) by @hubertdeng123
+
 ## 23.6.0
 
 ### Various fixes & improvements
