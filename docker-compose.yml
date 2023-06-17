@@ -426,7 +426,7 @@ services:
       # Leaving the value empty to just pass whatever is set
       # on the host system (or in the .env file)
       SENTRY_EVENT_RETENTION_DAYS:
-    command: '"0 0 * * * gosu vroom find /var/lib/sentry-profiles -mtime +$SENTRY_EVENT_RETENTION_DAYS -delete"'
+    command: '"0 0 * * * find /var/lib/sentry-profiles -mtime +$SENTRY_EVENT_RETENTION_DAYS -delete"'
     volumes:
       - sentry-vroom:/var/lib/sentry-profiles
 
