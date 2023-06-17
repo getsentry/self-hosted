@@ -414,6 +414,22 @@ services:
     depends_on:
       kafka:
         <<: *depends_on-healthy
+  vroom-cleanup:
+    <<: *restart_policy
+    image: vroom-cleanup-self-hosted-local
+    build:
+      context: ./cron
+      args:
+        BASE_IMAGE: debian:stable-slim
+    entrypoint: "/entrypoint.sh"
+    environment:
+      # Leaving the value empty to just pass whatever is set
+      # on the host system (or in the .env file)
+      SENTRY_EVENT_RETENTION_DAYS:
+    command: '"0 0 * * * gosu vroom find /var/lib/sentry-profiles -mtime +$SENTRY_EVENT_RETENTION_DAYS -delete"'
+    volumes:
+      - sentry-vroom:/var/lib/sentry-profiles
+
 volumes:
   # These store application data that should persist across restarts.
   sentry-data:
