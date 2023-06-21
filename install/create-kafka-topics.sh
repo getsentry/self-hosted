@@ -10,6 +10,5 @@ for topic in $NEEDED_KAFKA_TOPICS; do
     echo ""
   fi
 done
-sleep 10
 
 echo "${_endgroup}"
