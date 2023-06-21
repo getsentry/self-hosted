@@ -4,7 +4,7 @@ echo "${_group}Creating additional Kafka topics ..."
 # XXX(BYK): We cannot use auto.create.topics as Confluence and Apache hates it now (and makes it very hard to enable)
 NEEDED_KAFKA_TOPICS="ingest-attachments ingest-transactions ingest-events ingest-replay-recordings profiles"
 for topic in $NEEDED_KAFKA_TOPICS; do
-  $dcr kafka kafka-topics --create --topic $topic --bootstrap-server kafka:9092
+  $dcr kafka kafka-topics --if-not-exists --create --topic $topic --bootstrap-server kafka:9092
   echo ""
 done
 
