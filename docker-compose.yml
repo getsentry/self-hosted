@@ -346,7 +346,7 @@ services:
     command: run consumer ingest-replay-recordings --consumer-group ingest-replay-recordings
   ingest-profiles:
     <<: *sentry_defaults
-    command: run consumer ingest-profiles --consumer-group ingest-profiles --no-strict-offset-reset
+    command: run consumer --no-strict-offset-reset ingest-profiles --consumer-group ingest-profiles
   post-process-forwarder-errors:
     <<: *sentry_defaults
     command: run post-process-forwarder --entity errors
