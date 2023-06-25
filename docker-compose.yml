@@ -110,7 +110,7 @@ services:
       - "sentry-smtp-log:/var/log/exim4"
   memcached:
     <<: *restart_policy
-    image: "memcached:1.6.9-alpine"
+    image: "memcached:1.6.21-alpine"
     command: ["-I", "${SENTRY_MAX_EXTERNAL_SOURCEMAP_SIZE:-1M}"]
     healthcheck:
       <<: *healthcheck_defaults
