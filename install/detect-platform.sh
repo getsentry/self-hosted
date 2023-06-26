@@ -15,7 +15,7 @@ echo "${_group}Detecting Docker platform"
 export DOCKER_EXISTS=$(command -v docker)
 export DOCKER_ARCH=$(docker info --format '{{.Architecture}}')
 
-if ! "$DOCKER_EXISTS" &> /dev/null; then
+if ! "$DOCKER_EXISTS" &>/dev/null; then
   echo "FAIL: Could not find a \`docker\` binary on this system. Are you sure it's installed?"
   exit 1
 fi
