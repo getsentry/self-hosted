@@ -12,7 +12,7 @@ echo "${_group}Detecting Docker platform"
 # linux/amd64 by default due to virtualization.
 # See https://github.com/docker/cli/issues/3286 for the Docker bug.
 
-export DOCKER_EXISTS=$(command -v docker &> /dev/null)
+export DOCKER_EXISTS=$(command -v docker)
 export DOCKER_ARCH=$(docker info --format '{{.Architecture}}')
 
 if ! "$DOCKER_EXISTS" &> /dev/null; then
