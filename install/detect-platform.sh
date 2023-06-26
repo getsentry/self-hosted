@@ -12,8 +12,12 @@ echo "${_group}Detecting Docker platform"
 # linux/amd64 by default due to virtualization.
 # See https://github.com/docker/cli/issues/3286 for the Docker bug.
 
-export DOCKER_ARCH=$(docker info --format '{{.Architecture}}')
+if ! command -v docker &>/dev/null; then
+  echo "FAIL: Could not find a \`docker\` binary on this system. Are you sure it's installed?"
+  exit 1
+fi
 
+export DOCKER_ARCH=$(docker info --format '{{.Architecture}}')
 if [[ "$DOCKER_ARCH" = "x86_64" ]]; then
   export DOCKER_PLATFORM="linux/amd64"
   export CLICKHOUSE_IMAGE="yandex/clickhouse-server:20.3.9.70"
