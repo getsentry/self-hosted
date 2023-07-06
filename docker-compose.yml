@@ -243,7 +243,7 @@ services:
       timeout: 10s
       retries: 30
   geoipupdate:
-    image: "maxmindinc/geoipupdate:v4.7.1"
+    image: "maxmindinc/geoipupdate:v5.1.1"
     # Override the entrypoint in order to avoid using envvars for config.
     # Futz with settings so we can keep mmdb and conf in same dir on host
     # (image looks for them in separate dirs by default).
