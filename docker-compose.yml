@@ -110,7 +110,7 @@ services:
       - "sentry-smtp-log:/var/log/exim4"
   memcached:
     <<: *restart_policy
-    image: "memcached:1.6.9-alpine"
+    image: "memcached:1.6.21-alpine"
     command: ["-I", "${SENTRY_MAX_EXTERNAL_SOURCEMAP_SIZE:-1M}"]
     healthcheck:
       <<: *healthcheck_defaults
@@ -118,7 +118,7 @@ services:
       test: echo stats | nc 127.0.0.1 11211
   redis:
     <<: *restart_policy
-    image: "redis:6.2.10-alpine"
+    image: "redis:6.2.12-alpine"
     healthcheck:
       <<: *healthcheck_defaults
       test: redis-cli ping
@@ -332,30 +332,36 @@ services:
   worker:
     <<: *sentry_defaults
     command: run worker
-  ingest-consumer:
+  events-consumer:
     <<: *sentry_defaults
-    command: run ingest-consumer --all-consumer-types
+    command: run consumer ingest-events --consumer-group ingest-consumer
+  attachments-consumer:
+    <<: *sentry_defaults
+    command: run consumer ingest-attachments --consumer-group ingest-consumer
+  transactions-consumer:
+    <<: *sentry_defaults
+    command: run consumer ingest-transactions --consumer-group ingest-consumer
   ingest-replay-recordings:
     <<: *sentry_defaults
-    command: run ingest-replay-recordings
+    command: run consumer ingest-replay-recordings --consumer-group ingest-replay-recordings
   ingest-profiles:
     <<: *sentry_defaults
-    command: run ingest-profiles --no-strict-offset-reset
+    command: run consumer --no-strict-offset-reset ingest-profiles --consumer-group ingest-profiles
   post-process-forwarder-errors:
     <<: *sentry_defaults
-    command: run post-process-forwarder --entity errors
+    command: run consumer post-process-forwarder-errors --consumer-group post-process-forwarder --synchronize-commit-log-topic=snuba-commit-log --synchronize-commit-group=snuba-consumers
   post-process-forwarder-transactions:
     <<: *sentry_defaults
-    command: run post-process-forwarder --entity transactions --commit-log-topic=snuba-transactions-commit-log --synchronize-commit-group transactions_group
+    command: run consumer post-process-forwarder-transactions --consumer-group post-process-forwarder --synchronize-commit-log-topic=snuba-transactions-commit-log --synchronize-commit-group transactions_group
   subscription-consumer-events:
     <<: *sentry_defaults
-    command: run query-subscription-consumer --topic events-subscription-results
+    command: run consumer events-subscription-results --consumer-group query-subscription-consumer
   subscription-consumer-transactions:
     <<: *sentry_defaults
-    command: run query-subscription-consumer --topic transactions-subscription-results
+    command: run consumer transactions-subscription-results --consumer-group query-subscription-consumer
   subscription-consumer-sessions:
     <<: *sentry_defaults
-    command: run query-subscription-consumer --topic sessions-subscription-results
+    command: run consumer sessions-subscription-results --consumer-group query-subscription-consumer
   sentry-cleanup:
     <<: *sentry_defaults
     image: sentry-cleanup-self-hosted-local
@@ -369,7 +375,7 @@ services:
     <<: *restart_policy
     ports:
       - "$SENTRY_BIND:80/tcp"
-    image: "nginx:1.22.0-alpine"
+    image: "nginx:1.25.1-alpine"
     volumes:
       - type: bind
         read_only: true

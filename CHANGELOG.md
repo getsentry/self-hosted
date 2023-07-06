@@ -1,5 +1,19 @@
 # Changelog
 
+## 23.6.1
+
+### Various fixes & improvements
+
+- Fix bump version script (#2207) by @hubertdeng123
+
+## 23.6.0
+
+### Various fixes & improvements
+
+- Remove docker compose v1 (#2187) by @hubertdeng123
+- ref(compose): Separate ingest consumers (#2193) by @jan-auer
+- feat(profiling): Run profiling on self-hosted (#2154) by @phacops
+
 ## 23.5.2
 
 - No documented changes.
