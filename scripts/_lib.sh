@@ -17,7 +17,7 @@ function confirm() {
 # The purpose of this script is to make it easy to reset a local self-hosted
 # install to a clean state, optionally targeting a particular version.
 
-function clean() {
+function reset() {
   # If we have a version given, validate it.
   # ----------------------------------------
   # Note that arbitrary git refs won't work, because the *_IMAGE variables in
