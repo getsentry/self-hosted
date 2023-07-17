@@ -1,5 +1,15 @@
 # Changelog
 
+## 23.7.0
+
+### Various fixes & improvements
+
+- Remove nc -q option (#2275) by @hubertdeng123
+- Move open ai key from env variables (#2274) by @hubertdeng123
+- Fix command called in reset script (#2254) by @stayallive
+- Remove stale-bot in self-hosted (#2255) by @hubertdeng123
+- Update geoipupdate to 5.1.1 (#2236) by @williamdes
+
 ## 23.6.2
 
 ### Various fixes & improvements
