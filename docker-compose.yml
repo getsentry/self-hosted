@@ -175,7 +175,7 @@ services:
     healthcheck:
       <<: *healthcheck_defaults
       test:
-        ["CMD-SHELL", 'echo "ruok" | nc -w 2 -q 2 localhost 2181 | grep imok']
+        ["CMD-SHELL", 'echo "ruok" | nc -w 2 localhost 2181 | grep imok']
   kafka:
     <<: *restart_policy
     depends_on:
