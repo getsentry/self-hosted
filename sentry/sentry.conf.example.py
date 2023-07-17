@@ -301,12 +301,9 @@ GEOIP_PATH_MMDB = '/geoip/GeoLite2-City.mmdb'
 # for more information about the feature. Make sure the OpenAI's privacy policy is
 # aligned with your company.
 
-# Set the OPENAI_API_KEY on the .env or .env.custom file with a valid
-# OpenAI API key to turn on the feature.
-OPENAI_API_KEY = env("OPENAI_API_KEY", "")
-
-if OPENAI_API_KEY:
-  SENTRY_FEATURES["organizations:open-ai-suggestion"] = True
+# Set the feature to be True if you'd like to enable Suggested Fix. You'll also need to
+# add your OPENAI_API_KEY to the docker-compose.yml file.
+SENTRY_FEATURES["organizations:open-ai-suggestion"] = False
 
 ##############################################
 # Content Security Policy settings
