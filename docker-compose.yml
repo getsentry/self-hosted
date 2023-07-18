@@ -74,6 +74,7 @@ x-sentry-defaults: &sentry_defaults
     SENTRY_EVENT_RETENTION_DAYS:
     SENTRY_MAIL_HOST:
     SENTRY_MAX_EXTERNAL_SOURCEMAP_SIZE:
+    # Set this value if you plan on using the Suggested Fix Feature
     OPENAI_API_KEY:
   volumes:
     - "sentry-data:/data"
@@ -110,7 +111,7 @@ services:
       - "sentry-smtp-log:/var/log/exim4"
   memcached:
     <<: *restart_policy
-    image: "memcached:1.6.9-alpine"
+    image: "memcached:1.6.21-alpine"
     command: ["-I", "${SENTRY_MAX_EXTERNAL_SOURCEMAP_SIZE:-1M}"]
     healthcheck:
       <<: *healthcheck_defaults
@@ -118,7 +119,7 @@ services:
       test: echo stats | nc 127.0.0.1 11211
   redis:
     <<: *restart_policy
-    image: "redis:6.2.10-alpine"
+    image: "redis:6.2.12-alpine"
     healthcheck:
       <<: *healthcheck_defaults
       test: redis-cli ping
@@ -175,7 +176,7 @@ services:
     healthcheck:
       <<: *healthcheck_defaults
       test:
-        ["CMD-SHELL", 'echo "ruok" | nc -w 2 -q 2 localhost 2181 | grep imok']
+        ["CMD-SHELL", 'echo "ruok" | nc -w 2 localhost 2181 | grep imok']
   kafka:
     <<: *restart_policy
     depends_on:
@@ -243,7 +244,7 @@ services:
       timeout: 10s
       retries: 30
   geoipupdate:
-    image: "maxmindinc/geoipupdate:v4.7.1"
+    image: "maxmindinc/geoipupdate:v5.1.1"
     # Override the entrypoint in order to avoid using envvars for config.
     # Futz with settings so we can keep mmdb and conf in same dir on host
     # (image looks for them in separate dirs by default).
@@ -372,7 +373,7 @@ services:
     <<: *restart_policy
     ports:
       - "$SENTRY_BIND:80/tcp"
-    image: "nginx:1.22.0-alpine"
+    image: "nginx:1.25.1-alpine"
     volumes:
       - type: bind
         read_only: true

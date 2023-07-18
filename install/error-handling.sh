@@ -20,11 +20,17 @@ generate_breadcrumb_json() {
 
 send_event() {
   # Use traceback hash as the UUID since it is 32 characters long
-  local event_hash=$1
+  local cmd_exit=$1
   local error_msg=$2
-  local traceback_json=$3
-  local breadcrumbs=$4
-  local envelope_file="sentry-envelope-${event_hash}"
+  local traceback=$3
+  local traceback_json=$4
+  local breadcrumbs=$5
+  local fingerprint_value=$(
+    echo -n "$cmd_exit $error_msg $traceback" |
+      docker run -i --rm busybox md5sum |
+      cut -d' ' -f1
+  )
+  local envelope_file="sentry-envelope-${fingerprint_value}"
   local envelope_file_path="/tmp/$envelope_file"
   # If the envelope file exists, we've already sent it
   if [[ -f $envelope_file_path ]]; then
@@ -37,7 +43,7 @@ send_event() {
   local file_length=$(wc -c <$log_file | awk '{print $1}')
 
   # Add header for initial envelope information
-  $jq -n -c --arg event_id "$event_hash" \
+  $jq -n -c --arg event_id "$fingerprint_value" \
     --arg dsn "$SENTRY_DSN" \
     '$ARGS.named' >"$envelope_file_path"
   # Add header to specify the event type of envelope to be sent
@@ -59,10 +65,18 @@ send_event() {
       --argjson stacktrace "$stacktrace" \
       '$ARGS.named'
   )
+
+  # It'd be a bit cleaner in the Sentry UI if we passed the inputs to
+  # fingerprint_value hash rather than the hash itself (I believe the ultimate
+  # hash ends up simply being a hash of our hash), but we want the hash locally
+  # so that we can avoid resending the same event (design decision to avoid
+  # spam in the system). It was also futzy to figure out how to get the
+  # traceback in there properly. Meh.
   event_body=$(
     $jq -n -c --arg level error \
       --argjson exception "{\"values\":[$exception]}" \
       --argjson breadcrumbs "{\"values\": $breadcrumbs}" \
+      --argjson fingerprint "[\"$fingerprint_value\"]" \
       '$ARGS.named'
   )
   echo "$event_body" >>$envelope_file_path
@@ -203,8 +217,7 @@ cleanup() {
 
     # Only send event when report issues flag is set and if trap signal is not INT (ctrl+c)
     if [[ "$REPORT_SELF_HOSTED_ISSUES" == 1 && "$1" != "INT" ]]; then
-      local event_hash=$(echo -n "$cmd_exit $traceback" | docker run -i --rm busybox md5sum | cut -d' ' -f1)
-      send_event "$event_hash" "$error_msg" "$traceback_json" "$breadcrumbs"
+      send_event "$cmd_exit" "$error_msg" "$traceback" "$traceback_json" "$breadcrumbs"
     fi
 
     if [[ -n "$MINIMIZE_DOWNTIME" ]]; then

@@ -1,5 +1,30 @@
 # Changelog
 
+## 23.7.0
+
+### Various fixes & improvements
+
+- Remove nc -q option (#2275) by @hubertdeng123
+- Move open ai key from env variables (#2274) by @hubertdeng123
+- Fix command called in reset script (#2254) by @stayallive
+- Remove stale-bot in self-hosted (#2255) by @hubertdeng123
+- Update geoipupdate to 5.1.1 (#2236) by @williamdes
+
+## 23.6.2
+
+### Various fixes & improvements
+
+- Update nginx to 1.25.1 (#2235) by @williamdes
+- Fix error fingerprinting (#2237) by @chadwhitacre
+- A couple unit testing improvements (#2238) by @chadwhitacre
+- Fix #1684 (#2234) by @azaslavsky
+- Update memcached to 1.6.21 (#2231) by @williamdes
+- Update redis to 6.2.12 (#2230) by @williamdes
+- ref: Move all consumers to unified consumer CLI (#2224) by @hubertdeng123
+- Revert "ref: Move most consumers to unified consumer CLI" (#2223) by @hubertdeng123
+- ref: Move most consumers to unified consumer CLI (#2203) by @untitaker
+- Release 23.6.1 cleanup (#2209) by @hubertdeng123
+
 ## 23.6.1
 
 ### Various fixes & improvements
