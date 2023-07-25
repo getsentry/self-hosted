@@ -1,5 +1,12 @@
 # Changelog
 
+## 23.7.1
+
+### Various fixes & improvements
+
+- Resolve Safari Content-Disposition header bug (#2297) by @azaslavsky
+- feat: vroom cleanup script that respects default retention days (#2211) by @aldy505
+
 ## 23.7.0
 
 ### Various fixes & improvements
