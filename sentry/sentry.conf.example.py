@@ -269,6 +269,7 @@ SENTRY_FEATURES.update(
             "organizations:performance-view",
             "organizations:advanced-search",
             "organizations:session-replay",
+            "organizations:issue-platform",
             "organizations:profiling",
             "projects:custom-inbound-filters",
             "projects:data-forwarding",
