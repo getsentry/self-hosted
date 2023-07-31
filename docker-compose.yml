@@ -362,7 +362,7 @@ services:
     command: run consumer post-process-forwarder-transactions --consumer-group post-process-forwarder --synchronize-commit-log-topic=snuba-transactions-commit-log --synchronize-commit-group transactions_group
   post-process-forwarder-issue-platform:
     <<: *sentry_defaults
-    command: run consumer post-process-forwarder-issue-platform --consumer-group post-process-forwarder --synchronize-commit-log-topic=snuba-transactions-commit-log --synchronize-commit-group generic_events_group
+    command: run consumer post-process-forwarder-issue-platform --consumer-group post-process-forwarder --synchronize-commit-log-topic=snuba-generic-events-commit-log --synchronize-commit-group generic_events_group
   subscription-consumer-events:
     <<: *sentry_defaults
     command: run consumer events-subscription-results --consumer-group query-subscription-consumer
