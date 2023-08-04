@@ -275,6 +275,9 @@ services:
   snuba-replays-consumer:
     <<: *snuba_defaults
     command: consumer --storage replays --auto-offset-reset=latest --max-batch-time-ms 750 --no-strict-offset-reset
+  snuba-issue-occurrence-consumer:
+    <<: *snuba_defaults
+    command: consumer --storage search_issues --consumer-group generic_events_group --auto-offset-reset=latest --max-batch-time-ms 750 --no-strict-offset-reset
   snuba-replacer:
     <<: *snuba_defaults
     command: replacer --storage errors --auto-offset-reset=latest --no-strict-offset-reset
@@ -345,6 +348,9 @@ services:
   ingest-replay-recordings:
     <<: *sentry_defaults
     command: run consumer ingest-replay-recordings --consumer-group ingest-replay-recordings
+  ingest-occurrences:
+    <<: *sentry_defaults
+    command: run consumer ingest-occurrences --consumer-group ingest-occurrences
   ingest-profiles:
     <<: *sentry_defaults
     command: run consumer --no-strict-offset-reset ingest-profiles --consumer-group ingest-profiles
@@ -354,6 +360,9 @@ services:
   post-process-forwarder-transactions:
     <<: *sentry_defaults
     command: run consumer post-process-forwarder-transactions --consumer-group post-process-forwarder --synchronize-commit-log-topic=snuba-transactions-commit-log --synchronize-commit-group transactions_group
+  post-process-forwarder-issue-platform:
+    <<: *sentry_defaults
+    command: run consumer post-process-forwarder-issue-platform --consumer-group post-process-forwarder --synchronize-commit-log-topic=snuba-generic-events-commit-log --synchronize-commit-group generic_events_group
   subscription-consumer-events:
     <<: *sentry_defaults
     command: run consumer events-subscription-results --consumer-group query-subscription-consumer
