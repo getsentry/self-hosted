@@ -1,5 +1,13 @@
 # Changelog
 
+## 23.7.2
+
+### Various fixes & improvements
+
+- Ignore fixture-custom-ca-roots service in integration test (#2321) by @hubertdeng123
+- Update GeoIpUpdate to v6.0.0 (#2287) by @victorelec14
+- Bump healthcheck timeout (#2300) by @hubertdeng123
+
 ## 23.7.1
 
 ### Various fixes & improvements
