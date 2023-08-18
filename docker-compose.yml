@@ -18,7 +18,7 @@ x-sentry-defaults: &sentry_defaults
   <<: *restart_policy
   image: sentry-self-hosted-local
   # Set the platform to build for linux/arm64 when needed on Apple silicon Macs.
-  platform: ${DOCKER_PLATFORM:-}
+  # platform: ${DOCKER_PLATFORM:-}
   build:
     context: ./sentry
     args:
@@ -278,6 +278,18 @@ services:
   snuba-issue-occurrence-consumer:
     <<: *snuba_defaults
     command: consumer --storage search_issues --consumer-group generic_events_group --auto-offset-reset=latest --max-batch-time-ms 750 --no-strict-offset-reset
+  snuba-metrics-consumer:
+    <<: *snuba_defaults
+    command: consumer --storage metrics_raw --consumer-group snuba-metrics-consumers --auto-offset-reset=latest --max-batch-time-ms 750 --no-strict-offset-reset
+  snuba-generic-metrics-distributions-consumer:
+    <<: *snuba_defaults
+    command: consumer --storage generic_metrics_distributions_raw --consumer-group snuba-gen-metrics-distributions-consumers --auto-offset-reset=latest --max-batch-time-ms 750 --no-strict-offset-reset
+  snuba-generic-metrics-sets-consumer:
+    <<: *snuba_defaults
+    command: consumer --storage generic_metrics_sets_raw --consumer-group snuba-gen-metrics-sets-consumers --auto-offset-reset=latest --max-batch-time-ms 750 --no-strict-offset-reset
+  snuba-generic-metrics-counters-consumer:
+    <<: *snuba_defaults
+    command: consumer --storage generic_metrics_counters_raw --consumer-group snuba-gen-metrics-counters-consumers --auto-offset-reset=latest --max-batch-time-ms 750 --no-strict-offset-reset
   snuba-replacer:
     <<: *snuba_defaults
     command: replacer --storage errors --auto-offset-reset=latest --no-strict-offset-reset
@@ -290,6 +302,9 @@ services:
   snuba-subscription-consumer-transactions:
     <<: *snuba_defaults
     command: subscriptions-scheduler-executor --dataset transactions --entity transactions --auto-offset-reset=latest --no-strict-offset-reset --consumer-group=snuba-transactions-subscriptions-consumers --followed-consumer-group=transactions_group --delay-seconds=60 --schedule-ttl=60 --stale-threshold-seconds=900
+  snuba-subscription-consumer-metrics:
+    <<: *snuba_defaults
+    command: subscriptions-scheduler-executor --dataset metrics --entity metrics_sets --entity metrics_counters --auto-offset-reset=latest --no-strict-offset-reset --consumer-group=snuba-metrics-subscriptions-consumers --followed-consumer-group=snuba-metrics-consumers --delay-seconds=60 --schedule-ttl=60 --stale-threshold-seconds=900
   snuba-profiling-profiles-consumer:
     <<: *snuba_defaults
     command: consumer --storage profiles --auto-offset-reset=latest --max-batch-time-ms 1000 --no-strict-offset-reset
@@ -345,6 +360,15 @@ services:
   transactions-consumer:
     <<: *sentry_defaults
     command: run consumer ingest-transactions --consumer-group ingest-consumer
+  metrics-consumer:
+    <<: *sentry_defaults
+    command: run consumer ingest-metrics --consumer-group metrics-consumer
+  generic-metrics-consumer:
+    <<: *sentry_defaults
+    command: run consumer ingest-generic-metrics --consumer-group generic-metrics-consumer
+  billing-metrics-consumer:
+    <<: *sentry_defaults
+    command: run consumer billing-metrics-consumer --consumer-group billing-metrics-consumer
   ingest-replay-recordings:
     <<: *sentry_defaults
     command: run consumer ingest-replay-recordings --consumer-group ingest-replay-recordings
@@ -369,6 +393,12 @@ services:
   subscription-consumer-transactions:
     <<: *sentry_defaults
     command: run consumer transactions-subscription-results --consumer-group query-subscription-consumer
+  subscription-consumer-metrics:
+    <<: *sentry_defaults
+    command: run consumer metrics-subscription-results --consumer-group query-subscription-consumer
+  subscription-consumer-generic-metrics:
+    <<: *sentry_defaults
+    command: run consumer generic-metrics-subscription-results --consumer-group query-subscription-consumer
   sentry-cleanup:
     <<: *sentry_defaults
     image: sentry-cleanup-self-hosted-local
