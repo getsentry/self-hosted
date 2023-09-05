@@ -84,10 +84,13 @@ echo "${_endgroup}"
 
 echo "${_group}Running moar tests !!!"
 # Set up initial/required settings (InstallWizard request)
+export -f sentry_api_request get_csrf_token
 sentry_api_request "internal/options/?query=is:required" -X PUT --data '{"mail.use-tls":false,"mail.username":"","mail.port":25,"system.admin-email":"ben@byk.im","mail.password":"","system.url-prefix":"'"$SENTRY_TEST_HOST"'","auth.allow-registration":false,"beacon.anonymous":true}' >/dev/null
 
-SENTRY_DSN=$(sentry_api_request "projects/sentry/internal/keys/" | awk 'BEGIN { RS=",|:{\n"; FS="\""; } $2 == "public" && $4 ~ "^http" { print $4; exit; }')
+# Hacky way to get around test flakiness for now
+sleep 60
 # We ignore the protocol and the host as we already know those
+SENTRY_DSN=$(sentry_api_request "projects/sentry/internal/keys/" | awk 'BEGIN { RS=",|:{\n"; FS="\""; } $2 == "public" && $4 ~ "^http" { print $4; exit; }')
 DSN_PIECES=($(echo $SENTRY_DSN | sed -ne 's|^https\{0,1\}://\([0-9a-z]\{1,\}\)@[^/]\{1,\}/\([0-9]\{1,\}\)$|\1 \2|p' | tr ' ' '\n'))
 SENTRY_KEY=${DSN_PIECES[0]}
 PROJECT_ID=${DSN_PIECES[1]}
@@ -101,7 +104,6 @@ echo "Creating test event..."
 curl -sf --data '{"event_id": "'"$TEST_EVENT_ID"'","level":"error","message":"a failure","extra":{"object":"42"}}' -H 'Content-Type: application/json' -H "X-Sentry-Auth: Sentry sentry_version=7, sentry_key=$SENTRY_KEY, sentry_client=test-bash/0.1" "$SENTRY_TEST_HOST/api/$PROJECT_ID/store/" -o /dev/null
 
 EVENT_PATH="projects/sentry/internal/events/$TEST_EVENT_ID/"
-export -f sentry_api_request get_csrf_token
 export SENTRY_TEST_HOST COOKIE_FILE EVENT_PATH
 printf "Getting the test event back"
 timeout 60 bash -c 'until $(sentry_api_request "$EVENT_PATH" -Isf -X GET -o /dev/null); do printf '.'; sleep 0.5; done'
