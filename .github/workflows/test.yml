@@ -9,7 +9,7 @@ on:
       - "release/**"
   pull_request:
   schedule:
-    - cron: '1 0 * * *'
+    - cron: '0 * * * *'
 defaults:
   run:
     shell: bash
