@@ -1,5 +1,11 @@
 # Changelog
 
+## 23.8.0
+
+### Various fixes & improvements
+
+- Add issue platform infra (#2309) by @hubertdeng123
+
 ## 23.7.2
 
 ### Various fixes & improvements
