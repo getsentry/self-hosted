@@ -6,9 +6,26 @@
         <include from_env="MAX_MEMORY_USAGE_RATIO"/>
     </max_server_memory_usage_to_ram_ratio>
     <logger>
-        <level>information</level>
-        <console>1</console>
+        <level>warning</level>
+        <console>true</console>
     </logger>
+    <query_thread_log remove="remove"/>
+    <query_log remove="remove"/>
+    <text_log remove="remove"/>
+    <trace_log remove="remove"/>
+    <metric_log remove="remove"/>
+    <asynchronous_metric_log remove="remove"/>
+
+    <!-- Update: Required for newer versions of Clickhouse -->
+    <session_log remove="remove"/>
+    <part_log remove="remove"/>
+
+    <profiles>
+        <default>
+            <log_queries>0</log_queries>
+            <log_query_threads>0</log_query_threads>
+        </default>
+    </profiles>
     <merge_tree>
         <enable_mixed_granularity_parts>1</enable_mixed_granularity_parts>
     </merge_tree>
