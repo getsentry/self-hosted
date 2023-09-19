@@ -62,11 +62,11 @@ function reset() {
 function backup() {
   touch $(pwd)/sentry/backup.json
   chmod 666 $(pwd)/sentry/backup.json
-  $dc run -v $(pwd)/sentry:/sentry-data/backup --rm -T -e SENTRY_LOG_LEVEL=CRITICAL web export /sentry-data/backup/backup.json
+  $dc run -v $(pwd)/sentry:/sentry-data/backup --rm -T -e SENTRY_LOG_LEVEL=CRITICAL web export global /sentry-data/backup/backup.json
 }
 
 function restore() {
-  $dc run --rm -T web import /etc/sentry/backup.json
+  $dc run --rm -T web import global /etc/sentry/backup.json
 }
 
 # Needed variables to source error-handling script
