@@ -11,12 +11,16 @@ echo "Creating backup..."
 touch $(pwd)/sentry/backup.json
 chmod 666 $(pwd)/sentry/backup.json
 # Command here matches exactly what we have in our docs https://develop.sentry.dev/self-hosted/backup/#backup
-$dc run -v $(pwd)/sentry:/sentry-data/backup --rm -T -e SENTRY_LOG_LEVEL=CRITICAL web export /sentry-data/backup/backup.json
+$dc run -v $(pwd)/sentry:/sentry-data/backup --rm -T -e SENTRY_LOG_LEVEL=CRITICAL web export global /sentry-data/backup/backup.json
 # Check to make sure there is content in the file
 if [ ! -s "$(pwd)/sentry/backup.json" ]; then
   echo "Backup file is empty"
   exit 1
 fi
+
+# Print backup.json contents
+echo "Backup file contents:\n\n"
+cat "$(pwd)/sentry/backup.json"
 
 # Bring postgres down and recreate the docker volume
 $dc stop postgres
@@ -29,6 +33,6 @@ source install/set-up-and-migrate-database.sh
 $dc up -d
 
 echo "Importing backup..."
-$dc run --rm -T web import /etc/sentry/backup.json
+$dc run --rm -T web import global /etc/sentry/backup.json
 
 rm $(pwd)/sentry/backup.json
