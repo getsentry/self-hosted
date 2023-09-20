@@ -9,7 +9,7 @@ on:
       - "release/**"
   pull_request:
   schedule:
-    - cron: '0 0,12 * * *'
+    - cron: "0 0,12 * * *"
 defaults:
   run:
     shell: bash
@@ -22,6 +22,19 @@ jobs:
         uses: actions/checkout@v3
         with:
           path: self-hosted
+
+      - name: Get Compose
+        run: |
+          # Always remove `docker compose` support as that's the newer version
+          # and comes installed by default nowadays.
+          sudo rm -f "/usr/local/lib/docker/cli-plugins/docker-compose"
+          # Docker Compose v1 is installed here, remove it
+          sudo rm -f "/usr/local/bin/docker-compose"
+          sudo rm -f "/usr/local/lib/docker/cli-plugins/docker-compose"
+          sudo mkdir -p "/usr/local/lib/docker/cli-plugins"
+          sudo curl -L https://github.com/docker/compose/releases/download/v2.7.0/docker-compose-`uname -s`-`uname -m` -o "/usr/local/lib/docker/cli-plugins/docker-compose"
+          sudo chmod +x "/usr/local/lib/docker/cli-plugins/docker-compose"
+
       - name: End to end tests
         uses: getsentry/action-self-hosted-e2e-tests@03010bd2963edc1f47b6e5e03167a4bc1433ea36
         with:
