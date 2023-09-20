@@ -1,5 +1,20 @@
 # Changelog
 
+## 23.9.1
+
+### Various fixes & improvements
+
+- fix: e2e test jq bug (#2410) by @azaslavsky
+- feat(backup): Support new backup script (#2407) by @azaslavsky
+- Decrease frequency of e2e tests (#2383) by @hubertdeng123
+- Reduce logs coming from clickhouse (#2382) by @hubertdeng123
+- Increase frequency of e2e test runs (#2375) by @hubertdeng123
+- Remove nginx content-disposition hack for safari (#2381) by @hubertdeng123
+- Attempt to fix integration test flakiness (#2372) by @hubertdeng123
+- change health check for kafka service (#2371) by @johnatannvmd
+- Add metrics and generic metrics backend (#2355) by @hubertdeng123
+- Bump self-hosted e2e action commit sha (#2369) by @hubertdeng123
+
 ## 23.8.0
 
 ### Various fixes & improvements
