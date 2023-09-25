@@ -78,6 +78,8 @@ releasefile.cache-path: '/data/releasefile-cache'
 #   secret_key: 'XXXXXXX'
 #   bucket_name: 's3-bucket-name'
 
+# The URL prefix in which Sentry is accessible
+# system.url-prefix: https://example.sentry.com
 system.internal-url-prefix: 'http://web:9000'
 symbolicator.enabled: true
 symbolicator.options:
