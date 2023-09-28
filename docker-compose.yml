@@ -119,7 +119,7 @@ services:
       test: echo stats | nc 127.0.0.1 11211
   redis:
     <<: *restart_policy
-    image: "redis:6.2.12-alpine"
+    image: "redis:6.2.13-alpine"
     healthcheck:
       <<: *healthcheck_defaults
       test: redis-cli ping
