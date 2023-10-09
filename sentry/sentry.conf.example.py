@@ -322,8 +322,6 @@ SENTRY_FEATURES["organizations:open-ai-suggestion"] = False
 # Content Security Policy settings
 ##############################################
 
-if "csp.middleware.CSPMiddleware" not in MIDDLEWARE:
-    MIDDLEWARE = ("csp.middleware.CSPMiddleware",) + MIDDLEWARE
 # CSP_REPORT_URI = "https://{your-sentry-installation}/api/{csp-project}/security/?sentry_key={sentry-key}"
 CSP_REPORT_ONLY = True
 
