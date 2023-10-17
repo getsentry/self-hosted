@@ -16,7 +16,7 @@ Official bootstrap for running your own [Sentry](https://sentry.io/) with [Docke
 
 To get started with all the defaults, simply clone the repo and run `./install.sh` in your local check-out. Please also read the section below about monitoring. Sentry uses Python 3 by default since December 4th, 2020 and Sentry 21.1.0 is the last version to support Python 2.
 
-During the install, a prompt will ask if you want to create a user account. If you require that the install not be blocked by the prompt, run `./install.sh --skip-user-creation`.
+During the install, a prompt will ask if you want to create a user account. If you require that the install goes on without creating a user, run `./install.sh --skip-user-creation`.
 
 Thinking of not managing this yourself? Check out the [SaaS migration docs](https://docs.sentry.io/product/sentry-basics/migration/) or [contact us](https://sentry.io/from/self-hosted) for help.
 
