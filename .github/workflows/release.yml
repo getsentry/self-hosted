@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     name: "Release a new version"
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           token: ${{ secrets.GH_RELEASE_PAT }}
           fetch-depth: 0
@@ -40,7 +40,7 @@ jobs:
     name: Create release on self-hosted dogfood instance
     needs: release
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           token: ${{ secrets.GH_RELEASE_PAT }}
           fetch-depth: 0
