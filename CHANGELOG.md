@@ -1,5 +1,15 @@
 # Changelog
 
+## 23.10.0
+
+### Various fixes & improvements
+
+- Switch geoipupdate image to ghcr.io (#2442) by @hkraal
+- Add system.url-prefix to config for visibility (#2426) by @hubertdeng123
+- Remove CSPMiddleware since it is enabled by default in the upstream sentry (#2434) by @oioki
+- Update nginx.conf (#2455) by @mwarkentin
+- Update Redis container image to 6.2.13 (#2432) by @mencarellic
+
 ## 23.9.1
 
 ### Various fixes & improvements
