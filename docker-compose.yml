@@ -156,43 +156,27 @@ services:
         read_only: true
         source: ./postgres/
         target: /opt/sentry/
-  zookeeper:
-    <<: *restart_policy
-    image: "confluentinc/cp-zookeeper:5.5.7"
-    environment:
-      ZOOKEEPER_CLIENT_PORT: "2181"
-      CONFLUENT_SUPPORT_METRICS_ENABLE: "false"
-      ZOOKEEPER_LOG4J_ROOT_LOGLEVEL: "WARN"
-      ZOOKEEPER_TOOLS_LOG4J_LOGLEVEL: "WARN"
-      KAFKA_OPTS: "-Dzookeeper.4lw.commands.whitelist=ruok"
-    ulimits:
-      nofile:
-        soft: 4096
-        hard: 4096
-    volumes:
-      - "sentry-zookeeper:/var/lib/zookeeper/data"
-      - "sentry-zookeeper-log:/var/lib/zookeeper/log"
-      - "sentry-secrets:/etc/zookeeper/secrets"
-    healthcheck:
-      <<: *healthcheck_defaults
-      test:
-        ["CMD-SHELL", 'echo "ruok" | nc -w 2 localhost 2181 | grep imok']
   kafka:
     <<: *restart_policy
-    depends_on:
-      zookeeper:
-        <<: *depends_on-healthy
-    image: "confluentinc/cp-kafka:5.5.7"
+    image: "confluentinc/cp-kafka:7.5.0"
     environment:
-      KAFKA_ZOOKEEPER_CONNECT: "zookeeper:2181"
-      KAFKA_ADVERTISED_LISTENERS: "PLAINTEXT://kafka:9092"
+      # https://docs.confluent.io/platform/current/installation/docker/config-reference.html#cp-kakfa-example
+      KAFKA_PROCESS_ROLES: "broker,controller"
+      KAFKA_CONTROLLER_QUORUM_VOTERS: "1@127.0.0.1:29093"
+      KAFKA_CONTROLLER_LISTENER_NAMES: "CONTROLLER"
+      KAFKA_NODE_ID: "1"
+      CLUSTER_ID: "MkU3OEVBNTcwNTJENDM2Qk"
+      KAFKA_LISTENERS: "PLAINTEXT://0.0.0.0:29092,INTERNAL://0.0.0.0:9093,EXTERNAL://0.0.0.0:9092,CONTROLLER://0.0.0.0:29093"
+      KAFKA_ADVERTISED_LISTENERS: "PLAINTEXT://127.0.0.1:29092,INTERNAL://kafka:9093,EXTERNAL://kafka:9092"
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: "PLAINTEXT:PLAINTEXT,INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT,CONTROLLER:PLAINTEXT"
+      KAFKA_INTER_BROKER_LISTENER_NAME: "PLAINTEXT"
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: "1"
       KAFKA_OFFSETS_TOPIC_NUM_PARTITIONS: "1"
       KAFKA_LOG_RETENTION_HOURS: "24"
       KAFKA_MESSAGE_MAX_BYTES: "50000000" #50MB or bust
       KAFKA_MAX_REQUEST_SIZE: "50000000" #50MB on requests apparently too
       CONFLUENT_SUPPORT_METRICS_ENABLE: "false"
-      KAFKA_LOG4J_LOGGERS: "kafka.cluster=WARN,kafka.controller=WARN,kafka.coordinator=WARN,kafka.log=WARN,kafka.server=WARN,kafka.zookeeper=WARN,state.change.logger=WARN"
+      KAFKA_LOG4J_LOGGERS: "kafka.cluster=WARN,kafka.controller=WARN,kafka.coordinator=WARN,kafka.log=WARN,kafka.server=WARN,state.change.logger=WARN"
       KAFKA_LOG4J_ROOT_LOGLEVEL: "WARN"
       KAFKA_TOOLS_LOG4J_LOGLEVEL: "WARN"
     ulimits:
@@ -478,8 +462,6 @@ volumes:
     external: true
   sentry-redis:
     external: true
-  sentry-zookeeper:
-    external: true
   sentry-kafka:
     external: true
   sentry-clickhouse:
@@ -495,7 +477,6 @@ volumes:
   sentry-secrets:
   sentry-smtp:
   sentry-nginx-cache:
-  sentry-zookeeper-log:
   sentry-kafka-log:
   sentry-smtp-log:
   sentry-clickhouse-log:
