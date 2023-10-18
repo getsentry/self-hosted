@@ -9,6 +9,9 @@ else
   # TODO(getsentry/self-hosted#2489)
   if docker volume ls | grep -qw sentry-zookeeper; then
     docker volume rm sentry-zookeeper
+    if docker volume ls | grep -qw sentry-kafka; then
+      docker volume rm sentry-kafka
+    fi
   fi
 fi
 
