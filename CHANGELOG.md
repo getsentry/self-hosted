@@ -1,5 +1,17 @@
 # Changelog
 
+## 23.10.1
+
+### Various fixes & improvements
+
+- Revert "feat: upgrade to zookeeper-less kafka (#2445)" (#2500) by @hubertdeng123
+- Add fast revert GH workflow (#2499) by @hubertdeng123
+- build(deps): bump actions/checkout from 3 to 4 (#2493) by @dependabot
+- configure dependabot (#2491) by @mdtro
+- deps: bump nginx to 1.25.2 (#2490) by @mdtro
+- feat: upgrade to zookeeper-less kafka (#2445) by @joshuarli
+- Update outdated install option in README (#2440) by @hubertdeng123
+
 ## 23.10.0
 
 ### Various fixes & improvements
