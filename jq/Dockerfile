@@ -1,4 +1,4 @@
-FROM debian:bookworm-20231009-slim
+FROM debian:bookworm-slim
 
 LABEL MAINTAINER="oss@sentry.io"
 
