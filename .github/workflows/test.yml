@@ -97,5 +97,5 @@ jobs:
 
         - name: Unit Tests
           run: |
-            ./install.sh
+            ./install.sh --no-report-self-hosted-issues
             docker compose up -d
