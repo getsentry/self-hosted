@@ -90,12 +90,13 @@ jobs:
 
   run-install-script:
       runs-on: ubuntu-20.04
-      name: "unit tests"
+      name: "Run install script and bring containers up"
       steps:
         - name: Checkout
           uses: actions/checkout@v4
 
-        - name: Unit Tests
-          run: |
-            ./install.sh --no-report-self-hosted-issues
-            docker compose up -d
+        - name: Install self-hosted Sentry
+          run: ./install.sh --no-report-self-hosted-issues
+
+        - name: Bring containers up
+          run: docker compose up -d
