@@ -87,3 +87,15 @@ jobs:
         run: |
           docker compose ps
           docker compose logs
+
+  run-install-script:
+      runs-on: ubuntu-20.04
+      name: "unit tests"
+      steps:
+        - name: Checkout
+          uses: actions/checkout@v4
+
+        - name: Unit Tests
+          run: |
+            ./install.sh
+            docker compose up -d
