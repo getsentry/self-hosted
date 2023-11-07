@@ -306,6 +306,16 @@ GEOIP_PATH_MMDB = '/geoip/GeoLite2-City.mmdb'
 # BITBUCKET_CONSUMER_KEY = 'YOUR_BITBUCKET_CONSUMER_KEY'
 # BITBUCKET_CONSUMER_SECRET = 'YOUR_BITBUCKET_CONSUMER_SECRET'
 
+#######################
+# Discord Integration #
+#######################
+
+# Set the feature to be True if you'd like to enable Discord integration.
+# Refer to https://develop.sentry.dev/integrations/discord/
+SENTRY_FEATURES["organizations:integrations-discord"] = False
+SENTRY_FEATURES["organizations:integrations-discord-notifications"] = False
+SENTRY_FEATURES["organizations:integrations-discord-metric-alerts"] = False
+
 ##############################################
 # Suggested Fix Feature / OpenAI Integration #
 ##############################################
