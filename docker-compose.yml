@@ -368,6 +368,9 @@ services:
   ingest-profiles:
     <<: *sentry_defaults
     command: run consumer --no-strict-offset-reset ingest-profiles --consumer-group ingest-profiles
+  ingest-monitors:
+    <<: *sentry_defaults
+    command: run consumer --no-strict-offset-reset ingest-monitors --consumer-group ingest-monitors
   post-process-forwarder-errors:
     <<: *sentry_defaults
     command: run consumer post-process-forwarder-errors --consumer-group post-process-forwarder --synchronize-commit-log-topic=snuba-commit-log --synchronize-commit-group=snuba-consumers
