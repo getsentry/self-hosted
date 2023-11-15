@@ -1,5 +1,17 @@
 # Changelog
 
+## 23.11.0
+
+### Various fixes & improvements
+
+- feat: provide a toggle to enable discord integration (#2548) by @aldy505
+- ref: fix a typo (#2556) by @asottile-sentry
+- ref: use `git branch --show-current` instead of sed (#2550) by @asottile-sentry
+- Remove sessions infra (#2514) by @hubertdeng123
+- Upgrade Clickhouse to 21.8 (#2536) by @hubertdeng123
+- [Snyk] Security upgrade debian from bullseye-slim to bookworm-20231009-slim (#2511) by @Indigi-managed
+- snuba: Remove deprecated CLI arg (#2515) by @lynnagara
+
 ## 23.10.1
 
 ### Various fixes & improvements
