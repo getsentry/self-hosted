@@ -102,6 +102,7 @@ x-snuba-defaults: &snuba_defaults
 services:
   smtp:
     <<: *restart_policy
+    platform: linux/amd64
     image: tianon/exim4
     hostname: "${SENTRY_MAIL_HOST:-}"
     volumes:
