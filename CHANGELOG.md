@@ -1,5 +1,14 @@
 # Changelog
 
+## 23.11.1
+
+### Various fixes & improvements
+
+- feat: Add sentry-admin.sh tool (#2594) by @azaslavsky
+- Patch for dev self-hosted environments (#2592) by @hubertdeng123
+- Relicense under FSL-1.0-Apache-2.0 (#2586) by @chadwhitacre
+- Bump minimum ram usage (#2585) by @hubertdeng123
+
 ## 23.11.0
 
 ### Various fixes & improvements
