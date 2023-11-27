@@ -149,6 +149,7 @@ services:
     environment:
       POSTGRES_HOST_AUTH_METHOD: "trust"
     entrypoint: /opt/sentry/postgres-entrypoint.sh
+    shm_size: "256mb"
     volumes:
       - "sentry-postgres:/var/lib/postgresql/data"
       - type: bind
