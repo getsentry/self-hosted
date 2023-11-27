@@ -1,5 +1,9 @@
 # Changelog
 
+## 23.11.2
+
+- No documented changes.
+
 ## 23.11.1
 
 ### Various fixes & improvements
