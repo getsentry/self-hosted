@@ -10,7 +10,7 @@ echo "Creating backup..."
 # to group and owner. Instead, try creating the empty file and then give everyone write access to the backup file
 touch $(pwd)/sentry/backup.json
 chmod 666 $(pwd)/sentry/backup.json
-SENTRY_DOCKER_IO_DIR=$(pwd)/sentry /bin/bash $(pwd)/sentry-admin.sh export global /sentry-admin/backup.json
+SENTRY_DOCKER_IO_DIR=$(pwd)/sentry /bin/bash $(pwd)/sentry-admin.sh export global /sentry-admin/backup.json --no-prompt
 if [ ! -s "$(pwd)/sentry/backup.json" ]; then
   echo "Backup file is empty"
   exit 1
@@ -31,6 +31,6 @@ source install/set-up-and-migrate-database.sh
 $dc up -d
 
 echo "Importing backup..."
-SENTRY_DOCKER_IO_DIR=$(pwd)/sentry /bin/bash $(pwd)/sentry-admin.sh import global /sentry-admin/backup.json
+SENTRY_DOCKER_IO_DIR=$(pwd)/sentry /bin/bash $(pwd)/sentry-admin.sh import global /sentry-admin/backup.json --no-prompt
 
 rm $(pwd)/sentry/backup.json
