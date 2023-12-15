@@ -1,5 +1,11 @@
 # Changelog
 
+## 23.12.0
+
+### Various fixes & improvements
+
+- test(backup): Use --no-prompt for backup tests (#2618) by @azaslavsky
+
 ## 23.11.2
 
 - No documented changes.
