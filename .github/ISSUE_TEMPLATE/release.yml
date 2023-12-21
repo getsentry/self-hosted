@@ -3,6 +3,7 @@ description: Start a new self-hosted Sentry release
 body:
   - type: textarea
     attributes:
+      label: template
       value: |
         [YY.M.N](https://github.com/getsentry/self-hosted/issues) | ***YY.M.N*** | [YY.M.N](https://github.com/getsentry/self-hosted/issues)
 
