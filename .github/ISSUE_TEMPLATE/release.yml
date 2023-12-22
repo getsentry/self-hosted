@@ -21,7 +21,7 @@ body:
           - [ ] [Prepare the `self-hosted` release](https://github.com/getsentry/self-hosted/actions/workflows/release.yml) (_replace with publish issue repo link_).
           - [ ] Check to make sure the new release branch in self-hosted includes the appropriate CalVer images.
           - [ ] Accept (publish) the release.
-          - [ ] Edit [release notes](https://github.com/getsentry/self-hosted/releases) as necessary.
+          - [ ] Edit [release notes](https://github.com/getsentry/self-hosted/releases).
         - [ ] Follow up.
           - [ ] [Create the next release issue](https://github.com/getsentry/self-hosted/issues/new?assignees=&labels=&projects=&template=release.yml) (_replace with link_).
           - [ ] Update the [quarterly ticket](https://github.com/getsentry/team-ospo/issues).
