@@ -23,7 +23,7 @@ body:
           - [ ] Accept (publish) the release.
           - [ ] Edit [release notes](https://github.com/getsentry/self-hosted/releases) as necessary.
         - [ ] Follow up.
-          - [ ] [Create the next release issue](https://github.com/getsentry/self-hosted/issues/new) (_replace with link_).
+          - [ ] [Create the next release issue](https://github.com/getsentry/self-hosted/issues/new?assignees=&labels=&projects=&template=release.yml) (_replace with link_).
           - [ ] Update the [quarterly ticket](https://github.com/getsentry/team-ospo/issues).
           - [ ] Update the [release issue template](https://github.com/getsentry/self-hosted/blob/master/.github/ISSUE_TEMPLATE/release.yml).
           - [ ] Create a PR to update relocation release tests to add the new version (_replace with link_).
