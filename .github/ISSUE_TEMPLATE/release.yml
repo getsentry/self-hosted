@@ -7,7 +7,7 @@ body:
       label: Body
       description: "Edit YY.M.N in the title and three times in the first line of the body, then submit. 👍"
       value: |
-        [previous YY.M.N](https://github.com/getsentry/self-hosted/issues) | **YY.M.N** | [next YY.M.N](https://github.com/getsentry/self-hosted/issues)
+        [previous YY.M.N](https://github.com/getsentry/self-hosted/issues) | ***YY.M.N*** | [next YY.M.N](https://github.com/getsentry/self-hosted/issues)
 
         - [ ] Release all components (_replace items with [publish repo issue links](https://github.com/getsentry/publish/issues)_).
           - [ ] [`develop`](https://github.com/getsentry/develop/actions/workflows/prepare-release.yml)
@@ -23,9 +23,11 @@ body:
           - [ ] Accept (publish) the release.
           - [ ] Edit [release notes](https://github.com/getsentry/self-hosted/releases).
         - [ ] Follow up.
-          - [ ] [Create the next release issue](https://github.com/getsentry/self-hosted/issues/new?assignees=&labels=&projects=&template=release.yml) (_replace with link_).
+          - [ ] [Create the next release issue](https://github.com/getsentry/self-hosted/issues/new?assignees=&labels=&projects=&template=release.yml) and link it from this one.
+            - _replace with link_
           - [ ] Update the [quarterly ticket](https://github.com/getsentry/team-ospo/issues).
           - [ ] Update the [release issue template](https://github.com/getsentry/self-hosted/blob/master/.github/ISSUE_TEMPLATE/release.yml).
-          - [ ] Create a PR to update relocation release tests to add the new version (_replace with link_).
+          - [ ] Create a PR to update relocation release tests to add the new version.
+            - _replace with link_
     validations:
       required: true
