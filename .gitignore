@@ -104,3 +104,8 @@ postgres/wal2json
 # integration testing
 _integration-test/custom-ca-roots/nginx/*
 sentry/test-custom-ca-roots.py
+
+# Elastic Beanstalk Files
+.elasticbeanstalk/*
+!.elasticbeanstalk/*.cfg.yml
+!.elasticbeanstalk/*.global.yml
