@@ -1,0 +1,19 @@
+version: 2
+updates:
+  - package-ecosystem: docker
+    directory: "/"
+    schedule:
+      interval: daily
+    open-pull-requests-limit: 0 # only security updates
+    reviewers:
+      - "@getsentry/open-source"
+      - "@getsentry/security"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      # Check for updates to GitHub Actions every week
+      interval: "weekly"
+    reviewers:
+      - "@getsentry/open-source"
+      - "@getsentry/security"

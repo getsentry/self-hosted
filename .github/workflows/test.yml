@@ -19,7 +19,7 @@ jobs:
     name: "Sentry self-hosted end-to-end tests"
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           path: self-hosted
 
@@ -45,7 +45,7 @@ jobs:
     name: "unit tests"
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Unit Tests
         run: ./unit-test.sh
@@ -65,7 +65,7 @@ jobs:
       COMPOSE_PROJECT_NAME: self-hosted-${{ strategy.job-index }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Get Compose
         run: |

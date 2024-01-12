@@ -20,10 +20,10 @@ fi
 export DOCKER_ARCH=$(docker info --format '{{.Architecture}}')
 if [[ "$DOCKER_ARCH" = "x86_64" ]]; then
   export DOCKER_PLATFORM="linux/amd64"
-  export CLICKHOUSE_IMAGE="yandex/clickhouse-server:20.3.9.70"
+  export CLICKHOUSE_IMAGE="altinity/clickhouse-server:21.8.13.1.altinitystable"
 elif [[ "$DOCKER_ARCH" = "aarch64" ]]; then
   export DOCKER_PLATFORM="linux/arm64"
-  export CLICKHOUSE_IMAGE="altinity/clickhouse-server:21.6.1.6734-testing-arm"
+  export CLICKHOUSE_IMAGE="altinity/clickhouse-server:21.8.12.29.altinitydev.arm"
 else
   echo "FAIL: Unsupported docker architecture $DOCKER_ARCH."
   exit 1

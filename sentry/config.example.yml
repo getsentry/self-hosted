@@ -78,6 +78,8 @@ releasefile.cache-path: '/data/releasefile-cache'
 #   secret_key: 'XXXXXXX'
 #   bucket_name: 's3-bucket-name'
 
+# The URL prefix in which Sentry is accessible
+# system.url-prefix: https://example.sentry.com
 system.internal-url-prefix: 'http://web:9000'
 symbolicator.enabled: true
 symbolicator.options:
@@ -117,3 +119,15 @@ transaction-events.force-disable-internal-project: true
 # slack.signing-secret: <signing secret>
 ## If legacy-app is True use verfication-token instead of signing-secret
 # slack.verification-token: <verification token>
+
+
+#######################
+# Discord Integration #
+#######################
+
+# Refer to https://develop.sentry.dev/integrations/discord/
+
+# discord.application-id: "<application id>"
+# discord.public-key: "<public key>"
+# discord.client-secret: "<client secret>"
+# discord.bot-token: "<bot token>"
