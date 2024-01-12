@@ -60,14 +60,14 @@ function reset() {
 }
 
 function backup() {
-  type=$1
+  type=${1:-"global"}
   touch $(pwd)/sentry/backup.json
   chmod 666 $(pwd)/sentry/backup.json
   $dc run -v $(pwd)/sentry:/sentry-data/backup --rm -T -e SENTRY_LOG_LEVEL=CRITICAL web export $type /sentry-data/backup/backup.json
 }
 
 function restore() {
-  type=$1
+  type=${1:-"global"}
   $dc run --rm -T web import $type /etc/sentry/backup.json
 }
 
