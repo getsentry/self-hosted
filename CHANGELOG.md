@@ -1,5 +1,15 @@
 # Changelog
 
+## 24.1.0
+
+### Various fixes & improvements
+
+- Enable crons (#2712) by @hubertdeng123
+- Parameterize backup restore script (#2412) by @hubertdeng123
+- Run tests only on getsentry repository (#2681) by @aminvakil
+- Tweak the template now that we can see it (#2670) by @chadwhitacre
+- Nginx client request body is buffered to a temporary file (#2630) by @zKoz210
+
 ## 23.12.1
 
 ### Various fixes & improvements
