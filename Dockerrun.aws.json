@@ -1,0 +1,6 @@
+{
+    "AWSEBDockerrunVersion": "3",
+    "Image": {
+        "Update": "false"
+    }
+}
