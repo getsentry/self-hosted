@@ -72,7 +72,6 @@ x-sentry-defaults: &sentry_defaults
     SENTRY_EVENT_RETENTION_DAYS:
     SENTRY_MAIL_HOST:
     SENTRY_MAX_EXTERNAL_SOURCEMAP_SIZE:
-    # Set this value if you plan on using the Suggested Fix Feature
     OPENAI_API_KEY:
   volumes:
     - "sentry-data:/data"
