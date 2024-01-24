@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
-cmd=restore
+cmd="restore $1"
 source scripts/_lib.sh
 $cmd

@@ -15,6 +15,7 @@ defaults:
     shell: bash
 jobs:
   e2e-test:
+    if: github.repository_owner == 'getsentry'
     runs-on: ubuntu-20.04
     name: "Sentry self-hosted end-to-end tests"
     steps:
@@ -41,6 +42,7 @@ jobs:
           project_name: self-hosted
 
   unit-test:
+    if: github.repository_owner == 'getsentry'
     runs-on: ubuntu-20.04
     name: "unit tests"
     steps:
@@ -51,6 +53,7 @@ jobs:
         run: ./unit-test.sh
 
   integration-test:
+    if: github.repository_owner == 'getsentry'
     runs-on: ubuntu-20.04
     name: "integration test"
     strategy:

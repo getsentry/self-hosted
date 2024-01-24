@@ -111,12 +111,10 @@ else:
 
 CACHES = {
     "default": {
-        "BACKEND": "django.core.cache.backends.memcached.MemcachedCache",
+        "BACKEND": "django.core.cache.backends.memcached.PyMemcacheCache",
         "LOCATION": ["memcached:11211"],
         "TIMEOUT": 3600,
-        "OPTIONS": {
-            "server_max_value_length": unit_text_to_bytes(env("SENTRY_MAX_EXTERNAL_SOURCEMAP_SIZE", "1M")),
-        },
+        "OPTIONS": {"ignore_exc": True}
     }
 }
 
@@ -278,6 +276,7 @@ SENTRY_FEATURES.update(
             "organizations:session-replay",
             "organizations:issue-platform",
             "organizations:profiling",
+            "organizations:monitors",
             "organizations:dashboards-mep",
             "organizations:mep-rollout-flag",
             "organizations:dashboards-rh-widget",
@@ -314,9 +313,12 @@ GEOIP_PATH_MMDB = '/geoip/GeoLite2-City.mmdb'
 # for more information about the feature. Make sure the OpenAI's privacy policy is
 # aligned with your company.
 
-# Set the feature to be True if you'd like to enable Suggested Fix. You'll also need to
-# add your OPENAI_API_KEY to the docker-compose.yml file.
-SENTRY_FEATURES["organizations:open-ai-suggestion"] = False
+# Set the OPENAI_API_KEY on the .env or .env.custom file with a valid
+# OpenAI API key to turn on the feature.
+OPENAI_API_KEY = env("OPENAI_API_KEY", "")
+
+if OPENAI_API_KEY:
+  SENTRY_FEATURES["organizations:open-ai-suggestion"] = True
 
 ##############################################
 # Content Security Policy settings
