@@ -1,4 +1,4 @@
-# Self-Hosted Sentry 24.1.1
+# Self-Hosted Sentry nightly
 
 Official bootstrap for running your own [Sentry](https://sentry.io/) with [Docker](https://www.docker.com/).
 
