@@ -1,5 +1,12 @@
 # Changelog
 
+## 24.1.1
+
+### Various fixes & improvements
+
+- Revert "Move open ai key from env variables" (#2724) by @hubertdeng123
+- Fix cache error self hosted (#2722) by @hubertdeng123
+
 ## 24.1.0
 
 ### Various fixes & improvements
