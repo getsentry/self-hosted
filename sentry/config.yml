@@ -93,12 +93,12 @@ transaction-events.force-disable-internal-project: true
 
 # Refer to https://develop.sentry.dev/integrations/github/ for setup instructions.
 
-# github-login.extended-permissions: ['repo']
-# github-app.id: GITHUB_APP_ID
-# github-app.name: 'GITHUB_APP_NAME'
-# github-app.webhook-secret: 'GITHUB_WEBHOOK_SECRET' # Use only if configured in GitHub
-# github-app.client-id: 'GITHUB_CLIENT_ID'
-# github-app.client-secret: 'GITHUB_CLIENT_SECRET'
+github-login.extended-permissions: ['repo']
+github-app.id: ''
+github-app.name: ''
+github-app.webhook-secret: '' # Use only if configured in GitHub
+github-app.client-id: ''
+github-app.client-secret: ''
 # github-app.private-key: |
 #   -----BEGIN RSA PRIVATE KEY-----
 #   privatekeyprivatekeyprivatekeyprivatekey
