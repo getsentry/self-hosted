@@ -17,7 +17,7 @@ sed -i -e 's,^auth-google.client-secret:.*$,auth-google.client-secret: '"'$GOOGL
 sed -i -e 's,^slack.client-id:.*$,slack.client-id: '"'$SLACK_CLIENT_ID'"',' sentry/config.yml
 sed -i -e 's,^slack.client-secret:.*$,slack.client-secret: '"'$SLACK_CLIENT_SECRET'"',' sentry/config.yml
 sed -i -e 's,^slack.signing-secret:.*$,slack.signing-secret: '"'$SLACK_SIGNING_SECRET'"',' sentry/config.yml
-sed -i -e 's,^github-app.id:.*$,github-app.id: '"'$GITHUB_APP_ID'"',' sentry/config.yml
+sed -i -e 's,^github-app.id:.*$,github-app.id: '"$GITHUB_APP_ID"',' sentry/config.yml
 sed -i -e 's,^github-app.name:.*$,github-app.name: '"'$GITHUB_APP_NAME'"',' sentry/config.yml
 sed -i -e 's,^github-app.webhook-secret:.*$,github-app.webhook-secret: '"'$GITHUB_WEBHOOK_SECRET'"',' sentry/config.yml
 sed -i -e 's,^github-app.client-id:.*$,github-app.client-id: '"'$GITHUB_CLIENT_ID'"',' sentry/config.yml
