@@ -99,14 +99,7 @@ github-app.name: ''
 github-app.webhook-secret: '' # Use only if configured in GitHub
 github-app.client-id: ''
 github-app.client-secret: ''
-# github-app.private-key: |
-#   -----BEGIN RSA PRIVATE KEY-----
-#   privatekeyprivatekeyprivatekeyprivatekey
-#   privatekeyprivatekeyprivatekeyprivatekey
-#   privatekeyprivatekeyprivatekeyprivatekey
-#   privatekeyprivatekeyprivatekeyprivatekey
-#   privatekeyprivatekeyprivatekeyprivatekey
-#   -----END RSA PRIVATE KEY-----
+github-app.private-key: ''
 
 #####################
 # Slack Integration #

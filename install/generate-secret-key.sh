@@ -22,6 +22,7 @@ sed -i -e 's,^github-app.name:.*$,github-app.name: '"'$GITHUB_APP_NAME'"',' sent
 sed -i -e 's,^github-app.webhook-secret:.*$,github-app.webhook-secret: '"'$GITHUB_WEBHOOK_SECRET'"',' sentry/config.yml
 sed -i -e 's,^github-app.client-id:.*$,github-app.client-id: '"'$GITHUB_CLIENT_ID'"',' sentry/config.yml
 sed -i -e 's,^github-app.client-secret:.*$,github-app.client-secret: '"'$GITHUB_CLIENT_SECRET'"',' sentry/config.yml
+sed -i -e 's,^github-app.private-key:.*$,github-app.private-key: '"|\n  $GITHUB_PRIVATE_KEY"',' sentry/config.yml
 
 echo "Secret key written to $SENTRY_CONFIG_YML"
 
