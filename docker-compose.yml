@@ -145,7 +145,7 @@ services:
         "-c",
         "max_wal_senders=1",
         "-c",
-        "max_connections=${POSTGRES_MAX_CONNECTIONS:-300}",
+        "max_connections=${POSTGRES_MAX_CONNECTIONS:-100}",
       ]
     environment:
       POSTGRES_HOST_AUTH_METHOD: "trust"
