@@ -336,7 +336,7 @@ CSP_REPORT_ONLY = True
 #################
 
 # Since version 24.1.0, Sentry migrated to Django 4 which contains stricter CSRF protection.
-# If you are accessing Sentry from multiple domains behind a reverse proxy, you should set 
+# If you are accessing Sentry from multiple domains behind a reverse proxy, you should set
 # this to match your IPs/domains. Ports should be included if you are using custom ports.
 # https://docs.djangoproject.com/en/4.2/ref/settings/#std-setting-CSRF_TRUSTED_ORIGINS
 
