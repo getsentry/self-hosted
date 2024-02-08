@@ -1,5 +1,15 @@
 # Changelog
 
+## 24.1.2
+
+### Various fixes & improvements
+
+- Check memcached backend in Django (#2778) by @chadwhitacre
+- Fix groupedmessage indexing error (#2777) by @hubertdeng123
+- build(deps): bump actions/setup-python from 4 to 5 (#2644) by @dependabot
+- feat: provide csrf settings information for sentry config (#2762) by @aldy505
+- Fix apt config generation when http_proxy is set (#2725) (#2734) by @lemrouch
+
 ## 24.1.1
 
 ### Various fixes & improvements
