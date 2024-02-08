@@ -1,7 +1,8 @@
 echo "${_group}Setting up / migrating database ..."
 
 # Fixes https://github.com/getsentry/self-hosted/issues/2758, where a migration fails due to indexing issue
-indexes=$($dc up -d postgres && $dc exec postgres psql -qAt -U postgres -c "SELECT indexname, indexdef FROM pg_indexes WHERE tablename = 'sentry_groupedmessage';")
+$dc up -d postgres
+indexes=$($dc exec postgres psql -qAt -U postgres -c "SELECT indexname, indexdef FROM pg_indexes WHERE tablename = 'sentry_groupedmessage';")
 if [[ $indexes == *"sentry_groupedmessage_project_id_id_515aaa7e_uniq"* ]]; then
   $dc postgres psql -qAt -U postgres -c "DROP INDEX sentry_groupedmessage_project_id_id_515aaa7e_uniq;"
 fi
