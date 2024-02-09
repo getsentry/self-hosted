@@ -10,7 +10,7 @@ until $dc exec postgres psql -U postgres -c "select 1" >/dev/null 2>&1 || [ $RET
 done
 indexes=$($dc exec postgres psql -qAt -U postgres -c "SELECT indexname, indexdef FROM pg_indexes WHERE tablename = 'sentry_groupedmessage';")
 if [[ $indexes == *"sentry_groupedmessage_project_id_id_515aaa7e_uniq"* ]]; then
-  $dc postgres psql -qAt -U postgres -c "DROP INDEX sentry_groupedmessage_project_id_id_515aaa7e_uniq;"
+  $dc exec postgres psql -qAt -U postgres -c "DROP INDEX sentry_groupedmessage_project_id_id_515aaa7e_uniq;"
 fi
 
 if [[ -n "${CI:-}" || "${SKIP_USER_CREATION:-0}" == 1 ]]; then
