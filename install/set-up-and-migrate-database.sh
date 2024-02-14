@@ -8,10 +8,8 @@ until $dc exec postgres psql -U postgres -c "select 1" >/dev/null 2>&1 || [ $RET
   echo "Waiting for postgres server, $((RETRIES--)) remaining attempts..."
   sleep 1
 done
-indexes=$($dc exec postgres psql -qAt -U postgres -c "SELECT indexname, indexdef FROM pg_indexes WHERE tablename = 'sentry_groupedmessage';")
-if [[ $indexes == *"sentry_groupedmessage_project_id_id_515aaa7e_uniq"* ]]; then
-  $dc exec postgres psql -qAt -U postgres -c "DROP INDEX sentry_groupedmessage_project_id_id_515aaa7e_uniq;"
-fi
+$dc exec postgres psql -qAt -U postgres -c "ALTER TABLE sentry_groupedmessage DROP CONSTRAINT IF EXISTS sentry_groupedmessage_project_id_id_515aaa7e_uniq;"
+$dc exec postgres psql -qAt -U postgres -c "DROP INDEX IF EXISTS sentry_groupedmessage_project_id_id_515aaa7e_uniq;"
 
 if [[ -n "${CI:-}" || "${SKIP_USER_CREATION:-0}" == 1 ]]; then
   $dcr web upgrade --noinput
