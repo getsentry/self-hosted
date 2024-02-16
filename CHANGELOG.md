@@ -1,5 +1,14 @@
 # Changelog
 
+## 24.2.0
+
+### Various fixes & improvements
+
+- Bump nginx version (#2797) by @hubertdeng123
+- build(deps): bump pre-commit/action from 3.0.0 to 3.0.1 (#2788) by @dependabot
+- Tweak postgres indexing fix (#2792) by @hubertdeng123
+- fix: DB migration script (#2779) by @hubertdeng123
+
 ## 24.1.2
 
 ### Various fixes & improvements
