@@ -9,6 +9,7 @@ until $dc exec postgres psql -U postgres -c "select 1" >/dev/null 2>&1 || [ $RET
   sleep 1
 done
 
+# Using django ORM to provide broader support for users with external databases
 $dcr web shell -c "
 from django.db import connection
 
