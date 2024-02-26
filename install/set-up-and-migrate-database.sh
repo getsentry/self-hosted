@@ -2,6 +2,7 @@ echo "${_group}Setting up / migrating database ..."
 
 # Fixes https://github.com/getsentry/self-hosted/issues/2758, where a migration fails due to indexing issue
 $dc up -d postgres
+$dc up -d web
 # Wait for postgres
 RETRIES=5
 until $dc exec postgres psql -U postgres -c "select 1" >/dev/null 2>&1 || [ $RETRIES -eq 0 ]; do
