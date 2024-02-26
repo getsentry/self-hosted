@@ -8,8 +8,14 @@ until $dc exec postgres psql -U postgres -c "select 1" >/dev/null 2>&1 || [ $RET
   echo "Waiting for postgres server, $((RETRIES--)) remaining attempts..."
   sleep 1
 done
-$dc exec postgres psql -qAt -U postgres -c "ALTER TABLE IF EXISTS sentry_groupedmessage DROP CONSTRAINT IF EXISTS sentry_groupedmessage_project_id_id_515aaa7e_uniq;"
-$dc exec postgres psql -qAt -U postgres -c "DROP INDEX IF EXISTS sentry_groupedmessage_project_id_id_515aaa7e_uniq;"
+
+$dc exec web sentry shell -c "
+from django.db import connection
+
+with connection.cursor() as cursor:
+  cursor.execute('ALTER TABLE IF EXISTS sentry_groupedmessage DROP CONSTRAINT IF EXISTS sentry_groupedmessage_project_id_id_515aaa7e_uniq;')
+  cursor.execute('DROP INDEX IF EXISTS sentry_groupedmessage_project_id_id_515aaa7e_uniq;')
+"
 
 if [[ -n "${CI:-}" || "${SKIP_USER_CREATION:-0}" == 1 ]]; then
   $dcr web upgrade --noinput
