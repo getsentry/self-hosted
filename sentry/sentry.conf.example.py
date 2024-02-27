@@ -340,4 +340,4 @@ CSP_REPORT_ONLY = True
 # this to match your IPs/domains. Ports should be included if you are using custom ports.
 # https://docs.djangoproject.com/en/4.2/ref/settings/#std-setting-CSRF_TRUSTED_ORIGINS
 
-# CSRF_TRUSTED_ORIGINS = ["example.com", "127.0.0.1:9000"]
+# CSRF_TRUSTED_ORIGINS = ["https://example.com", "http://127.0.0.1:9000"]
