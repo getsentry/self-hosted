@@ -36,7 +36,7 @@ x-sentry-defaults: &sentry_defaults
       <<: *depends_on-default
     snuba-api:
       <<: *depends_on-default
-    snuba-consumer:
+    snuba-errors-consumer:
       <<: *depends_on-default
     snuba-outcomes-consumer:
       <<: *depends_on-default
@@ -252,9 +252,9 @@ services:
   snuba-api:
     <<: *snuba_defaults
   # Kafka consumer responsible for feeding events into Clickhouse
-  snuba-consumer:
+  snuba-errors-consumer:
     <<: *snuba_defaults
-    command: rust-consumer --storage errors --auto-offset-reset=latest --max-batch-time-ms 750 --no-strict-offset-reset
+    command: rust-consumer --storage errors --consumer-group errors_group --auto-offset-reset=latest --max-batch-time-ms 750 --no-strict-offset-reset
   # Kafka consumer responsible for feeding outcomes into Clickhouse
   # Use --auto-offset-reset=earliest to recover up to 7 days of TSDB data
   # since we did not do a proper migration
