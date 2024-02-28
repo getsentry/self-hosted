@@ -58,7 +58,7 @@ SENTRY_IMAGE=getsentry/sentry:83b1380 ./install.sh
 
 如果您使用 Linux 并且在运行 `./install.sh` 时需要使用 `sudo`,请确保将环境变量放在 `sudo` 之后:
 
-```shell  
+```shell
 sudo SENTRY_IMAGE=us.gcr.io/sentryio/sentry:83b1380 ./install.sh
 ```
 
