@@ -28,5 +28,6 @@
     </profiles>
     <merge_tree>
         <enable_mixed_granularity_parts>1</enable_mixed_granularity_parts>
+        <max_suspicious_broken_parts>1000</max_suspicious_broken_parts>
     </merge_tree>
 </yandex>
