@@ -5,10 +5,12 @@ from sentry.conf.server import *  # NOQA
 
 BYTE_MULTIPLIER = 1024
 UNITS = ("K", "M", "G")
+
+
 def unit_text_to_bytes(text):
     unit = text[-1].upper()
     power = UNITS.index(unit) + 1
-    return float(text[:-1])*(BYTE_MULTIPLIER**power)
+    return float(text[:-1]) * (BYTE_MULTIPLIER**power)
 
 
 # Generously adapted from pynetlinux: https://github.com/rlisagor/pynetlinux/blob/e3f16978855c6649685f0c43d4c3fcf768427ae5/pynetlinux/ifconfig.py#L197-L223
@@ -114,7 +116,7 @@ CACHES = {
         "BACKEND": "django.core.cache.backends.memcached.PyMemcacheCache",
         "LOCATION": ["memcached:11211"],
         "TIMEOUT": 3600,
-        "OPTIONS": {"ignore_exc": True}
+        "OPTIONS": {"ignore_exc": True},
     }
 }
 
@@ -191,7 +193,9 @@ SENTRY_DIGESTS = "sentry.digests.backends.redis.RedisBackend"
 ###################
 
 SENTRY_RELEASE_HEALTH = "sentry.release_health.metrics.MetricsReleaseHealthBackend"
-SENTRY_RELEASE_MONITOR = "sentry.release_health.release_monitor.metrics.MetricReleaseMonitorBackend"
+SENTRY_RELEASE_MONITOR = (
+    "sentry.release_health.release_monitor.metrics.MetricReleaseMonitorBackend"
+)
 
 ##############
 # Web Server #
@@ -248,7 +252,7 @@ SENTRY_WEB_OPTIONS = {
 # Mail #
 ########
 
-SENTRY_OPTIONS["mail.list-namespace"] = env('SENTRY_MAIL_HOST', 'localhost')
+SENTRY_OPTIONS["mail.list-namespace"] = env("SENTRY_MAIL_HOST", "localhost")
 SENTRY_OPTIONS["mail.from"] = f"sentry@{SENTRY_OPTIONS['mail.list-namespace']}"
 
 ############
@@ -288,6 +292,7 @@ SENTRY_FEATURES.update(
             "projects:plugins",
             "projects:rate-limits",
             "projects:servicehooks",
+            "projects:span-metrics-extraction",
         )
     }
 )
@@ -296,7 +301,7 @@ SENTRY_FEATURES.update(
 # MaxMind Integration #
 #######################
 
-GEOIP_PATH_MMDB = '/geoip/GeoLite2-City.mmdb'
+GEOIP_PATH_MMDB = "/geoip/GeoLite2-City.mmdb"
 
 #########################
 # Bitbucket Integration #
