@@ -28,7 +28,11 @@ teardown() {
   DID_TEAR_DOWN=1
 
   if [ "$1" != "EXIT" ]; then
-    echo "An error occurred, caught SIG$1 on line $2"
+    error_msg="An error occurred, caught SIG$1 on line $2"
+    echo "$error_msg"
+    dsn="https://5a620019b5124cbba230a9e62db9b825@o1.ingest.us.sentry.io/6627632"
+    sentry_cli="docker run --rm -v /tmp:/work -e SENTRY_DSN=$dsn getsentry/sentry-cli"
+    $sentry_cli send-event -m "$error_msg" --logfile "$log_file"
   fi
 
   echo "Tearing down ..."
@@ -41,10 +45,10 @@ echo "${_endgroup}"
 echo "${_group}Starting Sentry for tests ..."
 # Disable beacon for e2e tests
 echo 'SENTRY_BEACON=False' >>$SENTRY_CONFIG_PY
-echo y | $dcr web createuser --force-update --superuser --email $TEST_USER --password $TEST_PASS
 $dc up -d
-printf "Waiting for Sentry to be up"
 timeout 90 bash -c 'until $(curl -Isf -o /dev/null $SENTRY_TEST_HOST); do printf '.'; sleep 0.5; done'
+echo y | $dc exec web sentry createuser --force-update --superuser --email $TEST_USER --password $TEST_PASS
+printf "Waiting for Sentry to be up"
 echo ""
 echo "${_endgroup}"
 
