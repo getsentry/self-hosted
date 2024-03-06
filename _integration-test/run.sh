@@ -28,12 +28,7 @@ teardown() {
   DID_TEAR_DOWN=1
 
   if [ "$1" != "EXIT" ]; then
-    set +x
-    error_msg="An error occurred, caught SIG$1 on line $2"
-    echo "$error_msg"
-    dsn="https://5a620019b5124cbba230a9e62db9b825@o1.ingest.us.sentry.io/6627632"
-    local sentry_cli="docker run --rm -v $(pwd):/work -e SENTRY_DSN=$dsn getsentry/sentry-cli"
-    $sentry_cli send-event -m "$error_msg" --logfile $log_file
+    echo "An error occurred, caught SIG$1 on line $2"
   fi
 
   echo "Tearing down ..."

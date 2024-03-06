@@ -1,13 +1,13 @@
 echo "${_group}Setting up error handling ..."
 
-export SENTRY_DSN='https://19555c489ded4769978daae92f2346ca@self-hosted.getsentry.net/3'
-export SENTRY_ORG=self-hosted
-export SENTRY_PROJECT=installer
+if [ -z "${SENTRY_DSN:-}" ]; then
+  export SENTRY_DSN='https://19555c489ded4769978daae92f2346ca@self-hosted.getsentry.net/3'
+fi
 
 $dbuild -t sentry-self-hosted-jq-local --platform="$DOCKER_PLATFORM" jq
 
 jq="docker run --rm -i sentry-self-hosted-jq-local"
-sentry_cli="docker run --rm -v /tmp:/work -e SENTRY_ORG=$SENTRY_ORG -e SENTRY_PROJECT=$SENTRY_PROJECT -e SENTRY_DSN=$SENTRY_DSN getsentry/sentry-cli"
+sentry_cli="docker run --rm -v /tmp:/work -e SENTRY_DSN=$SENTRY_DSN getsentry/sentry-cli"
 
 send_envelope() {
   # Send envelope

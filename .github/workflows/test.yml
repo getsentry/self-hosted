@@ -68,6 +68,7 @@ jobs:
             compose_path: "/usr/local/lib/docker/cli-plugins"
     env:
       COMPOSE_PROJECT_NAME: self-hosted-${{ strategy.job-index }}
+      SENTRY_DSN: https://5a620019b5124cbba230a9e62db9b825@o1.ingest.us.sentry.io/6627632
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -91,7 +92,7 @@ jobs:
           timeout_minutes: 10
           retry_on: error
           command: |
-            export REPORT_SELF_HOSTED_ISSUES=0
+            export REPORT_SELF_HOSTED_ISSUES=1
             ./install.sh
 
       - name: Integration Test
