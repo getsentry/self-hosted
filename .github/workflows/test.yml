@@ -89,7 +89,9 @@ jobs:
           max_attempts: 3
           timeout_minutes: 10
           retry_on: error
-          command: ./install.sh
+          command: |
+            export REPORT_SELF_HOSTED_ISSUES=0
+            ./install.sh
 
       - name: Integration Test
         uses: nick-fields/retry@v3
