@@ -83,6 +83,14 @@ jobs:
           sudo curl -L https://github.com/docker/compose/releases/download/${{ matrix.compose_version }}/docker-compose-`uname -s`-`uname -m` -o "${{ matrix.compose_path }}/docker-compose"
           sudo chmod +x "${{ matrix.compose_path }}/docker-compose"
 
+      - name: Install self-hosted
+        uses: nick-fields/retry@v3
+        with:
+          max_attempts: 3
+          timeout_minutes: 10
+          retry_on: error
+          command: ./install.sh
+
       - name: Integration Test
         uses: nick-fields/retry@v3
         with:

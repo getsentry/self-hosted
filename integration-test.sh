@@ -10,13 +10,11 @@ test_option="$1"
 
 if [[ "$test_option" == "--initial-install" ]]; then
   echo "Testing initial install"
-  ./install.sh
   _integration-test/run.sh
   _integration-test/ensure-customizations-not-present.sh
   _integration-test/ensure-backup-restore-works.sh
 elif [[ "$test_option" == "--customizations" ]]; then
   echo "Testing customizations"
-  ./install.sh
   source install/dc-detect-version.sh
   $dc up -d
   echo "Making customizations"
