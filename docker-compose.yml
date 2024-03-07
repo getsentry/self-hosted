@@ -444,6 +444,9 @@ services:
       SENTRY_KAFKA_BROKERS_OCCURRENCES: "kafka:9092"
       SENTRY_BUCKET_PROFILES: file://localhost//var/lib/sentry-profiles
       SENTRY_SNUBA_HOST: "http://snuba-api:1218"
+    env_file:
+      - path: ./vroom.env
+        required: false
     volumes:
       - sentry-vroom:/var/lib/sentry-profiles
     depends_on:
