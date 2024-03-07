@@ -310,6 +310,7 @@ SENTRY_FEATURES.update(
             "organizations:starfish-browser-webvitals-pageoverview-v2",
             "organizations:starfish-browser-webvitals-use-backend-scores",
             "organizations:mobile-ttid-ttfd-contribution",
+            "organizations:starfish-mobile-appstart",
         )  # starfish related flags
     }
 )
