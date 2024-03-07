@@ -1,50 +1,23 @@
 #!/usr/bin/env bash
 set -ex
 
-source install/_lib.sh
-source install/dc-detect-version.sh
-
 echo "${_group}Setting up variables and helpers ..."
 export SENTRY_TEST_HOST="${SENTRY_TEST_HOST:-http://localhost:9000}"
 TEST_USER='test@example.com'
 TEST_PASS='test123TEST'
 COOKIE_FILE=$(mktemp)
 
-# Courtesy of https://stackoverflow.com/a/2183063/90297
-trap_with_arg() {
-  func="$1"
-  shift
-  for sig; do
-    trap "$func $sig "'$LINENO' "$sig"
-  done
-}
-
-DID_TEAR_DOWN=0
-# the teardown function will be the exit point
-teardown() {
-  if [ "$DID_TEAR_DOWN" -eq 1 ]; then
-    return 0
-  fi
-  DID_TEAR_DOWN=1
-
-  if [ "$1" != "EXIT" ]; then
-    echo "An error occurred, caught SIG$1 on line $2"
-  fi
-
-  echo "Tearing down ..."
-  rm $COOKIE_FILE
-  echo "Done."
-}
-trap_with_arg teardown ERR INT TERM EXIT
+trap_with_arg cleanup ERR INT TERM EXIT
 echo "${_endgroup}"
 
 echo "${_group}Starting Sentry for tests ..."
 # Disable beacon for e2e tests
 echo 'SENTRY_BEACON=False' >>$SENTRY_CONFIG_PY
-echo y | $dcr web createuser --force-update --superuser --email $TEST_USER --password $TEST_PASS
 $dc up -d
-printf "Waiting for Sentry to be up"
 timeout 90 bash -c 'until $(curl -Isf -o /dev/null $SENTRY_TEST_HOST); do printf '.'; sleep 0.5; done'
+# DC exec here is faster, tests run on the slower side and using exec would provide a boost
+echo y | $dc exec web sentry createuser --force-update --superuser --email $TEST_USER --password $TEST_PASS
+printf "Waiting for Sentry to be up"
 echo ""
 echo "${_endgroup}"
 
