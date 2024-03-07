@@ -101,7 +101,7 @@ jobs:
           max_attempts: 3
           timeout_minutes: 25
           retry_on: error
-          command: ./integration-test.sh --${{ matrix.test-group }}
+          command: ./integration-test.sh --${{ matrix.test_type }}
 
       - name: Inspect failure
         if: failure()
