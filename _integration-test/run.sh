@@ -43,6 +43,7 @@ echo "${_group}Starting Sentry for tests ..."
 echo 'SENTRY_BEACON=False' >>$SENTRY_CONFIG_PY
 $dc up -d
 timeout 90 bash -c 'until $(curl -Isf -o /dev/null $SENTRY_TEST_HOST); do printf '.'; sleep 0.5; done'
+# DC exec here is faster, tests run on the slower side and using exec would provide a boost
 echo y | $dc exec web sentry createuser --force-update --superuser --email $TEST_USER --password $TEST_PASS
 printf "Waiting for Sentry to be up"
 echo ""
