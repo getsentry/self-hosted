@@ -303,7 +303,7 @@ services:
     command: rust-consumer --storage functions_raw --consumer-group snuba-consumers --auto-offset-reset=latest --max-batch-time-ms 1000 --no-strict-offset-reset --no-skip-write
   snuba-spans-consumer:
     <<: *snuba_defaults
-    command: rust-consumer --storage spans --consumer-group snuba-consumers --auto-offset-reset=latest --max-batch-time-ms 1000 --no-strict-offset-reset --no-skip-write
+    command: rust-consumer --storage spans --consumer-group snuba-spans-consumers --auto-offset-reset=latest --max-batch-time-ms 1000 --no-strict-offset-reset --no-skip-write
   symbolicator:
     <<: *restart_policy
     image: "$SYMBOLICATOR_IMAGE"
