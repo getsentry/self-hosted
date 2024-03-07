@@ -86,22 +86,12 @@ jobs:
           sudo chmod +x "${{ matrix.compose_path }}/docker-compose"
 
       - name: Install self-hosted
-        uses: nick-fields/retry@v3
-        with:
-          max_attempts: 3
-          timeout_minutes: 10
-          retry_on: error
-          command: |
-            export REPORT_SELF_HOSTED_ISSUES=1
-            ./install.sh
+        run: |
+          export REPORT_SELF_HOSTED_ISSUES=1
+          ./install.sh
 
       - name: Integration Test
-        uses: nick-fields/retry@v3
-        with:
-          max_attempts: 3
-          timeout_minutes: 25
-          retry_on: error
-          command: ./integration-test.sh --${{ matrix.test_type }}
+        run: ./integration-test.sh --${{ matrix.test_type }}
 
       - name: Inspect failure
         if: failure()
