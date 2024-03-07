@@ -69,6 +69,7 @@ jobs:
     env:
       COMPOSE_PROJECT_NAME: self-hosted-${{ strategy.job-index }}
       SENTRY_DSN: https://5a620019b5124cbba230a9e62db9b825@o1.ingest.us.sentry.io/6627632
+      REPORT_SELF_HOSTED_ISSUES: 1
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -86,9 +87,7 @@ jobs:
           sudo chmod +x "${{ matrix.compose_path }}/docker-compose"
 
       - name: Install self-hosted
-        run: |
-          export REPORT_SELF_HOSTED_ISSUES=1
-          ./install.sh
+        run: ./install.sh
 
       - name: Integration Test
         run: ./integration-test.sh --${{ matrix.test_type }}

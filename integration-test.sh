@@ -1,21 +1,25 @@
 #!/usr/bin/env bash
 set -ex
 
+source install/_lib.sh
+source install/detect-platform.sh
+source install/dc-detect-version.sh
+source install/error-handling.sh
+
 echo "Reset customizations"
 rm -f sentry/enhance-image.sh
 rm -f sentry/requirements.txt
-export REPORT_SELF_HOSTED_ISSUES=0
 
 test_option="$1"
+export MINIMIZE_DOWNTIME=0
 
 if [[ "$test_option" == "--initial-install" ]]; then
   echo "Testing initial install"
-  _integration-test/run.sh
-  _integration-test/ensure-customizations-not-present.sh
-  _integration-test/ensure-backup-restore-works.sh
+  source _integration-test/run.sh
+  source _integration-test/ensure-customizations-not-present.sh
+  source _integration-test/ensure-backup-restore-works.sh
 elif [[ "$test_option" == "--customizations" ]]; then
   echo "Testing customizations"
-  source install/dc-detect-version.sh
   $dc up -d
   echo "Making customizations"
   cat <<EOT >sentry/enhance-image.sh
@@ -28,8 +32,9 @@ EOT
   printf "python-ldap" >sentry/requirements.txt
 
   echo "Testing in-place upgrade and customizations"
-  ./install.sh --minimize-downtime
-  _integration-test/run.sh
-  _integration-test/ensure-customizations-work.sh
-  _integration-test/ensure-backup-restore-works.sh
+  export MINIMIZE_DOWNTIME=1
+  ./install.sh
+  source _integration-test/run.sh
+  source _integration-test/ensure-customizations-work.sh
+  source _integration-test/ensure-backup-restore-works.sh
 fi
