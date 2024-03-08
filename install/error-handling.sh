@@ -1,8 +1,6 @@
 echo "${_group}Setting up error handling ..."
 
-if [ -z "${SENTRY_DSN:-}" ]; then
-  export SENTRY_DSN='https://19555c489ded4769978daae92f2346ca@self-hosted.getsentry.net/3'
-fi
+export SENTRY_DSN='https://19555c489ded4769978daae92f2346ca@self-hosted.getsentry.net/3'
 
 $dbuild -t sentry-self-hosted-jq-local --platform="$DOCKER_PLATFORM" jq
 
@@ -18,7 +16,7 @@ generate_breadcrumb_json() {
   cat $log_file | $jq -R -c 'split("\n") | {"message": (.[0]//""), "category": "log", "level": "info"}'
 }
 
-send_event() {
+save_envelope() {
   # Use traceback hash as the UUID since it is 32 characters long
   local cmd_exit=$1
   local error_msg=$2
@@ -90,8 +88,7 @@ send_event() {
   )
   echo "$attachment" >>$envelope_file_path
   cat $log_file >>$envelope_file_path
-  # Send envelope
-  send_envelope $envelope_file
+  echo $envelope_file
 }
 
 if [[ -z "${REPORT_SELF_HOSTED_ISSUES:-}" ]]; then
@@ -217,7 +214,13 @@ cleanup() {
 
     # Only send event when report issues flag is set and if trap signal is not INT (ctrl+c)
     if [[ "$REPORT_SELF_HOSTED_ISSUES" == 1 && "$1" != "INT" ]]; then
-      send_event "$cmd_exit" "$error_msg" "$traceback" "$traceback_json" "$breadcrumbs"
+      envelope_file=$(save_envelope "$cmd_exit" "$error_msg" "$traceback" "$traceback_json" "$breadcrumbs")
+      send_envelope $envelope_file
+    fi
+
+    # If integration test, let's save error envelope but don't send it yet
+    if [[ "${INTEGRATION_TEST:0}" == 1 ]]; then
+      save_envelope "$cmd_exit" "$error_msg" "$traceback" "$traceback_json" "$breadcrumbs"
     fi
 
     if [[ -n "$MINIMIZE_DOWNTIME" ]]; then

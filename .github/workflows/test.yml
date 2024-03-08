@@ -69,7 +69,8 @@ jobs:
     env:
       COMPOSE_PROJECT_NAME: self-hosted-${{ strategy.job-index }}
       SENTRY_DSN: https://5a620019b5124cbba230a9e62db9b825@o1.ingest.us.sentry.io/6627632
-      REPORT_SELF_HOSTED_ISSUES: 1
+      REPORT_SELF_HOSTED_ISSUES: 0
+      INTEGRATION_TEST: 1
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -90,10 +91,37 @@ jobs:
         run: ./install.sh
 
       - name: Integration Test
-        run: ./integration-test.sh --${{ matrix.test_type }}
+        uses: nick-fields/retry@v3
+        with:
+          timeout_minutes: 15
+          max_attempts: 3
+          command: ./integration-test.sh --${{ matrix.test_type }}
 
       - name: Inspect failure
         if: failure()
         run: |
+          num_envelopes=$(ls /tmp/sentry-envelope* | wc -l)
+          # If we have one envelope, we know that test failure is consistent
+          if [[ $num_envelopes == 1 ]]; then
+            envelope_file=$(ls /tmp/sentry-envelope*)
+            sed -i '' 's/"type":"Error"/"type":"Test Failure"/g' $envelope_file
+            curl -sL https://sentry.io/get-cli/ | sh
+            sentry-cli send-envelope $envelope_file
+          fi
           docker compose ps
           docker compose logs
+
+      - name: Flaky Test Detector
+        if: success()
+        run: |
+          num_envelopes=$(ls /tmp/sentry-envelope* | wc -l)
+          if [[ $num_envelopes -gt 0 ]]; then
+            cd /tmp/
+            for envelope_file in sentry-envelope*; do
+              # Change event details in envelope once we detect flaky test
+              sed -i '' 's/"level":"error"/"level":"warning"/g' $envelope_file
+              sed -i '' 's/"type":"Error"/"type":"Flaky Test"/g' $envelope_file
+              curl -sL https://sentry.io/get-cli/ | sh
+              sentry-cli send-envelope $envelope_file
+            done
+          fi
