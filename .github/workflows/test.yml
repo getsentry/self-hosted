@@ -102,6 +102,7 @@ jobs:
       - name: Inspect failure
         if: failure()
         run: |
+          set -ex
           num_envelopes=$(ls 2>/dev/null /tmp/sentry-envelope* | wc -l)
           # If we have one envelope, we know that test failure is consistent
           if [[ $num_envelopes == 1 ]]; then
@@ -116,6 +117,7 @@ jobs:
       - name: Flaky Test Detector
         if: success()
         run: |
+          set -ex
           num_envelopes=$(ls 2>/dev/null /tmp/sentry-envelope* | wc -l)
           if [[ $num_envelopes -gt 0 ]]; then
             cd /tmp/
