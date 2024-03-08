@@ -9,21 +9,15 @@ export REPORT_SELF_HOSTED_ISSUES=1
 dbuild="docker build"
 source install/error-handling.sh
 
-# mock send_envelope
-send_envelope() {
-  echo "Test Sending $1"
-}
-
 ##########################
 
-export -f send_envelope
-echo "Testing initial send_event"
+echo "Testing initial save_envelope"
 export log_file=test_log.txt
 echo "Test Logs" >"$log_file"
 echo "Error Msg" >>"$log_file"
 breadcrumbs=$(generate_breadcrumb_json | sed '$d' | $jq -s -c)
-SEND_EVENT_RESPONSE=$(
-  send_event \
+SAVE_ENVELOPE_RESPONSE=$(
+  save_envelope \
     "'foo' exited with status 1" \
     "Test exited with status 1" \
     "Traceback: ignore me" \
@@ -32,7 +26,7 @@ SEND_EVENT_RESPONSE=$(
 )
 rm "$log_file"
 expected_filename='sentry-envelope-f73e4da437c42a1d28b86a81ebcff35d'
-test "$SEND_EVENT_RESPONSE" == "Test Sending $expected_filename"
+test "$SAVE_ENVELOPE_RESPONSE" == "$expected_filename"
 ENVELOPE_CONTENTS=$(cat "/tmp/$expected_filename")
 test "$ENVELOPE_CONTENTS" == "$(cat _unit-test/snapshots/$expected_filename)"
 echo "Pass."
@@ -40,15 +34,15 @@ echo "Pass."
 ##########################
 
 echo "Testing send_event duplicate"
-SEND_EVENT_RESPONSE=$(
-  send_event \
+SAVE_ENVELOPE_RESPONSE=$(
+  save_envelope \
     "'foo' exited with status 1" \
     "Test exited with status 1" \
     "Traceback: ignore me" \
     "{\"ignore\": \"me\"}" \
     "$breadcrumbs"
 )
-test "$SEND_EVENT_RESPONSE" == "Looks like you've already sent this error to us, we're on it :)"
+test "$SAVE_ENVELOPE_RESPONSE" == "Looks like you've already sent this error to us, we're on it :)"
 echo "Pass."
 rm "/tmp/$expected_filename"
 
