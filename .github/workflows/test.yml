@@ -45,6 +45,8 @@ jobs:
     if: github.repository_owner == 'getsentry'
     runs-on: ubuntu-20.04
     name: "unit tests"
+    env:
+      INTEGRATION_TEST: 0
     steps:
       - name: Checkout
         uses: actions/checkout@v4
