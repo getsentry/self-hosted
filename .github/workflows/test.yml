@@ -102,7 +102,7 @@ jobs:
       - name: Inspect failure
         if: failure()
         run: |
-          num_envelopes=$(find /tmp/ -name "sentry-envelope*" -type f | wc -l)
+          num_envelopes=$(ls 2>/dev/null /tmp/sentry-envelope* | wc -l)
           # If we have one envelope, we know that test failure is consistent
           if [[ $num_envelopes == 1 ]]; then
             envelope_file=$(ls /tmp/sentry-envelope*)
@@ -116,7 +116,7 @@ jobs:
       - name: Flaky Test Detector
         if: success()
         run: |
-          num_envelopes=$(find /tmp/ -name "sentry-envelope*" -type f | wc -l)
+          num_envelopes=$(ls 2>/dev/null /tmp/sentry-envelope* | wc -l)
           if [[ $num_envelopes -gt 0 ]]; then
             cd /tmp/
             for envelope_file in sentry-envelope*; do
