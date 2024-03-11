@@ -97,7 +97,9 @@ jobs:
         with:
           timeout_minutes: 15
           max_attempts: 3
-          command: ./integration-test.sh --${{ matrix.test_type }}
+          command: |
+            ./integration-test.sh --${{ matrix.test_type }}
+            ls /tmp/
 
       - name: Inspect failure
         if: failure()
