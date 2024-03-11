@@ -9,7 +9,6 @@ COOKIE_FILE=$(mktemp)
 
 trap_with_arg cleanup ERR INT TERM EXIT
 echo "${_endgroup}"
-error "lol"
 
 echo "${_group}Starting Sentry for tests ..."
 # Disable beacon for e2e tests

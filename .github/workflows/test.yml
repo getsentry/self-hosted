@@ -109,7 +109,7 @@ jobs:
             envelope_file=$(ls /tmp/sentry-envelope*)
             sed -i 's/"type":"Error"/"type":"Test Failure"/g' $envelope_file
             curl -sL https://sentry.io/get-cli/ | sh
-            sentry-cli --log-level=debug send-envelope $envelope_file
+            sentry-cli send-envelope $envelope_file
           fi
           docker compose ps
           docker compose logs
