@@ -113,12 +113,26 @@ echo "${_endgroup}"
 echo "${_group}Test that profiling work ..."
 echo "Sending a test profile..."
 PROFILE_FIXTURE_PATH="$(git rev-parse --show-toplevel)/_integration-test/fixtures/envelope-with-profile"
-curl -sf --data-binary @$PROFILE_FIXTURE_PATH -H 'Content-Type: application/x-sentry-envelope' -H "X-Sentry-Auth: Sentry sentry_version=7, sentry_key=$SENTRY_KEY, sentry_client=test-bash/0.1" "$SENTRY_TEST_HOST/api/$PROJECT_ID/envelope/" -o /dev/null
+curl -sf --data-binary @$PROFILE_FIXTURE_PATH -H 'Content-Type: application/x-sentry-envelope' -H "X-Sentry-Auth: Sentry sentry_version=7, sentry_key=$SENTRY_KEY, sentry_client=test-bash/0.1" "$SENTRY_TEST_HOST/api/$PROJECT_ID/envelope/"
 
 printf "Getting the test profile back"
 PROFILE_ID="$(jq -r -n --slurpfile profile $PROFILE_FIXTURE_PATH '$profile[4].event_id')"
-PROFILE_PATH="api/0/projects/sentry/sentry/profiling/raw_profiles/$PROFILE_ID/"
-timeout 60 bash -c 'until $(sentry_api_request "$PROFILE_PATH" -Isf -X GET -o /dev/null); do printf '.'; sleep 0.5; done'
+PROFILE_PATH="projects/sentry/sentry/profiling/raw_profiles/$PROFILE_ID/"
+timeout 60 bash -c 'until sentry_api_request "$PROFILE_PATH" -X GET -o /dev/null; do printf '.'; sleep 0.5; done'
+echo " got it!"
+echo "${_endgroup}"
+
+echo "${_group}Test we can extract spans from an event..."
+echo "Sending a test span..."
+SPAN_FIXTURE_PATH="$(git rev-parse --show-toplevel)/_integration-test/fixtures/envelope-with-transaction"
+curl -sf --data-binary @$PROFILE_FIXTURE_PATH -H 'Content-Type: application/x-sentry-envelope' -H "X-Sentry-Auth: Sentry sentry_version=7, sentry_key=$SENTRY_KEY, sentry_client=test-bash/0.1" "$SENTRY_TEST_HOST/api/$PROJECT_ID/envelope/"
+
+printf "Getting a span back"
+TRACE_ID="$(jq -r -n --slurpfile span $SPAN_FIXTURE_PATH '$span[2].contexts.trace.trace_id')"
+SPAN_PATH="organizations/sentry/events/"
+SPAN_QUERY_PARAMS="-G --data-urlencode dataset=spansIndexed --data-urlencode field=id --data-urlencode project=1 --data-urlencode query=trace:$TRACE_ID --data-urlencode statsPeriod=1h"
+sleep 10
+sentry_api_request $SPAN_PATH -X GET $SPAN_QUERY_PARAMS | jq .data[] -e
 echo " got it!"
 echo "${_endgroup}"
 
