@@ -103,7 +103,7 @@ jobs:
         if: failure()
         run: |
           set -ex
-          num_envelopes=$(ls /tmp/ | grep -c sentry-envelope)
+          num_envelopes=$(ls /tmp/ | grep -c sentry-envelope || true)
           # If we have one envelope, we know that test failure is consistent
           if [[ $num_envelopes == 1 ]]; then
             envelope_file=$(ls /tmp/sentry-envelope*)
@@ -118,7 +118,7 @@ jobs:
         if: success()
         run: |
           set -ex
-          num_envelopes=$(ls /tmp/ | grep -c sentry-envelope)
+          num_envelopes=$(ls /tmp/ | grep -c sentry-envelope || true)
           if [[ $num_envelopes -gt 0 ]]; then
             cd /tmp/
             for envelope_file in sentry-envelope*; do
