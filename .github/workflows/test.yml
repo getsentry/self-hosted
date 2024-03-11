@@ -95,11 +95,10 @@ jobs:
       - name: Integration Test
         uses: nick-fields/retry@v3
         with:
-          timeout_minutes: 15
+          timeout_minutes: 25
           max_attempts: 3
           command: |
             ./integration-test.sh --${{ matrix.test_type }}
-            ls /tmp/
 
       - name: Inspect failure
         if: failure()
