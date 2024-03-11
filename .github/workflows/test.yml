@@ -103,6 +103,7 @@ jobs:
         if: failure()
         run: |
           set -ex
+          ls /tmp/sentry-envelope* >/dev/null
           num_envelopes=$(ls /tmp/sentry-envelope* >/dev/null | wc -l || true)
           # If we have one envelope, we know that test failure is consistent
           if [[ $num_envelopes == 1 ]]; then
@@ -118,6 +119,7 @@ jobs:
         if: success()
         run: |
           set -ex
+          ls /tmp/sentry-envelope* >/dev/null
           num_envelopes=$(ls /tmp/sentry-envelope* 2>/dev/null | wc -l || true)
           if [[ $num_envelopes -gt 0 ]]; then
             cd /tmp/
