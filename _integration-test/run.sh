@@ -157,7 +157,21 @@ curl -sf --data-binary @$PROFILE_FIXTURE_PATH -H 'Content-Type: application/x-se
 printf "Getting a span back"
 TRACE_ID="$(jq -r -n --slurpfile span $SPAN_FIXTURE_PATH '$span[2].contexts.trace.trace_id')"
 SPAN_PATH="organizations/sentry/events/?dataset=spansIndexed&field=id&project=1&query=trace%3A$TRACE_ID&statsPeriod=1h"
-sentry_api_request "$SPAN_PATH" -X GET
+count=0
+while true;
+do
+  sentry_api_request "$SPAN_PATH" -X GET | jq .data[] -e
+  if [ $? -eq 0 ]
+  then
+    break
+  fi
+  printf '.'
+  ((count++))
+  if [[ $count -eq 60 ]]
+  then
+    break
+  fi
+done
 timeout 60 bash -c 'until sentry_api_request "$SPAN_PATH" -X GET | jq .data[] -e; do printf '.'; sleep 0.5; done'
 echo " got it!"
 echo "${_endgroup}"
