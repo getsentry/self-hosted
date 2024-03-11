@@ -118,6 +118,7 @@ jobs:
         if: success()
         run: |
           set -ex
+          ls /tmp/
           num_envelopes=$(ls /tmp/ | grep -c sentry-envelope || true)
           if [[ $num_envelopes -gt 0 ]]; then
             cd /tmp/
