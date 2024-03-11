@@ -158,7 +158,7 @@ printf "Getting a span back"
 TRACE_ID="$(jq -r -n --slurpfile span $SPAN_FIXTURE_PATH '$span[2].contexts.trace.trace_id')"
 SPAN_PATH="organizations/sentry/events/?dataset=spansIndexed&field=id&project=1&query=trace%3A$TRACE_ID&statsPeriod=1h"
 sentry_api_request "$SPAN_PATH" -X GET
-timeout 60 bash -c 'until $(sentry_api_request "$SPAN_PATH" -X GET | jq .data[] -e); do printf '.'; sleep 0.5; done'
+timeout 60 bash -c 'until sentry_api_request "$SPAN_PATH" -X GET | jq .data[] -e; do printf '.'; sleep 0.5; done'
 echo " got it!"
 echo "${_endgroup}"
 
