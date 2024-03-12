@@ -125,7 +125,7 @@ jobs:
             cd /tmp/
             for envelope_file in sentry-envelope*; do
               # Change event details in envelope once we detect flaky test
-              sed -i 's/"level":"error"/"level":"warning"/g' $envelope_file
+              sed -i 's/"level":"error","exception"/"level":"warning","exception"/g' $envelope_file
               sed -i 's/"type":"Error"/"type":"Flaky Test"/g' $envelope_file
               curl -sL https://sentry.io/get-cli/ | sh
               sentry-cli send-envelope $envelope_file
