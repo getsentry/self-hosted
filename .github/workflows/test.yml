@@ -74,6 +74,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Install dev dependencies
+        run: pip install -r requirements-dev.txt
+
       - name: Get Compose
         run: |
           # Always remove `docker compose` support as that's the newer version
