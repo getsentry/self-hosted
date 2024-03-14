@@ -74,8 +74,20 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install dev dependencies
-        run: pip install -r requirements-dev.txt
+      - name: Setup dev environment
+        run: |
+          pip install -r requirements-dev.txt
+          ### pytest-sentry configuration ###
+          if [ "$GITHUB_REPOSITORY" = "getsentry/self-hosted" ]; then
+            echo "PYTEST_SENTRY_DSN=https://5a620019b5124cbba230a9e62db9b825@o1.ingest.us.sentry.io/6627632" >> $GITHUB_ENV
+            echo "PYTEST_SENTRY_TRACES_SAMPLE_RATE=0" >> $GITHUB_ENV
+
+            # This records failures on master to sentry in order to detect flakey tests, as it's
+            # expected that people have failing tests on their PRs
+            if [ "$GITHUB_REF" = "refs/heads/master" ]; then
+              echo "PYTEST_SENTRY_ALWAYS_REPORT=1" >> $GITHUB_ENV
+            fi
+          fi
 
       - name: Get Compose
         run: |
