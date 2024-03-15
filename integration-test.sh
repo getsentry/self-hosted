@@ -12,7 +12,6 @@ rm -f sentry/requirements.txt
 
 test_option="$1"
 export MINIMIZE_DOWNTIME=0
-$dc up -d
 
 if [[ "$test_option" == "--initial-install" ]]; then
   echo "Testing initial install"

@@ -22,6 +22,7 @@ class IntegrationTests(unittest.TestCase):
     def setUpClass(cls):
         cls.session = requests.Session()
         response = None
+        run_shell_command("docker compose --ansi never up -d")
         for i in range(5):
             try:
                 response = requests.get(SENTRY_TEST_HOST)
