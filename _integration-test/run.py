@@ -52,11 +52,12 @@ def configure_self_hosted_environment():
     for i in range(TIMEOUT_SECONDS):
         try:
             response = requests.get(SENTRY_TEST_HOST)
-        except requests.ConnectionError:
+        except:
+            time.sleep(1)
             pass
-        if response is not None and response.status_code == 200:
-            break
-        time.sleep(1)
+        else:
+            if response is not None and response.status_code == 200:
+                break
     assert response.status_code == 200
 
     # Create test user
