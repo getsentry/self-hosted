@@ -45,19 +45,17 @@ def get_sentry_dsn(session: requests.Session) -> str:
     return sentry_dsn
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="session", autouse=True)
 def configure_self_hosted_environment():
     response = None
     run_shell_command("docker compose --ansi never up -d")
     for i in range(TIMEOUT_SECONDS):
         try:
             response = requests.get(SENTRY_TEST_HOST)
-        except:
+        except requests.ConnectionError:
             time.sleep(1)
-            pass
-        else:
-            if response is not None and response.status_code == 200:
-                break
+        if response is not None and response.status_code == 200:
+            break
     assert response.status_code == 200
 
     # Create test user
