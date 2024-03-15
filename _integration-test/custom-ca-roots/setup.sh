@@ -25,11 +25,8 @@ openssl req -new -nodes -newkey rsa:2048 -keyout $TEST_NGINX_CONF_PATH/self.test
 
 # openssl req -in nginx/self.test.req -text -noout
 
-# Store extension details in a temporary file since python subprocess can't use process substitution
-printf "subjectAltName=DNS:self.test" >/tmp/extension_details
-
 openssl x509 -req -in $TEST_NGINX_CONF_PATH/self.test.req -CA $TEST_NGINX_CONF_PATH/ca.crt -CAkey $TEST_NGINX_CONF_PATH/ca.key \
-  -extfile /tmp/extension_details \
+  -addext "subjectAltName=DNS:self.test" \
   -CAcreateserial -out $TEST_NGINX_CONF_PATH/self.test.crt -days 1 -sha256
 
 # openssl x509 -in nginx/self.test.crt -text -noout

@@ -79,7 +79,7 @@ jobs:
           pip install -r requirements-dev.txt
           ### pytest-sentry configuration ###
           if [ "$GITHUB_REPOSITORY" = "getsentry/self-hosted" ]; then
-            echo "PYTEST_SENTRY_DSN=${{ env.SELF_HOSTED_TESTING_DSN }} >> $GITHUB_ENV
+            echo "PYTEST_SENTRY_DSN=${{ env.SELF_HOSTED_TESTING_DSN }}" >> $GITHUB_ENV
             echo "PYTEST_SENTRY_TRACES_SAMPLE_RATE=0" >> $GITHUB_ENV
 
             # This records failures on master to sentry in order to detect flakey tests, as it's
