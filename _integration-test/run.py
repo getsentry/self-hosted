@@ -11,6 +11,7 @@ SENTRY_CONFIG_PY = "sentry/sentry.conf.py"
 SENTRY_TEST_HOST = os.getenv("SENTRY_TEST_HOST", "http://localhost:9000")
 TEST_USER = "test@example.com"
 TEST_PASS = "test123TEST"
+TIMEOUT_SECONDS = 60
 
 
 def run_shell_command(cmd, **kwargs) -> subprocess.CompletedProcess:
@@ -23,7 +24,7 @@ class IntegrationTests(unittest.TestCase):
         cls.session = requests.Session()
         response = None
         run_shell_command("docker compose --ansi never up -d")
-        for i in range(5):
+        for i in range(TIMEOUT_SECONDS):
             try:
                 response = requests.get(SENTRY_TEST_HOST)
             except requests.ConnectionError:
@@ -39,7 +40,7 @@ class IntegrationTests(unittest.TestCase):
         )
 
     def poll_for_response(self, request: str) -> requests.Response:
-        for i in range(60):
+        for i in range(TIMEOUT_SECONDS):
             response = self.session.get(request, headers={"Referer": SENTRY_TEST_HOST})
             if response.status_code == 200:
                 break
@@ -49,7 +50,7 @@ class IntegrationTests(unittest.TestCase):
 
     @lru_cache
     def get_sentry_dsn(self) -> str:
-        for i in range(60):
+        for i in range(TIMEOUT_SECONDS):
             response = self.session.get(
                 f"{SENTRY_TEST_HOST}/api/0/projects/sentry/internal/keys/",
                 headers={"Referer": SENTRY_TEST_HOST},
