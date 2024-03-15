@@ -20,6 +20,7 @@ if [[ "$test_option" == "--initial-install" ]]; then
   source _integration-test/ensure-backup-restore-works.sh
 elif [[ "$test_option" == "--customizations" ]]; then
   echo "Testing customizations"
+  $dc up -d
   echo "Making customizations"
   cat <<EOT >sentry/enhance-image.sh
 #!/bin/bash
