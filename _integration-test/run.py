@@ -8,6 +8,7 @@ import sentry_sdk
 import time
 import json
 import re
+from typing import Callable
 
 SENTRY_CONFIG_PY = "sentry/sentry.conf.py"
 SENTRY_TEST_HOST = os.getenv("SENTRY_TEST_HOST", "http://localhost:9000")
@@ -16,16 +17,21 @@ TEST_PASS = "test123TEST"
 TIMEOUT_SECONDS = 60
 
 
-def poll_for_response(request: str, client: httpx.Client) -> httpx.Response:
+def poll_for_response(
+    request: str, client: httpx.Client, validator: Callable = None
+) -> httpx.Response:
     for i in range(TIMEOUT_SECONDS):
         response = client.get(
             request, follow_redirects=True, headers={"Referer": SENTRY_TEST_HOST}
         )
         if response.status_code == 200:
-            break
+            if validator is None or validator(response.text):
+                break
         time.sleep(1)
     else:
-        raise AssertionError("timeout waiting for response status code 200")
+        raise AssertionError(
+            "timeout waiting for response status code 200 or valid data"
+        )
     return response
 
 
@@ -34,23 +40,23 @@ def get_sentry_dsn(client: httpx.Client) -> str:
     response = poll_for_response(
         f"{SENTRY_TEST_HOST}/api/0/projects/sentry/internal/keys/",
         client,
+        lambda x: len(json.loads(x)[0]["dsn"]["public"]) > 0,
     )
     sentry_dsn = json.loads(response.text)[0]["dsn"]["public"]
-    assert len(sentry_dsn) > 0
     return sentry_dsn
 
 
 @pytest.fixture(scope="session", autouse=True)
 def configure_self_hosted_environment():
-    response = None
     subprocess.run(["docker", "compose", "--ansi", "never", "up", "-d"], check=True)
     for i in range(TIMEOUT_SECONDS):
         try:
             response = httpx.get(SENTRY_TEST_HOST, follow_redirects=True)
         except httpx.ConnectionError:
             time.sleep(1)
-        if response is not None and response.status_code == 200:
-            break
+        else:
+            if response.status_code == 200:
+                break
     else:
         raise AssertionError("timeout waiting for self-hosted to come up")
 
@@ -69,10 +75,10 @@ def configure_self_hosted_environment():
             TEST_USER,
             "--password",
             TEST_PASS,
+            "--no-input",
         ],
         check=True,
         text=True,
-        input="y",
     )
 
 
@@ -104,9 +110,15 @@ def test_initial_redirect():
 
 def test_login(client_login):
     client, login_response = client_login
-    assert '"isAuthenticated":true' in login_response.text
-    assert '"username":"test@example.com"' in login_response.text
-    assert '"isSuperuser":true' in login_response.text
+    parser = BeautifulSoup(login_response.text, "html.parser")
+    script_tag = parser.find(
+        "script", string=lambda x: x and "window.__initialData" in x
+    )
+    assert script_tag is not None
+    json_data = json.loads(script_tag.text.split("=", 1)[1].strip().rstrip(";"))
+    assert json_data["isAuthenticated"] is True
+    assert json_data["user"]["username"] == "test@example.com"
+    assert json_data["user"]["isSuperuser"] is True
     assert login_response.cookies["sc"] is not None
     # Set up initial/required settings (InstallWizard request)
     client.headers.update({"X-CSRFToken": login_response.cookies["sc"]})
@@ -152,19 +164,23 @@ def test_cleanup_crons_running():
             "ps",
             "-a",
         ],
-        text=True
+        text=True,
     )
-    pattern = re.compile(r'(\-cleanup\s+running)|(\-cleanup[_-].+\s+Up\s+)', re.MULTILINE)
+    pattern = re.compile(
+        r"(\-cleanup\s+running)|(\-cleanup[_-].+\s+Up\s+)", re.MULTILINE
+    )
     cleanup_crons = pattern.findall(docker_services)
     assert len(cleanup_crons) > 0
 
 
 def test_custom_cas():
-    subprocess.run(["./_integration-test/custom-ca-roots/setup.sh"], check=True)
-    subprocess.run(
-        ["docker", "compose", "--ansi", "never", "run", "--no-deps", "web", "python3", "/etc/sentry/test-custom-ca-roots.py"], check=True
-    )
-    subprocess.run(["./_integration-test/custom-ca-roots/teardown.sh"], check=True)
+    try:
+        subprocess.run(["./_integration-test/custom-ca-roots/setup.sh"], check=True)
+        subprocess.run(
+            ["docker", "compose", "--ansi", "never", "run", "--no-deps", "web", "python3", "/etc/sentry/test-custom-ca-roots.py"], check=True
+        )
+    finally:
+        subprocess.run(["./_integration-test/custom-ca-roots/teardown.sh"], check=True)
 
 
 def test_receive_transaction_events(client_login):
@@ -181,17 +197,13 @@ def test_receive_transaction_events(client_login):
 
         with sentry_sdk.start_transaction(op="task", name="Test Transactions"):
             placeholder_fn()
-    profiles_response = poll_for_response(
+    poll_for_response(
         f"{SENTRY_TEST_HOST}/api/0/organizations/sentry/events/?dataset=profiles&field=profile.id&project=1&statsPeriod=1h",
         client,
+        lambda x: len(json.loads(x)["data"]) > 0,
     )
-    assert profiles_response.status_code == 200
-    profiles_response_json = json.loads(profiles_response.text)
-    assert len(profiles_response_json) > 0
-    spans_response = poll_for_response(
+    poll_for_response(
         f"{SENTRY_TEST_HOST}/api/0/organizations/sentry/events/?dataset=spansIndexed&field=id&project=1&statsPeriod=1h",
         client,
+        lambda x: len(json.loads(x)["data"]) > 0,
     )
-    assert spans_response.status_code == 200
-    spans_response_json = json.loads(spans_response.text)
-    assert len(spans_response_json) > 0
