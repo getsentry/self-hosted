@@ -1,5 +1,22 @@
 # Changelog
 
+## 24.3.0
+
+### Various fixes & improvements
+
+- feat(spans): Ingest spans (#2861) by @phacops
+- Integration test improvements (#2858) by @hubertdeng123
+- increase postgres max_connections above 100 connections (#2740) by @erfantkerfan
+- deps: bump maxmind/geoipupdate to 6.1.0 (#2859) by @victorelec14
+- Enable proxy buffering in nginx (#2844) by @RexTim
+- Add snuba rust consumers (#2831) by @hubertdeng123
+- simplify if for open-ai-suggestion (#2732) by @LvckyAPI
+- Upgrade to FSL-1.1 (#2835) by @chadwhitacre
+- chore: provide clearer csrf url example (#2833) by @aldy505
+- chore: Use django ORM to perform sql commands (#2827) by @hubertdeng123
+- revert changes in 3067683f6c0e1c6dd9ceb72cb5155c1dbf3bf501 (#2829) by @hubertdeng123
+- use rust consumers in self-hosted (3067683f) by @hubertdeng123
+
 ## 24.2.0
 
 ### Various fixes & improvements

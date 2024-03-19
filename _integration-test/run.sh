@@ -1,50 +1,23 @@
 #!/usr/bin/env bash
 set -ex
 
-source install/_lib.sh
-source install/dc-detect-version.sh
-
 echo "${_group}Setting up variables and helpers ..."
 export SENTRY_TEST_HOST="${SENTRY_TEST_HOST:-http://localhost:9000}"
 TEST_USER='test@example.com'
 TEST_PASS='test123TEST'
 COOKIE_FILE=$(mktemp)
 
-# Courtesy of https://stackoverflow.com/a/2183063/90297
-trap_with_arg() {
-  func="$1"
-  shift
-  for sig; do
-    trap "$func $sig "'$LINENO' "$sig"
-  done
-}
-
-DID_TEAR_DOWN=0
-# the teardown function will be the exit point
-teardown() {
-  if [ "$DID_TEAR_DOWN" -eq 1 ]; then
-    return 0
-  fi
-  DID_TEAR_DOWN=1
-
-  if [ "$1" != "EXIT" ]; then
-    echo "An error occurred, caught SIG$1 on line $2"
-  fi
-
-  echo "Tearing down ..."
-  rm $COOKIE_FILE
-  echo "Done."
-}
-trap_with_arg teardown ERR INT TERM EXIT
+trap_with_arg cleanup ERR INT TERM EXIT
 echo "${_endgroup}"
 
 echo "${_group}Starting Sentry for tests ..."
 # Disable beacon for e2e tests
 echo 'SENTRY_BEACON=False' >>$SENTRY_CONFIG_PY
-echo y | $dcr web createuser --force-update --superuser --email $TEST_USER --password $TEST_PASS
 $dc up -d
-printf "Waiting for Sentry to be up"
 timeout 90 bash -c 'until $(curl -Isf -o /dev/null $SENTRY_TEST_HOST); do printf '.'; sleep 0.5; done'
+# DC exec here is faster, tests run on the slower side and using exec would provide a boost
+echo y | $dc exec web sentry createuser --force-update --superuser --email $TEST_USER --password $TEST_PASS
+printf "Waiting for Sentry to be up"
 echo ""
 echo "${_endgroup}"
 
@@ -140,12 +113,26 @@ echo "${_endgroup}"
 echo "${_group}Test that profiling work ..."
 echo "Sending a test profile..."
 PROFILE_FIXTURE_PATH="$(git rev-parse --show-toplevel)/_integration-test/fixtures/envelope-with-profile"
-curl -sf --data-binary @$PROFILE_FIXTURE_PATH -H 'Content-Type: application/x-sentry-envelope' -H "X-Sentry-Auth: Sentry sentry_version=7, sentry_key=$SENTRY_KEY, sentry_client=test-bash/0.1" "$SENTRY_TEST_HOST/api/$PROJECT_ID/envelope/" -o /dev/null
+curl -sf --data-binary @$PROFILE_FIXTURE_PATH -H 'Content-Type: application/x-sentry-envelope' -H "X-Sentry-Auth: Sentry sentry_version=7, sentry_key=$SENTRY_KEY, sentry_client=test-bash/0.1" "$SENTRY_TEST_HOST/api/$PROJECT_ID/envelope/"
 
 printf "Getting the test profile back"
 PROFILE_ID="$(jq -r -n --slurpfile profile $PROFILE_FIXTURE_PATH '$profile[4].event_id')"
-PROFILE_PATH="api/0/projects/sentry/sentry/profiling/raw_profiles/$PROFILE_ID/"
-timeout 60 bash -c 'until $(sentry_api_request "$PROFILE_PATH" -Isf -X GET -o /dev/null); do printf '.'; sleep 0.5; done'
+PROFILE_PATH="projects/sentry/sentry/profiling/raw_profiles/$PROFILE_ID/"
+timeout 60 bash -c 'until sentry_api_request "$PROFILE_PATH" -X GET -o /dev/null; do printf '.'; sleep 0.5; done'
+echo " got it!"
+echo "${_endgroup}"
+
+echo "${_group}Test we can extract spans from an event..."
+echo "Sending a test span..."
+SPAN_FIXTURE_PATH="$(git rev-parse --show-toplevel)/_integration-test/fixtures/envelope-with-transaction"
+curl -sf --data-binary @$PROFILE_FIXTURE_PATH -H 'Content-Type: application/x-sentry-envelope' -H "X-Sentry-Auth: Sentry sentry_version=7, sentry_key=$SENTRY_KEY, sentry_client=test-bash/0.1" "$SENTRY_TEST_HOST/api/$PROJECT_ID/envelope/"
+
+printf "Getting a span back"
+TRACE_ID="$(jq -r -n --slurpfile span $SPAN_FIXTURE_PATH '$span[2].contexts.trace.trace_id')"
+SPAN_PATH="organizations/sentry/events/"
+SPAN_QUERY_PARAMS="-G --data-urlencode dataset=spansIndexed --data-urlencode field=id --data-urlencode project=1 --data-urlencode query=trace:$TRACE_ID --data-urlencode statsPeriod=1h"
+sleep 10
+sentry_api_request $SPAN_PATH -X GET $SPAN_QUERY_PARAMS | jq .data[] -e
 echo " got it!"
 echo "${_endgroup}"
 
