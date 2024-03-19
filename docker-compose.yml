@@ -272,7 +272,7 @@ services:
     command: rust-consumer --storage replays --consumer-group snuba-consumers --auto-offset-reset=latest --max-batch-time-ms 750 --no-strict-offset-reset --no-skip-write
   snuba-issue-occurrence-consumer:
     <<: *snuba_defaults
-    command: rust-consumer --storage search_issues --consumer-group generic_events_group --auto-offset-reset=latest --max-batch-time-ms 750 --no-strict-offset-reset --no-skip-write
+    command: consumer --storage search_issues --consumer-group generic_events_group --auto-offset-reset=latest --max-batch-time-ms 750 --no-strict-offset-reset
   snuba-metrics-consumer:
     <<: *snuba_defaults
     command: rust-consumer --storage metrics_raw --consumer-group snuba-metrics-consumers --auto-offset-reset=latest --max-batch-time-ms 750 --no-strict-offset-reset --no-skip-write
