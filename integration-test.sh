@@ -17,7 +17,7 @@ if [[ "$test_option" == "--initial-install" ]]; then
   echo "Testing initial install"
   pytest --reruns 5 _integration-test/run.py
   source _integration-test/ensure-customizations-not-present.sh
-  source _integration-test/ensure-backup-restore-works.sh
+  pytest _integration-test/backup.py
 elif [[ "$test_option" == "--customizations" ]]; then
   echo "Testing customizations"
   $dc up -d
@@ -36,5 +36,5 @@ EOT
   ./install.sh
   pytest --reruns 5 _integration-test/run.py
   source _integration-test/ensure-customizations-work.sh
-  source _integration-test/ensure-backup-restore-works.sh
+  pytest _integration-test/backup.py
 fi
