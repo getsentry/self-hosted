@@ -74,6 +74,21 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Setup dev environment
+        run: |
+          pip install -r requirements-dev.txt
+          ### pytest-sentry configuration ###
+          if [ "$GITHUB_REPOSITORY" = "getsentry/self-hosted" ]; then
+            echo "PYTEST_SENTRY_DSN=${{ env.SELF_HOSTED_TESTING_DSN }}" >> $GITHUB_ENV
+            echo "PYTEST_SENTRY_TRACES_SAMPLE_RATE=0" >> $GITHUB_ENV
+
+            # This records failures on master to sentry in order to detect flakey tests, as it's
+            # expected that people have failing tests on their PRs
+            if [ "$GITHUB_REF" = "refs/heads/master" ]; then
+              echo "PYTEST_SENTRY_ALWAYS_REPORT=1" >> $GITHUB_ENV
+            fi
+          fi
+
       - name: Get Compose
         run: |
           # Always remove `docker compose` support as that's the newer version

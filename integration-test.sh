@@ -15,7 +15,7 @@ export MINIMIZE_DOWNTIME=0
 
 if [[ "$test_option" == "--initial-install" ]]; then
   echo "Testing initial install"
-  source _integration-test/run.sh
+  pytest --reruns 5 _integration-test/run.py
   source _integration-test/ensure-customizations-not-present.sh
   source _integration-test/ensure-backup-restore-works.sh
 elif [[ "$test_option" == "--customizations" ]]; then
@@ -34,7 +34,7 @@ EOT
   echo "Testing in-place upgrade and customizations"
   export MINIMIZE_DOWNTIME=1
   ./install.sh
-  source _integration-test/run.sh
+  pytest --reruns 5 _integration-test/run.py
   source _integration-test/ensure-customizations-work.sh
   source _integration-test/ensure-backup-restore-works.sh
 fi

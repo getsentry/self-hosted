@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 set -e
 export COMPOSE_FILE=docker-compose.yml:_integration-test/custom-ca-roots/docker-compose.test.yml
 
@@ -42,4 +43,4 @@ openssl req -x509 -newkey rsa:2048 -nodes -days 1 -keyout $TEST_NGINX_CONF_PATH/
 
 cp _integration-test/custom-ca-roots/test.py sentry/test-custom-ca-roots.py
 
-$dc up -d fixture-custom-ca-roots
+docker compose --ansi never up -d fixture-custom-ca-roots
