@@ -45,7 +45,7 @@ def get_sentry_dsn(client: httpx.Client) -> str:
     sentry_dsn = json.loads(response.text)[0]["dsn"]["public"]
     return sentry_dsn
 
-  
+
 @pytest.fixture()
 def client_login():
     client = httpx.Client()
