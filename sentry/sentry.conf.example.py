@@ -304,11 +304,7 @@ SENTRY_FEATURES.update(
             "organizations:starfish-browser-webvitals-replace-fid-with-inp",
             "organizations:deprecate-fid-from-performance-score",
             "organizations:performance-database-view",
-            "organizations:starfish-browser-webvitals",
             "organizations:performance-screens-view",
-            "organizations:starfish-browser-resource-module-ui",
-            "organizations:starfish-browser-webvitals-pageoverview-v2",
-            "organizations:starfish-browser-webvitals-use-backend-scores",
             "organizations:mobile-ttid-ttfd-contribution",
             "organizations:starfish-mobile-appstart",
         )  # starfish related flags
