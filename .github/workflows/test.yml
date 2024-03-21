@@ -59,7 +59,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        test_type: ["initial-install", "customizations"]
+        customizations_enabled: ["False", "True"]
         compose_version: ["v2.0.1", "v2.7.0"]
         include:
           - compose_version: "v2.0.1"
@@ -105,7 +105,7 @@ jobs:
         run: ./install.sh
 
       - name: Integration Test
-        run: ./integration-test.sh --${{ matrix.test_type }}
+        run: pytest --reruns 5 _integration-test/ --customizations=${{ matrix.customizations_enabled }}
 
       - name: Inspect failure
         if: failure()

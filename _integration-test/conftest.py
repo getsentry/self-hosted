@@ -10,9 +10,10 @@ TEST_USER = "test@example.com"
 TEST_PASS = "test123TEST"
 TIMEOUT_SECONDS = 60
 
+def pytest_addoption(parser):
+    parser.addoption("--customizations",  default=False)
 
-@pytest.fixture(scope="session", autouse=True)
-def configure_self_hosted_environment():
+def pytest_configure(config):
     subprocess.run(["docker", "compose", "--ansi", "never", "up", "-d"], check=True)
     for i in range(TIMEOUT_SECONDS):
         try:
@@ -25,12 +26,30 @@ def configure_self_hosted_environment():
     else:
         raise AssertionError("timeout waiting for self-hosted to come up")
 
+    if config.getoption("--customizations"):
+        script_content = '''\
+#!/bin/bash
+touch /created-by-enhance-image
+apt-get update
+apt-get install -y gcc libsasl2-dev python-dev libldap2-dev libssl-dev
+'''
+
+        with open('sentry/enhance-image.sh', 'w') as script_file:
+            script_file.write(script_content)
+        # Set executable permissions for the shell script
+        os.chmod('sentry/enhance-image.sh', 0o755)
+
+        # Write content to the requirements.txt file
+        with open('sentry/requirements.txt', 'w') as req_file:
+            req_file.write('python-ldap\n')
+        os.environ['MINIMIZE_DOWNTIME'] = "1"
     # Create test user
     subprocess.run(
         [
             "docker",
             "compose",
             "exec",
+            "-T",
             "web",
             "sentry",
             "createuser",
@@ -45,3 +64,9 @@ def configure_self_hosted_environment():
         check=True,
         text=True,
     )
+
+@pytest.fixture()
+def setup_backup_restore_env_variables():
+    os.environ['SENTRY_DOCKER_IO_DIR'] = os.path.join(os.getcwd(), 'sentry')
+    os.environ['SKIP_USER_CREATION'] = "1"
+

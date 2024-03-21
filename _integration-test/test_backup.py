@@ -1,13 +1,8 @@
 import subprocess
 import os
-import pytest
 
-@pytest.fixture()
-def setup_env():
-    os.environ['SENTRY_DOCKER_IO_DIR'] = os.path.join(os.getcwd(), 'sentry')
-    os.environ['SKIP_USER_CREATION'] = "1"
 
-def test_backup(setup_env):
+def test_backup(setup_backup_restore_env_variables):
     # Docker was giving me permissioning issues when trying to create this file and write to it even after giving read + write access
     # to group and owner. Instead, try creating the empty file and then give everyone write access to the backup file
     file_path = os.path.join(os.getcwd(), 'sentry', 'backup.json')
@@ -18,7 +13,7 @@ def test_backup(setup_env):
     subprocess.run([sentry_admin_sh, "export", "global", "/sentry-admin/backup.json", "--no-prompt"], check=True)
     assert os.path.getsize(file_path) > 0
 
-def test_import(setup_env):
+def test_import(setup_backup_restore_env_variables):
     # Bring postgres down and recreate the docker volume
     subprocess.run(["docker", "compose", "--ansi", "never", "stop", "postgres"], check=True)
     subprocess.run(["docker", "compose", "--ansi", "never", "rm", "-f", "-v", "postgres"], check=True)
