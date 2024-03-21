@@ -207,7 +207,7 @@ services:
       - "sentry-secrets:/etc/kafka/secrets"
     healthcheck:
       <<: *healthcheck_defaults
-      test: ["CMD-SHELL", "/usr/bin/kafka-topics --bootstrap-server kafka:9092 --list"]
+      test: ["CMD-SHELL", "nc -z localhost 9092"]
       interval: 10s
       timeout: 10s
       retries: 30
