@@ -70,4 +70,3 @@ apt-get install -y gcc libsasl2-dev python-dev libldap2-dev libssl-dev
 def setup_backup_restore_env_variables():
     os.environ['SENTRY_DOCKER_IO_DIR'] = os.path.join(os.getcwd(), 'sentry')
     os.environ['SKIP_USER_CREATION'] = "1"
-
