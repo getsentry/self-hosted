@@ -1,3 +1,4 @@
+codecov-cli>=0.4.1
 sentry-sdk>=1.39.2
 pytest>=8.0.0
 pytest-rerunfailures>=11.0

@@ -101,14 +101,22 @@ jobs:
           sudo curl -L https://github.com/docker/compose/releases/download/${{ matrix.compose_version }}/docker-compose-`uname -s`-`uname -m` -o "${{ matrix.compose_path }}/docker-compose"
           sudo chmod +x "${{ matrix.compose_path }}/docker-compose"
 
-      - name: Install self-hosted
-        run: ./install.sh
-
       - name: Integration Test
-        run: pytest --reruns 5 _integration-test/ --customizations=${{ matrix.customizations_enabled }}
+        run: pytest -rPv --cov --junitxml=junit.xml --reruns 5 _integration-test/ --customizations=${{ matrix.customizations_enabled }}
 
       - name: Inspect failure
         if: failure()
         run: |
           docker compose ps
           docker compose logs
+
+      - name: Upload coverage to Codecov
+      	uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+
+      - name: Upload test results to Codecov
+      	if: ${{ !cancelled() }}
+        uses: codecov/test-results-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}

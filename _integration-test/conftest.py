@@ -15,6 +15,7 @@ def pytest_addoption(parser):
 
 @pytest.fixture(scope="session", autouse=True)
 def configure_self_hosted_environment(request):
+    subprocess.run(["./install.sh"], check=True)
     subprocess.run(["docker", "compose", "--ansi", "never", "up", "-d"], check=True)
     for i in range(TIMEOUT_SECONDS):
         try:
