@@ -16,7 +16,7 @@ defaults:
 jobs:
   e2e-test:
     if: github.repository_owner == 'getsentry'
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     name: "Sentry self-hosted end-to-end tests"
     steps:
       - name: Checkout
@@ -68,8 +68,8 @@ jobs:
             compose_path: "/usr/local/lib/docker/cli-plugins"
     env:
       COMPOSE_PROJECT_NAME: self-hosted-${{ strategy.job-index }}
-      SENTRY_DSN: https://5a620019b5124cbba230a9e62db9b825@o1.ingest.us.sentry.io/6627632
-      REPORT_SELF_HOSTED_ISSUES: 1
+      REPORT_SELF_HOSTED_ISSUES: 0
+      SELF_HOSTED_TESTING_DSN: ${{ vars.SELF_HOSTED_TESTING_DSN }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -79,14 +79,14 @@ jobs:
           pip install -r requirements-dev.txt
           ### pytest-sentry configuration ###
           if [ "$GITHUB_REPOSITORY" = "getsentry/self-hosted" ]; then
-            echo "PYTEST_SENTRY_DSN=${{ env.SELF_HOSTED_TESTING_DSN }}" >> $GITHUB_ENV
+            echo "PYTEST_SENTRY_DSN=$SELF_HOSTED_TESTING_DSN" >> $GITHUB_ENV
             echo "PYTEST_SENTRY_TRACES_SAMPLE_RATE=0" >> $GITHUB_ENV
 
             # This records failures on master to sentry in order to detect flakey tests, as it's
             # expected that people have failing tests on their PRs
-            if [ "$GITHUB_REF" = "refs/heads/master" ]; then
-              echo "PYTEST_SENTRY_ALWAYS_REPORT=1" >> $GITHUB_ENV
-            fi
+            # if [ "$GITHUB_REF" = "refs/heads/master" ]; then
+            echo "PYTEST_SENTRY_ALWAYS_REPORT=1" >> $GITHUB_ENV
+            # fi
           fi
 
       - name: Get Compose
@@ -101,8 +101,11 @@ jobs:
           sudo curl -L https://github.com/docker/compose/releases/download/${{ matrix.compose_version }}/docker-compose-`uname -s`-`uname -m` -o "${{ matrix.compose_path }}/docker-compose"
           sudo chmod +x "${{ matrix.compose_path }}/docker-compose"
 
+      - name: Install self-hosted
+        run: ./install.sh
+
       - name: Integration Test
-        run: pytest -rPv --cov --junitxml=junit.xml --reruns 5 _integration-test/ --customizations=${{ matrix.customizations_enabled }}
+        run: pytest --cov --junitxml=junit.xml --reruns 3 _integration-test/ --customizations=${{ matrix.customizations_enabled }}
 
       - name: Inspect failure
         if: failure()
@@ -111,12 +114,13 @@ jobs:
           docker compose logs
 
       - name: Upload coverage to Codecov
-      	uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v4
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
+          slug: getsentry/self-hosted
 
       - name: Upload test results to Codecov
-      	if: ${{ !cancelled() }}
+        if: ${{ !cancelled() }}
         uses: codecov/test-results-action@v1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
