@@ -14,12 +14,12 @@ def pytest_addoption(parser):
     parser.addoption("--customizations",  default=False)
 
 @pytest.fixture(scope="session", autouse=True)
-def configure_self_hosted_environment():
+def configure_self_hosted_environment(request):
     subprocess.run(["docker", "compose", "--ansi", "never", "up", "-d"], check=True)
     for i in range(TIMEOUT_SECONDS):
         try:
             response = httpx.get(SENTRY_TEST_HOST, follow_redirects=True)
-        except httpx.ConnectionError:
+        except httpx.ConnectError:
             time.sleep(1)
         else:
             if response.status_code == 200:
@@ -27,7 +27,7 @@ def configure_self_hosted_environment():
     else:
         raise AssertionError("timeout waiting for self-hosted to come up")
 
-    if config.getoption("--customizations"):
+    if request.config.getoption("--customizations"):
         script_content = '''\
 #!/bin/bash
 touch /created-by-enhance-image
