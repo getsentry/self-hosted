@@ -13,7 +13,8 @@ TIMEOUT_SECONDS = 60
 def pytest_addoption(parser):
     parser.addoption("--customizations",  default=False)
 
-def pytest_configure(config):
+@pytest.fixture(scope="session", autouse=True)
+def configure_self_hosted_environment():
     subprocess.run(["docker", "compose", "--ansi", "never", "up", "-d"], check=True)
     for i in range(TIMEOUT_SECONDS):
         try:
