@@ -233,6 +233,7 @@ def test_customizations():
             "--entrypoint=/etc/sentry/entrypoint.sh",
             "sentry-cleanup",
             "python",
+            "-c",
             "import ldap",
         ]
     ]
