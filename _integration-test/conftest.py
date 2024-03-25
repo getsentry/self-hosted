@@ -19,7 +19,7 @@ def configure_self_hosted_environment(request):
     for i in range(TIMEOUT_SECONDS):
         try:
             response = httpx.get(SENTRY_TEST_HOST, follow_redirects=True)
-        except httpx.ConnectError:
+        except httpx.NetworkError:
             time.sleep(1)
         else:
             if response.status_code == 200:
