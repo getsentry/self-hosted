@@ -28,6 +28,7 @@ def configure_self_hosted_environment(request):
         raise AssertionError("timeout waiting for self-hosted to come up")
 
     if request.config.getoption("--customizations"):
+        os.environ['TEST_CUSTOMIZATIONS'] = "1"
         script_content = '''\
 #!/bin/bash
 touch /created-by-enhance-image

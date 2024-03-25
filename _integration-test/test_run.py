@@ -141,7 +141,18 @@ def test_custom_cas():
     try:
         subprocess.run(["./_integration-test/custom-ca-roots/setup.sh"], check=True)
         subprocess.run(
-            ["docker", "compose", "--ansi", "never", "run", "--no-deps", "web", "python3", "/etc/sentry/test-custom-ca-roots.py"], check=True
+            [
+                "docker",
+                "compose",
+                "--ansi",
+                "never",
+                "run",
+                "--no-deps",
+                "web",
+                "python3",
+                "/etc/sentry/test-custom-ca-roots.py",
+            ],
+            check=True,
         )
     finally:
         subprocess.run(["./_integration-test/custom-ca-roots/teardown.sh"], check=True)
@@ -171,3 +182,124 @@ def test_receive_transaction_events(client_login):
         client,
         lambda x: len(json.loads(x)["data"]) > 0,
     )
+
+
+def test_customizations():
+    if os.getenv("SENTRY_TEST_HOST", False):
+        subprocess.run(
+            [
+                "docker",
+                "compose",
+                "--ansi",
+                "never",
+                "run",
+                "--no-deps",
+                "web",
+                "bash",
+                "-c" "if [ ! -e /created-by-enhance-image ]; then exit 1; fi",
+            ],
+            check=True,
+        )
+        subprocess.run(
+            [
+                "docker",
+                "compose",
+                "--ansi",
+                "never",
+                "run",
+                "--no-deps",
+                "--entrypoint=/etc/sentry/entrypoint.sh",
+                "sentry-cleanup",
+                "bash" "-c" "if [ ! -e /created-by-enhance-image ]; then exit 1; fi",
+            ],
+            check=True,
+        )
+        subprocess.run(
+            [
+                "docker",
+                "compose",
+                "--ansi",
+                "never",
+                "run",
+                "--no-deps",
+                "web",
+                "python",
+                "-c" "import ldap",
+            ],
+            check=True,
+        )
+        subprocess.run(
+            [
+                "docker",
+                "compose",
+                "--ansi",
+                "never",
+                "run",
+                "--no-deps",
+                "--entrypoint=/etc/sentry/entrypoint.sh",
+                "sentry-cleanup",
+                "python" "import ldap",
+            ],
+            check=True,
+        )
+    else:
+        subprocess.run(
+            [
+                "!",
+                "docker",
+                "compose",
+                "--ansi",
+                "never",
+                "run",
+                "--no-deps",
+                "web",
+                "bash",
+                "-c" "if [ ! -e /created-by-enhance-image ]; then exit 1; fi",
+            ],
+            check=True,
+        )
+        subprocess.run(
+            [
+                "!",
+                "docker",
+                "compose",
+                "--ansi",
+                "never",
+                "run",
+                "--no-deps",
+                "--entrypoint=/etc/sentry/entrypoint.sh",
+                "sentry-cleanup",
+                "bash" "-c" "if [ ! -e /created-by-enhance-image ]; then exit 1; fi",
+            ],
+            check=True,
+        )
+        subprocess.run(
+            [
+                "!",
+                "docker",
+                "compose",
+                "--ansi",
+                "never",
+                "run",
+                "--no-deps",
+                "web",
+                "python",
+                "-c" "import ldap",
+            ],
+            check=True,
+        )
+        subprocess.run(
+            [
+                "!",
+                "docker",
+                "compose",
+                "--ansi",
+                "never",
+                "run",
+                "--no-deps",
+                "--entrypoint=/etc/sentry/entrypoint.sh",
+                "sentry-cleanup",
+                "python" "import ldap",
+            ],
+            check=True,
+        )
