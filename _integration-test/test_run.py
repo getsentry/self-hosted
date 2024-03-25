@@ -185,121 +185,60 @@ def test_receive_transaction_events(client_login):
 
 
 def test_customizations():
-    if os.getenv("SENTRY_TEST_HOST", False):
-        subprocess.run(
-            [
-                "docker",
-                "compose",
-                "--ansi",
-                "never",
-                "run",
-                "--no-deps",
-                "web",
-                "bash",
-                "-c" "if [ ! -e /created-by-enhance-image ]; then exit 1; fi",
-            ],
-            check=True,
-        )
-        subprocess.run(
-            [
-                "docker",
-                "compose",
-                "--ansi",
-                "never",
-                "run",
-                "--no-deps",
-                "--entrypoint=/etc/sentry/entrypoint.sh",
-                "sentry-cleanup",
-                "bash" "-c" "if [ ! -e /created-by-enhance-image ]; then exit 1; fi",
-            ],
-            check=True,
-        )
-        subprocess.run(
-            [
-                "docker",
-                "compose",
-                "--ansi",
-                "never",
-                "run",
-                "--no-deps",
-                "web",
-                "python",
-                "-c" "import ldap",
-            ],
-            check=True,
-        )
-        subprocess.run(
-            [
-                "docker",
-                "compose",
-                "--ansi",
-                "never",
-                "run",
-                "--no-deps",
-                "--entrypoint=/etc/sentry/entrypoint.sh",
-                "sentry-cleanup",
-                "python" "import ldap",
-            ],
-            check=True,
-        )
-    else:
-        subprocess.run(
-            [
-                "!",
-                "docker",
-                "compose",
-                "--ansi",
-                "never",
-                "run",
-                "--no-deps",
-                "web",
-                "bash",
-                "-c" "if [ ! -e /created-by-enhance-image ]; then exit 1; fi",
-            ],
-            check=True,
-        )
-        subprocess.run(
-            [
-                "!",
-                "docker",
-                "compose",
-                "--ansi",
-                "never",
-                "run",
-                "--no-deps",
-                "--entrypoint=/etc/sentry/entrypoint.sh",
-                "sentry-cleanup",
-                "bash" "-c" "if [ ! -e /created-by-enhance-image ]; then exit 1; fi",
-            ],
-            check=True,
-        )
-        subprocess.run(
-            [
-                "!",
-                "docker",
-                "compose",
-                "--ansi",
-                "never",
-                "run",
-                "--no-deps",
-                "web",
-                "python",
-                "-c" "import ldap",
-            ],
-            check=True,
-        )
-        subprocess.run(
-            [
-                "!",
-                "docker",
-                "compose",
-                "--ansi",
-                "never",
-                "run",
-                "--no-deps",
-                "--entrypoint=/etc/sentry/entrypoint.sh",
-                "sentry-cleanup",
-                "python" "import ldap",
-            ],
-            check=True,
-        )
+    commands = [
+        [
+            "docker",
+            "compose",
+            "--ansi",
+            "never",
+            "run",
+            "--no-deps",
+            "web",
+            "bash",
+            "-c",
+            "if [ ! -e /created-by-enhance-image ]; then exit 1; fi",
+        ],
+        [
+            "docker",
+            "compose",
+            "--ansi",
+            "never",
+            "run",
+            "--no-deps",
+            "--entrypoint=/etc/sentry/entrypoint.sh",
+            "sentry-cleanup",
+            "bash",
+            "-c",
+            "if [ ! -e /created-by-enhance-image ]; then exit 1; fi",
+        ],
+        [
+            "docker",
+            "compose",
+            "--ansi",
+            "never",
+            "run",
+            "--no-deps",
+            "web",
+            "python",
+            "-c",
+            "import ldap",
+        ],
+        [
+            "docker",
+            "compose",
+            "--ansi",
+            "never",
+            "run",
+            "--no-deps",
+            "--entrypoint=/etc/sentry/entrypoint.sh",
+            "sentry-cleanup",
+            "python",
+            "import ldap",
+        ]
+    ]
+    for command in commands:
+        result = subprocess.run(command, check=False)
+        if os.getenv("TEST_CUSTOMIZATIONS", "False") == "True":
+            assert result.returncode == 0
+        else:
+            assert result.returncode != 0
