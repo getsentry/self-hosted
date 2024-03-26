@@ -103,10 +103,14 @@ jobs:
           sudo chmod +x "${{ matrix.compose_path }}/docker-compose"
 
       - name: Install self-hosted
-        run: ./install.sh
+        uses: nick-fields/retry@v3
+        with:
+          timeout_minutes: 10
+          max_attempts: 3
+          command: ./install.sh
 
       - name: Integration Test
-        run: pytest --cov --junitxml=junit.xml --reruns 3 _integration-test/ --customizations=${{ matrix.customizations_enabled }}
+        run: pytest --cov --junitxml=junit.xml --reruns 3 _integration-test/ --customizations=${{ matrix.customizations }}
 
       - name: Inspect failure
         if: failure()
