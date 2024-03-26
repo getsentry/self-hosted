@@ -55,11 +55,11 @@ jobs:
   integration-test:
     if: github.repository_owner == 'getsentry'
     runs-on: ubuntu-20.04
-    name: "integration test"
+    name: integration test ${{ matrix.compose_version }} - customizations ${{ matrix.customizations }}
     strategy:
       fail-fast: false
       matrix:
-        test_type: ["initial-install", "customizations"]
+        customizations: ["disabled", "enabled"]
         compose_version: ["v2.0.1", "v2.7.0"]
         include:
           - compose_version: "v2.0.1"
@@ -68,8 +68,8 @@ jobs:
             compose_path: "/usr/local/lib/docker/cli-plugins"
     env:
       COMPOSE_PROJECT_NAME: self-hosted-${{ strategy.job-index }}
-      SENTRY_DSN: https://5a620019b5124cbba230a9e62db9b825@o1.ingest.us.sentry.io/6627632
-      REPORT_SELF_HOSTED_ISSUES: 1
+      REPORT_SELF_HOSTED_ISSUES: 0
+      SELF_HOSTED_TESTING_DSN: ${{ vars.SELF_HOSTED_TESTING_DSN }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -77,9 +77,10 @@ jobs:
       - name: Setup dev environment
         run: |
           pip install -r requirements-dev.txt
+          echo "PY_COLORS=1" >> "$GITHUB_ENV"
           ### pytest-sentry configuration ###
           if [ "$GITHUB_REPOSITORY" = "getsentry/self-hosted" ]; then
-            echo "PYTEST_SENTRY_DSN=${{ env.SELF_HOSTED_TESTING_DSN }}" >> $GITHUB_ENV
+            echo "PYTEST_SENTRY_DSN=$SELF_HOSTED_TESTING_DSN" >> $GITHUB_ENV
             echo "PYTEST_SENTRY_TRACES_SAMPLE_RATE=0" >> $GITHUB_ENV
 
             # This records failures on master to sentry in order to detect flakey tests, as it's
@@ -102,13 +103,29 @@ jobs:
           sudo chmod +x "${{ matrix.compose_path }}/docker-compose"
 
       - name: Install self-hosted
-        run: ./install.sh
+        uses: nick-fields/retry@v3
+        with:
+          timeout_minutes: 10
+          max_attempts: 3
+          command: ./install.sh
 
       - name: Integration Test
-        run: ./integration-test.sh --${{ matrix.test_type }}
+        run: pytest --cov --junitxml=junit.xml --reruns 3 _integration-test/ --customizations=${{ matrix.customizations }}
 
       - name: Inspect failure
         if: failure()
         run: |
           docker compose ps
           docker compose logs
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          slug: getsentry/self-hosted
+
+      - name: Upload test results to Codecov
+        if: ${{ !cancelled() }}
+        uses: codecov/test-results-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
