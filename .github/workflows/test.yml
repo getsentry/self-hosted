@@ -16,7 +16,7 @@ defaults:
 jobs:
   e2e-test:
     if: github.repository_owner == 'getsentry'
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-20.04
     name: "Sentry self-hosted end-to-end tests"
     steps:
       - name: Checkout
@@ -55,11 +55,11 @@ jobs:
   integration-test:
     if: github.repository_owner == 'getsentry'
     runs-on: ubuntu-20.04
-    name: "integration test"
+    name: integration test ${{ matrix.compose_version }} - customizations ${{ matrix.customizations }}
     strategy:
       fail-fast: false
       matrix:
-        customizations_enabled: ["False", "True"]
+        customizations: ["disabled", "enabled"]
         compose_version: ["v2.0.1", "v2.7.0"]
         include:
           - compose_version: "v2.0.1"

@@ -11,7 +11,7 @@ TEST_PASS = "test123TEST"
 TIMEOUT_SECONDS = 60
 
 def pytest_addoption(parser):
-    parser.addoption("--customizations",  default=False)
+    parser.addoption("--customizations",  default="disabled")
 
 @pytest.fixture(scope="session", autouse=True)
 def configure_self_hosted_environment(request):
@@ -28,7 +28,7 @@ def configure_self_hosted_environment(request):
         raise AssertionError("timeout waiting for self-hosted to come up")
 
     if request.config.getoption("--customizations") == "True":
-        os.environ['TEST_CUSTOMIZATIONS'] = "True"
+        os.environ['TEST_CUSTOMIZATIONS'] = "enabled"
         script_content = '''\
 #!/bin/bash
 touch /created-by-enhance-image
