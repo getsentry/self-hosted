@@ -37,7 +37,7 @@ jobs:
           sudo chmod +x "/usr/local/lib/docker/cli-plugins/docker-compose"
 
       - name: End to end tests
-        uses: getsentry/action-self-hosted-e2e-tests@03010bd2963edc1f47b6e5e03167a4bc1433ea36
+        uses: getsentry/action-self-hosted-e2e-tests@main
         with:
           project_name: self-hosted
 
