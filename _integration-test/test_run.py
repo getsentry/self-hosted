@@ -145,7 +145,7 @@ def test_cleanup_crons_running():
     assert len(cleanup_crons) > 0
 
 
-def test_custom_cas():
+def test_custom_certificate_authorities():
     # Set environment variable
     os.environ["COMPOSE_FILE"] = (
         "docker-compose.yml:_integration-test/custom-ca-roots/docker-compose.test.yml"
@@ -309,6 +309,7 @@ def test_custom_cas():
                 encryption_algorithm=serialization.NoEncryption(),
             )
         )
+    # Our asserts for this test case must be executed within the web container, so we are copying a python test script into the mounted sentry directory
     with open(fake_test_cert_path, "wb") as cert_file:
         cert_file.write(fake_test_cert.public_bytes(serialization.Encoding.PEM))
         shutil.copyfile(
