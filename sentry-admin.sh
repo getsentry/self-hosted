@@ -19,7 +19,8 @@ on the host filesystem. Commands that write files should write them to the '/sen
 
 # Actual invocation that runs the command in the container.
 invocation() {
-  $dc run -v "$VOLUME_MAPPING" --rm -T -e SENTRY_LOG_LEVEL=CRITICAL web "$@"
+  output=$($dc run -v "$VOLUME_MAPPING" --rm -T -e SENTRY_LOG_LEVEL=CRITICAL web "$@" 2>&1)
+  echo "$output"
 }
 
 # Function to modify lines starting with `Usage: sentry` to say `Usage: ./sentry-admin.sh` instead.
