@@ -1,14 +1,22 @@
-import subprocess
+import datetime
+import json
 import os
+import re
+import shutil
+import subprocess
+import time
 from functools import lru_cache
-from bs4 import BeautifulSoup
+from typing import Callable
+
 import httpx
 import pytest
 import sentry_sdk
-import time
-import json
-import re
-from typing import Callable
+from bs4 import BeautifulSoup
+from cryptography import x509
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives import hashes, serialization
+from cryptography.hazmat.primitives.asymmetric import rsa
+from cryptography.x509.oid import NameOID
 
 SENTRY_CONFIG_PY = "sentry/sentry.conf.py"
 SENTRY_TEST_HOST = os.getenv("SENTRY_TEST_HOST", "http://localhost:9000")
@@ -137,25 +145,218 @@ def test_cleanup_crons_running():
     assert len(cleanup_crons) > 0
 
 
-def test_custom_cas():
-    try:
-        subprocess.run(["./_integration-test/custom-ca-roots/setup.sh"], check=True)
-        subprocess.run(
-            [
-                "docker",
-                "compose",
-                "--ansi",
-                "never",
-                "run",
-                "--no-deps",
-                "web",
-                "python3",
-                "/etc/sentry/test-custom-ca-roots.py",
-            ],
-            check=True,
+def test_custom_certificate_authorities():
+    # Set environment variable
+    os.environ["COMPOSE_FILE"] = (
+        "docker-compose.yml:_integration-test/custom-ca-roots/docker-compose.test.yml"
+    )
+
+    test_nginx_conf_path = "_integration-test/custom-ca-roots/nginx"
+    custom_certs_path = "certificates"
+
+    # Generate tightly constrained CA
+    ca_key = rsa.generate_private_key(
+        public_exponent=65537, key_size=2048, backend=default_backend()
+    )
+
+    ca_name = x509.Name(
+        [x509.NameAttribute(NameOID.COMMON_NAME, "TEST CA *DO NOT TRUST*")]
+    )
+
+    ca_cert = (
+        x509.CertificateBuilder()
+        .subject_name(ca_name)
+        .issuer_name(ca_name)
+        .public_key(ca_key.public_key())
+        .serial_number(x509.random_serial_number())
+        .not_valid_before(datetime.datetime.utcnow())
+        .not_valid_after(datetime.datetime.utcnow() + datetime.timedelta(days=1))
+        .add_extension(x509.BasicConstraints(ca=True, path_length=None), critical=True)
+        .add_extension(
+            x509.KeyUsage(
+                digital_signature=False,
+                key_encipherment=False,
+                content_commitment=False,
+                data_encipherment=False,
+                key_agreement=False,
+                key_cert_sign=True,
+                crl_sign=True,
+                encipher_only=False,
+                decipher_only=False,
+            ),
+            critical=True,
         )
-    finally:
-        subprocess.run(["./_integration-test/custom-ca-roots/teardown.sh"], check=True)
+        .add_extension(
+            x509.NameConstraints([x509.DNSName("self.test")], None), critical=True
+        )
+        .sign(private_key=ca_key, algorithm=hashes.SHA256(), backend=default_backend())
+    )
+
+    ca_key_path = f"{test_nginx_conf_path}/ca.key"
+    ca_crt_path = f"{test_nginx_conf_path}/ca.crt"
+
+    with open(ca_key_path, "wb") as key_file:
+        key_file.write(
+            ca_key.private_bytes(
+                encoding=serialization.Encoding.PEM,
+                format=serialization.PrivateFormat.TraditionalOpenSSL,
+                encryption_algorithm=serialization.NoEncryption(),
+            )
+        )
+
+    with open(ca_crt_path, "wb") as cert_file:
+        cert_file.write(ca_cert.public_bytes(serialization.Encoding.PEM))
+
+    # Create custom certs path and copy ca.crt
+    os.makedirs(custom_certs_path, exist_ok=True)
+    shutil.copyfile(ca_crt_path, f"{custom_certs_path}/test-custom-ca-roots.crt")
+    # Generate server key and certificate
+
+    self_test_key_path = os.path.join(test_nginx_conf_path, "self.test.key")
+    self_test_csr_path = os.path.join(test_nginx_conf_path, "self.test.csr")
+    self_test_cert_path = os.path.join(test_nginx_conf_path, "self.test.crt")
+
+    self_test_key = rsa.generate_private_key(public_exponent=65537, key_size=2048)
+
+    self_test_req = (
+        x509.CertificateSigningRequestBuilder()
+        .subject_name(
+            x509.Name(
+                [
+                    x509.NameAttribute(
+                        NameOID.COMMON_NAME, "Self Signed with CA Test Server"
+                    )
+                ]
+            )
+        )
+        .add_extension(
+            x509.SubjectAlternativeName([x509.DNSName("self.test")]), critical=False
+        )
+        .sign(self_test_key, hashes.SHA256())
+    )
+
+    self_test_cert = (
+        x509.CertificateBuilder()
+        .subject_name(
+            x509.Name(
+                [
+                    x509.NameAttribute(
+                        NameOID.COMMON_NAME, "Self Signed with CA Test Server"
+                    )
+                ]
+            )
+        )
+        .issuer_name(ca_cert.issuer)
+        .serial_number(x509.random_serial_number())
+        .not_valid_before(datetime.datetime.utcnow())
+        .not_valid_after(datetime.datetime.utcnow() + datetime.timedelta(days=1))
+        .public_key(self_test_req.public_key())
+        .add_extension(
+            x509.SubjectAlternativeName([x509.DNSName("self.test")]), critical=False
+        )
+        .sign(private_key=ca_key, algorithm=hashes.SHA256())
+    )
+
+    # Save server key, CSR, and certificate
+    with open(self_test_key_path, "wb") as key_file:
+        key_file.write(
+            self_test_key.private_bytes(
+                encoding=serialization.Encoding.PEM,
+                format=serialization.PrivateFormat.TraditionalOpenSSL,
+                encryption_algorithm=serialization.NoEncryption(),
+            )
+        )
+    with open(self_test_csr_path, "wb") as csr_file:
+        csr_file.write(self_test_req.public_bytes(serialization.Encoding.PEM))
+    with open(self_test_cert_path, "wb") as cert_file:
+        cert_file.write(self_test_cert.public_bytes(serialization.Encoding.PEM))
+
+    # Generate server key and certificate for fake.test
+
+    fake_test_key_path = os.path.join(test_nginx_conf_path, "fake.test.key")
+    fake_test_cert_path = os.path.join(test_nginx_conf_path, "fake.test.crt")
+
+    fake_test_key = rsa.generate_private_key(public_exponent=65537, key_size=2048)
+
+    fake_test_cert = (
+        x509.CertificateBuilder()
+        .subject_name(
+            x509.Name(
+                [x509.NameAttribute(NameOID.COMMON_NAME, "Self Signed Test Server")]
+            )
+        )
+        .issuer_name(
+            x509.Name(
+                [x509.NameAttribute(NameOID.COMMON_NAME, "Self Signed Test Server")]
+            )
+        )
+        .serial_number(x509.random_serial_number())
+        .not_valid_before(datetime.datetime.utcnow())
+        .not_valid_after(datetime.datetime.utcnow() + datetime.timedelta(days=1))
+        .public_key(fake_test_key.public_key())
+        .add_extension(
+            x509.SubjectAlternativeName([x509.DNSName("fake.test")]), critical=False
+        )
+        .sign(private_key=fake_test_key, algorithm=hashes.SHA256())
+    )
+
+    # Save server key and certificate for fake.test
+    with open(fake_test_key_path, "wb") as key_file:
+        key_file.write(
+            fake_test_key.private_bytes(
+                encoding=serialization.Encoding.PEM,
+                format=serialization.PrivateFormat.TraditionalOpenSSL,
+                encryption_algorithm=serialization.NoEncryption(),
+            )
+        )
+    # Our asserts for this test case must be executed within the web container, so we are copying a python test script into the mounted sentry directory
+    with open(fake_test_cert_path, "wb") as cert_file:
+        cert_file.write(fake_test_cert.public_bytes(serialization.Encoding.PEM))
+        shutil.copyfile(
+            "_integration-test/custom-ca-roots/test.py",
+            "sentry/test-custom-ca-roots.py",
+        )
+
+    subprocess.run(
+        ["docker", "compose", "--ansi", "never", "up", "-d", "fixture-custom-ca-roots"],
+        check=True,
+    )
+    subprocess.run(
+        [
+            "docker",
+            "compose",
+            "--ansi",
+            "never",
+            "run",
+            "--no-deps",
+            "web",
+            "python3",
+            "/etc/sentry/test-custom-ca-roots.py",
+        ],
+        check=True,
+    )
+    subprocess.run(
+        [
+            "docker",
+            "compose",
+            "--ansi",
+            "never",
+            "rm",
+            "-s",
+            "-f",
+            "-v",
+            "fixture-custom-ca-roots",
+        ],
+        check=True,
+    )
+
+    # Remove files
+    os.remove(f"{custom_certs_path}/test-custom-ca-roots.crt")
+    os.remove("sentry/test-custom-ca-roots.py")
+
+    # Unset environment variable
+    if "COMPOSE_FILE" in os.environ:
+        del os.environ["COMPOSE_FILE"]
 
 
 def test_receive_transaction_events(client_login):
@@ -235,7 +436,7 @@ def test_customizations():
             "python",
             "-c",
             "import ldap",
-        ]
+        ],
     ]
     for command in commands:
         result = subprocess.run(command, check=False)
