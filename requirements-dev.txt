@@ -1,3 +1,4 @@
+cryptography>=42.0.4
 sentry-sdk>=1.39.2
 pytest>=8.0.0
 pytest-cov>=4.1.0
