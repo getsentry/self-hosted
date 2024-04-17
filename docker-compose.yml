@@ -40,6 +40,8 @@ x-sentry-defaults: &sentry_defaults
       <<: *depends_on-default
     snuba-outcomes-consumer:
       <<: *depends_on-default
+    snuba-outcomes-billing-consumer:
+      <<: *depends_on-default
     snuba-transactions-consumer:
       <<: *depends_on-default
     snuba-subscription-consumer-events:
@@ -205,7 +207,7 @@ services:
       - "sentry-secrets:/etc/kafka/secrets"
     healthcheck:
       <<: *healthcheck_defaults
-      test: ["CMD-SHELL", "/usr/bin/kafka-topics --bootstrap-server kafka:9092 --list"]
+      test: ["CMD-SHELL", "nc -z localhost 9092"]
       interval: 10s
       timeout: 10s
       retries: 30
@@ -263,6 +265,9 @@ services:
   snuba-outcomes-consumer:
     <<: *snuba_defaults
     command: rust-consumer --storage outcomes_raw --consumer-group snuba-consumers --auto-offset-reset=earliest --max-batch-time-ms 750 --no-strict-offset-reset --no-skip-write
+  snuba-outcomes-billing-consumer:
+    <<: *snuba_defaults
+    command: rust-consumer --storage outcomes_raw --consumer-group snuba-consumers --auto-offset-reset=earliest --max-batch-time-ms 750 --no-strict-offset-reset --no-skip-write --raw-events-topic outcomes-billing
   # Kafka consumer responsible for feeding transactions data into Clickhouse
   snuba-transactions-consumer:
     <<: *snuba_defaults
@@ -276,6 +281,9 @@ services:
   snuba-metrics-consumer:
     <<: *snuba_defaults
     command: rust-consumer --storage metrics_raw --consumer-group snuba-metrics-consumers --auto-offset-reset=latest --max-batch-time-ms 750 --no-strict-offset-reset --no-skip-write
+  snuba-group-attributes-consumer:
+    <<: *snuba_defaults
+    command: rust-consumer --storage group_attributes --consumer-group snuba-group-attributes-consumers --auto-offset-reset=latest --max-batch-time-ms 750 --no-strict-offset-reset --no-skip-write
   snuba-generic-metrics-distributions-consumer:
     <<: *snuba_defaults
     command: rust-consumer --storage generic_metrics_distributions_raw --consumer-group snuba-gen-metrics-distributions-consumers --auto-offset-reset=latest --max-batch-time-ms 750 --no-strict-offset-reset --no-skip-write
