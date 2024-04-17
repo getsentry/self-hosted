@@ -6,4 +6,4 @@
 # the user that the workstation is ready for use.
 #
 # Works under the assumption that this is the last setup script to run!
-echo "ready_at: $(date -u +"%Y-%m-%dT%H:%M:%SZ")" > /home/user/.sentry.workstation.remote
+echo "ready_at: $(date -u +"%Y-%m-%dT%H:%M:%SZ")" >/home/user/.sentry.workstation.remote
