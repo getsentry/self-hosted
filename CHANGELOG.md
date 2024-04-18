@@ -1,5 +1,14 @@
 # Changelog
 
+## 24.4.1
+
+### Various fixes & improvements
+
+- chore(deps): bump memcached and redis to latest patch versions (#2973) by @mdtro
+- Use docker compose exec to create additional kafka topics (#2904) by @saz
+- Add example to docker compose version in problem report (#2959) by @edgariscoding
+- Port last integration tests to python (#2966) by @hubertdeng123
+
 ## 24.4.0
 
 ### Various fixes & improvements
