@@ -60,11 +60,11 @@ jobs:
       fail-fast: false
       matrix:
         customizations: ["disabled", "enabled"]
-        compose_version: ["v2.0.1", "v2.7.0"]
+        compose_version: ["v2.0.1", "v2.26.0"]
         include:
           - compose_version: "v2.0.1"
             compose_path: "/usr/local/lib/docker/cli-plugins"
-          - compose_version: "v2.7.0"
+          - compose_version: "v2.26.0"
             compose_path: "/usr/local/lib/docker/cli-plugins"
     env:
       COMPOSE_PROJECT_NAME: self-hosted-${{ strategy.job-index }}
@@ -110,7 +110,12 @@ jobs:
           command: ./install.sh
 
       - name: Integration Test
-        run: pytest --cov --junitxml=junit.xml --reruns 3 _integration-test/ --customizations=${{ matrix.customizations }}
+        run: |
+          if [ "${{ matrix.compose_version }}" = "v2.0.1" ]; then
+            pytest --reruns 5 --cov --junitxml=junit.xml _integration-test/ --customizations=${{ matrix.customizations }}
+          else
+            pytest --cov --junitxml=junit.xml _integration-test/ --customizations=${{ matrix.customizations }}
+          fi
 
       - name: Inspect failure
         if: failure()
