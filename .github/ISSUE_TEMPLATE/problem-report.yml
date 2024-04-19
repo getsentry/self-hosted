@@ -36,6 +36,7 @@ body:
       placeholder: 2.6.0 ← should look like this (docker compose version)
       description: |
         What version of docker compose are you using to run self-hosted?
+        e.g: (docker compose version)
     validations:
       required: true
   - type: textarea

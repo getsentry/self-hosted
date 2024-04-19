@@ -111,7 +111,7 @@ services:
       - "sentry-smtp-log:/var/log/exim4"
   memcached:
     <<: *restart_policy
-    image: "memcached:1.6.21-alpine"
+    image: "memcached:1.6.26-alpine"
     command: ["-I", "${SENTRY_MAX_EXTERNAL_SOURCEMAP_SIZE:-1M}"]
     healthcheck:
       <<: *healthcheck_defaults
@@ -119,7 +119,7 @@ services:
       test: echo stats | nc 127.0.0.1 11211
   redis:
     <<: *restart_policy
-    image: "redis:6.2.13-alpine"
+    image: "redis:6.2.14-alpine"
     healthcheck:
       <<: *healthcheck_defaults
       test: redis-cli ping
@@ -132,7 +132,7 @@ services:
   postgres:
     <<: *restart_policy
     # Using the same postgres version as Sentry dev for consistency purposes
-    image: "postgres:14.5"
+    image: "postgres:14.11-alpine"
     healthcheck:
       <<: *healthcheck_defaults
       # Using default user "postgres" from sentry/sentry.conf.example.py or value of POSTGRES_USER if provided
