@@ -1,5 +1,66 @@
 # Changelog
 
+## 24.4.1
+
+### Various fixes & improvements
+
+- chore(deps): bump memcached and redis to latest patch versions (#2973) by @mdtro
+- Use docker compose exec to create additional kafka topics (#2904) by @saz
+- Add example to docker compose version in problem report (#2959) by @edgariscoding
+- Port last integration tests to python (#2966) by @hubertdeng123
+
+## 24.4.0
+
+### Various fixes & improvements
+
+- Use python for e2e tests (#2953) by @hubertdeng123
+- feat: adds group attributes consumer (#2927) by @scefali
+- fix(spans): Adds organizations:standalone-span-ingestion flag to default config (#2936) by @edwardgou-sentry
+- Bump ubuntu version for tests (#2923) by @hubertdeng123
+- Write Customization tests in python (#2918) by @hubertdeng123
+- feat(clickhouse): Added max_suspicious_broken_parts to the config.xml (#2853) by @victorelec14
+- Port backup tests to python (#2907) by @hubertdeng123
+- Fix defunct java processes (#2914) by @hubertdeng123
+- Integration tests in python (#2892) by @hubertdeng123
+- feat: run outcomes-billing consumer (#2909) by @lynnagara
+- Remove duplicate feature flags (#2899) by @JannKleen
+
+## 24.3.0
+
+### Various fixes & improvements
+
+- feat(spans): Ingest spans (#2861) by @phacops
+- Integration test improvements (#2858) by @hubertdeng123
+- increase postgres max_connections above 100 connections (#2740) by @erfantkerfan
+- deps: bump maxmind/geoipupdate to 6.1.0 (#2859) by @victorelec14
+- Enable proxy buffering in nginx (#2844) by @RexTim
+- Add snuba rust consumers (#2831) by @hubertdeng123
+- simplify if for open-ai-suggestion (#2732) by @LvckyAPI
+- Upgrade to FSL-1.1 (#2835) by @chadwhitacre
+- chore: provide clearer csrf url example (#2833) by @aldy505
+- chore: Use django ORM to perform sql commands (#2827) by @hubertdeng123
+- revert changes in 3067683f6c0e1c6dd9ceb72cb5155c1dbf3bf501 (#2829) by @hubertdeng123
+- use rust consumers in self-hosted (3067683f) by @hubertdeng123
+
+## 24.2.0
+
+### Various fixes & improvements
+
+- Bump nginx version (#2797) by @hubertdeng123
+- build(deps): bump pre-commit/action from 3.0.0 to 3.0.1 (#2788) by @dependabot
+- Tweak postgres indexing fix (#2792) by @hubertdeng123
+- fix: DB migration script (#2779) by @hubertdeng123
+
+## 24.1.2
+
+### Various fixes & improvements
+
+- Check memcached backend in Django (#2778) by @chadwhitacre
+- Fix groupedmessage indexing error (#2777) by @hubertdeng123
+- build(deps): bump actions/setup-python from 4 to 5 (#2644) by @dependabot
+- feat: provide csrf settings information for sentry config (#2762) by @aldy505
+- Fix apt config generation when http_proxy is set (#2725) (#2734) by @lemrouch
+
 ## 24.1.1
 
 ### Various fixes & improvements
