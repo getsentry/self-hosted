@@ -1,5 +1,30 @@
 # Changelog
 
+## 24.4.1
+
+### Various fixes & improvements
+
+- chore(deps): bump memcached and redis to latest patch versions (#2973) by @mdtro
+- Use docker compose exec to create additional kafka topics (#2904) by @saz
+- Add example to docker compose version in problem report (#2959) by @edgariscoding
+- Port last integration tests to python (#2966) by @hubertdeng123
+
+## 24.4.0
+
+### Various fixes & improvements
+
+- Use python for e2e tests (#2953) by @hubertdeng123
+- feat: adds group attributes consumer (#2927) by @scefali
+- fix(spans): Adds organizations:standalone-span-ingestion flag to default config (#2936) by @edwardgou-sentry
+- Bump ubuntu version for tests (#2923) by @hubertdeng123
+- Write Customization tests in python (#2918) by @hubertdeng123
+- feat(clickhouse): Added max_suspicious_broken_parts to the config.xml (#2853) by @victorelec14
+- Port backup tests to python (#2907) by @hubertdeng123
+- Fix defunct java processes (#2914) by @hubertdeng123
+- Integration tests in python (#2892) by @hubertdeng123
+- feat: run outcomes-billing consumer (#2909) by @lynnagara
+- Remove duplicate feature flags (#2899) by @JannKleen
+
 ## 24.3.0
 
 ### Various fixes & improvements
