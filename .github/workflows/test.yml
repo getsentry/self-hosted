@@ -102,7 +102,7 @@ jobs:
           if [ "${{ matrix.compose_version }}" = "v2.0.1" ]; then
             pytest --reruns 3 --cov --junitxml=junit.xml _integration-test/ --customizations=${{ matrix.customizations }}
           else
-            pytest --cov --junitxml=junit.xml _integration-test/ --customizations=${{ matrix.customizations }}
+            pytest -rA --cov --junitxml=junit.xml _integration-test/ --customizations=${{ matrix.customizations }}
           fi
 
       - name: Inspect failure
