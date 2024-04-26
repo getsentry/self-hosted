@@ -52,7 +52,11 @@ apt-get install -y gcc libsasl2-dev python-dev libldap2-dev libssl-dev
         with open("sentry/requirements.txt", "w") as req_file:
             req_file.write("python-ldap\n")
         os.environ["MINIMIZE_DOWNTIME"] = "1"
-        subprocess.run(["./install.sh"], check=True)
+        subprocess.run(
+            ["./install.sh"],
+            check=True,
+            capture_output=True,
+        )
     # Create test user
     subprocess.run(
         [
