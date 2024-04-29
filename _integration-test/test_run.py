@@ -313,7 +313,7 @@ def test_custom_certificate_authorities():
     with open(fake_test_cert_path, "wb") as cert_file:
         cert_file.write(fake_test_cert.public_bytes(serialization.Encoding.PEM))
         shutil.copyfile(
-            "_integration-test/custom-ca-roots/test.py",
+            "_integration-test/custom-ca-roots/custom-ca-roots-test.py",
             "sentry/test-custom-ca-roots.py",
         )
 
