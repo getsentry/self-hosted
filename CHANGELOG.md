@@ -1,5 +1,19 @@
 # Changelog
 
+## 24.4.2
+
+### Various fixes & improvements
+
+- Edit test file name (#3002) by @hubertdeng123
+- Revert "Sampling: Run e2e tests every 5 minutes" (#2999) by @hubertdeng123
+- Fix master test failures (#3000) by @hubertdeng123
+- Sampling: Run e2e tests every 5 minutes (#2994) by @hubertdeng123
+- Tweak e2e test github action (#2987) by @hubertdeng123
+- fix(performance): Add spans-first-ui flag to enable starfish/performance module views in ui (#2993) by @edwardgou-sentry
+- Bump docker compose version in CI (#2980) by @hubertdeng123
+- Upgrade postgres to 14.11 (#2975) by @mdtro
+- Add workstation configuration (#2968) by @azaslavsky
+
 ## 24.4.1
 
 ### Various fixes & improvements
