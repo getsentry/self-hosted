@@ -40,6 +40,43 @@ jobs:
       - name: Unit Tests
         run: ./unit-test.sh
 
+  upgrade-test:
+    if: github.repository_owner == 'getsentry'
+    runs-on: ubuntu-22.04
+    name: "Sentry upgrade test"
+    env:
+      REPORT_SELF_HOSTED_ISSUES: 0
+    steps:
+      - name: Get latest self-hosted release version
+        run: |
+          LATEST_TAG=$(curl -s https://api.github.com/repos/getsentry/self-hosted/releases/latest | jq -r '.tag_name')
+          echo "LATEST_TAG=$LATEST_TAG" >> $GITHUB_ENV
+
+      - name: Checkout latest release
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.LATEST_TAG }}
+
+      - name: Get Compose
+        run: |
+          # Docker Compose v1 is installed here, remove it
+          sudo rm -f "/usr/local/bin/docker-compose"
+          sudo rm -f "/usr/local/lib/docker/cli-plugins/docker-compose"
+          sudo mkdir -p "/usr/local/lib/docker/cli-plugins"
+          sudo curl -L https://github.com/docker/compose/releases/download/v2.26.0/docker-compose-`uname -s`-`uname -m` -o "/usr/local/lib/docker/cli-plugins/docker-compose"
+          sudo chmod +x "/usr/local/lib/docker/cli-plugins/docker-compose"
+
+      - name: Install ${{ env.LATEST_TAG }}
+        run: ./install.sh
+
+      - name: Checkout current ref
+        uses: actions/checkout@v4
+
+      - name: Install current ref
+        run: |
+          # Hacky way to get around permissioning issues in update-docker-volume-permissions.sh script
+          sudo -E ./install.sh
+
   integration-test:
     if: github.repository_owner == 'getsentry'
     runs-on: ubuntu-22.04
