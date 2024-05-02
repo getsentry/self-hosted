@@ -22,13 +22,13 @@ source install/check-minimum-requirements.sh
 # Let's go! Start impacting things.
 source install/turn-things-off.sh
 source install/update-docker-volume-permissions.sh
+source install/upgrade-clickhouse.sh
 source install/create-docker-volumes.sh
 source install/ensure-files-from-examples.sh
 source install/check-memcached-backend.sh
 source install/ensure-relay-credentials.sh
 source install/generate-secret-key.sh
 source install/update-docker-images.sh
-source install/upgrade-clickhouse.sh
 source install/build-docker-images.sh
 source install/install-wal2json.sh
 source install/bootstrap-snuba.sh
