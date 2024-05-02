@@ -47,13 +47,15 @@ jobs:
     env:
       REPORT_SELF_HOSTED_ISSUES: 0
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
       - name: Get latest self-hosted release version
         run: |
           LATEST_TAG=$(curl -s https://api.github.com/repos/getsentry/self-hosted/releases/latest | jq -r '.tag_name')
-          git checkout "$LATEST_TAG"
+          echo "LATEST_TAG=$LATEST_TAG" >> $GITHUB_ENV
+
+      - name: Checkout latest release
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.LATEST_TAG }}
 
       - name: Get Compose
         run: |
@@ -67,10 +69,11 @@ jobs:
       - name: Install ${{ env.LATEST_TAG }}
         run: ./install.sh
 
-      - name: Install master
-        run: |
-          git checkout master
-          ./install.sh
+      - name: Checkout current ref
+        uses: actions/checkout@v4
+
+      - name: Install current ref
+        run: ./install.sh
 
   integration-test:
     if: github.repository_owner == 'getsentry'
