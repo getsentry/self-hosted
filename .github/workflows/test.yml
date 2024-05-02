@@ -75,7 +75,7 @@ jobs:
       - name: Install current ref
         run: |
           # Hacky way to get around permissioning issues in update-docker-volume-permissions.sh script
-          sudo ./install.sh --no-report-self-hosted-issues
+          sudo -E ./install.sh
 
   integration-test:
     if: github.repository_owner == 'getsentry'
