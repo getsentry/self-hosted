@@ -40,6 +40,38 @@ jobs:
       - name: Unit Tests
         run: ./unit-test.sh
 
+  upgrade-test:
+    if: github.repository_owner == 'getsentry'
+    runs-on: ubuntu-22.04
+    name: "Sentry upgrade test"
+    steps:
+      - name: Get latest self-hosted release version
+        run: |
+          LATEST_TAG=$(git describe --tags `git rev-list --tags --max-count=1`)
+          echo "LATEST_TAG=$LATEST_TAG" >> $GITHUB_ENV
+
+      - name: Checkout latest self-hosted version
+        uses: actions/checkout@v4
+        ref: {{ env.LATEST_TAG }}
+
+      - name: Get Compose
+        run: |
+          # Docker Compose v1 is installed here, remove it
+          sudo rm -f "/usr/local/bin/docker-compose"
+          sudo rm -f "/usr/local/lib/docker/cli-plugins/docker-compose"
+          sudo mkdir -p "/usr/local/lib/docker/cli-plugins"
+          sudo curl -L https://github.com/docker/compose/releases/download/v2.26.0/docker-compose-`uname -s`-`uname -m` -o "/usr/local/lib/docker/cli-plugins/docker-compose"
+          sudo chmod +x "/usr/local/lib/docker/cli-plugins/docker-compose"
+
+      - name: Install {{ env.LATEST_TAG }}
+        run: ./install.sh
+
+      - name: Checkout master
+        uses: actions/checkout@v4
+
+      - name: Install master
+        run: ./install.sh
+
   integration-test:
     if: github.repository_owner == 'getsentry'
     runs-on: ubuntu-22.04
