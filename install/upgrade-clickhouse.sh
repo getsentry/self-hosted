@@ -4,6 +4,14 @@ echo "${_group}Upgrading Clickhouse ..."
 if [[ -n "$(docker volume ls -q --filter name=sentry-clickhouse)" ]]; then
   # In order to get to 23.8, we need to first upgrade go from 21.8 -> 22.8 -> 23.3 -> 23.8
   $dc up -d clickhouse
+
+  # Wait for clickhouse
+  RETRIES=30
+  until $dc ps clickhouse | grep 'healthy' || [ $RETRIES -eq 0 ]; do
+    echo "Waiting for clickhouse server, $((RETRIES--)) remaining attempts..."
+    sleep 1
+  done
+
   version=$($dc exec clickhouse clickhouse-client -q 'SELECT version()')
   if [[ "$version" == "22.8.15.25.altinitystable" || "$version" == "21.8.12.29.altinitydev.arm" ]]; then
     $dc down clickhouse
