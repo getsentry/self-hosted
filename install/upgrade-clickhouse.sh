@@ -2,7 +2,7 @@ echo "${_group}Upgrading Clickhouse ..."
 
 # First check to see if user is upgrading by checking for existing clickhouse volume
 if [[ -n "$(docker volume ls -q --filter name=sentry-clickhouse)" ]]; then
-  # In order to get to 23.8, we need to first upgrade go from 21.8 -> 22.8 -> 23.3 -> 23.8
+  # Start clickhouse if it is not already running
   $dc up -d clickhouse
 
   # Wait for clickhouse
@@ -12,6 +12,7 @@ if [[ -n "$(docker volume ls -q --filter name=sentry-clickhouse)" ]]; then
     sleep 1
   done
 
+  # In order to get to 23.8, we need to first upgrade go from 21.8 -> 22.8 -> 23.3 -> 23.8
   version=$($dc exec clickhouse clickhouse-client -q 'SELECT version()')
   if [[ "$version" == "22.8.15.25.altinitystable" || "$version" == "21.8.12.29.altinitydev.arm" ]]; then
     $dc down clickhouse
@@ -22,3 +23,4 @@ if [[ -n "$(docker volume ls -q --filter name=sentry-clickhouse)" ]]; then
   fi
   $dc down clickhouse
 fi
+echo "${_endgroup}"

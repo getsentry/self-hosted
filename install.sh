@@ -20,9 +20,9 @@ source install/check-latest-commit.sh
 source install/check-minimum-requirements.sh
 
 # Let's go! Start impacting things.
+source install/upgrade-clickhouse.sh
 source install/turn-things-off.sh
 source install/update-docker-volume-permissions.sh
-source install/upgrade-clickhouse.sh
 source install/create-docker-volumes.sh
 source install/ensure-files-from-examples.sh
 source install/check-memcached-backend.sh
