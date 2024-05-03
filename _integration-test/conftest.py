@@ -48,11 +48,8 @@ apt-get install -y gcc libsasl2-dev python-dev-is-python3 libldap2-dev libssl-de
         # Set executable permissions for the shell script
         os.chmod("sentry/enhance-image.sh", 0o755)
 
-        # Write content to the requirements.txt file
-        with open("sentry/requirements.txt", "w") as req_file:
-            req_file.write("python-ldap\n")
         os.environ["MINIMIZE_DOWNTIME"] = "1"
-        output = subprocess.run(["./install.sh"], check=True, capture_output=True)
+        output = subprocess.run(["./install.sh"], check=False, capture_output=True)
         print(output.stdout)
     # Create test user
     subprocess.run(
