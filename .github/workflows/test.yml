@@ -137,7 +137,7 @@ jobs:
       - name: Integration Test
         run: |
           if [ "${{ matrix.compose_version }}" = "v2.0.1" ]; then
-            pytest --reruns 3 --cov --junitxml=junit.xml _integration-test/ --customizations=${{ matrix.customizations }}
+            pytest -rA --cov --junitxml=junit.xml _integration-test/ --customizations=${{ matrix.customizations }}
           else
             pytest -rA --cov --junitxml=junit.xml _integration-test/ --customizations=${{ matrix.customizations }}
           fi
