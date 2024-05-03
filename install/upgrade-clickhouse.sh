@@ -23,6 +23,5 @@ if [[ -n "$(docker volume ls -q --filter name=sentry-clickhouse)" ]]; then
   else
     echo "Detected clickhouse version $version. Skipping upgrades!"
   fi
-  $dc down clickhouse
 fi
 echo "${_endgroup}"
