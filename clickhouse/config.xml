@@ -1,10 +1,6 @@
 <yandex>
-    <max_server_memory_usage_to_ram_ratio>
-        <!-- This include is important!
-         It is required for the version of Clickhouse
-         used on ARM to read the environment variable. -->
-        <include from_env="MAX_MEMORY_USAGE_RATIO"/>
-    </max_server_memory_usage_to_ram_ratio>
+ <!-- This include is important! It is required for the version of Clickhouse used on ARM to read the environment variable. -->
+    <max_server_memory_usage_to_ram_ratio><include from_env="MAX_MEMORY_USAGE_RATIO"/></max_server_memory_usage_to_ram_ratio>
     <logger>
         <level>warning</level>
         <console>true</console>
