@@ -1,5 +1,17 @@
 # Changelog
 
+## 24.5.0
+
+### Various fixes & improvements
+
+- fix: Make docker volume script respect compose project name (#3039) by @hubertdeng123
+- remove ref to skip writes (#3041) by @john-z-yang
+- Add clickhouse healthchecks to upgrade (#3024) by @hubertdeng123
+- Upgrade clickhouse to 23.8 (#3009) by @hubertdeng123
+- fix: use nginx realip module (#2977) by @oioki
+- Add upgrade test (#3012) by @hubertdeng123
+- Bump kafka and zookeeper versions (#2988) by @hubertdeng123
+
 ## 24.4.2
 
 ### Various fixes & improvements
