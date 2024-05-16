@@ -134,6 +134,9 @@ SENTRY_EVENTSTREAM_OPTIONS = {"producer_configuration": DEFAULT_KAFKA_OPTIONS}
 
 KAFKA_CLUSTERS["default"] = DEFAULT_KAFKA_OPTIONS
 
+# Temporary flag to test a new ingest consumer for user feedback.
+SENTRY_OPTIONS["feedback.ingest-topic.rollout-rate"] = 1.0
+
 ###############
 # Rate Limits #
 ###############
