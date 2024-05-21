@@ -7,6 +7,12 @@ if [[ -n "$MSYSTEM" ]]; then
   exit 1
 fi
 
+# Check if script was executed with root/sudo
+if [ `id -u` -ne 0 ]
+  then echo Please run this script as root or using sudo!
+  exit
+fi
+
 source install/_lib.sh
 
 # Pre-flight. No impact yet.
