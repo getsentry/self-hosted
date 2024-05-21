@@ -8,10 +8,19 @@ if [[ -n "$MSYSTEM" ]]; then
 fi
 
 # Check if script was executed with root/sudo
-if [ `id -u` -ne 0 ]
-  then echo Please run this script as root or using sudo!
-  exit
+if [ "$(id -u)" -ne 0 ]; then
+    if [ "$CI" != "true" ]; then
+        echo "You should be using sudo, are you sure you want to continue? [y/n]"
+        read -r answer
+        if [ "$answer" != "${answer#[Yy]}" ] ;then
+            echo "Continuing without sudo. This might cause issues later on."
+        else
+            echo "The script execution was stopped. Please run it again with sudo."
+            exit
+        fi
+    fi
 fi
+
 
 source install/_lib.sh
 
