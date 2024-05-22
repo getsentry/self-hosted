@@ -177,7 +177,8 @@ services:
       - "sentry-secrets:/etc/zookeeper/secrets"
     healthcheck:
       <<: *healthcheck_defaults
-      test: ["CMD-SHELL", 'echo "ruok" | nc -w 2 localhost 2181 | grep imok']
+      test:
+        ["CMD-SHELL", 'echo "ruok" | nc -w 2 localhost 2181 | grep imok']
   kafka:
     <<: *restart_policy
     depends_on:
@@ -249,8 +250,7 @@ services:
     # Override the entrypoint in order to avoid using envvars for config.
     # Futz with settings so we can keep mmdb and conf in same dir on host
     # (image looks for them in separate dirs by default).
-    entrypoint:
-      ["/usr/bin/geoipupdate", "-d", "/sentry", "-f", "/sentry/GeoIP.conf"]
+    entrypoint: ["/usr/bin/geoipupdate", "-d", "/sentry", "-f", "/sentry/GeoIP.conf"]
     volumes:
       - "./geoip:/sentry"
   snuba-api:
@@ -363,9 +363,6 @@ services:
   transactions-consumer:
     <<: *sentry_defaults
     command: run consumer ingest-transactions --consumer-group ingest-consumer
-  ingest-feedback-events:
-    <<: *sentry_defaults
-    command: run consumer ingest-feedback-events --consumer-group ingest-consumer
   metrics-consumer:
     <<: *sentry_defaults
     command: run consumer ingest-metrics --consumer-group metrics-consumer
