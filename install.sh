@@ -10,7 +10,7 @@ fi
 # Check if script was executed with root/sudo
 if [ "$(id -u)" -ne 0 ]; then
     if [ "$CI" != "true" ]; then
-        echo "You should be using sudo, are you sure you want to continue? [y/n]"
+        echo "It is recommended to run the script as the root user (by using sudo or as a direct root user) to avoid permission issues. Are you sure you want to continue? [y/n]"
         read -r answer
         if [ "$answer" != "${answer#[Yy]}" ] ;then
             echo "Continuing without sudo. This might cause issues later on."
