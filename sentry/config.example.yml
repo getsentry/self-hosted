@@ -117,7 +117,7 @@ transaction-events.force-disable-internal-project: true
 # slack.client-id: <'client id'>
 # slack.client-secret: <client secret>
 # slack.signing-secret: <signing secret>
-## If legacy-app is True use verfication-token instead of signing-secret
+## If legacy-app is True use verification-token instead of signing-secret
 # slack.verification-token: <verification token>
 
 
