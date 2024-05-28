@@ -50,7 +50,7 @@ jobs:
       - name: Get latest self-hosted release version
         run: |
           LATEST_TAG=$(curl -s https://api.github.com/repos/getsentry/self-hosted/releases/latest | jq -r '.tag_name')
-          echo "LATEST_TAG=$LATEST_TAG" >> $GITHUB_ENV
+          echo "LATEST_TAG=24.2.0" >> $GITHUB_ENV
 
       - name: Checkout latest release
         uses: actions/checkout@v4
@@ -73,9 +73,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Install current ref
-        run: |
-          # Hacky way to get around permissioning issues in update-docker-volume-permissions.sh script
-          sudo -E ./install.sh
+        run: ./install.sh
 
   integration-test:
     if: github.repository_owner == 'getsentry'
