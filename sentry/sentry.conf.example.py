@@ -295,7 +295,7 @@ SENTRY_FEATURES.update(
         )
         + (
             "organizations:deprecate-fid-from-performance-score",
-            "organizations:indexed-spans-extraction",
+            # "organizations:indexed-spans-extraction",
             "organizations:insights-entry-points",
             "organizations:insights-initial-modules",
             "organizations:mobile-ttid-ttfd-contribution",
