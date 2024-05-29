@@ -27,7 +27,9 @@ jobs:
       - name: End to end tests
         uses: getsentry/action-self-hosted-e2e-tests@main
         with:
-          project_name: self-hosted
+          project_name: relay
+          image_url: ghcr.io/getsentry/relay:e27613a1b41bef3a417aef4031d234114903b2f8
+          docker_repo: getsentry/relay
 
   unit-test:
     if: github.repository_owner == 'getsentry'
