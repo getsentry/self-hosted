@@ -300,8 +300,6 @@ SENTRY_FEATURES.update(
             "organizations:insights-initial-modules",
             "organizations:mobile-ttid-ttfd-contribution",
             "organizations:performance-calculate-score-relay",
-            "organizations:performance-database-view",
-            "organizations:performance-screens-view",
             "organizations:spans-first-ui",
             "organizations:standalone-span-ingestion",
             "organizations:starfish-browser-resource-module-image-view",
