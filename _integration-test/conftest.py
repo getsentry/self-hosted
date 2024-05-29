@@ -18,11 +18,27 @@ def pytest_addoption(parser):
 
 @pytest.fixture(scope="session", autouse=True)
 def configure_self_hosted_environment(request):
-    subprocess.run(
-        ["docker", "compose", "--ansi", "never", "up", "-d"],
-        check=True,
-        capture_output=True,
-    )
+    if os.path.exists(".env.custom"):
+        subprocess.run(
+            [
+                "docker",
+                "compose",
+                "--ansi",
+                "never",
+                "--env-file",
+                ".env.custom",
+                "up",
+                "-d",
+            ],
+            check=True,
+            capture_output=True,
+        )
+    else:
+        subprocess.run(
+            ["docker", "compose", "--ansi", "never", "up", "-d"],
+            check=True,
+            capture_output=True,
+        )
     for i in range(TIMEOUT_SECONDS):
         try:
             response = httpx.get(SENTRY_TEST_HOST, follow_redirects=True)
