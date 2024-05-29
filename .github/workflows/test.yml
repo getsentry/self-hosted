@@ -73,9 +73,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Install current ref
-        run: |
-          # Hacky way to get around permissioning issues in update-docker-volume-permissions.sh script
-          sudo -E ./install.sh
+        run: ./install.sh
 
   integration-test:
     if: github.repository_owner == 'getsentry'
