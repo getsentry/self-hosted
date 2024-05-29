@@ -21,6 +21,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          path: self-hosted
 
       - name: End to end tests
         uses: getsentry/action-self-hosted-e2e-tests@main
