@@ -294,21 +294,22 @@ SENTRY_FEATURES.update(
             "projects:servicehooks",
         )
         + (
-            "projects:span-metrics-extraction",
+            "organizations:deprecate-fid-from-performance-score",
+            "organizations:indexed-spans-extraction",
+            "organizations:insights-entry-points",
+            "organizations:insights-initial-modules",
+            "organizations:mobile-ttid-ttfd-contribution",
+            "organizations:performance-calculate-score-relay",
+            "organizations:spans-first-ui",
+            "organizations:standalone-span-ingestion",
             "organizations:starfish-browser-resource-module-image-view",
             "organizations:starfish-browser-resource-module-ui",
             "organizations:starfish-browser-webvitals",
             "organizations:starfish-browser-webvitals-pageoverview-v2",
-            "organizations:starfish-browser-webvitals-use-backend-scores",
-            "organizations:performance-calculate-score-relay",
             "organizations:starfish-browser-webvitals-replace-fid-with-inp",
-            "organizations:deprecate-fid-from-performance-score",
-            "organizations:performance-database-view",
-            "organizations:performance-screens-view",
-            "organizations:mobile-ttid-ttfd-contribution",
+            "organizations:starfish-browser-webvitals-use-backend-scores",
             "organizations:starfish-mobile-appstart",
-            "organizations:standalone-span-ingestion",
-            "organizations:spans-first-ui",
+            "projects:span-metrics-extraction",
         )  # starfish related flags
     }
 )
