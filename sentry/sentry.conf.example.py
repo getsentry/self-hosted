@@ -312,7 +312,6 @@ SENTRY_FEATURES.update(
             "organizations:starfish-browser-webvitals-use-backend-scores",
             "organizations:starfish-mobile-appstart",
             "projects:span-metrics-extraction",
-            "projects:span-metrics-extraction-addons",
         )  # starfish related flags
     }
 )
