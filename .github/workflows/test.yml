@@ -58,7 +58,7 @@ jobs:
             echo "LATEST_TAG=$LATEST_TAG" >> $GITHUB_ENV
           else
             # Use latest hard stop version
-            echo "LATEST_TAG=23.6.2" >> $GITHUB_ENV
+            echo "LATEST_TAG=24.1.0" >> $GITHUB_ENV
           fi
 
       - name: Checkout latest release
