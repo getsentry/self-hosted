@@ -79,7 +79,7 @@ releasefile.cache-path: '/data/releasefile-cache'
 #   bucket_name: 's3-bucket-name'
 
 # Uncomment this and set this to the main URL domain name that your Sentry instance can be accessed from.
-# This URL value is used on emails, and DSN creations. In some cases, the `system.url-prefix` doesn't survive restarts, 
+# This URL value is used on emails, and DSN creations. In some cases, the `system.url-prefix` doesn't survive restarts,
 # therefore it's recommended to have this value set beforehand.
 # system.url-prefix: https://example.sentry.com
 
