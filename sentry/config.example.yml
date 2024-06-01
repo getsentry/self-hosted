@@ -7,7 +7,7 @@
 # Mail Server #
 ###############
 
-# mail.backend: 'smtp'  # Use dummy if you want to disable email entirely
+# mail.backend: 'smtp'  # Set this to 'dummy' if you want to disable email entirely
 mail.host: 'smtp'
 # mail.port: 25
 # mail.username: ''
@@ -78,8 +78,11 @@ releasefile.cache-path: '/data/releasefile-cache'
 #   secret_key: 'XXXXXXX'
 #   bucket_name: 's3-bucket-name'
 
-# The URL prefix in which Sentry is accessible
+# Uncomment this and set this to the main URL domain name that your Sentry instance can be accessed from.
+# This URL value is used on emails, and DSN creations. In some cases, the `system.url-prefix` doesn't survive restarts, 
+# therefore it's recommended to have this value set beforehand.
 # system.url-prefix: https://example.sentry.com
+
 system.internal-url-prefix: 'http://web:9000'
 symbolicator.enabled: true
 symbolicator.options:
