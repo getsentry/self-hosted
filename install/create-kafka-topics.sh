@@ -24,6 +24,9 @@ done
 
 # This topic must have only a single partition for the consumer to work correctly
 # https://github.com/getsentry/ops/blob/7dbc26f39c584ec924c8fef2ad5c532d6a158be3/k8s/clusters/us/_topicctl.yaml#L288-L295
-$dc exec kafka kafka-topics --create --topic monitors-clock-tick --bootstrap-server kafka:9092 --partitions 1
+
+if ! echo "$EXISTING_KAFKA_TOPICS" | grep -qE "(^| )monitors-clock-tick( |$)"; then
+  $dc exec kafka kafka-topics --create --topic monitors-clock-tick --bootstrap-server kafka:9092 --partitions 1
+fi
 
 echo "${_endgroup}"
