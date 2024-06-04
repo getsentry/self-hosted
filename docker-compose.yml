@@ -380,25 +380,25 @@ services:
     command: run consumer ingest-occurrences --consumer-group ingest-occurrences
   ingest-profiles:
     <<: *sentry_defaults
-    command: run consumer --no-strict-offset-reset ingest-profiles --consumer-group ingest-profiles
+    command: run consumer ingest-profiles --consumer-group ingest-profiles
   ingest-monitors:
     <<: *sentry_defaults
-    command: run consumer --no-strict-offset-reset ingest-monitors --consumer-group ingest-monitors
+    command: run consumer ingest-monitors --consumer-group ingest-monitors
   monitors-clock-tick:
     <<: *sentry_defaults
-    command: run consumer --no-strict-offset-reset monitors-clock-tick --consumer-group monitors-clock-tick
+    command: run consumer monitors-clock-tick --consumer-group monitors-clock-tick
   monitors-clock-tasks:
     <<: *sentry_defaults
-    command: run consumer --no-strict-offset-reset monitors-clock-tasks --consumer-group monitors-clock-tasks
+    command: run consumer monitors-clock-tasks --consumer-group monitors-clock-tasks
   post-process-forwarder-errors:
     <<: *sentry_defaults
-    command: run consumer post-process-forwarder-errors --consumer-group post-process-forwarder --synchronize-commit-log-topic=snuba-commit-log --synchronize-commit-group=snuba-consumers
+    command: run consumer --no-strict-offset-reset post-process-forwarder-errors --consumer-group post-process-forwarder --synchronize-commit-log-topic=snuba-commit-log --synchronize-commit-group=snuba-consumers
   post-process-forwarder-transactions:
     <<: *sentry_defaults
-    command: run consumer post-process-forwarder-transactions --consumer-group post-process-forwarder --synchronize-commit-log-topic=snuba-transactions-commit-log --synchronize-commit-group transactions_group
+    command: run consumer --no-strict-offset-reset post-process-forwarder-transactions --consumer-group post-process-forwarder --synchronize-commit-log-topic=snuba-transactions-commit-log --synchronize-commit-group transactions_group
   post-process-forwarder-issue-platform:
     <<: *sentry_defaults
-    command: run consumer post-process-forwarder-issue-platform --consumer-group post-process-forwarder --synchronize-commit-log-topic=snuba-generic-events-commit-log --synchronize-commit-group generic_events_group
+    command: run consumer --no-strict-offset-reset post-process-forwarder-issue-platform --consumer-group post-process-forwarder --synchronize-commit-log-topic=snuba-generic-events-commit-log --synchronize-commit-group generic_events_group
   subscription-consumer-events:
     <<: *sentry_defaults
     command: run consumer events-subscription-results --consumer-group query-subscription-consumer
