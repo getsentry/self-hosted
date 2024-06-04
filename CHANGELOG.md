@@ -1,5 +1,18 @@
 # Changelog
 
+## 24.5.1
+
+### Various fixes & improvements
+
+- Update consumer flags (#3112) by @hubertdeng123
+- feat: Add crons task consumers  (#3106) by @wedamija
+- Update minimum docker compose requirement (#3078) by @JannKleen
+- Different approach to editing permissions of docker volumes (#3084) by @hubertdeng123
+- ref(spans): Add new feature flags needed (#3092) by @phacops
+- chore: Add comment explaining the one liner in clickhouse config (#3085) by @hubertdeng123
+- Fix install: use dynamic docker root dir instead of hardcoded one (#3064) by @boutetnico
+- Typo in config.example.yml (#3063) by @luchaninov
+
 ## 24.5.0
 
 ### Various fixes & improvements
