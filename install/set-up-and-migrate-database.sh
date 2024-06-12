@@ -19,7 +19,7 @@ with connection.cursor() as cursor:
 "
 
 if [[ -n "${CI:-}" || "${SKIP_USER_CREATION:-0}" == 1 ]]; then
-  $dcr web upgrade --noinput
+  $dcr web upgrade --noinput --create-kafka-topics
   echo ""
   echo "Did not prompt for user creation. Run the following command to create one"
   echo "yourself (recommended):"
@@ -27,7 +27,7 @@ if [[ -n "${CI:-}" || "${SKIP_USER_CREATION:-0}" == 1 ]]; then
   echo "  $dc_base run --rm web createuser"
   echo ""
 else
-  $dcr web upgrade
+  $dcr web upgrade --create-kafka-topics
 fi
 
 echo "${_endgroup}"
