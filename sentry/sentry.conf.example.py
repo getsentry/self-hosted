@@ -298,6 +298,7 @@ SENTRY_FEATURES.update(
             "organizations:indexed-spans-extraction",
             "organizations:insights-entry-points",
             "organizations:insights-initial-modules",
+            "organizations:insights-addon-modules",
             "organizations:mobile-ttid-ttfd-contribution",
             "organizations:performance-calculate-score-relay",
             "organizations:standalone-span-ingestion",
@@ -309,9 +310,6 @@ SENTRY_FEATURES.update(
             "organizations:starfish-browser-webvitals-use-backend-scores",
             "organizations:starfish-mobile-appstart",
             "projects:span-metrics-extraction",
-            "organizations:insights-entry-points",
-            "organizations:insights-initial-modules",
-            "organizations:insights-addon-modules",
         )  # starfish related flags
     }
 )
