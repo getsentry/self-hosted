@@ -390,22 +390,6 @@ services:
     volumes:
       - "sentry-symbolicator:/data"
   web:
-    <<: *sentry_defaults
-    ulimits:
-      nofile:
-        soft: 4096
-        hard: 4096
-    healthcheck:
-      <<: *healthcheck_defaults
-      test:
-        - "CMD"
-        - "/bin/bash"
-        - "-c"
-        # Courtesy of https://unix.stackexchange.com/a/234089/108960
-        - 'exec 3<>/dev/tcp/127.0.0.1/9000 && echo -e "GET /_health/ HTTP/1.1\r\nhost: 127.0.0.1\r\n\r\n" >&3 && grep ok -s -m 1 <&3'
-    profiles:
-      - errors-only
-  web-feature-complete:
     <<: *sentry_defaults-feature-complete
     ulimits:
       nofile:
@@ -421,6 +405,22 @@ services:
         - 'exec 3<>/dev/tcp/127.0.0.1/9000 && echo -e "GET /_health/ HTTP/1.1\r\nhost: 127.0.0.1\r\n\r\n" >&3 && grep ok -s -m 1 <&3'
     profiles:
       - feature-complete
+  web-errors-only:
+    <<: *sentry_defaults
+    ulimits:
+      nofile:
+        soft: 4096
+        hard: 4096
+    healthcheck:
+      <<: *healthcheck_defaults
+      test:
+        - "CMD"
+        - "/bin/bash"
+        - "-c"
+        # Courtesy of https://unix.stackexchange.com/a/234089/108960
+        - 'exec 3<>/dev/tcp/127.0.0.1/9000 && echo -e "GET /_health/ HTTP/1.1\r\nhost: 127.0.0.1\r\n\r\n" >&3 && grep ok -s -m 1 <&3'
+    profiles:
+      - errors-only
   cron:
     <<: *sentry_defaults
     command: run cron
@@ -541,7 +541,7 @@ services:
       - web
       - relay
     profiles:
-      - errors-only
+      - feature-complete
   relay:
     <<: *restart_policy
     image: "$RELAY_IMAGE"
@@ -562,8 +562,8 @@ services:
       web:
         <<: *depends_on-healthy
     profiles:
-      - errors-only
-  nginx-feature-complete:
+      - feature-complete
+  nginx-errors-only:
     <<: *restart_policy
     ports:
       - "$SENTRY_BIND:80/tcp"
@@ -575,11 +575,11 @@ services:
         target: /etc/nginx
       - sentry-nginx-cache:/var/cache/nginx
     depends_on:
-      - web-feature-complete
-      - relay-feature-complete
+      - web-errors-only
+      - relay-errors-only
     profiles:
-      - feature-complete
-  relay-feature-complete:
+      - errors-only
+  relay-errors-only:
     <<: *restart_policy
     image: "$RELAY_IMAGE"
     volumes:
@@ -596,10 +596,10 @@ services:
         <<: *depends_on-healthy
       redis:
         <<: *depends_on-healthy
-      web-feature-complete:
+      web-errors-only:
         <<: *depends_on-healthy
     profiles:
-      - feature-complete
+      - errors-only
   vroom:
     <<: *restart_policy
     image: "$VROOM_IMAGE"
