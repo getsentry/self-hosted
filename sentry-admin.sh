@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Set the script directory as working directory.
+cd $(dirname $0)
+
 # Detect docker and platform state.
 source install/dc-detect-version.sh
 source install/detect-platform.sh
