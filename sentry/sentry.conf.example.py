@@ -293,6 +293,7 @@ SENTRY_FEATURES.update(
             "projects:rate-limits",
             "projects:servicehooks",
         )
+        # Starfish related flags
         + (
             "organizations:deprecate-fid-from-performance-score",
             "organizations:indexed-spans-extraction",
@@ -311,7 +312,15 @@ SENTRY_FEATURES.update(
             "organizations:starfish-mobile-appstart",
             "projects:span-metrics-extraction",
             "projects:span-metrics-extraction-addons",
-        )  # starfish related flags
+        ) 
+        # User Feedback related flags
+        + (
+            "organizations:user-feedback-ui",
+            "organizations:feedback-visible",
+            "organizations:user-feedback-ingest",
+            "organizations:user-feedback-spam-filter-ingest",
+            "organizations:user-feedback-spam-filter-actions",
+        )
     }
 )
 

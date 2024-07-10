@@ -384,6 +384,9 @@ services:
   ingest-monitors:
     <<: *sentry_defaults
     command: run consumer ingest-monitors --consumer-group ingest-monitors
+  ingest-feedback-events:
+    <<: *sentry_defaults
+    command: run consumer ingest-feedback-events --consumer-group ingest-consumer
   monitors-clock-tick:
     <<: *sentry_defaults
     command: run consumer monitors-clock-tick --consumer-group monitors-clock-tick
