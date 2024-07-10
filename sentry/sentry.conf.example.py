@@ -312,7 +312,7 @@ SENTRY_FEATURES.update(
             "organizations:starfish-mobile-appstart",
             "projects:span-metrics-extraction",
             "projects:span-metrics-extraction-addons",
-        ) 
+        )
         # User Feedback related flags
         + (
             "organizations:user-feedback-ui",
