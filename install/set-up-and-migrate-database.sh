@@ -9,6 +9,12 @@ until $dc exec postgres psql -U postgres -c "select 1" >/dev/null 2>&1 || [ $RET
   sleep 1
 done
 
+os=$(docker compose exec postgres cat /etc/os-release | grep 'ID=debian')
+if [[ -z $os ]]; then
+  echo "Postgres image debian check failed, exiting..."
+  exit 1
+fi
+
 # Using django ORM to provide broader support for users with external databases
 $dcr web shell -c "
 from django.db import connection
