@@ -1,5 +1,14 @@
 # Changelog
 
+## 24.7.0
+
+### Various fixes & improvements
+
+- Check postgres os before proceeding with install (#3197) by @hubertdeng123
+- Update sentry-admin.sh to select its own working directory (#3184) by @theoriginalgri
+- feat: add insights feature flags (#3152) by @aldy505
+- feat(relay): Forward /api/0/relays/* to inner relays (#3144) by @iambriccardo
+
 ## 24.6.0
 
 ### Various fixes & improvements
