@@ -28,8 +28,6 @@ x-sentry-defaults: &sentry_defaults
       <<: *depends_on-healthy
     kafka:
       <<: *depends_on-healthy
-    zookeeper:
-      <<: *depends_on-default
     postgres:
       <<: *depends_on-healthy
     memcached:
@@ -39,18 +37,6 @@ x-sentry-defaults: &sentry_defaults
     snuba-api:
       <<: *depends_on-default
     symbolicator:
-      <<: *depends_on-default
-    snuba-errors-consumer:
-      <<: *depends_on-default
-    snuba-outcomes-consumer:
-      <<: *depends_on-default
-    snuba-outcomes-billing-consumer:
-      <<: *depends_on-default
-    snuba-subscription-consumer-events:
-      <<: *depends_on-default
-    snuba-replacer:
-      <<: *depends_on-default
-    snuba-group-attributes-consumer:
       <<: *depends_on-default
   entrypoint: "/etc/sentry/entrypoint.sh"
   command: ["run", "web"]
@@ -78,45 +64,11 @@ x-sentry-defaults: &sentry_defaults
     - "./sentry:/etc/sentry"
     - "./geoip:/geoip:ro"
     - "./certificates:/usr/local/share/ca-certificates:ro"
-x-sentry-defaults-feature-complete: &sentry_defaults-feature-complete
-  <<: *sentry_defaults
-  depends_on:
-    <<: *sentry_depends_on
-    snuba-transactions-consumer:
-      <<: *depends_on-default
-    snuba-replays-consumer:
-      <<: *depends_on-default
-    snuba-issue-occurrence-consumer:
-      <<: *depends_on-default
-    snuba-metrics-consumer:
-      <<: *depends_on-default
-    snuba-generic-metrics-distributions-consumer:
-      <<: *depends_on-default
-    snuba-generic-metrics-sets-consumer:
-      <<: *depends_on-default
-    snuba-generic-metrics-counters-consumer:
-      <<: *depends_on-default
-    snuba-subscription-consumer-transactions:
-      <<: *depends_on-default
-    snuba-subscription-consumer-metrics:
-      <<: *depends_on-default
-    snuba-profiling-profiles-consumer:
-      <<: *depends_on-default
-    snuba-profiling-functions-consumer:
-      <<: *depends_on-default
-    snuba-spans-consumer:
-      <<: *depends_on-default
-    vroom:
-      <<: *depends_on-default
-    profiles:
-      - feature-complete
 x-snuba-defaults: &snuba_defaults
   <<: *restart_policy
   depends_on:
     clickhouse:
       <<: *depends_on-healthy
-    zookeeper:
-      <<: *depends_on-default
     kafka:
       <<: *depends_on-healthy
     redis:
@@ -394,7 +346,7 @@ services:
     volumes:
       - "sentry-symbolicator:/data"
   web:
-    <<: [*sentry_defaults, *sentry_defaults-feature-complete]
+    <<: *sentry_defaults
     ulimits:
       nofile:
         soft: 4096
