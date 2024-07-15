@@ -23,7 +23,7 @@ x-sentry-defaults: &sentry_defaults
     context: ./sentry
     args:
       - SENTRY_IMAGE
-  depends_on: &sentry_depends_on
+  depends_on:
     redis:
       <<: *depends_on-healthy
     kafka:
