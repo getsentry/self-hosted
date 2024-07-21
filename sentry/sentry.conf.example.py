@@ -363,3 +363,9 @@ CSP_REPORT_ONLY = True
 # https://docs.djangoproject.com/en/4.2/ref/settings/#std-setting-CSRF_TRUSTED_ORIGINS
 
 # CSRF_TRUSTED_ORIGINS = ["https://example.com", "http://127.0.0.1:9000"]
+
+#################
+# JS SDK Loader #
+#################
+
+JS_SDK_LOADER_DEFAULT_SDK_URL = "https://browser.sentry-cdn.com/%s/bundle%s.min.js"
