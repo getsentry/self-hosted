@@ -132,7 +132,7 @@ services:
   postgres:
     <<: *restart_policy
     # Using the same postgres version as Sentry dev for consistency purposes
-    image: "postgres:14.11-alpine"
+    image: "postgres:14.11"
     healthcheck:
       <<: *healthcheck_defaults
       # Using default user "postgres" from sentry/sentry.conf.example.py or value of POSTGRES_USER if provided
@@ -177,8 +177,7 @@ services:
       - "sentry-secrets:/etc/zookeeper/secrets"
     healthcheck:
       <<: *healthcheck_defaults
-      test:
-        ["CMD-SHELL", 'echo "ruok" | nc -w 2 localhost 2181 | grep imok']
+      test: ["CMD-SHELL", 'echo "ruok" | nc -w 2 localhost 2181 | grep imok']
   kafka:
     <<: *restart_policy
     depends_on:
@@ -250,7 +249,8 @@ services:
     # Override the entrypoint in order to avoid using envvars for config.
     # Futz with settings so we can keep mmdb and conf in same dir on host
     # (image looks for them in separate dirs by default).
-    entrypoint: ["/usr/bin/geoipupdate", "-d", "/sentry", "-f", "/sentry/GeoIP.conf"]
+    entrypoint:
+      ["/usr/bin/geoipupdate", "-d", "/sentry", "-f", "/sentry/GeoIP.conf"]
     volumes:
       - "./geoip:/sentry"
   snuba-api:
@@ -293,6 +293,9 @@ services:
   snuba-generic-metrics-counters-consumer:
     <<: *snuba_defaults
     command: rust-consumer --storage generic_metrics_counters_raw --consumer-group snuba-gen-metrics-counters-consumers --auto-offset-reset=latest --max-batch-time-ms 750 --no-strict-offset-reset
+  snuba-generic-metrics-gauges-consumer:
+    <<: *snuba_defaults
+    command: rust-consumer --storage generic_metrics_gauges_raw --consumer-group snuba-gen-metrics-gauges-consumers --auto-offset-reset=latest --max-batch-time-ms 750 --no-strict-offset-reset
   snuba-replacer:
     <<: *snuba_defaults
     command: replacer --storage errors --auto-offset-reset=latest --no-strict-offset-reset
@@ -380,19 +383,25 @@ services:
     command: run consumer ingest-occurrences --consumer-group ingest-occurrences
   ingest-profiles:
     <<: *sentry_defaults
-    command: run consumer --no-strict-offset-reset ingest-profiles --consumer-group ingest-profiles
+    command: run consumer ingest-profiles --consumer-group ingest-profiles
   ingest-monitors:
     <<: *sentry_defaults
-    command: run consumer --no-strict-offset-reset ingest-monitors --consumer-group ingest-monitors
+    command: run consumer ingest-monitors --consumer-group ingest-monitors
+  monitors-clock-tick:
+    <<: *sentry_defaults
+    command: run consumer monitors-clock-tick --consumer-group monitors-clock-tick
+  monitors-clock-tasks:
+    <<: *sentry_defaults
+    command: run consumer monitors-clock-tasks --consumer-group monitors-clock-tasks
   post-process-forwarder-errors:
     <<: *sentry_defaults
-    command: run consumer post-process-forwarder-errors --consumer-group post-process-forwarder --synchronize-commit-log-topic=snuba-commit-log --synchronize-commit-group=snuba-consumers
+    command: run consumer --no-strict-offset-reset post-process-forwarder-errors --consumer-group post-process-forwarder --synchronize-commit-log-topic=snuba-commit-log --synchronize-commit-group=snuba-consumers
   post-process-forwarder-transactions:
     <<: *sentry_defaults
-    command: run consumer post-process-forwarder-transactions --consumer-group post-process-forwarder --synchronize-commit-log-topic=snuba-transactions-commit-log --synchronize-commit-group transactions_group
+    command: run consumer --no-strict-offset-reset post-process-forwarder-transactions --consumer-group post-process-forwarder --synchronize-commit-log-topic=snuba-transactions-commit-log --synchronize-commit-group transactions_group
   post-process-forwarder-issue-platform:
     <<: *sentry_defaults
-    command: run consumer post-process-forwarder-issue-platform --consumer-group post-process-forwarder --synchronize-commit-log-topic=snuba-generic-events-commit-log --synchronize-commit-group generic_events_group
+    command: run consumer --no-strict-offset-reset post-process-forwarder-issue-platform --consumer-group post-process-forwarder --synchronize-commit-log-topic=snuba-generic-events-commit-log --synchronize-commit-group generic_events_group
   subscription-consumer-events:
     <<: *sentry_defaults
     command: run consumer events-subscription-results --consumer-group query-subscription-consumer

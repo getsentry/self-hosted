@@ -9,6 +9,12 @@ until $dc exec postgres psql -U postgres -c "select 1" >/dev/null 2>&1 || [ $RET
   sleep 1
 done
 
+os=$($dc exec postgres cat /etc/os-release | grep 'ID=debian')
+if [[ -z $os ]]; then
+  echo "Postgres image debian check failed, exiting..."
+  exit 1
+fi
+
 # Using django ORM to provide broader support for users with external databases
 $dcr web shell -c "
 from django.db import connection
@@ -19,7 +25,7 @@ with connection.cursor() as cursor:
 "
 
 if [[ -n "${CI:-}" || "${SKIP_USER_CREATION:-0}" == 1 ]]; then
-  $dcr web upgrade --noinput
+  $dcr web upgrade --noinput --create-kafka-topics
   echo ""
   echo "Did not prompt for user creation. Run the following command to create one"
   echo "yourself (recommended):"
@@ -27,7 +33,7 @@ if [[ -n "${CI:-}" || "${SKIP_USER_CREATION:-0}" == 1 ]]; then
   echo "  $dc_base run --rm web createuser"
   echo ""
 else
-  $dcr web upgrade
+  $dcr web upgrade --create-kafka-topics
 fi
 
 echo "${_endgroup}"

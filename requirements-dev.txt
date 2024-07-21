@@ -1,4 +1,4 @@
-sentry-sdk>=1.39.2
+sentry-sdk>=2.4.0
 pytest>=8.0.0
 pytest-cov>=4.1.0
 pytest-rerunfailures>=11.0
