@@ -76,7 +76,7 @@ MINIMIZE_DOWNTIME="${MINIMIZE_DOWNTIME:-}"
 STOP_TIMEOUT=60
 
 # Save logs in order to send envelope to Sentry
-log_file=sentry_"$cmd"_log-$(date +'%Y-%m-%d_%H-%M-%S').txt
+log_file=sentry_"${cmd%% *}"_log-$(date +'%Y-%m-%d_%H-%M-%S').txt
 exec &> >(tee -a "$log_file")
 version=""
 
