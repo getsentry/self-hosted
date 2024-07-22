@@ -363,3 +363,6 @@ CSP_REPORT_ONLY = True
 # https://docs.djangoproject.com/en/4.2/ref/settings/#std-setting-CSRF_TRUSTED_ORIGINS
 
 # CSRF_TRUSTED_ORIGINS = ["https://example.com", "http://127.0.0.1:9000"]
+
+# If you would like to use self-hosted Sentry with only errors enabled, please set this
+SENTRY_SELF_HOSTED_ERRORS_ONLY = env("COMPOSE_PROFILES") == "feature-complete"
