@@ -369,3 +369,7 @@ CSP_REPORT_ONLY = True
 #################
 
 JS_SDK_LOADER_DEFAULT_SDK_URL = "https://browser.sentry-cdn.com/%s/bundle%s.min.js"
+
+
+# If you would like to use self-hosted Sentry with only errors enabled, please set this
+SENTRY_SELF_HOSTED_ERRORS_ONLY = env("COMPOSE_PROFILES") != "feature-complete"

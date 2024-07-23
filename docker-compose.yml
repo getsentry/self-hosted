@@ -36,23 +36,7 @@ x-sentry-defaults: &sentry_defaults
       <<: *depends_on-default
     snuba-api:
       <<: *depends_on-default
-    snuba-errors-consumer:
-      <<: *depends_on-default
-    snuba-outcomes-consumer:
-      <<: *depends_on-default
-    snuba-outcomes-billing-consumer:
-      <<: *depends_on-default
-    snuba-transactions-consumer:
-      <<: *depends_on-default
-    snuba-subscription-consumer-events:
-      <<: *depends_on-default
-    snuba-subscription-consumer-transactions:
-      <<: *depends_on-default
-    snuba-replacer:
-      <<: *depends_on-default
     symbolicator:
-      <<: *depends_on-default
-    vroom:
       <<: *depends_on-default
   entrypoint: "/etc/sentry/entrypoint.sh"
   command: ["run", "web"]
@@ -71,6 +55,7 @@ x-sentry-defaults: &sentry_defaults
     GRPC_DEFAULT_SSL_ROOTS_FILE_PATH_ENV_VAR: *ca_bundle
     # Leaving the value empty to just pass whatever is set
     # on the host system (or in the .env file)
+    COMPOSE_PROFILES:
     SENTRY_EVENT_RETENTION_DAYS:
     SENTRY_MAIL_HOST:
     SENTRY_MAX_EXTERNAL_SOURCEMAP_SIZE:
@@ -268,55 +253,84 @@ services:
   snuba-outcomes-billing-consumer:
     <<: *snuba_defaults
     command: rust-consumer --storage outcomes_raw --consumer-group snuba-consumers --auto-offset-reset=earliest --max-batch-time-ms 750 --no-strict-offset-reset --raw-events-topic outcomes-billing
-  # Kafka consumer responsible for feeding transactions data into Clickhouse
-  snuba-transactions-consumer:
-    <<: *snuba_defaults
-    command: rust-consumer --storage transactions --consumer-group transactions_group --auto-offset-reset=latest --max-batch-time-ms 750 --no-strict-offset-reset
-  snuba-replays-consumer:
-    <<: *snuba_defaults
-    command: rust-consumer --storage replays --consumer-group snuba-consumers --auto-offset-reset=latest --max-batch-time-ms 750 --no-strict-offset-reset
-  snuba-issue-occurrence-consumer:
-    <<: *snuba_defaults
-    command: rust-consumer --storage search_issues --consumer-group generic_events_group --auto-offset-reset=latest --max-batch-time-ms 750 --no-strict-offset-reset
-  snuba-metrics-consumer:
-    <<: *snuba_defaults
-    command: rust-consumer --storage metrics_raw --consumer-group snuba-metrics-consumers --auto-offset-reset=latest --max-batch-time-ms 750 --no-strict-offset-reset
   snuba-group-attributes-consumer:
     <<: *snuba_defaults
     command: rust-consumer --storage group_attributes --consumer-group snuba-group-attributes-consumers --auto-offset-reset=latest --max-batch-time-ms 750 --no-strict-offset-reset
-  snuba-generic-metrics-distributions-consumer:
-    <<: *snuba_defaults
-    command: rust-consumer --storage generic_metrics_distributions_raw --consumer-group snuba-gen-metrics-distributions-consumers --auto-offset-reset=latest --max-batch-time-ms 750 --no-strict-offset-reset
-  snuba-generic-metrics-sets-consumer:
-    <<: *snuba_defaults
-    command: rust-consumer --storage generic_metrics_sets_raw --consumer-group snuba-gen-metrics-sets-consumers --auto-offset-reset=latest --max-batch-time-ms 750 --no-strict-offset-reset
-  snuba-generic-metrics-counters-consumer:
-    <<: *snuba_defaults
-    command: rust-consumer --storage generic_metrics_counters_raw --consumer-group snuba-gen-metrics-counters-consumers --auto-offset-reset=latest --max-batch-time-ms 750 --no-strict-offset-reset
-  snuba-generic-metrics-gauges-consumer:
-    <<: *snuba_defaults
-    command: rust-consumer --storage generic_metrics_gauges_raw --consumer-group snuba-gen-metrics-gauges-consumers --auto-offset-reset=latest --max-batch-time-ms 750 --no-strict-offset-reset
   snuba-replacer:
     <<: *snuba_defaults
     command: replacer --storage errors --auto-offset-reset=latest --no-strict-offset-reset
   snuba-subscription-consumer-events:
     <<: *snuba_defaults
     command: subscriptions-scheduler-executor --dataset events --entity events --auto-offset-reset=latest --no-strict-offset-reset --consumer-group=snuba-events-subscriptions-consumers --followed-consumer-group=snuba-consumers --schedule-ttl=60 --stale-threshold-seconds=900
+  #############################################
+  ## Feature Complete Sentry Snuba Consumers ##
+  #############################################
+  # Kafka consumer responsible for feeding transactions data into Clickhouse
+  snuba-transactions-consumer:
+    <<: *snuba_defaults
+    command: rust-consumer --storage transactions --consumer-group transactions_group --auto-offset-reset=latest --max-batch-time-ms 750 --no-strict-offset-reset
+    profiles:
+      - feature-complete
+  snuba-replays-consumer:
+    <<: *snuba_defaults
+    command: rust-consumer --storage replays --consumer-group snuba-consumers --auto-offset-reset=latest --max-batch-time-ms 750 --no-strict-offset-reset
+    profiles:
+      - feature-complete
+  snuba-issue-occurrence-consumer:
+    <<: *snuba_defaults
+    command: rust-consumer --storage search_issues --consumer-group generic_events_group --auto-offset-reset=latest --max-batch-time-ms 750 --no-strict-offset-reset
+    profiles:
+      - feature-complete
+  snuba-metrics-consumer:
+    <<: *snuba_defaults
+    command: rust-consumer --storage metrics_raw --consumer-group snuba-metrics-consumers --auto-offset-reset=latest --max-batch-time-ms 750 --no-strict-offset-reset
+    profiles:
+      - feature-complete
   snuba-subscription-consumer-transactions:
     <<: *snuba_defaults
     command: subscriptions-scheduler-executor --dataset transactions --entity transactions --auto-offset-reset=latest --no-strict-offset-reset --consumer-group=snuba-transactions-subscriptions-consumers --followed-consumer-group=transactions_group --schedule-ttl=60 --stale-threshold-seconds=900
+    profiles:
+      - feature-complete
   snuba-subscription-consumer-metrics:
     <<: *snuba_defaults
     command: subscriptions-scheduler-executor --dataset metrics --entity metrics_sets --entity metrics_counters --auto-offset-reset=latest --no-strict-offset-reset --consumer-group=snuba-metrics-subscriptions-consumers --followed-consumer-group=snuba-metrics-consumers --schedule-ttl=60 --stale-threshold-seconds=900
+    profiles:
+      - feature-complete
+  snuba-generic-metrics-distributions-consumer:
+    <<: *snuba_defaults
+    command: rust-consumer --storage generic_metrics_distributions_raw --consumer-group snuba-gen-metrics-distributions-consumers --auto-offset-reset=latest --max-batch-time-ms 750 --no-strict-offset-reset
+    profiles:
+      - feature-complete
+  snuba-generic-metrics-sets-consumer:
+    <<: *snuba_defaults
+    command: rust-consumer --storage generic_metrics_sets_raw --consumer-group snuba-gen-metrics-sets-consumers --auto-offset-reset=latest --max-batch-time-ms 750 --no-strict-offset-reset
+    profiles:
+      - feature-complete
+  snuba-generic-metrics-counters-consumer:
+    <<: *snuba_defaults
+    command: rust-consumer --storage generic_metrics_counters_raw --consumer-group snuba-gen-metrics-counters-consumers --auto-offset-reset=latest --max-batch-time-ms 750 --no-strict-offset-reset
+    profiles:
+      - feature-complete
+  snuba-generic-metrics-gauges-consumer:
+    <<: *snuba_defaults
+    command: rust-consumer --storage generic_metrics_gauges_raw --consumer-group snuba-gen-metrics-gauges-consumers --auto-offset-reset=latest --max-batch-time-ms 750 --no-strict-offset-reset
+    profiles:
+      - feature-complete
   snuba-profiling-profiles-consumer:
     <<: *snuba_defaults
     command: rust-consumer --storage profiles --consumer-group snuba-consumers --auto-offset-reset=latest --max-batch-time-ms 1000 --no-strict-offset-reset
+    profiles:
+      - feature-complete
   snuba-profiling-functions-consumer:
     <<: *snuba_defaults
     command: rust-consumer --storage functions_raw --consumer-group snuba-consumers --auto-offset-reset=latest --max-batch-time-ms 1000 --no-strict-offset-reset
+    profiles:
+      - feature-complete
   snuba-spans-consumer:
     <<: *snuba_defaults
     command: rust-consumer --storage spans --consumer-group snuba-spans-consumers --auto-offset-reset=latest --max-batch-time-ms 1000 --no-strict-offset-reset
+    profiles:
+      - feature-complete
   symbolicator:
     <<: *restart_policy
     image: "$SYMBOLICATOR_IMAGE"
@@ -363,57 +377,90 @@ services:
   attachments-consumer:
     <<: *sentry_defaults
     command: run consumer ingest-attachments --consumer-group ingest-consumer
-  transactions-consumer:
-    <<: *sentry_defaults
-    command: run consumer ingest-transactions --consumer-group ingest-consumer
-  metrics-consumer:
-    <<: *sentry_defaults
-    command: run consumer ingest-metrics --consumer-group metrics-consumer
-  generic-metrics-consumer:
-    <<: *sentry_defaults
-    command: run consumer ingest-generic-metrics --consumer-group generic-metrics-consumer
-  billing-metrics-consumer:
-    <<: *sentry_defaults
-    command: run consumer billing-metrics-consumer --consumer-group billing-metrics-consumer
-  ingest-replay-recordings:
-    <<: *sentry_defaults
-    command: run consumer ingest-replay-recordings --consumer-group ingest-replay-recordings
-  ingest-occurrences:
-    <<: *sentry_defaults
-    command: run consumer ingest-occurrences --consumer-group ingest-occurrences
-  ingest-profiles:
-    <<: *sentry_defaults
-    command: run consumer ingest-profiles --consumer-group ingest-profiles
-  ingest-monitors:
-    <<: *sentry_defaults
-    command: run consumer ingest-monitors --consumer-group ingest-monitors
-  monitors-clock-tick:
-    <<: *sentry_defaults
-    command: run consumer monitors-clock-tick --consumer-group monitors-clock-tick
-  monitors-clock-tasks:
-    <<: *sentry_defaults
-    command: run consumer monitors-clock-tasks --consumer-group monitors-clock-tasks
   post-process-forwarder-errors:
     <<: *sentry_defaults
     command: run consumer --no-strict-offset-reset post-process-forwarder-errors --consumer-group post-process-forwarder --synchronize-commit-log-topic=snuba-commit-log --synchronize-commit-group=snuba-consumers
-  post-process-forwarder-transactions:
-    <<: *sentry_defaults
-    command: run consumer --no-strict-offset-reset post-process-forwarder-transactions --consumer-group post-process-forwarder --synchronize-commit-log-topic=snuba-transactions-commit-log --synchronize-commit-group transactions_group
-  post-process-forwarder-issue-platform:
-    <<: *sentry_defaults
-    command: run consumer --no-strict-offset-reset post-process-forwarder-issue-platform --consumer-group post-process-forwarder --synchronize-commit-log-topic=snuba-generic-events-commit-log --synchronize-commit-group generic_events_group
   subscription-consumer-events:
     <<: *sentry_defaults
     command: run consumer events-subscription-results --consumer-group query-subscription-consumer
+  ##############################################
+  ## Feature Complete Sentry Ingest Consumers ##
+  ##############################################
+  transactions-consumer:
+    <<: *sentry_defaults
+    command: run consumer ingest-transactions --consumer-group ingest-consumer
+    profiles:
+      - feature-complete
+  metrics-consumer:
+    <<: *sentry_defaults
+    command: run consumer ingest-metrics --consumer-group metrics-consumer
+    profiles:
+      - feature-complete
+  generic-metrics-consumer:
+    <<: *sentry_defaults
+    command: run consumer ingest-generic-metrics --consumer-group generic-metrics-consumer
+    profiles:
+      - feature-complete
+  billing-metrics-consumer:
+    <<: *sentry_defaults
+    command: run consumer billing-metrics-consumer --consumer-group billing-metrics-consumer
+    profiles:
+      - feature-complete
+  ingest-replay-recordings:
+    <<: *sentry_defaults
+    command: run consumer ingest-replay-recordings --consumer-group ingest-replay-recordings
+    profiles:
+      - feature-complete
+  ingest-occurrences:
+    <<: *sentry_defaults
+    command: run consumer ingest-occurrences --consumer-group ingest-occurrences
+    profiles:
+      - feature-complete
+  ingest-profiles:
+    <<: *sentry_defaults
+    command: run consumer ingest-profiles --consumer-group ingest-profiles
+    profiles:
+      - feature-complete
+  ingest-monitors:
+    <<: *sentry_defaults
+    command: run consumer ingest-monitors --consumer-group ingest-monitors
+    profiles:
+      - feature-complete
+  monitors-clock-tick:
+    <<: *sentry_defaults
+    command: run consumer monitors-clock-tick --consumer-group monitors-clock-tick
+    profiles:
+      - feature-complete
+  monitors-clock-tasks:
+    <<: *sentry_defaults
+    command: run consumer monitors-clock-tasks --consumer-group monitors-clock-tasks
+    profiles:
+      - feature-complete
+  post-process-forwarder-transactions:
+    <<: *sentry_defaults
+    command: run consumer --no-strict-offset-reset post-process-forwarder-transactions --consumer-group post-process-forwarder --synchronize-commit-log-topic=snuba-transactions-commit-log --synchronize-commit-group transactions_group
+    profiles:
+      - feature-complete
+  post-process-forwarder-issue-platform:
+    <<: *sentry_defaults
+    command: run consumer --no-strict-offset-reset post-process-forwarder-issue-platform --consumer-group post-process-forwarder --synchronize-commit-log-topic=snuba-generic-events-commit-log --synchronize-commit-group generic_events_group
+    profiles:
+      - feature-complete
   subscription-consumer-transactions:
     <<: *sentry_defaults
     command: run consumer transactions-subscription-results --consumer-group query-subscription-consumer
+    profiles:
+      - feature-complete
   subscription-consumer-metrics:
     <<: *sentry_defaults
     command: run consumer metrics-subscription-results --consumer-group query-subscription-consumer
+    profiles:
+      - feature-complete
   subscription-consumer-generic-metrics:
     <<: *sentry_defaults
     command: run consumer generic-metrics-subscription-results --consumer-group query-subscription-consumer
+    profiles:
+      - feature-complete
   sentry-cleanup:
     <<: *sentry_defaults
     image: sentry-cleanup-self-hosted-local
@@ -469,6 +516,8 @@ services:
     depends_on:
       kafka:
         <<: *depends_on-healthy
+    profiles:
+      - feature-complete
   vroom-cleanup:
     <<: *restart_policy
     image: vroom-cleanup-self-hosted-local
@@ -484,6 +533,8 @@ services:
     command: '"0 0 * * * find /var/lib/sentry-profiles -type f -mtime +$SENTRY_EVENT_RETENTION_DAYS -delete"'
     volumes:
       - sentry-vroom:/var/lib/sentry-profiles
+    profiles:
+      - feature-complete
 
 volumes:
   # These store application data that should persist across restarts.
