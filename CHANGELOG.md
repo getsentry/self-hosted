@@ -1,5 +1,13 @@
 # Changelog
 
+## 24.7.1
+
+### Various fixes & improvements
+
+- Fix: errors only config flag (#3220) by @hubertdeng123
+- Add errors only self-hosted infrastructure (#3190) by @hubertdeng123
+- feat(generic-metrics): Add gauges to docker compose, re-try (#3177) by @ayirr7
+
 ## 24.7.0
 
 ### Various fixes & improvements
