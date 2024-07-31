@@ -315,11 +315,12 @@ SENTRY_FEATURES.update(
         )
         # User Feedback related flags
         + (
+            "organizations:user-feedback-ingest",
+            "organizations:user-feedback-replay-clip",
             "organizations:user-feedback-ui",
             "organizations:feedback-visible",
-            "organizations:user-feedback-ingest",
-            "organizations:user-feedback-spam-filter-ingest",
-            "organizations:user-feedback-spam-filter-actions",
+            "organizations:feedback-ingest",
+            "organizations:feedback-post-process-group",
         )
     }
 )
