@@ -293,6 +293,7 @@ SENTRY_FEATURES.update(
             "projects:rate-limits",
             "projects:servicehooks",
         )
+        # Starfish related flags
         + (
             "organizations:deprecate-fid-from-performance-score",
             "organizations:indexed-spans-extraction",
@@ -311,9 +312,22 @@ SENTRY_FEATURES.update(
             "organizations:starfish-mobile-appstart",
             "projects:span-metrics-extraction",
             "projects:span-metrics-extraction-addons",
-        )  # starfish related flags
+        )
+        # User Feedback related flags
+        + (
+            "organizations:user-feedback-ingest",
+            "organizations:user-feedback-replay-clip",
+            "organizations:user-feedback-ui",
+            "organizations:feedback-visible",
+            "organizations:feedback-ingest",
+            "organizations:feedback-post-process-group",
+        )
     }
 )
+
+# Temporary flag to mark User Feedback to be produced to the dedicated feedback topic by relay.
+# This will be removed at a later time after it's considered stable and fully rolled out.
+SENTRY_OPTIONS["feedback.ingest-topic.rollout-rate"] = 1.0
 
 #######################
 # MaxMind Integration #

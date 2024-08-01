@@ -426,6 +426,11 @@ services:
     command: run consumer ingest-monitors --consumer-group ingest-monitors
     profiles:
       - feature-complete
+  ingest-feedback-events:
+    <<: *sentry_defaults
+    command: run consumer ingest-feedback-events --consumer-group ingest-feedback
+    profiles:
+      - feature-complete
   monitors-clock-tick:
     <<: *sentry_defaults
     command: run consumer monitors-clock-tick --consumer-group monitors-clock-tick
