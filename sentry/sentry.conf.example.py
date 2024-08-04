@@ -382,8 +382,23 @@ CSP_REPORT_ONLY = True
 # JS SDK Loader #
 #################
 
+# Configure Sentry JS SDK bundle URL template for Loader Scripts.
+# Learn more about the Loader Scripts: https://docs.sentry.io/platforms/javascript/install/loader/
+
 JS_SDK_LOADER_DEFAULT_SDK_URL = "https://browser.sentry-cdn.com/%s/bundle%s.min.js"
 
 
 # If you would like to use self-hosted Sentry with only errors enabled, please set this
 SENTRY_SELF_HOSTED_ERRORS_ONLY = env("COMPOSE_PROFILES") != "feature-complete"
+
+#####################
+# Insights Settings #
+#####################
+
+# Since version 24.3.0, Insights features are available on self-hosted. For Requests module,
+# there are scrubbing logic done on Relay to prevent high cardinality of stored HTTP hosts.
+# However in self-hosted scenario, the amount of stored HTTP hosts might be consistent,
+# and you may have allow list of hosts that you want to keep. Uncomment the following line
+# to allow specific hosts. It might be IP addresses or domain names (without `http://` or `https://`).
+
+# SENTRY_OPTIONS["relay.span-normalization.allowed_hosts"] = ["example.com", "192.168.10.1"]
