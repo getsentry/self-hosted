@@ -302,6 +302,7 @@ SENTRY_FEATURES.update(
             "organizations:insights-addon-modules",
             "organizations:mobile-ttid-ttfd-contribution",
             "organizations:performance-calculate-score-relay",
+            "organizations:performance-trace-explorer",
             "organizations:standalone-span-ingestion",
             "organizations:starfish-browser-resource-module-image-view",
             "organizations:starfish-browser-resource-module-ui",
