@@ -325,10 +325,6 @@ SENTRY_FEATURES.update(
     }
 )
 
-# Temporary flag to mark User Feedback to be produced to the dedicated feedback topic by relay.
-# This will be removed at a later time after it's considered stable and fully rolled out.
-SENTRY_OPTIONS["feedback.ingest-topic.rollout-rate"] = 1.0
-
 #######################
 # MaxMind Integration #
 #######################
