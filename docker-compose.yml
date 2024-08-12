@@ -126,17 +126,10 @@ services:
       [
         "postgres",
         "-c",
-        "wal_level=logical",
-        "-c",
-        "max_replication_slots=1",
-        "-c",
-        "max_wal_senders=1",
-        "-c",
         "max_connections=${POSTGRES_MAX_CONNECTIONS:-100}",
       ]
     environment:
       POSTGRES_HOST_AUTH_METHOD: "trust"
-    entrypoint: /opt/sentry/postgres-entrypoint.sh
     volumes:
       - "sentry-postgres:/var/lib/postgresql/data"
       - type: bind
