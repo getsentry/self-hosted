@@ -79,7 +79,7 @@ releasefile.cache-path: '/data/releasefile-cache'
 #   bucket_name: 's3-bucket-name'
 
 # The URL prefix in which Sentry is accessible
-# system.url-prefix: https://example.sentry.com
+system.url-prefix: 'https://sentry.42porto.com'
 system.internal-url-prefix: 'http://web:9000'
 symbolicator.enabled: true
 symbolicator.options:
@@ -92,13 +92,17 @@ transaction-events.force-disable-internal-project: true
 ######################
 
 # Refer to https://develop.sentry.dev/integrations/github/ for setup instructions.
-
-# github-login.extended-permissions: ['repo']
+# # App ID
 # github-app.id: GITHUB_APP_ID
+# # App Name
 # github-app.name: 'GITHUB_APP_NAME'
+# # Webhook Secret
 # github-app.webhook-secret: 'GITHUB_WEBHOOK_SECRET' # Use only if configured in GitHub
+# # Client ID
 # github-app.client-id: 'GITHUB_CLIENT_ID'
+# # Client Secret
 # github-app.client-secret: 'GITHUB_CLIENT_SECRET'
+# # Private key
 # github-app.private-key: |
 #   -----BEGIN RSA PRIVATE KEY-----
 #   privatekeyprivatekeyprivatekeyprivatekey
@@ -107,6 +111,10 @@ transaction-events.force-disable-internal-project: true
 #   privatekeyprivatekeyprivatekeyprivatekey
 #   privatekeyprivatekeyprivatekeyprivatekey
 #   -----END RSA PRIVATE KEY-----
+
+# # Only needed if you have multiple organizations enabled
+# github-login.client-id: 'GITHUB_LOGIN_CLIENT_ID'
+# github-login.client-secret: 'GITHUB_LOGIN_CLIENT_SECRET'
 
 #####################
 # Slack Integration #

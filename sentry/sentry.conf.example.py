@@ -387,3 +387,14 @@ JS_SDK_LOADER_DEFAULT_SDK_URL = "https://browser.sentry-cdn.com/%s/bundle%s.min.
 
 # If you would like to use self-hosted Sentry with only errors enabled, please set this
 SENTRY_SELF_HOSTED_ERRORS_ONLY = env("COMPOSE_PROFILES") != "feature-complete"
+
+
+##############
+# GitHub Auth
+##############
+
+# # https://develop.sentry.dev/self-hosted/sso/#github-auth
+# GITHUB_APP_ID=""
+# GITHUB_API_SECRET=""
+# SENTRY_OPTIONS['github-login.require-verified-email'] = True
+
