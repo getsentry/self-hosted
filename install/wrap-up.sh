@@ -28,3 +28,8 @@ else
   echo "-----------------------------------------------------------------"
   echo ""
 fi
+
+# TODO(getsentry/self-hosted#2489)
+if docker volume ls | grep -qw sentry-zookeeper; then
+  docker volume rm sentry-zookeeper
+fi
