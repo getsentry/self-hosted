@@ -1,5 +1,18 @@
 # Changelog
 
+## 24.8.0
+
+### Various fixes & improvements
+
+- Migrate to zookeeper-less kafka  (#3263) by @hubertdeng123
+- Revert "ref(feedback): cleanup topic rollout option" (#3262) by @aliu39
+- ref(feedback): cleanup topic rollout option (#3256) by @aliu39
+- Remove cdc and wal2json and use the default postgres entrypoint (#3260) by @beezz
+- add `-euo pipefail` to enhance-image.example.sh (#3246) by @asottile-sentry
+- remove python-dev (#3242) by @asottile-sentry
+- feat: enable user feedback feature (#3193) by @aldy505
+- Use CDN by default for JS SDK Loader (#3213) by @stayallive
+
 ## 24.7.1
 
 ### Various fixes & improvements
