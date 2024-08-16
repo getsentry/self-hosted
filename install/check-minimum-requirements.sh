@@ -35,7 +35,7 @@ echo "Found Docker Compose version $COMPOSE_VERSION"
 CPU_AVAILABLE_IN_DOCKER=$(docker run --rm busybox nproc --all)
 if [[ "$CPU_AVAILABLE_IN_DOCKER" -lt "$MIN_CPU_HARD" ]]; then
   echo "FAIL: Required minimum CPU cores available to Docker is $MIN_CPU_HARD, found $CPU_AVAILABLE_IN_DOCKER"
-  exit 1s
+  exit 1
 fi
 
 RAM_AVAILABLE_IN_DOCKER=$(docker run --rm busybox free -m 2>/dev/null | awk '/Mem/ {print $2}')
