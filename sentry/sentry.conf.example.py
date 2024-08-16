@@ -293,6 +293,7 @@ SENTRY_FEATURES.update(
             "projects:rate-limits",
             "projects:servicehooks",
         )
+        # Starfish related flags
         + (
             "organizations:deprecate-fid-from-performance-score",
             "organizations:indexed-spans-extraction",
@@ -311,9 +312,22 @@ SENTRY_FEATURES.update(
             "organizations:starfish-mobile-appstart",
             "projects:span-metrics-extraction",
             "projects:span-metrics-extraction-addons",
-        )  # starfish related flags
+        )
+        # User Feedback related flags
+        + (
+            "organizations:user-feedback-ingest",
+            "organizations:user-feedback-replay-clip",
+            "organizations:user-feedback-ui",
+            "organizations:feedback-visible",
+            "organizations:feedback-ingest",
+            "organizations:feedback-post-process-group",
+        )
     }
 )
+
+# Temporary flag to mark User Feedback to be produced to the dedicated feedback topic by relay.
+# This will be removed at a later time after it's considered stable and fully rolled out.
+SENTRY_OPTIONS["feedback.ingest-topic.rollout-rate"] = 1.0
 
 #######################
 # MaxMind Integration #
@@ -363,6 +377,13 @@ CSP_REPORT_ONLY = True
 # https://docs.djangoproject.com/en/4.2/ref/settings/#std-setting-CSRF_TRUSTED_ORIGINS
 
 # CSRF_TRUSTED_ORIGINS = ["https://example.com", "http://127.0.0.1:9000"]
+
+#################
+# JS SDK Loader #
+#################
+
+JS_SDK_LOADER_DEFAULT_SDK_URL = "https://browser.sentry-cdn.com/%s/bundle%s.min.js"
+
 
 # If you would like to use self-hosted Sentry with only errors enabled, please set this
 SENTRY_SELF_HOSTED_ERRORS_ONLY = env("COMPOSE_PROFILES") != "feature-complete"

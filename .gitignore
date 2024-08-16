@@ -98,9 +98,6 @@ geoip/GeoIP.conf
 geoip/*.mmdb
 geoip/.geoipupdate.lock
 
-# wal2json download
-postgres/wal2json
-
 # integration testing
 _integration-test/custom-ca-roots/nginx/*
 sentry/test-custom-ca-roots.py

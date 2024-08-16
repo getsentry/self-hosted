@@ -10,10 +10,8 @@ body:
         [previous YY.M.N](https://github.com/getsentry/self-hosted/issues) | ***YY.M.N*** | [next YY.M.N](https://github.com/getsentry/self-hosted/issues)
 
         - [ ] Release all components (_replace items with [publish repo issue links](https://github.com/getsentry/publish/issues)_).
-          - [ ] [`develop`](https://github.com/getsentry/develop/actions/workflows/prepare-release.yml)
           - [ ] [`relay`](https://github.com/getsentry/relay/actions/workflows/release_binary.yml)
           - [ ] [`sentry`](https://github.com/getsentry/sentry/actions/workflows/release.yml)
-          - [ ] [`sentry-docs`](https://github.com/getsentry/sentry-docs/actions/workflows/prepare-release.yml)
           - [ ] [`snuba`](https://github.com/getsentry/snuba/actions/workflows/release.yml)
           - [ ] [`symbolicator`](https://github.com/getsentry/symbolicator/actions/workflows/release.yml)
           - [ ] [`vroom`](https://github.com/getsentry/vroom/actions/workflows/release.yaml)
@@ -25,7 +23,6 @@ body:
         - [ ] Follow up.
           - [ ] [Create the next release issue](https://github.com/getsentry/self-hosted/issues/new?assignees=&labels=&projects=&template=release.yml) and link it from this one.
             - _replace with link_
-          - [ ] Update the [quarterly ticket](https://github.com/getsentry/team-ospo/issues).
           - [ ] Update the [release issue template](https://github.com/getsentry/self-hosted/blob/master/.github/ISSUE_TEMPLATE/release.yml).
           - [ ] Create a PR to update relocation release tests to add the new version.
             - _replace with link_
