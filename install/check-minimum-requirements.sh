@@ -4,8 +4,11 @@ source install/_min-requirements.sh
 
 # Check the version of $1 is greater than or equal to $2 using sort. Note: versions must be stripped of "v"
 function vergte() {
-  printf "%s\n%s" $1 $2 | sort --version-sort --check=quiet --reverse
-  echo $?
+  if [[ "$(printf "%s\n%s" "$1" "$2" | sort --version-sort | head -n 1)" == "$2" ]]; then
+    return 0  # $1 is greater than or equal to $2
+  else
+    return 1  # $1 is less than $2
+  fi
 }
 
 DOCKER_VERSION=$(docker version --format '{{.Server.Version}}' || echo '')
