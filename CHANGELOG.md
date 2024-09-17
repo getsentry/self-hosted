@@ -1,5 +1,15 @@
 # Changelog
 
+## 24.9.0
+
+### Various fixes & improvements
+
+- docs: link to develop docs (#3307) by @joshuarli
+- fix: more leeway for minimum RAM (#3290) by @joshuarli
+- Mandate minimum requirements for ram/cpu (#3275) by @hubertdeng123
+- ref(feedback): cleanup topic rollout option (#3276) by @aliu39
+- Update release template (#3270) by @hubertdeng123
+
 ## 24.8.0
 
 ### Various fixes & improvements
