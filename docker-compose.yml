@@ -60,6 +60,12 @@ x-sentry-defaults: &sentry_defaults
     SENTRY_MAIL_HOST:
     SENTRY_MAX_EXTERNAL_SOURCEMAP_SIZE:
     OPENAI_API_KEY:
+    REPORT_SELF_HOSTED_ISSUES:
+    POSTGRES_DB:
+    POSTGRES_USER:
+    POSTGRES_PASSWORD:
+    POSTGRES_HOST:
+    POSTGRES_PORT:
   volumes:
     - "sentry-data:/data"
     - "./sentry:/etc/sentry"

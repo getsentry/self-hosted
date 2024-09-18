@@ -45,11 +45,11 @@ INTERNAL_SYSTEM_IPS = (get_internal_network(),)
 DATABASES = {
     "default": {
         "ENGINE": "sentry.db.postgres",
-        "NAME": "postgres",
-        "USER": "postgres",
-        "PASSWORD": "",
-        "HOST": "postgres",
-        "PORT": "",
+        "NAME": env("POSTGRES_DB", "postgres"),
+        "USER": env("POSTGRES_USER", "postgres"),
+        "PASSWORD": env("POSTGRES_PASSWORD", ""),
+        "HOST": env("POSTGRES_HOST", "postgres"),
+        "PORT": env("POSTGRES_PORT", ""),
     }
 }
 
