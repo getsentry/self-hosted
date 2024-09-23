@@ -36,4 +36,5 @@ source install/bootstrap-snuba.sh
 source install/upgrade-postgres.sh
 source install/set-up-and-migrate-database.sh
 source install/geoip.sh
+source install/setup-js-sdk-assets.sh
 source install/wrap-up.sh

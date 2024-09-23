@@ -460,6 +460,7 @@ services:
         source: ./nginx
         target: /etc/nginx
       - sentry-nginx-cache:/var/cache/nginx
+      - sentry-nginx-www:/var/www
     depends_on:
       - web
       - relay
@@ -528,6 +529,11 @@ volumes:
   sentry-clickhouse:
     external: true
   sentry-symbolicator:
+    external: true
+  # This volume stores JS SDK assets, this is created as an external volume
+  # to minimize hiccups created by the nginx container and its' dependencies.
+  # The data inside this volume should be cleaned periodically on upgrades.
+  sentry-nginx-www:
     external: true
   # This volume stores profiles and should be persisted.
   # Not being external will still persist data across restarts.
