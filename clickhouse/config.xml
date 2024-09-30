@@ -16,6 +16,8 @@
     <session_log remove="remove"/>
     <part_log remove="remove"/>
 
+    <allow_nullable_key>1</allow_nullable_key>
+
     <profiles>
         <default>
             <log_queries>0</log_queries>
