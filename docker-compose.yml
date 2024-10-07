@@ -530,9 +530,8 @@ volumes:
     external: true
   sentry-symbolicator:
     external: true
-  # This volume stores JS SDK assets, this is created as an external volume
-  # to minimize hiccups created by the nginx container and its' dependencies.
-  # The data inside this volume should be cleaned periodically on upgrades.
+  # This volume stores JS SDK assets and the data inside this volume should
+  # be cleaned periodically on upgrades.
   sentry-nginx-www:
   # This volume stores profiles and should be persisted.
   # Not being external will still persist data across restarts.
