@@ -534,7 +534,6 @@ volumes:
   # to minimize hiccups created by the nginx container and its' dependencies.
   # The data inside this volume should be cleaned periodically on upgrades.
   sentry-nginx-www:
-    external: true
   # This volume stores profiles and should be persisted.
   # Not being external will still persist data across restarts.
   # It won't persist if someone does a docker compose down -v.
