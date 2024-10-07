@@ -5,7 +5,6 @@ source install/dc-detect-version.sh
 $dcb --force-rm web
 
 export SETUP_JS_SDK_ASSETS=1
-export SETUP_JS_SDK_KEEP_OLD_ASSETS=1
 
 source install/setup-js-sdk-assets.sh
 
@@ -13,8 +12,9 @@ sdk_files=$(docker compose run --no-deps --rm -v "sentry-nginx-www:/var/www" ngi
 sdk_tree=$(docker compose run --no-deps --rm -v "sentry-nginx-www:/var/www" nginx tree /var/www/js-sdk/ | tail -n 1)
 
 # `sdk_files` should contains 2 lines, `7.*` and `8.*`
-echo "$sdk_files"
-test "2" == "$(echo "$sdk_files" | grep '[0-9]+$' | wc -l)"
+total_directories=$(echo "$sdk_files" | grep '{7,8}\.[0-9]+$' | wc -l)
+echo "$sdk_files $total_directories"
+test "2" == "$total_directories"
 echo "Pass"
 
 # `sdk_tree` should outputs "3 directories, 10 files"
