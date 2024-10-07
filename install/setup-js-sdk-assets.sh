@@ -15,11 +15,12 @@ if [[ "${SETUP_JS_SDK_ASSETS:-}" == "1" ]]; then
 
   jq="docker run --rm -i sentry-self-hosted-jq-local"
 
-  latest_js_v7=$($dcr --no-deps -T web cat /usr/src/sentry/src/sentry/loader/_registry.json | $jq -r '.versions | reverse | map(select(.|any(.; startswith("7.")))) | .[0]')
-  latest_js_v8=$($dcr --no-deps -T web cat /usr/src/sentry/src/sentry/loader/_registry.json | $jq -r '.versions | reverse | map(select(.|any(.; startswith("8.")))) | .[0]')
+  latest_js_v7=$($dcr --no-deps --rm -T web cat /usr/src/sentry/src/sentry/loader/_registry.json | $jq -r '.versions | reverse | map(select(.|any(.; startswith("7.")))) | .[0]')
+  latest_js_v8=$($dcr --no-deps --rm -T web cat /usr/src/sentry/src/sentry/loader/_registry.json | $jq -r '.versions | reverse | map(select(.|any(.; startswith("8.")))) | .[0]')
 
   # Download those two using wget
   for version in "${latest_js_v7}" "${latest_js_v8}"; do
+    $dcr --no-deps --rm -v "sentry-nginx-www:/js-sdk" nginx mkdir -p /var/www/js-sdk/${version}
     for variant in "tracing" "tracing.replay" "replay" "tracing.replay.feedback" "feedback"; do
       $dcr --no-deps --rm -v "sentry-nginx-www:/js-sdk" nginx wget -q -O /var/www/js-sdk/${version}/bundle.${variant}.min.js "https://browser.sentry-cdn.com/${version}/bundle.${variant}.min.js"
     done
