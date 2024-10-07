@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 source _unit-test/_test_setup.sh
+source install/dc-detect-version.sh
 
 export SETUP_JS_SDK_ASSETS=1
 export SETUP_JS_SDK_KEEP_OLD_ASSETS=1
