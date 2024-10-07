@@ -14,8 +14,10 @@ sdk_tree=$(docker compose run --no-deps --rm -v "sentry-nginx-www:/var/www/js-sd
 
 # `sdk_files` should contains 2 lines, `7.*` and `8.*`
 test "2" == "$(echo "$sdk_files" | grep '[0-9]+$' | wc -l)"
+echo "Pass"
 
 # `sdk_tree` should outputs "3 directories, 10 files"
 test "3 directories, 10 files" == "$(echo "$sdk_tree")"
+echo "Pass"
 
 report_success

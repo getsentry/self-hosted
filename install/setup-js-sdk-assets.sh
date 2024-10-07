@@ -23,6 +23,8 @@ if [[ "${SETUP_JS_SDK_ASSETS:-}" == "1" ]]; then
   latest_js_v7=$(echo "$loader_registry" | $jq -r '.versions | reverse | map(select(.|any(.; startswith("7.")))) | .[0]')
   latest_js_v8=$(echo "$loader_registry" | $jq -r '.versions | reverse | map(select(.|any(.; startswith("8.")))) | .[0]')
 
+  echo "Found JS SDKs v${latest_js_v7} and v${latest_js_v8}, downloading from upstream.."
+
   # Download those two using wget
   for version in "${latest_js_v7}" "${latest_js_v8}"; do
     $dcr --no-deps --rm -v "sentry-nginx-www:/js-sdk" nginx mkdir -p /var/www/js-sdk/${version}
