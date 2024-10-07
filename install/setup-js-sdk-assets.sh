@@ -15,8 +15,13 @@ if [[ "${SETUP_JS_SDK_ASSETS:-}" == "1" ]]; then
 
   jq="docker run --rm -i sentry-self-hosted-jq-local"
 
-  latest_js_v7=$($dcr --no-deps --rm -T web cat /usr/src/sentry/src/sentry/loader/_registry.json | $jq -r '.versions | reverse | map(select(.|any(.; startswith("7.")))) | .[0]')
-  latest_js_v8=$($dcr --no-deps --rm -T web cat /usr/src/sentry/src/sentry/loader/_registry.json | $jq -r '.versions | reverse | map(select(.|any(.; startswith("8.")))) | .[0]')
+  loader_registry=$($dcr --no-deps --rm -T web cat /usr/src/sentry/src/sentry/loader/_registry.json)
+  # The `loader_registry` should start with "Updating certificates...", we want to delete that and the subsequent ca-certificates related lines.
+  # We want to remove everything before the first '{'.
+  loader_registry=$(echo "$loader_registry" | sed '0,/{/s/[^{]*//')
+
+  latest_js_v7=$(echo "$loader_registry" | $jq -r '.versions | reverse | map(select(.|any(.; startswith("7.")))) | .[0]')
+  latest_js_v8=$(echo "$loader_registry" | $jq -r '.versions | reverse | map(select(.|any(.; startswith("8.")))) | .[0]')
 
   # Download those two using wget
   for version in "${latest_js_v7}" "${latest_js_v8}"; do
