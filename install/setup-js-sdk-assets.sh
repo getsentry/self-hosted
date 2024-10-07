@@ -1,12 +1,12 @@
 # This will only run if the SETUP_JS_SDK_ASSETS environment variable is set to 1
-if [[ "$SETUP_JS_SDK_ASSETS" == "1" ]]; then
+if [[ "${SETUP_JS_SDK_ASSETS:-}" == "1" ]]; then
   echo "${_group}Setting up JS SDK assets"
 
   # If the `sentry-nginx-www` volume exists, we need to prune the contents.
   # We don't want to fill the volume with old JS SDK assets.
   # If people want to keep the old assets, they can set the environment variable
   # `SETUP_JS_SDK_KEEP_OLD_ASSETS` to any value.
-  if [[ -z "$SETUP_JS_SDK_KEEP_OLD_ASSETS" ]]; then
+  if [[ -z "${SETUP_JS_SDK_KEEP_OLD_ASSETS:-}" ]]; then
     echo "Cleaning up old JS SDK assets..."
     docker run --rm -v "sentry-nginx-www:/js-sdk" busybox rm -rf /js-sdk/*
   fi
