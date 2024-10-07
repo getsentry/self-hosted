@@ -1,4 +1,5 @@
-# This will only run if the SETUP_JS_SDK_ASSETS environment variable is set to 1
+# This will only run if the SETUP_JS_SDK_ASSETS environment variable is set to 1.
+# Think of this as some kind of a feature flag.
 if [[ "${SETUP_JS_SDK_ASSETS:-}" == "1" ]]; then
   echo "${_group}Setting up JS SDK assets"
 
