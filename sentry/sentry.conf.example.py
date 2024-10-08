@@ -380,7 +380,14 @@ CSP_REPORT_ONLY = True
 
 # Configure Sentry JS SDK bundle URL template for Loader Scripts.
 # Learn more about the Loader Scripts: https://docs.sentry.io/platforms/javascript/install/loader/
-
+# If you wish to host your own JS SDK bundles, set `SETUP_JS_SDK_ASSETS` environment variable to `1`
+# on your `.env` or `.env.custom` file. Then, replace the value below with your own public URL.
+# For example: "https://sentry.example.com/js-sdk/%s/bundle%s.min.js"
+#
+# By default, the previous JS SDK assets version will be pruned during upgrades, if you wish
+# to keep the old assets, set `SETUP_JS_SDK_KEEP_OLD_ASSETS` environment variable to any value on
+# your `.env` or `.env.custom` file. The files should only be a few KBs, and this might be useful
+# if you're using it directly like a CDN instead of using the loader script.
 JS_SDK_LOADER_DEFAULT_SDK_URL = "https://browser.sentry-cdn.com/%s/bundle%s.min.js"
 
 
