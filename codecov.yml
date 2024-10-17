@@ -1,5 +1,5 @@
 coverage:
   status:
     project:
-      test:
+      default:
         only_pulls: true
