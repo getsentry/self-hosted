@@ -1,5 +1,16 @@
 # Changelog
 
+## 24.10.0
+
+### Various fixes & improvements
+
+- chore: Disable codecov for master/release branches (#3384) by @hubertdeng123
+- chore: replace old URLs of the repo with the new docs (#3375) by @victorelec14
+- ref: span normalization allowed host config (#3245) by @aldy505
+- docs: explicitly specify `mail.use-{tls,ssl}` is mutually exclusive (#3368) by @aldy505
+- ref: allow hosted js sdk bundles (#3365) by @aldy505
+- fix(clickhouse): Allow nullable key (#3354) by @nikhars
+
 ## 24.9.0
 
 ### Various fixes & improvements
