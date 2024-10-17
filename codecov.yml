@@ -1,0 +1,8 @@
+coverage:
+  status:
+    project:
+      default:
+        only_pulls: true
+    patch:
+      default:
+        only_pulls: true
