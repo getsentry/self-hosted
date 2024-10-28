@@ -318,9 +318,6 @@ SENTRY_FEATURES.update(
             "organizations:user-feedback-ingest",
             "organizations:user-feedback-replay-clip",
             "organizations:user-feedback-ui",
-            "organizations:feedback-visible",
-            "organizations:feedback-ingest",
-            "organizations:feedback-post-process-group",
         )
     }
 )
