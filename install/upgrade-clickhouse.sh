@@ -13,7 +13,6 @@ function get_clickhouse_version() {
   $dc exec clickhouse clickhouse-client -q 'SELECT version()'
 }
 
-
 # First check to see if user is upgrading by checking for existing clickhouse volume
 if [[ -n "$(docker volume ls -q --filter name=sentry-clickhouse)" ]]; then
   # Start clickhouse if it is not already running
@@ -38,7 +37,7 @@ if [[ -n "$(docker volume ls -q --filter name=sentry-clickhouse)" ]]; then
     $dc up -d clickhouse
     wait_for_clickhouse
   fi
-  
+
   version=$(get_clickhouse_version)
   if [[ "$version" == "23.3.19.33.altinitystable" || "$version" == "23.3.19.33.altinitydev.arm" ]]; then
     $dc down clickhouse
