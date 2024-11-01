@@ -29,7 +29,7 @@ if [[ -n "$(docker volume ls -q --filter name=sentry-clickhouse)" ]]; then
     $dc up -d clickhouse
     wait_for_clickhouse
     $dc down clickhouse
-    $dcb --build-arg BASE_IMAGE=altinity/clickhouse-server:24.3.5.47.altinitystable clickhouse
+    $dcb --build-arg BASE_IMAGE=altinity/clickhouse-server:23.8.11.29.altinitystable clickhouse
     $dc up -d clickhouse
     wait_for_clickhouse
   else
