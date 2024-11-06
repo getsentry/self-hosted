@@ -18,9 +18,9 @@ echo $total_directories
 test "5" == "$total_directories"
 echo "Pass"
 
-# `sdk_tree` should outputs "5 directories, 10 files"
+# `sdk_tree` should outputs "5 directories, 16 files"
 echo "$sdk_tree"
-test "5 directories, 10 files" == "$(echo "$sdk_tree")"
+test "5 directories, 16 files" == "$(echo "$sdk_tree")"
 echo "Pass"
 
 report_success
