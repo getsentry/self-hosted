@@ -42,8 +42,7 @@ if [[ "${SETUP_JS_SDK_ASSETS:-}" == "1" ]]; then
       fi
 
       echo "Downloading JS SDK v${version} for ${variant}.min.js..."
-      
-      $dcr --no-deps --rm -v "sentry-nginx-www:/var/www" nginx curl -sLo /var/www/js-sdk/${version}/${variant}.min.js "https://browser.sentry-cdn.com/${version}/${variant}.min.js"
+      $dcr --no-deps --rm -v "sentry-nginx-www:/var/www" nginx curl --retry 3 -sLo /var/www/js-sdk/${version}/${variant}.min.js "https://browser.sentry-cdn.com/${version}/${variant}.min.js"
     done
   done
 

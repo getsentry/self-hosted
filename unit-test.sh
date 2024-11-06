@@ -11,8 +11,9 @@ for test_file in _unit-test/*-test.sh; do
   fi
   echo "🙈 Running $test_file ..."
   $test_file
-  if [ $? != 0 ]; then
-    echo fail 👎
+  exit_code=$?
+  if [ $exit_code != 0 ]; then
+    echo fail 👎 with exit code $exit_code
     fail=1
   fi
 done
