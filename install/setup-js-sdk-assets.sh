@@ -34,8 +34,9 @@ if [[ "${SETUP_JS_SDK_ASSETS:-}" == "1" ]]; then
   for version in "$latest_js_v4" "$latest_js_v5" "$latest_js_v6" "$latest_js_v7" "$latest_js_v8"; do
     $dcr --no-deps --rm -v "sentry-nginx-www:/var/www" nginx mkdir -p /var/www/js-sdk/${version}
     for variant in "bundle" "bundle.tracing" "bundle.tracing.replay" "bundle.replay" "bundle.tracing.replay.feedback" "bundle.feedback"; do
+      # We want to have a HEAD lookup. If the response status code is not 200, we will skip the variant.
       # Taken from https://superuser.com/questions/272265/getting-curl-to-output-http-status-code#comment1025992_272273
-      status_code=$($dcr --no-deps --rm nginx curl --silent -I https://browser.sentry-cdn.com/${version}/${variant}.min.js 2>/dev/null | head -n 1 | cut -d$' ' -f2)
+      status_code=$($dcr --no-deps --rm nginx curl --retry 3 --silent -I "https://browser.sentry-cdn.com/${version}/${variant}.min.js" 2>/dev/null | head -n 1 | cut -d$' ' -f2)
       if [[ "$status_code" != "200" ]]; then
         echo "Skipping download of JS SDK v${version} for ${variant}.min.js, because the status code was ${status_code} (non 200)"
         continue
