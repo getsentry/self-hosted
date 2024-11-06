@@ -21,7 +21,7 @@ if [[ "${SETUP_JS_SDK_ASSETS:-}" == "1" ]]; then
   # We want to remove everything before the first '{'.
   loader_registry=$(echo "$loader_registry" | sed '0,/{/s/[^{]*//')
 
-  # Sentry backend provides SDK versions from v4.x up to v8.x.
+  #  Sentry backend provides SDK versions from v4.x up to v8.x.
   latest_js_v4=$(echo "$loader_registry" | $jq -r '.versions | reverse | map(select(.|any(.; startswith("4.")))) | .[0]')
   latest_js_v5=$(echo "$loader_registry" | $jq -r '.versions | reverse | map(select(.|any(.; startswith("5.")))) | .[0]')
   latest_js_v6=$(echo "$loader_registry" | $jq -r '.versions | reverse | map(select(.|any(.; startswith("6.")))) | .[0]')
@@ -35,7 +35,7 @@ if [[ "${SETUP_JS_SDK_ASSETS:-}" == "1" ]]; then
     $dcr --no-deps --rm -v "sentry-nginx-www:/var/www" nginx mkdir -p /var/www/js-sdk/${version}
     for variant in "bundle" "bundle.tracing" "bundle.tracing.replay" "bundle.replay" "bundle.tracing.replay.feedback" "bundle.feedback"; do
       # Taken from https://superuser.com/questions/272265/getting-curl-to-output-http-status-code#comment1025992_272273
-      status_code=$($dcr --no-deps --rm nginx curl -I https://browser.sentry-cdn.com/4.6.6/bundle.min.js 2>/dev/null | head -n 1 | cut -d$' ' -f2)
+      status_code=$($dcr --no-deps --rm nginx curl -I https://browser.sentry-cdn.com/${version}/${variant}.min.js 2>/dev/null | head -n 1 | cut -d$' ' -f2)
       if [[ "$status_code" != "200" ]]; then
         echo "Skipping download of JS SDK v${version} for variant ${variant}, because the status code was ${status_code} (non 200)"
         continue
