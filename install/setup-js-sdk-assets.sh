@@ -34,7 +34,7 @@ if [[ "${SETUP_JS_SDK_ASSETS:-}" == "1" ]]; then
   variants="{bundle,bundle.tracing,bundle.tracing.replay,bundle.replay,bundle.tracing.replay.feedback,bundle.feedback}"
 
   # Download those versions & variants using curl
-  $dcr --no-deps --rm -v "sentry-nginx-www:/var/www" nginx curl --compressed --retry 3 --create-dirs -fsLo /var/www/js-sdk/${versions}/${variants}.min.js "https://browser.sentry-cdn.com/#1/#2.min.js" || true
+  $dcr --no-deps --rm -v "sentry-nginx-www:/var/www" nginx curl --compressed --retry 3 --create-dirs -fsLo "/var/www/js-sdk/#1/#2.min.js" "https://browser.sentry-cdn.com/${versions}/${variants}.min.js" || true
 
   echo "${_endgroup}"
 fi
