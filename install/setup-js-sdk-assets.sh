@@ -30,8 +30,8 @@ if [[ "${SETUP_JS_SDK_ASSETS:-}" == "1" ]]; then
 
   echo "Found JS SDKs: v${latest_js_v4}, v${latest_js_v5}, v${latest_js_v6}, v${latest_js_v7}, v${latest_js_v8}"
 
-  versions=( "$latest_js_v4" "$latest_js_v5" "$latest_js_v6" "$latest_js_v7" "$latest_js_v8" )
-  variants=( "bundle" "bundle.tracing" "bundle.tracing.replay" "bundle.replay" "bundle.tracing.replay.feedback" "bundle.feedback" )
+  versions=("$latest_js_v4" "$latest_js_v5" "$latest_js_v6" "$latest_js_v7" "$latest_js_v8")
+  variants=("bundle" "bundle.tracing" "bundle.tracing.replay" "bundle.replay" "bundle.tracing.replay.feedback" "bundle.feedback")
 
   # Download those versions & variants using curl
   for version in "${versions[@]}"; do
