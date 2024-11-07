@@ -39,14 +39,14 @@ if [[ "${SETUP_JS_SDK_ASSETS:-}" == "1" ]]; then
     for variant in "${variants[@]}"; do
       # We want to have a HEAD lookup. If the response status code is not 200, we will skip the variant.
       # Taken from https://superuser.com/questions/272265/getting-curl-to-output-http-status-code#comment1025992_272273
-      status_code=$($dcr --no-deps --rm nginx curl --retry 5 -sLI "https://browser.sentry-cdn.com/${version}/${variant}.min.js" 2>/dev/null | head -n 1 | cut -d$' ' -f2)
+      status_code=$($dcr --no-deps --rm nginx curl --retry 3 -sLI "https://js.sentry-cdn.com/${version}/${variant}.min.js" 2>/dev/null | head -n 1 | cut -d$' ' -f2)
       if [[ "$status_code" != "200" ]]; then
         echo "Skipping download of JS SDK v${version} for ${variant}.min.js, because the status code was ${status_code} (non 200)"
         continue
       fi
 
       echo "Downloading JS SDK v${version} for ${variant}.min.js..."
-      $dcr --no-deps --rm -v "sentry-nginx-www:/var/www" nginx curl --retry 10 -sLo /var/www/js-sdk/${version}/${variant}.min.js "https://browser.sentry-cdn.com/${version}/${variant}.min.js"
+      $dcr --no-deps --rm -v "sentry-nginx-www:/var/www" nginx curl --retry 3 -sLo /var/www/js-sdk/${version}/${variant}.min.js "https://js.sentry-cdn.com/${version}/${variant}.min.js"
     done
   done
 
