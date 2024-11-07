@@ -23,4 +23,9 @@ echo "$sdk_tree"
 test "5 directories, 17 files" == "$(echo "$sdk_tree")"
 echo "Pass"
 
+# Files should all be >1k (ensure they are not empty)
+echo "Testing file sizes"
+test "17" == "$(find /var/www/js-sdk -type f -size +1k | wc -l)"
+echo "Pass"
+
 report_success
