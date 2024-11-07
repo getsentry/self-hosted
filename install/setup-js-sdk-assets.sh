@@ -30,17 +30,11 @@ if [[ "${SETUP_JS_SDK_ASSETS:-}" == "1" ]]; then
 
   echo "Found JS SDKs: v${latest_js_v4}, v${latest_js_v5}, v${latest_js_v6}, v${latest_js_v7}, v${latest_js_v8}"
 
-  versions=("$latest_js_v4" "$latest_js_v5" "$latest_js_v6" "$latest_js_v7" "$latest_js_v8")
-  variants=("bundle" "bundle.tracing" "bundle.tracing.replay" "bundle.replay" "bundle.tracing.replay.feedback" "bundle.feedback")
+  versions="{$latest_js_v4,$latest_js_v5,$latest_js_v6,$latest_js_v7,$latest_js_v8}"
+  variants="{bundle,bundle.tracing,bundle.tracing.replay,bundle.replay,bundle.tracing.replay.feedback,bundle.feedback}"
 
   # Download those versions & variants using curl
-  for version in "${versions[@]}"; do
-    $dcr --no-deps --rm -v "sentry-nginx-www:/var/www" nginx mkdir -p /var/www/js-sdk/${version}
-    for variant in "${variants[@]}"; do
-      echo "Downloading JS SDK v${version} for ${variant}.min.js..."
-      $dcr --no-deps --rm -v "sentry-nginx-www:/var/www" nginx curl --retry 3 -sLo /var/www/js-sdk/${version}/${variant}.min.js "https://browser.sentry-cdn.com/${version}/${variant}.min.js" || true
-    done
-  done
+  $dcr --no-deps --rm -v "sentry-nginx-www:/var/www" nginx curl --compressed --retry 3 --create-dirs -fsLo /var/www/js-sdk/${versions}/${variants}.min.js "https://browser.sentry-cdn.com/#1/#2.min.js" || true
 
   echo "${_endgroup}"
 fi
