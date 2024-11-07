@@ -457,7 +457,7 @@ services:
     volumes:
       - type: bind
         read_only: true
-        source: ./nginx/nginx.conf
+        source: ./nginx.conf
         target: /etc/nginx/nginx.conf
       - sentry-nginx-cache:/var/cache/nginx
       - sentry-nginx-www:/var/www
