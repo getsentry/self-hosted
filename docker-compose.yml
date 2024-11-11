@@ -107,7 +107,7 @@ services:
     image: "redis:6.2.14-alpine"
     healthcheck:
       <<: *healthcheck_defaults
-      test: redis-cli ping
+      test: redis-cli ping | grep PONG
     volumes:
       - "sentry-redis:/data"
     ulimits:
