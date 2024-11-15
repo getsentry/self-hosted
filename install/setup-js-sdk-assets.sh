@@ -21,18 +21,20 @@ if [[ "${SETUP_JS_SDK_ASSETS:-}" == "1" ]]; then
   # We want to remove everything before the first '{'.
   loader_registry=$(echo "$loader_registry" | sed '0,/{/s/[^{]*//')
 
+  #  Sentry backend provides SDK versions from v4.x up to v8.x.
+  latest_js_v4=$(echo "$loader_registry" | $jq -r '.versions | reverse | map(select(.|any(.; startswith("4.")))) | .[0]')
+  latest_js_v5=$(echo "$loader_registry" | $jq -r '.versions | reverse | map(select(.|any(.; startswith("5.")))) | .[0]')
+  latest_js_v6=$(echo "$loader_registry" | $jq -r '.versions | reverse | map(select(.|any(.; startswith("6.")))) | .[0]')
   latest_js_v7=$(echo "$loader_registry" | $jq -r '.versions | reverse | map(select(.|any(.; startswith("7.")))) | .[0]')
   latest_js_v8=$(echo "$loader_registry" | $jq -r '.versions | reverse | map(select(.|any(.; startswith("8.")))) | .[0]')
 
-  echo "Found JS SDKs v${latest_js_v7} and v${latest_js_v8}, downloading from upstream.."
+  echo "Found JS SDKs: v${latest_js_v4}, v${latest_js_v5}, v${latest_js_v6}, v${latest_js_v7}, v${latest_js_v8}"
 
-  # Download those two using wget
-  for version in "${latest_js_v7}" "${latest_js_v8}"; do
-    $dcr --no-deps --rm -v "sentry-nginx-www:/var/www" nginx mkdir -p /var/www/js-sdk/${version}
-    for variant in "tracing" "tracing.replay" "replay" "tracing.replay.feedback" "feedback"; do
-      $dcr --no-deps --rm -v "sentry-nginx-www:/var/www" nginx wget -q -O /var/www/js-sdk/${version}/bundle.${variant}.min.js "https://browser.sentry-cdn.com/${version}/bundle.${variant}.min.js"
-    done
-  done
+  versions="{$latest_js_v4,$latest_js_v5,$latest_js_v6,$latest_js_v7,$latest_js_v8}"
+  variants="{bundle,bundle.tracing,bundle.tracing.replay,bundle.replay,bundle.tracing.replay.feedback,bundle.feedback}"
+
+  # Download those versions & variants using curl
+  $dcr --no-deps --rm -v "sentry-nginx-www:/var/www" nginx curl -w '%{response_code} %{url}\n' --no-progress-meter --compressed --retry 3 --create-dirs -fLo "/var/www/js-sdk/#1/#2.min.js" "https://browser.sentry-cdn.com/${versions}/${variants}.min.js" || true
 
   echo "${_endgroup}"
 fi
