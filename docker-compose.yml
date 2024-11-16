@@ -112,7 +112,7 @@ services:
       - "sentry-redis:/data"
       - type: bind
         read_only: true
-        source: ./redis/redis.conf
+        source: ./redis.conf
         target: /usr/local/etc/redis/redis.conf
     ulimits:
       nofile:
