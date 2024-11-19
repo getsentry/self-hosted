@@ -110,6 +110,10 @@ services:
       test: redis-cli ping | grep PONG
     volumes:
       - "sentry-redis:/data"
+      - type: bind
+        read_only: true
+        source: ./redis.conf
+        target: /usr/local/etc/redis/redis.conf
     ulimits:
       nofile:
         soft: 10032
