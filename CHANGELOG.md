@@ -1,5 +1,18 @@
 # Changelog
 
+## 24.11.0
+
+### Various fixes & improvements
+
+- feat(healthcheck): Improve redis healthcheck (#3422) by @hubertdeng123
+- fix: missing mime types and turning off autoindex for js-sdk endpoint (#3395) by @aldy505
+- fix: Use js.sentry-cdn.com for JS SDK downloads (#3417) by @BYK
+- fix(loader): provide js sdk assets from 4.x (#3415) by @aldy505
+- Revert "Revert "ref(feedback): remove issue platform flags after releasing issue types"" (#3403) by @BYK
+- Revert "ref(feedback): remove issue platform flags after releasing issue types" (#3402) by @BYK
+- ref(feedback): remove issue platform flags after releasing issue types (#3397) by @aliu39
+- fix(sentry-admin): Do not wait for command finish to display output (#3390) by @Makhonya
+
 ## 24.10.0
 
 ### Various fixes & improvements
