@@ -1,5 +1,13 @@
 # Changelog
 
+## 24.11.1
+
+### Various fixes & improvements
+
+- fix(redis): Use a safer eviction rule (#3432) by @BYK
+- feat: add Redis configuration for improved memory management (#3427) by @Hassanzadeh-sd
+- build(deps): bump codecov/codecov-action from 4 to 5 (#3429) by @dependabot
+
 ## 24.11.0
 
 ### Various fixes & improvements
