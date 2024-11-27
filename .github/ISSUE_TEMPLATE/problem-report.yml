@@ -20,10 +20,20 @@ body:
     validations:
       required: true
   - type: input
+    id: machine_specification
+    attributes:
+      label: Machine Specification
+      placeholder: Ubuntu 24.04 with 16 cores Intel Xeon CPU, 32 GB RAM, 0 swap, 200 GB SSD NVME ← should look like this
+      description: |
+        What machine specification are you running self-hosted on?
+        This is helpful for us to know what kind of hardware you're running on.
+    validations:
+      required: true
+  - type: input
     id: docker_version
     attributes:
       label: Docker Version
-      placeholder: 20.10.16 ← should look like this
+      placeholder: 20.10.16 ← should look like this (docker --version)
       description: |
         What version of docker are you using to run self-hosted?
         e.g: (docker --version)
@@ -54,6 +64,8 @@ body:
     id: expected
     attributes:
       label: Expected Result
+      description: |
+        What did you expect to happen?
     validations:
       required: true
   - type: textarea
@@ -70,7 +82,7 @@ body:
         - logs output
     validations:
       required: true
-  - type: textarea
+  - type: input
     id: event_id
     attributes:
       label: Event ID
@@ -82,5 +94,7 @@ body:
       value: |-
         ## Thanks
         Check our [triage docs](https://open.sentry.io/triage/) for what to expect next.
+
+        If you're reporting a security issue, please follow our [security policy](https://github.com/getsentry/.github/blob/main/SECURITY.md) instead.
     validations:
       required: false
