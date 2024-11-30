@@ -20,16 +20,6 @@ body:
     validations:
       required: true
   - type: input
-    id: machine_specification
-    attributes:
-      label: Machine Specification
-      placeholder: Ubuntu 24.04 with 16 cores Intel Xeon CPU, 32 GB RAM, 0 swap, 200 GB SSD NVME ← should look like this
-      description: |
-        What machine specification are you running self-hosted on?
-        This is helpful for us to know what kind of hardware you're running on.
-    validations:
-      required: true
-  - type: input
     id: docker_version
     attributes:
       label: Docker Version
@@ -49,6 +39,14 @@ body:
         e.g: (docker compose version)
     validations:
       required: true
+  - type: checkboxes
+    id: machine_specification
+    attributes:
+      label: Machine Specification
+      description: Make sure your system meets the [minimum system requirements of Sentry](https://develop.sentry.dev/self-hosted/#required-minimum-system-resources).
+      options:
+        - label: My system meets the [minimum system requirements of Sentry](https://develop.sentry.dev/self-hosted/#required-minimum-system-resources)
+          required: true
   - type: textarea
     id: repro
     attributes:
