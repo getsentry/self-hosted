@@ -45,8 +45,10 @@ body:
       label: Machine Specification
       description: Make sure your system meets the [minimum system requirements of Sentry](https://develop.sentry.dev/self-hosted/#required-minimum-system-resources).
       options:
-        - label: My system meets the [minimum system requirements of Sentry](https://develop.sentry.dev/self-hosted/#required-minimum-system-resources)
+        - label: My system meets the minimum system requirements of Sentry
           required: true
+    validations:
+      required: true
   - type: textarea
     id: repro
     attributes:
