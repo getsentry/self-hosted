@@ -46,15 +46,8 @@ jobs:
     name: Create release on self-hosted dogfood instance
     needs: release
     steps:
-      - name: Get auth token
-        id: token
-        uses: actions/create-github-app-token@5d869da34e18e7287c1daad50e0b8ea0f506ce69 # v1.11.0
-        with:
-          app-id: ${{ vars.SENTRY_RELEASE_BOT_CLIENT_ID }}
-          private-key: ${{ secrets.SENTRY_RELEASE_BOT_PRIVATE_KEY }}
       - uses: actions/checkout@v4
         with:
-          token: ${{ steps.token.outputs.token }}
           fetch-depth: 0
       - uses: getsentry/action-release@v1
         env:
