@@ -117,6 +117,9 @@ services:
       nofile:
         soft: 10032
         hard: 10032
+    command:
+      - redis-server
+      - /usr/local/etc/redis/redis.conf
   postgres:
     <<: *restart_policy
     # Using the same postgres version as Sentry dev for consistency purposes
