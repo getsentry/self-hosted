@@ -1,5 +1,15 @@
 # Changelog
 
+## 24.11.2
+
+### Various fixes & improvements
+
+- fix(redis): Actually use custom config (#3459) by @BYK
+- feat(release): Replace release bot with GH app (#3458) by @Jeffreyhung
+- chore(issue-template): ask for machine specification and provide link to security policy (#3447) by @aldy505
+- add sentry/backup.json to gitignore (#3450) by @niklassc7
+- ref: remove suggested fix (#3446) by @aldy505
+
 ## 24.11.1
 
 ### Various fixes & improvements
