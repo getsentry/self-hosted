@@ -1,5 +1,9 @@
 # Changelog
 
+## 24.12.0
+
+- No documented changes.
+
 ## 24.11.2
 
 ### Various fixes & improvements
