@@ -11,3 +11,10 @@ processing:
     - {name: "message.max.bytes", value: 50000000} # 50MB
   redis: redis://redis:6379
   geoip_path: "/geoip/GeoLite2-City.mmdb"
+
+# In some cases, relay might fail to find out the actual machine memory
+# therefore it makes the healthcheck fail and events can't be submitted.
+# As a workaround, uncomment the following line:
+#
+# health:
+#  max_memory_percent: 1.0
