@@ -85,7 +85,7 @@ def test_asset_internal_rewrite():
     we don't have a CDN setup in self-hosted."""
     response = httpx.get(f"{SENTRY_TEST_HOST}/_assets/entrypoints/app.js")
     assert response.status_code == 200
-    assert response.headers["Content-Type"] == "application/javascript"
+    assert response.headers["Content-Type"] == "text/javascript"
 
 
 def test_login(client_login):
