@@ -80,6 +80,14 @@ def test_initial_redirect():
     assert initial_auth_redirect.url == f"{SENTRY_TEST_HOST}/auth/login/sentry/"
 
 
+def test_asset_internal_rewrite():
+    """Tests whether we correctly map `/_assets/*` to `/_static/dist/sentry` as
+    we don't have a CDN setup in self-hosted."""
+    response = httpx.get(f"{SENTRY_TEST_HOST}/_assets/entrypoints/app.js")
+    assert response.status_code == 200
+    assert response.headers["Content-Type"] == "application/javascript"
+
+
 def test_login(client_login):
     client, login_response = client_login
     parser = BeautifulSoup(login_response.text, "html.parser")
