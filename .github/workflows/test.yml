@@ -91,6 +91,12 @@ jobs:
       - name: Install ${{ env.LATEST_TAG }}
         run: ./install.sh
 
+      - name: Prepare Docker Volume Caching
+        run: |
+          # Set permissions for docker volumes so we can cache and restore
+          # Hack taken from https://forums.docker.com/t/access-var-lib-docker-volumes-as-a-non-root-user/122050
+          sudo chmod 711 /var/lib/docker/
+
       - name: Save Postgres Volume Cache
         if: steps.restore_cache.outputs.cache-hit != 'true'
         uses: actions/cache/save@v4
@@ -177,6 +183,12 @@ jobs:
           timeout_minutes: 10
           max_attempts: 3
           command: ./install.sh
+
+      - name: Prepare Docker Volume Caching
+        run: |
+          # Set permissions for docker volumes so we can cache and restore
+          # Hack taken from https://forums.docker.com/t/access-var-lib-docker-volumes-as-a-non-root-user/122050
+          sudo chmod 711 /var/lib/docker/
 
       - name: Save Postgres Volume Cache
         if: steps.restore_cache.outputs.cache-hit != 'true'
