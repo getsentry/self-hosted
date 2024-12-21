@@ -1,5 +1,82 @@
 # Changelog
 
+## 24.12.0
+
+- No documented changes.
+
+## 24.11.2
+
+### Various fixes & improvements
+
+- fix(redis): Actually use custom config (#3459) by @BYK
+- feat(release): Replace release bot with GH app (#3458) by @Jeffreyhung
+- chore(issue-template): ask for machine specification and provide link to security policy (#3447) by @aldy505
+- add sentry/backup.json to gitignore (#3450) by @niklassc7
+- ref: remove suggested fix (#3446) by @aldy505
+
+## 24.11.1
+
+### Various fixes & improvements
+
+- fix(redis): Use a safer eviction rule (#3432) by @BYK
+- feat: add Redis configuration for improved memory management (#3427) by @Hassanzadeh-sd
+- build(deps): bump codecov/codecov-action from 4 to 5 (#3429) by @dependabot
+
+## 24.11.0
+
+### Various fixes & improvements
+
+- feat(healthcheck): Improve redis healthcheck (#3422) by @hubertdeng123
+- fix: missing mime types and turning off autoindex for js-sdk endpoint (#3395) by @aldy505
+- fix: Use js.sentry-cdn.com for JS SDK downloads (#3417) by @BYK
+- fix(loader): provide js sdk assets from 4.x (#3415) by @aldy505
+- Revert "Revert "ref(feedback): remove issue platform flags after releasing issue types"" (#3403) by @BYK
+- Revert "ref(feedback): remove issue platform flags after releasing issue types" (#3402) by @BYK
+- ref(feedback): remove issue platform flags after releasing issue types (#3397) by @aliu39
+- fix(sentry-admin): Do not wait for command finish to display output (#3390) by @Makhonya
+
+## 24.10.0
+
+### Various fixes & improvements
+
+- chore: Disable codecov for master/release branches (#3384) by @hubertdeng123
+- chore: replace old URLs of the repo with the new docs (#3375) by @victorelec14
+- ref: span normalization allowed host config (#3245) by @aldy505
+- docs: explicitly specify `mail.use-{tls,ssl}` is mutually exclusive (#3368) by @aldy505
+- ref: allow hosted js sdk bundles (#3365) by @aldy505
+- fix(clickhouse): Allow nullable key (#3354) by @nikhars
+
+## 24.9.0
+
+### Various fixes & improvements
+
+- docs: link to develop docs (#3307) by @joshuarli
+- fix: more leeway for minimum RAM (#3290) by @joshuarli
+- Mandate minimum requirements for ram/cpu (#3275) by @hubertdeng123
+- ref(feedback): cleanup topic rollout option (#3276) by @aliu39
+- Update release template (#3270) by @hubertdeng123
+
+## 24.8.0
+
+### Various fixes & improvements
+
+- Migrate to zookeeper-less kafka  (#3263) by @hubertdeng123
+- Revert "ref(feedback): cleanup topic rollout option" (#3262) by @aliu39
+- ref(feedback): cleanup topic rollout option (#3256) by @aliu39
+- Remove cdc and wal2json and use the default postgres entrypoint (#3260) by @beezz
+- add `-euo pipefail` to enhance-image.example.sh (#3246) by @asottile-sentry
+- remove python-dev (#3242) by @asottile-sentry
+- feat: enable user feedback feature (#3193) by @aldy505
+- Use CDN by default for JS SDK Loader (#3213) by @stayallive
+
+## 24.7.1
+
+### Various fixes & improvements
+
+- Fix: errors only config flag (#3220) by @hubertdeng123
+- Add errors only self-hosted infrastructure (#3190) by @hubertdeng123
+- feat(generic-metrics): Add gauges to docker compose, re-try (#3177) by @ayirr7
+
 ## 24.7.0
 
 ### Various fixes & improvements

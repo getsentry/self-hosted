@@ -5,3 +5,4 @@ pytest-rerunfailures>=11.0
 pytest-sentry>=0.1.11
 httpx>=0.25.2
 beautifulsoup4>=4.7.1
+cryptography>=43.0.3

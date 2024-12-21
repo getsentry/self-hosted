@@ -23,7 +23,7 @@ body:
     id: docker_version
     attributes:
       label: Docker Version
-      placeholder: 20.10.16 ← should look like this
+      placeholder: 20.10.16 ← should look like this (docker --version)
       description: |
         What version of docker are you using to run self-hosted?
         e.g: (docker --version)
@@ -37,6 +37,16 @@ body:
       description: |
         What version of docker compose are you using to run self-hosted?
         e.g: (docker compose version)
+    validations:
+      required: true
+  - type: checkboxes
+    id: machine_specification
+    attributes:
+      label: Machine Specification
+      description: Make sure your system meets the [minimum system requirements of Sentry](https://develop.sentry.dev/self-hosted/#required-minimum-system-resources).
+      options:
+        - label: My system meets the minimum system requirements of Sentry
+          required: true
     validations:
       required: true
   - type: textarea
@@ -54,6 +64,8 @@ body:
     id: expected
     attributes:
       label: Expected Result
+      description: |
+        What did you expect to happen?
     validations:
       required: true
   - type: textarea
@@ -70,7 +82,7 @@ body:
         - logs output
     validations:
       required: true
-  - type: textarea
+  - type: input
     id: event_id
     attributes:
       label: Event ID
@@ -82,5 +94,7 @@ body:
       value: |-
         ## Thanks
         Check our [triage docs](https://open.sentry.io/triage/) for what to expect next.
+
+        If you're reporting a security issue, please follow our [security policy](https://github.com/getsentry/.github/blob/main/SECURITY.md) instead.
     validations:
       required: false
