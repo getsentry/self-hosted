@@ -70,12 +70,14 @@ jobs:
         id: cache_key
         run: |
           # Set permissions for docker volumes so we can cache and restore
+          # Hack taken from https://forums.docker.com/t/access-var-lib-docker-volumes-as-a-non-root-user/122050
           sudo chmod 711 /var/lib/docker/
           source .env
           SENTRY_IMAGE_SHA=$(docker buildx imagetools inspect $SENTRY_IMAGE --format "{{json .Manifest}}" | jq -r '.digest')
           echo "SENTRY_IMAGE_SHA=$SENTRY_IMAGE_SHA" >> $GITHUB_OUTPUT
 
       - name: Restore Postgres Volume Cache
+        id: restore_cache
         uses: actions/cache/restore@v4
         with:
           key: sentry-image-sha-${{ steps.cache_key.outputs.SENTRY_IMAGE_SHA }}
@@ -83,6 +85,13 @@ jobs:
 
       - name: Install ${{ env.LATEST_TAG }}
         run: ./install.sh
+
+      - name: Save Postgres Volume Cache
+        if: steps.restore_cache.outputs.cache-hit == 'false'
+        uses: actions/cache/save@v4
+        with:
+          key: sentry-image-sha-${{ steps.cache_key.outputs.SENTRY_IMAGE_SHA }}
+          path: /var/lib/docker/volumes/sentry_postgres-data/_data
 
       - name: Checkout current ref
         uses: actions/checkout@v4
@@ -144,12 +153,14 @@ jobs:
         id: cache_key
         run: |
           # Set permissions for docker volumes so we can cache and restore
+          # Hack taken from https://forums.docker.com/t/access-var-lib-docker-volumes-as-a-non-root-user/122050
           sudo chmod 711 /var/lib/docker/
           source .env
           SENTRY_IMAGE_SHA=$(docker buildx imagetools inspect $SENTRY_IMAGE --format "{{json .Manifest}}" | jq -r '.digest')
           echo "SENTRY_IMAGE_SHA=$SENTRY_IMAGE_SHA" >> $GITHUB_OUTPUT
 
       - name: Restore Postgres Volume Cache
+        id: restore_cache
         uses: actions/cache/restore@v4
         with:
           key: sentry-image-sha-${{ steps.cache_key.outputs.SENTRY_IMAGE_SHA }}
@@ -163,6 +174,7 @@ jobs:
           command: ./install.sh
 
       - name: Save Postgres Volume Cache
+        if: steps.restore_cache.outputs.cache-hit == 'false'
         uses: actions/cache/save@v4
         with:
           key: sentry-image-sha-${{ steps.cache_key.outputs.SENTRY_IMAGE_SHA }}
