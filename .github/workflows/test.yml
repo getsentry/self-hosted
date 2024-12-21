@@ -81,7 +81,7 @@ jobs:
         uses: actions/cache/restore@v4
         with:
           key: sentry-image-sha-${{ steps.cache_key.outputs.SENTRY_IMAGE_SHA }}
-          path: /var/lib/docker/volumes/sentry_postgres-data/_data
+          path: /var/lib/docker/volumes/sentry-postgres/_data
 
       - name: Install ${{ env.LATEST_TAG }}
         run: ./install.sh
@@ -91,7 +91,7 @@ jobs:
         uses: actions/cache/save@v4
         with:
           key: ${{ steps.restore_cache.outputs.cache-primary-key }}
-          path: /var/lib/docker/volumes/sentry_postgres-data/_data
+          path: /var/lib/docker/volumes/sentry-postgres/_data
 
       - name: Checkout current ref
         uses: actions/checkout@v4
@@ -164,7 +164,7 @@ jobs:
         uses: actions/cache/restore@v4
         with:
           key: sentry-image-sha-${{ steps.cache_key.outputs.SENTRY_IMAGE_SHA }}
-          path: /var/lib/docker/volumes/sentry_postgres-data/_data
+          path: /var/lib/docker/volumes/sentry-postgres/_data
 
       - name: Install self-hosted
         uses: nick-fields/retry@v3
@@ -178,7 +178,7 @@ jobs:
         uses: actions/cache/save@v4
         with:
           key: ${{ steps.restore_cache.outputs.cache-primary-key }}
-          path: /var/lib/docker/volumes/sentry_postgres-data/_data
+          path: /var/lib/docker/volumes/sentry-postgres/_data
 
       - name: Integration Test
         run: |
