@@ -84,7 +84,7 @@ jobs:
         id: restore_cache
         uses: actions/cache/restore@v4
         with:
-          key: sentry-image-sha-${{ steps.cache_key.outputs.SENTRY_IMAGE_SHA }}
+          key: v1-sentry-image-sha-${{ steps.cache_key.outputs.SENTRY_IMAGE_SHA }}
           path: /var/lib/docker/volumes/sentry-postgres/_data
 
       - name: Install ${{ env.LATEST_TAG }}
@@ -171,7 +171,7 @@ jobs:
         id: restore_cache
         uses: actions/cache/restore@v4
         with:
-          key: sentry-image-sha-${{ steps.cache_key.outputs.SENTRY_IMAGE_SHA }}
+          key: v1-sentry-image-sha-${{ steps.cache_key.outputs.SENTRY_IMAGE_SHA }}
           path: /var/lib/docker/volumes/sentry-postgres/_data
 
       - name: Install self-hosted
