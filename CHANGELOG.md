@@ -1,5 +1,13 @@
 # Changelog
 
+## 24.12.1
+
+### Various fixes & improvements
+
+- chore: clearer message for errors-only mode (#3487) by @aldy505
+- chore(relay): provide opt-in max_memory_percent config as workaround for failing healthcheck (#3486) by @aldy505
+- fix(nginx): _assets should rewrite to _static/sentry/dist (#3483) by @BYK
+
 ## 24.12.0
 
 - No documented changes.
