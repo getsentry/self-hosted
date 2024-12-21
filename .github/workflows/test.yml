@@ -125,12 +125,31 @@ jobs:
           sudo curl -L https://github.com/docker/compose/releases/download/${{ matrix.compose_version }}/docker-compose-`uname -s`-`uname -m` -o "${{ matrix.compose_path }}/docker-compose"
           sudo chmod +x "${{ matrix.compose_path }}/docker-compose"
 
+      - name: Get Cache Key
+        id: cache_key
+        run: |
+          source .env
+          SENTRY_IMAGE_SHA=$(docker buildx imagetools inspect $SENTRY_IMAGE --format "{{json .Manifest}}" | jq -r '.digest')
+          echo "::set-output name=SENTRY_IMAGE_SHA::$SENTRY_IMAGE_SHA"
+
+      - name: Restore Postgres Volume Cache
+        uses: actions/cache/restore@v4
+        with:
+          key: sentry-image-sha-${{ steps.cache_key.outputs.SENTRY_IMAGE_SHA }}
+          path: /var/lib/docker/volumes/sentry_postgres-data
+
       - name: Install self-hosted
         uses: nick-fields/retry@v3
         with:
           timeout_minutes: 10
           max_attempts: 3
           command: ./install.sh
+
+      - name: Save Postgres Volume Cache
+        uses: actions/cache/save@v4
+        with:
+          key: sentry-image-sha-${{ steps.cache_key.outputs.SENTRY_IMAGE_SHA }}
+          path: /var/lib/docker/volumes/sentry_postgres-data
 
       - name: Integration Test
         run: |
