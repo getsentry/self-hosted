@@ -87,7 +87,7 @@ jobs:
         run: ./install.sh
 
       - name: Save Postgres Volume Cache
-        if: steps.restore_cache.outputs.cache-hit == 'false'
+        if: steps.restore_cache.outputs.cache-hit != 'true'
         uses: actions/cache/save@v4
         with:
           key: ${{ steps.restore_cache.outputs.cache-primary-key }}
@@ -174,7 +174,7 @@ jobs:
           command: ./install.sh
 
       - name: Save Postgres Volume Cache
-        if: steps.restore_cache.outputs.cache-hit == 'false'
+        if: steps.restore_cache.outputs.cache-hit != 'true'
         uses: actions/cache/save@v4
         with:
           key: ${{ steps.restore_cache.outputs.cache-primary-key }}
