@@ -129,7 +129,7 @@ jobs:
         id: cache_key
         run: |
           # Set permissions for docker volumes so we can cache and restore
-          sudo chmod -R 777 /var/lib/docker/volumes/
+          sudo chmod 711 /var/lib/docker/
           source .env
           SENTRY_IMAGE_SHA=$(docker buildx imagetools inspect $SENTRY_IMAGE --format "{{json .Manifest}}" | jq -r '.digest')
           echo "::set-output name=SENTRY_IMAGE_SHA::$SENTRY_IMAGE_SHA"
