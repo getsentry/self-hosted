@@ -75,6 +75,7 @@ jobs:
         id: cache_key
         run: |
           # Set permissions for docker volumes so we can cache and restore
+          sudo chmod 711 /var/lib/docker
           sudo chmod -R 777 /var/lib/docker/volumes
           source .env
           SENTRY_IMAGE_SHA=$(docker buildx imagetools inspect $SENTRY_IMAGE --format "{{println .Manifest.Digest}}")
@@ -93,6 +94,7 @@ jobs:
       - name: Prepare Docker Volume Caching
         run: |
           # Set permissions for docker volumes so we can cache and restore
+          sudo chmod 711 /var/lib/docker
           sudo chmod -R 755 /var/lib/docker/volumes
 
       - name: Save Postgres Volume Cache
@@ -162,6 +164,7 @@ jobs:
         id: cache_key
         run: |
           # Set permissions for docker volumes so we can cache and restore
+          sudo chmod 711 /var/lib/docker
           sudo chmod -R 777 /var/lib/docker/volumes
           source .env
           SENTRY_IMAGE_SHA=$(docker buildx imagetools inspect $SENTRY_IMAGE --format "{{println .Manifest.Digest}}")
@@ -184,6 +187,7 @@ jobs:
       - name: Prepare Docker Volume Caching
         run: |
           # Set permissions for docker volumes so we can cache and restore
+          sudo chmod 711 /var/lib/docker
           sudo chmod -R 755 /var/lib/docker/volumes
 
       - name: Save Postgres Volume Cache
