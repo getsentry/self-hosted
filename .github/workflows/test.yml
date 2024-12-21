@@ -90,7 +90,7 @@ jobs:
         if: steps.restore_cache.outputs.cache-hit == 'false'
         uses: actions/cache/save@v4
         with:
-          key: sentry-image-sha-${{ steps.cache_key.outputs.SENTRY_IMAGE_SHA }}
+          key: ${{ steps.restore_cache.outputs.cache-primary-key }}
           path: /var/lib/docker/volumes/sentry_postgres-data/_data
 
       - name: Checkout current ref
@@ -177,7 +177,7 @@ jobs:
         if: steps.restore_cache.outputs.cache-hit == 'false'
         uses: actions/cache/save@v4
         with:
-          key: sentry-image-sha-${{ steps.cache_key.outputs.SENTRY_IMAGE_SHA }}
+          key: ${{ steps.restore_cache.outputs.cache-primary-key }}
           path: /var/lib/docker/volumes/sentry_postgres-data/_data
 
       - name: Integration Test
