@@ -75,7 +75,7 @@ jobs:
         id: cache_key
         run: |
           # Set permissions for docker volumes so we can cache and restore
-          sudo chmod -R 777 /var/lib/docker/volumes
+          sudo chmod 711 /var/lib/docker
           source .env
           SENTRY_IMAGE_SHA=$(docker buildx imagetools inspect $SENTRY_IMAGE --format "{{println .Manifest.Digest}}")
           echo "SENTRY_IMAGE_SHA=$SENTRY_IMAGE_SHA" >> $GITHUB_OUTPUT
@@ -93,7 +93,7 @@ jobs:
       - name: Prepare Docker Volume Caching
         run: |
           # Set permissions for docker volumes so we can cache and restore
-          sudo chmod -R 777 /var/lib/docker/volumes
+          sudo chown -R $USER: /var/lib/docker/volumes
 
       - name: Save Postgres Volume Cache
         if: steps.restore_cache.outputs.cache-hit != 'true'
@@ -162,7 +162,7 @@ jobs:
         id: cache_key
         run: |
           # Set permissions for docker volumes so we can cache and restore
-          sudo chmod -R 777 /var/lib/docker/volumes
+          sudo chmod 711 /var/lib/docker/volumes
           source .env
           SENTRY_IMAGE_SHA=$(docker buildx imagetools inspect $SENTRY_IMAGE --format "{{println .Manifest.Digest}}")
           echo "SENTRY_IMAGE_SHA=$SENTRY_IMAGE_SHA" >> $GITHUB_OUTPUT
@@ -184,7 +184,7 @@ jobs:
       - name: Prepare Docker Volume Caching
         run: |
           # Set permissions for docker volumes so we can cache and restore
-          sudo chmod -R 777 /var/lib/docker/volumes
+          sudo chown -R $USER: /var/lib/docker/volumes
 
       - name: Save Postgres Volume Cache
         if: steps.restore_cache.outputs.cache-hit != 'true'
