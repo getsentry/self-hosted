@@ -132,7 +132,7 @@ jobs:
           sudo chmod 711 /var/lib/docker/
           source .env
           SENTRY_IMAGE_SHA=$(docker buildx imagetools inspect $SENTRY_IMAGE --format "{{json .Manifest}}" | jq -r '.digest')
-          echo "::set-output name=SENTRY_IMAGE_SHA::$SENTRY_IMAGE_SHA"
+          echo "SENTRY_IMAGE_SHA=$SENTRY_IMAGE_SHA" >> $GITHUB_OUTPUT
 
       - name: Restore Postgres Volume Cache
         uses: actions/cache/restore@v4
