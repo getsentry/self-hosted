@@ -66,6 +66,21 @@ jobs:
           sudo curl -L https://github.com/docker/compose/releases/download/v2.26.0/docker-compose-`uname -s`-`uname -m` -o "/usr/local/lib/docker/cli-plugins/docker-compose"
           sudo chmod +x "/usr/local/lib/docker/cli-plugins/docker-compose"
 
+      - name: Prepare Docker Volume Caching
+        id: cache_key
+        run: |
+          # Set permissions for docker volumes so we can cache and restore
+          sudo chmod 711 /var/lib/docker/
+          source .env
+          SENTRY_IMAGE_SHA=$(docker buildx imagetools inspect $SENTRY_IMAGE --format "{{json .Manifest}}" | jq -r '.digest')
+          echo "SENTRY_IMAGE_SHA=$SENTRY_IMAGE_SHA" >> $GITHUB_OUTPUT
+
+      - name: Restore Postgres Volume Cache
+        uses: actions/cache/restore@v4
+        with:
+          key: sentry-image-sha-${{ steps.cache_key.outputs.SENTRY_IMAGE_SHA }}
+          path: /var/lib/docker/volumes/sentry_postgres-data/_data
+
       - name: Install ${{ env.LATEST_TAG }}
         run: ./install.sh
 
