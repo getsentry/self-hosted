@@ -80,13 +80,16 @@ jobs:
           source .env
           SENTRY_IMAGE_SHA=$(docker buildx imagetools inspect $SENTRY_IMAGE --format "{{println .Manifest.Digest}}")
           echo "SENTRY_IMAGE_SHA=$SENTRY_IMAGE_SHA" >> $GITHUB_OUTPUT
+          SNUBA_IMAGE_SHA=$(docker buildx imagetools inspect $SNUBA_IMAGE --format "{{println .Manifest.Digest}}")
+          echo "SNUBA_IMAGE_SHA=$SNUBA_IMAGE_SHA" >> $GITHUB_OUTPUT
 
       - name: Restore DB Volumes Cache
         id: restore_cache
         uses: actions/cache/restore@v4
         with:
-          key: db-volumes-v2-${{ steps.cache_key.outputs.SENTRY_IMAGE_SHA }}
+          key: db-volumes-v2-${{ steps.cache_key.outputs.SENTRY_IMAGE_SHA }}-${{ steps.cache_key.outputs.SNUBA_IMAGE_SHA }}
           restore-keys: |
+            db-volumes-v2-${{ steps.cache_key.outputs.SENTRY_IMAGE_SHA }}
             db-volumes-v2-
             db-volumes-
           path: |
@@ -178,13 +181,16 @@ jobs:
           source .env
           SENTRY_IMAGE_SHA=$(docker buildx imagetools inspect $SENTRY_IMAGE --format "{{println .Manifest.Digest}}")
           echo "SENTRY_IMAGE_SHA=$SENTRY_IMAGE_SHA" >> $GITHUB_OUTPUT
+          SNUBA_IMAGE_SHA=$(docker buildx imagetools inspect $SNUBA_IMAGE --format "{{println .Manifest.Digest}}")
+          echo "SNUBA_IMAGE_SHA=$SNUBA_IMAGE_SHA" >> $GITHUB_OUTPUT
 
       - name: Restore DB Volumes Cache
         id: restore_cache
         uses: actions/cache/restore@v4
         with:
-          key: db-volumes-v2-${{ steps.cache_key.outputs.SENTRY_IMAGE_SHA }}
+          key: db-volumes-v2-${{ steps.cache_key.outputs.SENTRY_IMAGE_SHA }}-${{ steps.cache_key.outputs.SNUBA_IMAGE_SHA }}
           restore-keys: |
+            db-volumes-v2-${{ steps.cache_key.outputs.SENTRY_IMAGE_SHA }}
             db-volumes-v2-
             db-volumes-
           path: |
