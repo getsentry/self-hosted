@@ -85,8 +85,13 @@ jobs:
         id: restore_cache
         uses: actions/cache/restore@v4
         with:
-          key: v1-sentry-image-sha-${{ steps.cache_key.outputs.SENTRY_IMAGE_SHA }}
-          path: /var/lib/docker/volumes/sentry-postgres/_data
+          key: db-volumes-v1-${{ steps.cache_key.outputs.SENTRY_IMAGE_SHA }}
+          restore-keys: |
+            db-volumes-v1-
+            db-volumes-
+          path: |
+            /var/lib/docker/volumes/sentry-postgres/_data
+            /var/lib/docker/volumes/sentry-clickhouse/_data
 
       - name: Install ${{ env.LATEST_TAG }}
         run: ./install.sh
@@ -102,7 +107,9 @@ jobs:
         uses: actions/cache/save@v4
         with:
           key: ${{ steps.restore_cache.outputs.cache-primary-key }}
-          path: /var/lib/docker/volumes/sentry-postgres/_data
+          path: |
+            /var/lib/docker/volumes/sentry-postgres/_data
+            /var/lib/docker/volumes/sentry-clickhouse/_data
 
       - name: Checkout current ref
         uses: actions/checkout@v4
@@ -174,8 +181,13 @@ jobs:
         id: restore_cache
         uses: actions/cache/restore@v4
         with:
-          key: v1-sentry-image-sha-${{ steps.cache_key.outputs.SENTRY_IMAGE_SHA }}
-          path: /var/lib/docker/volumes/sentry-postgres/_data
+          key: db-volumes-v1-${{ steps.cache_key.outputs.SENTRY_IMAGE_SHA }}
+          restore-keys: |
+            db-volumes-v1-
+            db-volumes-
+          path: |
+            /var/lib/docker/volumes/sentry-postgres/_data
+            /var/lib/docker/volumes/sentry-clickhouse/_data
 
       - name: Install self-hosted
         uses: nick-fields/retry@v3
@@ -195,7 +207,9 @@ jobs:
         uses: actions/cache/save@v4
         with:
           key: ${{ steps.restore_cache.outputs.cache-primary-key }}
-          path: /var/lib/docker/volumes/sentry-postgres/_data
+          path: |
+            /var/lib/docker/volumes/sentry-postgres/_data
+            /var/lib/docker/volumes/sentry-clickhouse/_data
 
       - name: Integration Test
         run: |
