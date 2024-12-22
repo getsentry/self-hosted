@@ -81,7 +81,7 @@ jobs:
           SENTRY_IMAGE_SHA=$(docker buildx imagetools inspect $SENTRY_IMAGE --format "{{println .Manifest.Digest}}")
           echo "SENTRY_IMAGE_SHA=$SENTRY_IMAGE_SHA" >> $GITHUB_OUTPUT
 
-      - name: Restore Postgres Volume Cache
+      - name: Restore DB Volumes Cache
         id: restore_cache
         uses: actions/cache/restore@v4
         with:
@@ -102,7 +102,7 @@ jobs:
           sudo chmod 711 /var/lib/docker
           sudo chmod -R 755 /var/lib/docker/volumes
 
-      - name: Save Postgres Volume Cache
+      - name: Save DB Volumes Cache
         if: steps.restore_cache.outputs.cache-hit != 'true'
         uses: actions/cache/save@v4
         with:
@@ -177,7 +177,7 @@ jobs:
           SENTRY_IMAGE_SHA=$(docker buildx imagetools inspect $SENTRY_IMAGE --format "{{println .Manifest.Digest}}")
           echo "SENTRY_IMAGE_SHA=$SENTRY_IMAGE_SHA" >> $GITHUB_OUTPUT
 
-      - name: Restore Postgres Volume Cache
+      - name: Restore DB Volumes Cache
         id: restore_cache
         uses: actions/cache/restore@v4
         with:
@@ -202,7 +202,7 @@ jobs:
           sudo chmod 711 /var/lib/docker
           sudo chmod -R 755 /var/lib/docker/volumes
 
-      - name: Save Postgres Volume Cache
+      - name: Save DB Volumes Cache
         if: steps.restore_cache.outputs.cache-hit != 'true'
         uses: actions/cache/save@v4
         with:
