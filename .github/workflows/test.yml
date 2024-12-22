@@ -75,8 +75,8 @@ jobs:
         id: cache_key
         run: |
           # Set permissions for docker volumes so we can cache and restore
-          sudo chmod 711 /var/lib/docker
-          sudo chmod -R 777 /var/lib/docker/volumes
+          sudo chmod o+x /var/lib/docker
+          sudo chmod -R o+rwx /var/lib/docker/volumes
           source .env
           SENTRY_IMAGE_SHA=$(docker buildx imagetools inspect $SENTRY_IMAGE --format "{{println .Manifest.Digest}}")
           echo "SENTRY_IMAGE_SHA=$SENTRY_IMAGE_SHA" >> $GITHUB_OUTPUT
@@ -103,8 +103,8 @@ jobs:
       - name: Prepare Docker Volume Caching
         run: |
           # Set permissions for docker volumes so we can cache and restore
-          sudo chmod 711 /var/lib/docker
-          sudo chmod -R 755 /var/lib/docker/volumes
+          sudo chmod o+x /var/lib/docker
+          sudo chmod -R o+rx /var/lib/docker/volumes
 
       - name: Save DB Volumes Cache
         if: steps.restore_cache.outputs.cache-hit != 'true'
@@ -176,8 +176,8 @@ jobs:
         id: cache_key
         run: |
           # Set permissions for docker volumes so we can cache and restore
-          sudo chmod 711 /var/lib/docker
-          sudo chmod -R 777 /var/lib/docker/volumes
+          sudo chmod o+x /var/lib/docker
+          sudo chmod -R o+rwx /var/lib/docker/volumes
           source .env
           SENTRY_IMAGE_SHA=$(docker buildx imagetools inspect $SENTRY_IMAGE --format "{{println .Manifest.Digest}}")
           echo "SENTRY_IMAGE_SHA=$SENTRY_IMAGE_SHA" >> $GITHUB_OUTPUT
@@ -209,7 +209,7 @@ jobs:
         run: |
           # Set permissions for docker volumes so we can cache and restore
           sudo chmod 711 /var/lib/docker
-          sudo chmod -R 755 /var/lib/docker/volumes
+          sudo chmod -R 0+rx /var/lib/docker/volumes
 
       - name: Save DB Volumes Cache
         if: steps.restore_cache.outputs.cache-hit != 'true'
