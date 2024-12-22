@@ -217,7 +217,6 @@ jobs:
 
       - name: Integration Test
         run: |
-          docker compose up --wait
           if [ "${{ matrix.compose_version }}" = "v2.19.0" ]; then
             pytest --reruns 3 --cov --junitxml=junit.xml _integration-test/ --customizations=${{ matrix.customizations }}
           else
