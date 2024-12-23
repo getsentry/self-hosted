@@ -87,14 +87,13 @@ jobs:
         id: restore_cache
         uses: actions/cache/restore@v4
         with:
-          key: db-volumes-v3-${{ steps.cache_key.outputs.SENTRY_IMAGE_SHA }}-${{ steps.cache_key.outputs.SNUBA_IMAGE_SHA }}
+          key: db-volumes-v4-${{ steps.cache_key.outputs.SENTRY_IMAGE_SHA }}-${{ steps.cache_key.outputs.SNUBA_IMAGE_SHA }}
           restore-keys: |
-            db-volumes-v3-${{ steps.cache_key.outputs.SENTRY_IMAGE_SHA }}
-            db-volumes-v3-
+            db-volumes-v4-${{ steps.cache_key.outputs.SENTRY_IMAGE_SHA }}
+            db-volumes-v4-
           path: |
             /var/lib/docker/volumes/sentry-postgres/_data
             /var/lib/docker/volumes/sentry-clickhouse/_data
-            /var/lib/docker/volumes/sentry-kafka/_data
 
       - name: Install ${{ env.LATEST_TAG }}
         run: ./install.sh
@@ -113,7 +112,6 @@ jobs:
           path: |
             /var/lib/docker/volumes/sentry-postgres/_data
             /var/lib/docker/volumes/sentry-clickhouse/_data
-            /var/lib/docker/volumes/sentry-kafka/_data
 
       - name: Checkout current ref
         uses: actions/checkout@v4
@@ -187,14 +185,13 @@ jobs:
         id: restore_cache
         uses: actions/cache/restore@v4
         with:
-          key: db-volumes-v3-${{ steps.cache_key.outputs.SENTRY_IMAGE_SHA }}-${{ steps.cache_key.outputs.SNUBA_IMAGE_SHA }}
+          key: db-volumes-v4-${{ steps.cache_key.outputs.SENTRY_IMAGE_SHA }}-${{ steps.cache_key.outputs.SNUBA_IMAGE_SHA }}
           restore-keys: |
-            db-volumes-v3-${{ steps.cache_key.outputs.SENTRY_IMAGE_SHA }}
-            db-volumes-v3-
+            db-volumes-v4-${{ steps.cache_key.outputs.SENTRY_IMAGE_SHA }}
+            db-volumes-v4-
           path: |
             /var/lib/docker/volumes/sentry-postgres/_data
             /var/lib/docker/volumes/sentry-clickhouse/_data
-            /var/lib/docker/volumes/sentry-kafka/_data
 
       - name: Install self-hosted
         uses: nick-fields/retry@v3
@@ -217,7 +214,6 @@ jobs:
           path: |
             /var/lib/docker/volumes/sentry-postgres/_data
             /var/lib/docker/volumes/sentry-clickhouse/_data
-            /var/lib/docker/volumes/sentry-kafka/_data
 
       - name: Integration Test
         run: |
