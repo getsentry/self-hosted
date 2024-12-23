@@ -91,10 +91,10 @@ jobs:
           restore-keys: |
             db-volumes-v3-${{ steps.cache_key.outputs.SENTRY_IMAGE_SHA }}
             db-volumes-v3-
-            db-volumes-
           path: |
             /var/lib/docker/volumes/sentry-postgres/_data
             /var/lib/docker/volumes/sentry-clickhouse/_data
+            /var/lib/docker/volumes/sentry-kafka/_data
 
       - name: Install ${{ env.LATEST_TAG }}
         run: ./install.sh
@@ -113,6 +113,7 @@ jobs:
           path: |
             /var/lib/docker/volumes/sentry-postgres/_data
             /var/lib/docker/volumes/sentry-clickhouse/_data
+            /var/lib/docker/volumes/sentry-kafka/_data
 
       - name: Checkout current ref
         uses: actions/checkout@v4
@@ -190,10 +191,10 @@ jobs:
           restore-keys: |
             db-volumes-v3-${{ steps.cache_key.outputs.SENTRY_IMAGE_SHA }}
             db-volumes-v3-
-            db-volumes-
           path: |
             /var/lib/docker/volumes/sentry-postgres/_data
             /var/lib/docker/volumes/sentry-clickhouse/_data
+            /var/lib/docker/volumes/sentry-kafka/_data
 
       - name: Install self-hosted
         uses: nick-fields/retry@v3
@@ -205,8 +206,8 @@ jobs:
       - name: Prepare Docker Volume Caching
         run: |
           # Set permissions for docker volumes so we can cache and restore
-          sudo chmod 711 /var/lib/docker
-          sudo chmod -R 0+rx /var/lib/docker/volumes
+          sudo chmod o+x /var/lib/docker
+          sudo chmod -R o+rx /var/lib/docker/volumes
 
       - name: Save DB Volumes Cache
         if: steps.restore_cache.outputs.cache-hit != 'true'
@@ -216,6 +217,7 @@ jobs:
           path: |
             /var/lib/docker/volumes/sentry-postgres/_data
             /var/lib/docker/volumes/sentry-clickhouse/_data
+            /var/lib/docker/volumes/sentry-kafka/_data
 
       - name: Integration Test
         run: |
