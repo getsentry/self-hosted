@@ -20,7 +20,7 @@ if [[ -n "$(docker volume ls -q --filter name=sentry-postgres)" && "$(docker run
   docker volume rm sentry-postgres-new
   echo "Re-indexing due to glibc change, this may take a while..."
   echo "Starting up new PostgreSQL version"
-  $dc up -d postgres
+  $dc up --wait postgres
 
   # Wait for postgres
   RETRIES=5
