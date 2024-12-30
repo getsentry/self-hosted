@@ -10,6 +10,11 @@ on:
   pull_request:
   schedule:
     - cron: "0 0,12 * * *"
+
+concurrency:
+  group: ${{ github.ref_name || github.sha }}
+  cancel-in-progress: true
+
 defaults:
   run:
     shell: bash
@@ -66,8 +71,47 @@ jobs:
           sudo curl -L https://github.com/docker/compose/releases/download/v2.26.0/docker-compose-`uname -s`-`uname -m` -o "/usr/local/lib/docker/cli-plugins/docker-compose"
           sudo chmod +x "/usr/local/lib/docker/cli-plugins/docker-compose"
 
+      - name: Prepare Docker Volume Caching
+        id: cache_key
+        run: |
+          # Set permissions for docker volumes so we can cache and restore
+          sudo chmod o+x /var/lib/docker
+          sudo chmod -R o+rwx /var/lib/docker/volumes
+          source .env
+          SENTRY_IMAGE_SHA=$(docker buildx imagetools inspect $SENTRY_IMAGE --format "{{println .Manifest.Digest}}")
+          echo "SENTRY_IMAGE_SHA=$SENTRY_IMAGE_SHA" >> $GITHUB_OUTPUT
+          SNUBA_IMAGE_SHA=$(docker buildx imagetools inspect $SNUBA_IMAGE --format "{{println .Manifest.Digest}}")
+          echo "SNUBA_IMAGE_SHA=$SNUBA_IMAGE_SHA" >> $GITHUB_OUTPUT
+
+      - name: Restore DB Volumes Cache
+        id: restore_cache
+        uses: actions/cache/restore@v4
+        with:
+          key: db-volumes-v4-${{ steps.cache_key.outputs.SENTRY_IMAGE_SHA }}-${{ steps.cache_key.outputs.SNUBA_IMAGE_SHA }}
+          restore-keys: |
+            db-volumes-v4-${{ steps.cache_key.outputs.SENTRY_IMAGE_SHA }}
+            db-volumes-v4-
+          path: |
+            /var/lib/docker/volumes/sentry-postgres/_data
+            /var/lib/docker/volumes/sentry-clickhouse/_data
+
       - name: Install ${{ env.LATEST_TAG }}
         run: ./install.sh
+
+      - name: Prepare Docker Volume Caching
+        run: |
+          # Set permissions for docker volumes so we can cache and restore
+          sudo chmod o+x /var/lib/docker
+          sudo chmod -R o+rx /var/lib/docker/volumes
+
+      - name: Save DB Volumes Cache
+        if: steps.restore_cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          key: ${{ steps.restore_cache.outputs.cache-primary-key }}
+          path: |
+            /var/lib/docker/volumes/sentry-postgres/_data
+            /var/lib/docker/volumes/sentry-clickhouse/_data
 
       - name: Checkout current ref
         uses: actions/checkout@v4
@@ -125,12 +169,51 @@ jobs:
           sudo curl -L https://github.com/docker/compose/releases/download/${{ matrix.compose_version }}/docker-compose-`uname -s`-`uname -m` -o "${{ matrix.compose_path }}/docker-compose"
           sudo chmod +x "${{ matrix.compose_path }}/docker-compose"
 
+      - name: Prepare Docker Volume Caching
+        id: cache_key
+        run: |
+          # Set permissions for docker volumes so we can cache and restore
+          sudo chmod o+x /var/lib/docker
+          sudo chmod -R o+rwx /var/lib/docker/volumes
+          source .env
+          SENTRY_IMAGE_SHA=$(docker buildx imagetools inspect $SENTRY_IMAGE --format "{{println .Manifest.Digest}}")
+          echo "SENTRY_IMAGE_SHA=$SENTRY_IMAGE_SHA" >> $GITHUB_OUTPUT
+          SNUBA_IMAGE_SHA=$(docker buildx imagetools inspect $SNUBA_IMAGE --format "{{println .Manifest.Digest}}")
+          echo "SNUBA_IMAGE_SHA=$SNUBA_IMAGE_SHA" >> $GITHUB_OUTPUT
+
+      - name: Restore DB Volumes Cache
+        id: restore_cache
+        uses: actions/cache/restore@v4
+        with:
+          key: db-volumes-v4-${{ steps.cache_key.outputs.SENTRY_IMAGE_SHA }}-${{ steps.cache_key.outputs.SNUBA_IMAGE_SHA }}
+          restore-keys: |
+            db-volumes-v4-${{ steps.cache_key.outputs.SENTRY_IMAGE_SHA }}
+            db-volumes-v4-
+          path: |
+            /var/lib/docker/volumes/sentry-postgres/_data
+            /var/lib/docker/volumes/sentry-clickhouse/_data
+
       - name: Install self-hosted
         uses: nick-fields/retry@v3
         with:
           timeout_minutes: 10
           max_attempts: 3
           command: ./install.sh
+
+      - name: Prepare Docker Volume Caching
+        run: |
+          # Set permissions for docker volumes so we can cache and restore
+          sudo chmod o+x /var/lib/docker
+          sudo chmod -R o+rx /var/lib/docker/volumes
+
+      - name: Save DB Volumes Cache
+        if: steps.restore_cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          key: ${{ steps.restore_cache.outputs.cache-primary-key }}
+          path: |
+            /var/lib/docker/volumes/sentry-postgres/_data
+            /var/lib/docker/volumes/sentry-clickhouse/_data
 
       - name: Integration Test
         run: |
