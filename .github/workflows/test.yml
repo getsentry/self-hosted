@@ -126,6 +126,12 @@ jobs:
       - name: Install current ref
         run: ./install.sh
 
+      - name: Inspect failure
+        if: failure()
+        run: |
+          docker compose ps
+          docker compose logs
+
   integration-test:
     if: github.repository_owner == 'getsentry'
     runs-on: ubuntu-22.04
