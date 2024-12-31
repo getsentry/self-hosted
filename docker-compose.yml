@@ -218,6 +218,11 @@ services:
         source: ./garage.toml
         target: /etc/garage.toml
       - "sentry-garage:/var/lib/garage/"
+    healthcheck:
+      test: "wget -no-verbose --tries=1 --spider http://localhost:3903/health || exit 1"
+      interval: 20s
+      timeout: 20s
+      retries: 10      
   snuba-api:
     <<: *snuba_defaults
   # Kafka consumer responsible for feeding events into Clickhouse
