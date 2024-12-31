@@ -34,6 +34,8 @@ x-sentry-defaults: &sentry_defaults
       <<: *depends_on-default
     smtp:
       <<: *depends_on-default
+    garage:
+      <<: *depends_on-default
     snuba-api:
       <<: *depends_on-default
     symbolicator:
@@ -139,6 +141,7 @@ services:
   kafka:
     <<: *restart_policy
     image: "confluentinc/cp-kafka:7.6.1"
+    user: root
     environment:
       # https://docs.confluent.io/platform/current/installation/docker/config-reference.html#cp-kakfa-example
       KAFKA_PROCESS_ROLES: "broker,controller"
@@ -207,6 +210,14 @@ services:
       interval: 10s
       timeout: 10s
       retries: 30
+  garage:
+    image: dxflrs/garage:v1.0.1
+    volumes:
+      - type: bind
+        read_only: true
+        source: ./garage.toml
+        target: /etc/garage.toml
+      - "sentry-garage:/var/lib/garage/"
   snuba-api:
     <<: *snuba_defaults
   # Kafka consumer responsible for feeding events into Clickhouse
@@ -540,3 +551,4 @@ volumes:
   sentry-kafka-log:
   sentry-smtp-log:
   sentry-clickhouse-log:
+  sentry-garage:
