@@ -1,7 +1,7 @@
 echo "${_group}Bootstrapping garage (node store)..."
 
 $dc up --wait garage
-if [[ $($dc exec garage /garage bucket list | tail -1 | awk '{print $1}' != 'nodestore' )]]; then
+if [[ $($dc exec garage /garage bucket list | tail -1 | awk '{print $1}') != 'nodestore' ]]; then
   node_id = $(exec garage /garage status | tail -1 | awk '{print $1}')
   $dc exec garage /garage layout assign -z dc1 -c 100G "$node_id"
   $dc exec garage /garage layout apply --version 1
