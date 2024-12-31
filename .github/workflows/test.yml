@@ -98,7 +98,7 @@ jobs:
 
       - name: Install ${{ env.LATEST_TAG }}
         env:
-          SKIP_DB_MIGRATIONS: ${{ steps.restore_cache.outputs.cache-hit == 'true' && '1' || '0' }}
+          SKIP_DB_MIGRATIONS: ${{ steps.restore_cache.outputs.cache-hit == 'true' && '1' || '' }}
         run: |
           # This is for the cache restore on Kafka to work in older releases
           echo 'services: {"kafka": {"user": "root"}}' > docker-compose.override.yml
@@ -212,7 +212,7 @@ jobs:
 
       - name: Install self-hosted
         env:
-          SKIP_DB_MIGRATIONS: ${{ steps.restore_cache.outputs.cache-hit == 'true' && '1' || '0' }}
+          SKIP_DB_MIGRATIONS: ${{ steps.restore_cache.outputs.cache-hit == 'true' && '1' || '' }}
         run: ./install.sh
 
       - name: Prepare Docker Volume Caching
