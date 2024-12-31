@@ -5,7 +5,7 @@ garage="$dc exec garage /garage"
 
 if [[ $($garage bucket list | tail -1 | awk '{print $1}') != 'nodestore' ]]; then
   node_id=$($garage status | tail -1 | awk '{print $1}')
-  $garage layout assign -z dc1 -c 100G "$node_id"
+  $garage layout assign -z local -c $GARAGE_STORAGE_SIZE "$node_id"
   $garage layout apply --version 1
 
   $garage bucket create nodestore
