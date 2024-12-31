@@ -106,6 +106,9 @@ jobs:
           # Set permissions for docker volumes so we can cache and restore
           sudo chmod o+x /var/lib/docker
           sudo chmod -R o+rx /var/lib/docker/volumes
+          # Set tar ownership for it to be able to read
+          # From: https://github.com/actions/toolkit/issues/946#issuecomment-1726311681
+          sudo chown root /usr/bin/tar && sudo chmod u+s /usr/bin/tar
 
       - name: Save DB Volumes Cache
         if: steps.restore_cache.outputs.cache-hit != 'true'
@@ -208,6 +211,9 @@ jobs:
           # Set permissions for docker volumes so we can cache and restore
           sudo chmod o+x /var/lib/docker
           sudo chmod -R o+rx /var/lib/docker/volumes
+          # Set tar ownership for it to be able to read
+          # From: https://github.com/actions/toolkit/issues/946#issuecomment-1726311681
+          sudo chown root /usr/bin/tar && sudo chmod u+s /usr/bin/tar
 
       - name: Save DB Volumes Cache
         if: steps.restore_cache.outputs.cache-hit != 'true'
