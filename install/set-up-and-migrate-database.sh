@@ -1,6 +1,6 @@
 echo "${_group}Setting up / migrating database ..."
 
-if [[ -n "${SKIP_DB_MIGRATIONS:-}" ]]; then
+if [[ -z "${SKIP_DB_MIGRATIONS:-}" ]]; then
   # Fixes https://github.com/getsentry/self-hosted/issues/2758, where a migration fails due to indexing issue
   $dc up --wait postgres
 
