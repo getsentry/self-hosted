@@ -101,7 +101,7 @@ jobs:
           SKIP_DB_MIGRATIONS: ${{ steps.restore_cache.outputs.cache-hit == 'true' && '1' || '' }}
         run: |
           # This is for the cache restore on Kafka to work in older releases
-          echo 'services: {"kafka": {"user": "root"}}' > docker-compose.override.yml
+          docker run --rm -v "sentry-kafka:/data" busybox chown -R 1001:1001 /data
           ./install.sh
 
       - name: Prepare Docker Volume Caching
@@ -127,7 +127,10 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Install current ref
-        run: ./install.sh
+        run: |
+          # This is for the cache restore on Kafka to work in older releases
+          docker run --rm -v "sentry-kafka:/data" busybox chown -R 1001:1001 /data
+          ./install.sh
 
       - name: Inspect failure
         if: failure()
@@ -213,7 +216,10 @@ jobs:
       - name: Install self-hosted
         env:
           SKIP_DB_MIGRATIONS: ${{ steps.restore_cache.outputs.cache-hit == 'true' && '1' || '' }}
-        run: ./install.sh
+        run: |
+          # This is for the cache restore on Kafka to work in older releases
+          docker run --rm -v "sentry-kafka:/data" busybox chown -R 1001:1001 /data
+          ./install.sh
 
       - name: Prepare Docker Volume Caching
         run: |
