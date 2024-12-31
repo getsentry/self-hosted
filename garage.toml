@@ -11,7 +11,8 @@ rpc_public_addr = "0.0.0.0:3901"
 # decide to use garage in a multi-node setup.
 rpc_secret = "28f2fc651d4f280cea95e166f9113fe589039f9711d6c4f461872c1c5aaf7dec"
 
-compression_level = 2
+# Setting 0 chooses the default which is 3 for now
+compression_level = 0
 
 [s3_api]
 s3_region = "garage"
