@@ -94,8 +94,11 @@ jobs:
           path: |
             /var/lib/docker/volumes/sentry-postgres/_data
             /var/lib/docker/volumes/sentry-clickhouse/_data
+            /var/lib/docker/volumes/sentry-kafka/_data
 
       - name: Install ${{ env.LATEST_TAG }}
+        env:
+          SKIP_DB_MIGRATIONS: ${{ steps.restore_cache.outputs.cache-hit == 'true' && '1' || '0' }}
         run: ./install.sh
 
       - name: Prepare Docker Volume Caching
@@ -112,6 +115,7 @@ jobs:
           path: |
             /var/lib/docker/volumes/sentry-postgres/_data
             /var/lib/docker/volumes/sentry-clickhouse/_data
+            /var/lib/docker/volumes/sentry-kafka/_data
 
       - name: Checkout current ref
         uses: actions/checkout@v4
@@ -192,13 +196,12 @@ jobs:
           path: |
             /var/lib/docker/volumes/sentry-postgres/_data
             /var/lib/docker/volumes/sentry-clickhouse/_data
+            /var/lib/docker/volumes/sentry-kafka/_data
 
       - name: Install self-hosted
-        uses: nick-fields/retry@v3
-        with:
-          timeout_minutes: 10
-          max_attempts: 3
-          command: ./install.sh
+        env:
+          SKIP_DB_MIGRATIONS: ${{ steps.restore_cache.outputs.cache-hit == 'true' && '1' || '0' }}
+        run: ./install.sh
 
       - name: Prepare Docker Volume Caching
         run: |
@@ -214,6 +217,7 @@ jobs:
           path: |
             /var/lib/docker/volumes/sentry-postgres/_data
             /var/lib/docker/volumes/sentry-clickhouse/_data
+            /var/lib/docker/volumes/sentry-kafka/_data
 
       - name: Integration Test
         run: |
