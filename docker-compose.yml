@@ -34,8 +34,6 @@ x-sentry-defaults: &sentry_defaults
       <<: *depends_on-default
     smtp:
       <<: *depends_on-default
-    seaweed:
-      <<: *depends_on-default
     snuba-api:
       <<: *depends_on-default
     symbolicator:
@@ -210,11 +208,6 @@ services:
       interval: 10s
       timeout: 10s
       retries: 30
-  seaweed:
-    image: chrislusf/seaweedfs:3.80
-    command: ['server', '-s3']
-    volumes:
-      - "sentry-seaweed:/data"
   snuba-api:
     <<: *snuba_defaults
   # Kafka consumer responsible for feeding events into Clickhouse
@@ -548,4 +541,3 @@ volumes:
   sentry-kafka-log:
   sentry-smtp-log:
   sentry-clickhouse-log:
-  sentry-seaweed:
