@@ -5,7 +5,7 @@ db_engine = "sqlite"
 replication_factor = 1
 # idk why rcp_ is needed without replication but ok
 rpc_bind_addr = "[::]:3901"
-rpc_public_addr = "127.0.0.1:3901"
+rpc_public_addr = "0.0.0.0:3901"
 # This secret will not ever be used as we are in a single node setup
 # so this static value is OK. Don't forget to change it if you ever
 # decide to use garage in a multi-node setup.
