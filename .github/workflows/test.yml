@@ -94,15 +94,24 @@ jobs:
           path: |
             /var/lib/docker/volumes/sentry-postgres/_data
             /var/lib/docker/volumes/sentry-clickhouse/_data
+            /var/lib/docker/volumes/sentry-kafka/_data
 
       - name: Install ${{ env.LATEST_TAG }}
-        run: ./install.sh
+        env:
+          SKIP_DB_MIGRATIONS: ${{ steps.restore_cache.outputs.cache-hit == 'true' && '1' || '' }}
+        run: |
+          # This is for the cache restore on Kafka to work in older releases
+          docker run --rm -v "sentry-kafka:/data" busybox chown -R 1000:1000 /data
+          ./install.sh
 
       - name: Prepare Docker Volume Caching
         run: |
           # Set permissions for docker volumes so we can cache and restore
           sudo chmod o+x /var/lib/docker
           sudo chmod -R o+rx /var/lib/docker/volumes
+          # Set tar ownership for it to be able to read
+          # From: https://github.com/actions/toolkit/issues/946#issuecomment-1726311681
+          sudo chown root /usr/bin/tar && sudo chmod u+s /usr/bin/tar
 
       - name: Save DB Volumes Cache
         if: steps.restore_cache.outputs.cache-hit != 'true'
@@ -112,12 +121,22 @@ jobs:
           path: |
             /var/lib/docker/volumes/sentry-postgres/_data
             /var/lib/docker/volumes/sentry-clickhouse/_data
+            /var/lib/docker/volumes/sentry-kafka/_data
 
       - name: Checkout current ref
         uses: actions/checkout@v4
 
       - name: Install current ref
-        run: ./install.sh
+        run: |
+          # This is for the cache restore on Kafka to work in older releases
+          docker run --rm -v "sentry-kafka:/data" busybox chown -R 1000:1000 /data
+          ./install.sh
+
+      - name: Inspect failure
+        if: failure()
+        run: |
+          docker compose ps
+          docker compose logs
 
   integration-test:
     if: github.repository_owner == 'getsentry'
@@ -192,19 +211,24 @@ jobs:
           path: |
             /var/lib/docker/volumes/sentry-postgres/_data
             /var/lib/docker/volumes/sentry-clickhouse/_data
+            /var/lib/docker/volumes/sentry-kafka/_data
 
       - name: Install self-hosted
-        uses: nick-fields/retry@v3
-        with:
-          timeout_minutes: 10
-          max_attempts: 3
-          command: ./install.sh
+        env:
+          SKIP_DB_MIGRATIONS: ${{ steps.restore_cache.outputs.cache-hit == 'true' && '1' || '' }}
+        run: |
+          # This is for the cache restore on Kafka to work in older releases
+          docker run --rm -v "sentry-kafka:/data" busybox chown -R 1000:1000 /data
+          ./install.sh
 
       - name: Prepare Docker Volume Caching
         run: |
           # Set permissions for docker volumes so we can cache and restore
           sudo chmod o+x /var/lib/docker
           sudo chmod -R o+rx /var/lib/docker/volumes
+          # Set tar ownership for it to be able to read
+          # From: https://github.com/actions/toolkit/issues/946#issuecomment-1726311681
+          sudo chown root /usr/bin/tar && sudo chmod u+s /usr/bin/tar
 
       - name: Save DB Volumes Cache
         if: steps.restore_cache.outputs.cache-hit != 'true'
@@ -214,6 +238,7 @@ jobs:
           path: |
             /var/lib/docker/volumes/sentry-postgres/_data
             /var/lib/docker/volumes/sentry-clickhouse/_data
+            /var/lib/docker/volumes/sentry-kafka/_data
 
       - name: Integration Test
         run: |
