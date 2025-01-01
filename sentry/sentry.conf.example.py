@@ -90,14 +90,10 @@ SENTRY_SELF_HOSTED_ERRORS_ONLY = env("COMPOSE_PROFILES") != "feature-complete"
 
 SENTRY_NODESTORE = "sentry_nodestore_s3.S3PassthroughDjangoNodeStorage"
 SENTRY_NODESTORE_OPTIONS = {
-    "delete_through": True,
-    "write_through": False,
-    "read_through": True,
     "compression": False,  # we have compression enabled in Garage itself
     "endpoint_url": "http://garage:3900",
     "bucket_path": "nodestore",
     "bucket_name": "nodestore",
-    "retry_attempts": 3,
     "region_name": "garage",
     "aws_access_key_id": "<GARAGE_KEY_ID>",
     "aws_secret_access_key": "<GARAGE_SECRET_KEY>",
