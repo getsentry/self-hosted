@@ -141,19 +141,8 @@ jobs:
   integration-test:
     if: github.repository_owner == 'getsentry'
     runs-on: ubuntu-22.04
-    name: integration test ${{ matrix.compose_version }} - customizations ${{ matrix.customizations }}
-    strategy:
-      fail-fast: false
-      matrix:
-        customizations: ["disabled", "enabled"]
-        compose_version: ["v2.19.0", "v2.26.0"]
-        include:
-          - compose_version: "v2.19.0"
-            compose_path: "/usr/local/lib/docker/cli-plugins"
-          - compose_version: "v2.26.0"
-            compose_path: "/usr/local/lib/docker/cli-plugins"
+    name: integration test
     env:
-      COMPOSE_PROJECT_NAME: self-hosted-${{ strategy.job-index }}
       REPORT_SELF_HOSTED_ISSUES: 0
       SELF_HOSTED_TESTING_DSN: ${{ vars.SELF_HOSTED_TESTING_DSN }}
     steps:
@@ -177,16 +166,19 @@ jobs:
           fi
 
       - name: Get Compose
+        env:
+          COMPOSE_PATH: /usr/local/lib/docker/cli-plugins
+          COMPOSE_VERSION: 'v2.26.0'
         run: |
           # Always remove `docker compose` support as that's the newer version
           # and comes installed by default nowadays.
           sudo rm -f "/usr/local/lib/docker/cli-plugins/docker-compose"
           # Docker Compose v1 is installed here, remove it
           sudo rm -f "/usr/local/bin/docker-compose"
-          sudo rm -f "${{ matrix.compose_path }}/docker-compose"
-          sudo mkdir -p "${{ matrix.compose_path }}"
-          sudo curl -L https://github.com/docker/compose/releases/download/${{ matrix.compose_version }}/docker-compose-`uname -s`-`uname -m` -o "${{ matrix.compose_path }}/docker-compose"
-          sudo chmod +x "${{ matrix.compose_path }}/docker-compose"
+          sudo rm -f "${{ env.COMPOSE_PATH }}/docker-compose"
+          sudo mkdir -p "${{ env.COMPOSE_PATH }}"
+          sudo curl -L https://github.com/docker/compose/releases/download/${{ env.COMPOSE_VERSION }}/docker-compose-`uname -s`-`uname -m` -o "${{ env.COMPOSE_PATH }}/docker-compose"
+          sudo chmod +x "${{ env.COMPOSE_PATH }}/docker-compose"
 
       - name: Prepare Docker Volume Caching
         id: cache_key
@@ -243,11 +235,7 @@ jobs:
       - name: Integration Test
         run: |
           docker compose up --wait
-          if [ "${{ matrix.compose_version }}" = "v2.19.0" ]; then
-            pytest --reruns 3 --cov --junitxml=junit.xml _integration-test/ --customizations=${{ matrix.customizations }}
-          else
-            pytest --cov --junitxml=junit.xml _integration-test/ --customizations=${{ matrix.customizations }}
-          fi
+          pytest --cov --junitxml=junit.xml _integration-test/ --customizations=enabled
 
       - name: Inspect failure
         if: failure()
