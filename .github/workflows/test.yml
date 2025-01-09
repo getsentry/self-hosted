@@ -105,6 +105,7 @@ jobs:
           ./install.sh
 
       - name: Prepare Docker Volume Caching
+        if: steps.restore_cache.outputs.cache-hit != 'true'
         run: |
           # Set permissions for docker volumes so we can cache and restore
           sudo chmod o+x /var/lib/docker
@@ -214,6 +215,7 @@ jobs:
           ./install.sh
 
       - name: Prepare Docker Volume Caching
+        if: steps.restore_cache.outputs.cache-hit != 'true'
         run: |
           # Set permissions for docker volumes so we can cache and restore
           sudo chmod o+x /var/lib/docker
