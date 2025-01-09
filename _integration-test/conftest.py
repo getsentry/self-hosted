@@ -17,29 +17,29 @@ def pytest_addoption(parser):
     parser.addoption("--customizations", default="disabled")
 
 
-def pytest_sessionstart(session):
-    """Back up the state of DB volumes"""
-    result = subprocess.run(
-        [
-            "rsync",
-            "-avWm",
-            "--no-compress",
-            "--mkpath",
-            "/var/lib/docker/volumes/sentry-postgres",
-            "/var/lib/docker/volumes/sentry-clickhouse",
-            "/var/lib/docker/volumes/sentry-kafka",
-            join(os.environ["RUNNER_TEMP"], "volumes", ""),
-        ],
-        check=False,
-        capture_output=True,
-    )
-    print(result.stdout.decode())
-    print(result.stderr.decode())
-    result.check_returncode()
-
-
 @pytest.fixture(scope="session", autouse=True)
 def configure_self_hosted_environment(request):
+    """Back up the state of DB volumes"""
+    try:
+        subprocess.run(
+            [
+                "rsync",
+                "-avWm",
+                "--no-compress",
+                "--mkpath",
+                "/var/lib/docker/volumes/sentry-postgres",
+                "/var/lib/docker/volumes/sentry-clickhouse",
+                "/var/lib/docker/volumes/sentry-kafka",
+                join(os.environ["RUNNER_TEMP"], "volumes", ""),
+            ],
+            check=True,
+            capture_output=True,
+        )
+    except subprocess.CalledProcessError as e:
+        print(e.stdout.decode())
+        print(e.stderr.decode())
+        raise e
+
     subprocess.run(
         ["docker", "compose", "--ansi", "never", "up", "--wait"],
         check=True,
