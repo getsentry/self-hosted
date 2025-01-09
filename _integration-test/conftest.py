@@ -1,4 +1,5 @@
 import os
+from os.path import join
 import subprocess
 import time
 
@@ -14,6 +15,28 @@ TIMEOUT_SECONDS = 60
 
 def pytest_addoption(parser):
     parser.addoption("--customizations", default="disabled")
+
+
+def pytest_sessionstart(_session):
+    """Back up the state of DB volumes"""
+    rsync -a \
+    --include=/etc --include=/etc/fstab \
+    --include=/home --include=/home/user --include='/home/user/download/***' \
+    --exclude='*' / bkp
+    subprocess.run(
+        [
+            "rsync",
+            "-av",
+            "--include=/var/lib/docker/volumes",
+            "--include=/var/lib/docker/volumes/sentry-postgres",
+            "--include=/var/lib/docker/volumes/sentry-clickhouse",
+            "--include=/var/lib/docker/volumes/sentry-kafka",
+            "--exclude=*",
+            join(os.environ["RUNNER_TEMP"], "volumes"),
+        ],
+        check=True,
+        capture_output=True,
+    )
 
 
 @pytest.fixture(scope="session", autouse=True)
