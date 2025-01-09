@@ -31,14 +31,14 @@ def pytest_sessionstart(session):
             join(os.environ["RUNNER_TEMP"], "volumes"),
         ],
         check=True,
-        capture_output=True,
+        # capture_output=True,
     )
 
 
 @pytest.fixture(scope="session", autouse=True)
 def configure_self_hosted_environment(request):
     subprocess.run(
-        ["docker", "compose", "--ansi", "never", "up", "-d"],
+        ["docker", "compose", "--ansi", "never", "up", "--wait"],
         check=True,
         capture_output=True,
     )

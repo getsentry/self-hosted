@@ -326,7 +326,15 @@ def test_custom_certificate_authorities():
         )
 
     subprocess.run(
-        ["docker", "compose", "--ansi", "never", "up", "-d", "fixture-custom-ca-roots"],
+        [
+            "docker",
+            "compose",
+            "--ansi",
+            "never",
+            "up",
+            "--wait",
+            "fixture-custom-ca-roots",
+        ],
         check=True,
     )
     subprocess.run(
