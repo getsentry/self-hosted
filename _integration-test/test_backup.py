@@ -46,10 +46,13 @@ def test_import(setup_backup_restore_env_variables):
     subprocess.run(["docker", "compose", "--ansi", "never", "down"], check=True)
     for name in ("postgres", "clickhouse", "kafka"):
         subprocess.run(["docker", "volume", "rm", f"sentry-{name}"], check=True)
+        subprocess.run(["docker", "volume", "create", f"sentry-{name}"], check=True)
         subprocess.run(
             [
+                "sudo",
                 "rsync",
-                "-av",
+                "-avWm",
+                "--no-compress",
                 "--mkpath",
                 join(os.environ["RUNNER_TEMP"], "volumes", f"sentry-{name}", ""),
                 f"/var/lib/docker/volumes/sentry-{name}/",
