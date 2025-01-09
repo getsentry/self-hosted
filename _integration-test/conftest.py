@@ -17,7 +17,7 @@ def pytest_addoption(parser):
     parser.addoption("--customizations", default="disabled")
 
 
-def pytest_sessionstart(_session):
+def pytest_sessionstart(session):
     """Back up the state of DB volumes"""
     subprocess.run(
         [
