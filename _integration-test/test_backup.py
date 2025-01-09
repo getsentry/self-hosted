@@ -1,4 +1,5 @@
 import os
+from os.path import join
 import subprocess
 
 
@@ -49,8 +50,9 @@ def test_import(setup_backup_restore_env_variables):
             [
                 "rsync",
                 "-av",
-                join(os.environ["RUNNER_TEMP"], "volumes", f"sentry-{name}"),
-                f"/var/lib/docker/volumes/sentry-{name}",
+                "--mkpath",
+                join(os.environ["RUNNER_TEMP"], "volumes", f"sentry-{name}", ""),
+                f"/var/lib/docker/volumes/sentry-{name}/",
             ],
             check=True,
             capture_output=True,
