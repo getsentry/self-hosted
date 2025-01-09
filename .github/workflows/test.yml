@@ -105,9 +105,9 @@ jobs:
           ./install.sh
 
       - name: Prepare Docker Volume Caching
-        if: steps.restore_cache.outputs.cache-hit != 'true'
         run: |
           # Set permissions for docker volumes so we can cache and restore
+          # We need these for the backup/restore test snapshotting too
           sudo chmod o+x /var/lib/docker
           sudo chmod -R o+rx /var/lib/docker/volumes
           # Set tar ownership for it to be able to read
@@ -215,9 +215,9 @@ jobs:
           ./install.sh
 
       - name: Prepare Docker Volume Caching
-        if: steps.restore_cache.outputs.cache-hit != 'true'
         run: |
           # Set permissions for docker volumes so we can cache and restore
+          # We need these for the backup/restore test snapshotting too
           sudo chmod o+x /var/lib/docker
           sudo chmod -R o+rx /var/lib/docker/volumes
           # Set tar ownership for it to be able to read
