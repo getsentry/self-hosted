@@ -456,7 +456,4 @@ def test_customizations():
     ]
     for command in commands:
         result = subprocess.run(command, check=False)
-        if os.getenv("TEST_CUSTOMIZATIONS", "disabled") == "enabled":
-            assert result.returncode == 0
-        else:
-            assert result.returncode != 0
+        assert result.returncode == 0
