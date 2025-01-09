@@ -19,7 +19,7 @@ def pytest_addoption(parser):
 
 def pytest_sessionstart(session):
     """Back up the state of DB volumes"""
-    subprocess.run(
+    result = subprocess.run(
         [
             "rsync",
             "-av",
@@ -30,9 +30,12 @@ def pytest_sessionstart(session):
             "--exclude=*",
             join(os.environ["RUNNER_TEMP"], "volumes"),
         ],
-        check=True,
-        # capture_output=True,
+        check=False,
+        capture_output=True,
     )
+    print(result.stdout.decode())
+    print(result.stderr.decode())
+    result.check_returncode()
 
 
 @pytest.fixture(scope="session", autouse=True)
