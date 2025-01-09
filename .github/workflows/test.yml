@@ -236,6 +236,11 @@ jobs:
 
       - name: Integration Test
         run: |
+          rsync -avWm --no-compress --mkpath \
+            /var/lib/docker/volumes/sentry-postgres \
+            /var/lib/docker/volumes/sentry-clickhouse \
+            /var/lib/docker/volumes/sentry-kafka \
+            "$RUNNER_TEMP/volumes/"
           docker compose up --wait
           pytest --cov --junitxml=junit.xml _integration-test/ --customizations=enabled
 
