@@ -49,9 +49,8 @@ def test_import(setup_backup_restore_env_variables):
         subprocess.run(["docker", "volume", "create", f"sentry-{name}"], check=True)
         subprocess.run(
             [
-                "sudo",
                 "rsync",
-                "-avWm",
+                "-aWm",
                 "--no-compress",
                 "--mkpath",
                 join(os.environ["RUNNER_TEMP"], "volumes", f"sentry-{name}", ""),
@@ -60,6 +59,23 @@ def test_import(setup_backup_restore_env_variables):
             check=True,
             capture_output=True,
         )
+
+    subprocess.run(
+        [
+            "docker",
+            "run",
+            "--rm",
+            "-v",
+            "sentry-kafka:/data",
+            "busybox",
+            "chown",
+            "-R",
+            "1000:1000",
+            "/data",
+        ],
+        check=True,
+        capture_output=True,
+    )
 
     subprocess.run(
         ["docker", "compose", "--ansi", "never", "up", "--wait"],
