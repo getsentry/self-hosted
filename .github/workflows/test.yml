@@ -233,6 +233,7 @@ jobs:
           # Set tar ownership for it to be able to read
           # From: https://github.com/actions/toolkit/issues/946#issuecomment-1726311681
           sudo chown root /usr/bin/tar && sudo chmod u+s /usr/bin/tar
+          sudo chown root /usr/bin/rsync && sudo chmod u+s /usr/bin/rsync
 
       - name: Save DB Volumes Cache
         if: steps.restore_cache.outputs.cache-hit != 'true'
