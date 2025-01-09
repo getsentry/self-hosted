@@ -19,10 +19,6 @@ def pytest_addoption(parser):
 
 def pytest_sessionstart(_session):
     """Back up the state of DB volumes"""
-    rsync -a \
-    --include=/etc --include=/etc/fstab \
-    --include=/home --include=/home/user --include='/home/user/download/***' \
-    --exclude='*' / bkp
     subprocess.run(
         [
             "rsync",
