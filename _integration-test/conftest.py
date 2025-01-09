@@ -22,13 +22,12 @@ def pytest_sessionstart(session):
     result = subprocess.run(
         [
             "rsync",
-            "-av",
+            "-avWm",
+            "--no-compress",
             "--mkpath",
-            "--include=/var/lib/docker/volumes/",
-            "--include=/var/lib/docker/volumes/sentry-postgres",
-            "--include=/var/lib/docker/volumes/sentry-clickhouse",
-            "--include=/var/lib/docker/volumes/sentry-kafka",
-            "--exclude=*",
+            "/var/lib/docker/volumes/sentry-postgres",
+            "/var/lib/docker/volumes/sentry-clickhouse",
+            "/var/lib/docker/volumes/sentry-kafka",
             join(os.environ["RUNNER_TEMP"], "volumes", ""),
         ],
         check=False,
