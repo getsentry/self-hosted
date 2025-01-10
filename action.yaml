@@ -1,0 +1,149 @@
+name: "Sentry self-hosted end-to-end tests"
+inputs:
+  project_name:
+    required: false
+    description: "e.g. snuba, sentry, relay, self-hosted"
+  image_url:
+    required: false
+    description: "The URL to the built relay, snuba, sentry image to test against."
+  CODECOV_TOKEN:
+    required: false
+    description: "The Codecov token to upload coverage."
+
+runs:
+  using: "composite"
+  steps:
+    - name: Go into self-hosted directory
+      shell: bash
+      run: cd ${{ github.action_path }}
+
+    - name: Configure to use the test image
+      if: inputs.project_name && inputs.image_url
+      shell: bash
+      run: |
+        image_var=$(echo ${{ inputs.project_name }}_IMAGE | tr '[:lower:]' '[:upper:]')
+        echo "${image_var}=${{ inputs.image_url }}" >> $GITHUB_ENV
+
+    - name: Setup dev environment
+      shell: bash
+      run: |
+        pip install -r requirements-dev.txt
+        echo "PY_COLORS=1" >> "$GITHUB_ENV"
+        ### pytest-sentry configuration ###
+        if [ "$GITHUB_REPOSITORY" = "getsentry/self-hosted" ]; then
+          echo "PYTEST_SENTRY_DSN=$SELF_HOSTED_TESTING_DSN" >> $GITHUB_ENV
+          echo "PYTEST_SENTRY_TRACES_SAMPLE_RATE=0" >> $GITHUB_ENV
+
+          # This records failures on master to sentry in order to detect flakey tests, as it's
+          # expected that people have failing tests on their PRs
+          if [ "$GITHUB_REF" = "refs/heads/master" ]; then
+            echo "PYTEST_SENTRY_ALWAYS_REPORT=1" >> $GITHUB_ENV
+          fi
+        fi
+
+    - name: Get Compose
+      env:
+        COMPOSE_PATH: /usr/local/lib/docker/cli-plugins
+        COMPOSE_VERSION: "v2.26.0"
+      shell: bash
+      run: |
+        # Always remove `docker compose` support as that's the newer version
+        # and comes installed by default nowadays.
+        sudo rm -f "/usr/local/lib/docker/cli-plugins/docker-compose"
+        # Docker Compose v1 is installed here, remove it
+        sudo rm -f "/usr/local/bin/docker-compose"
+        sudo rm -f "${{ env.COMPOSE_PATH }}/docker-compose"
+        sudo mkdir -p "${{ env.COMPOSE_PATH }}"
+        sudo curl -L https://github.com/docker/compose/releases/download/${{ env.COMPOSE_VERSION }}/docker-compose-`uname -s`-`uname -m` -o "${{ env.COMPOSE_PATH }}/docker-compose"
+        sudo chmod +x "${{ env.COMPOSE_PATH }}/docker-compose"
+
+    - name: Prepare Docker Volume Caching
+      id: cache_key
+      shell: bash
+      run: |
+        # Set permissions for docker volumes so we can cache and restore
+        sudo chmod o+x /var/lib/docker
+        sudo chmod -R o+rwx /var/lib/docker/volumes
+        source .env
+        SENTRY_IMAGE_SHA=$(docker buildx imagetools inspect $SENTRY_IMAGE --format "{{println .Manifest.Digest}}")
+        echo "SENTRY_IMAGE_SHA=$SENTRY_IMAGE_SHA" >> $GITHUB_OUTPUT
+        SNUBA_IMAGE_SHA=$(docker buildx imagetools inspect $SNUBA_IMAGE --format "{{println .Manifest.Digest}}")
+        echo "SNUBA_IMAGE_SHA=$SNUBA_IMAGE_SHA" >> $GITHUB_OUTPUT
+
+    - name: Restore DB Volumes Cache
+      id: restore_cache
+      uses: actions/cache/restore@v4
+      with:
+        key: db-volumes-v4-${{ steps.cache_key.outputs.SENTRY_IMAGE_SHA }}-${{ steps.cache_key.outputs.SNUBA_IMAGE_SHA }}
+        restore-keys: |
+          db-volumes-v4-${{ steps.cache_key.outputs.SENTRY_IMAGE_SHA }}
+          db-volumes-v4-
+        path: |
+          /var/lib/docker/volumes/sentry-postgres/_data
+          /var/lib/docker/volumes/sentry-clickhouse/_data
+          /var/lib/docker/volumes/sentry-kafka/_data
+
+    - name: Install self-hosted
+      env:
+        SKIP_DB_MIGRATIONS: ${{ steps.restore_cache.outputs.cache-hit == 'true' && '1' || '' }}
+      shell: bash
+      run: |
+        # This is for the cache restore on Kafka to work in older releases
+        docker run --rm -v "sentry-kafka:/data" busybox chown -R 1000:1000 /data
+        # Add some customizations to test that path
+        cat <<EOT >> sentry/enhance-image.sh
+        #!/bin/bash
+        touch /created-by-enhance-image
+        apt-get update
+        apt-get install -y gcc libsasl2-dev python-dev-is-python3 libldap2-dev libssl-dev
+        EOT
+        chmod 755 sentry/enhance-image.sh
+        echo "python-ldap" > sentry/requirements.txt
+
+        ./install.sh --no-report-self-hosted-issues --skip-commit-check
+
+    - name: Prepare Docker Volume Caching
+      shell: bash
+      run: |
+        # Set permissions for docker volumes so we can cache and restore
+        # We need these for the backup/restore test snapshotting too
+        sudo chmod o+x /var/lib/docker
+        sudo chmod -R o+rx /var/lib/docker/volumes
+        # Set tar ownership for it to be able to read
+        # From: https://github.com/actions/toolkit/issues/946#issuecomment-1726311681
+        sudo chown root /usr/bin/tar && sudo chmod u+s /usr/bin/tar
+        sudo chown root /usr/bin/rsync && sudo chmod u+s /usr/bin/rsync
+
+    - name: Save DB Volumes Cache
+      if: steps.restore_cache.outputs.cache-hit != 'true'
+      uses: actions/cache/save@v4
+      with:
+        key: ${{ steps.restore_cache.outputs.cache-primary-key }}
+        path: |
+          /var/lib/docker/volumes/sentry-postgres/_data
+          /var/lib/docker/volumes/sentry-clickhouse/_data
+          /var/lib/docker/volumes/sentry-kafka/_data
+
+    - name: Integration Test
+      shell: bash
+      run: |
+        rsync -aW --no-compress --mkpath \
+          /var/lib/docker/volumes/sentry-postgres \
+          /var/lib/docker/volumes/sentry-clickhouse \
+          /var/lib/docker/volumes/sentry-kafka \
+          "$RUNNER_TEMP/volumes/"
+        docker compose up --wait
+        pytest -x --cov --junitxml=junit.xml _integration-test/
+
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v5
+      if: inputs.CODECOV_TOKEN
+      with:
+        token: ${{ inputs.CODECOV_TOKEN }}
+        slug: getsentry/self-hosted
+
+    - name: Upload test results to Codecov
+      if: inputs.CODECOV_TOKEN && !cancelled()
+      uses: codecov/test-results-action@v1
+      with:
+        token: ${{ inputs.CODECOV_TOKEN }}
