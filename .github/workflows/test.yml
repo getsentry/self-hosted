@@ -136,7 +136,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Use action from local checkout
-        uses: .
+        uses: './'
 
       - name: Inspect failure
         if: failure()
