@@ -49,7 +49,7 @@ def test_import(setup_backup_restore_env_variables):
         subprocess.run(
             [
                 "rsync",
-                "-aWm",
+                "-am",
                 "--no-compress",
                 "--mkpath",
                 join(os.environ["RUNNER_TEMP"], "volumes", f"sentry-{name}", ""),

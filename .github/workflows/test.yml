@@ -247,13 +247,13 @@ jobs:
 
       - name: Integration Test
         run: |
-          rsync -aWm --no-compress --mkpath \
+          rsync -am --no-compress --mkpath \
             /var/lib/docker/volumes/sentry-postgres \
             /var/lib/docker/volumes/sentry-clickhouse \
             /var/lib/docker/volumes/sentry-kafka \
             "$RUNNER_TEMP/volumes/"
           docker compose up --wait
-          pytest --cov --junitxml=junit.xml _integration-test/
+          pytest -x --cov --junitxml=junit.xml _integration-test/
 
       - name: Inspect failure
         if: failure()
