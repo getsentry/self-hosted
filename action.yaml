@@ -13,20 +13,17 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - name: Go into self-hosted directory
-      shell: bash
-      run: cd ${{ github.action_path }}
-
     - name: Configure to use the test image
       if: inputs.project_name && inputs.image_url
       shell: bash
       run: |
         image_var=$(echo ${{ inputs.project_name }}_IMAGE | tr '[:lower:]' '[:upper:]')
-        echo "${image_var}=${{ inputs.image_url }}" >> $GITHUB_ENV
+        echo "${image_var}=${{ inputs.image_url }}" >> ${{ github.action_path }}/.env
 
     - name: Setup dev environment
       shell: bash
       run: |
+        cd ${{ github.action_path }}
         pip install -r requirements-dev.txt
         echo "PY_COLORS=1" >> "$GITHUB_ENV"
         ### pytest-sentry configuration ###
@@ -64,7 +61,7 @@ runs:
         # Set permissions for docker volumes so we can cache and restore
         sudo chmod o+x /var/lib/docker
         sudo chmod -R o+rwx /var/lib/docker/volumes
-        source .env
+        source ${{ github.action_path }}/.env
         SENTRY_IMAGE_SHA=$(docker buildx imagetools inspect $SENTRY_IMAGE --format "{{println .Manifest.Digest}}")
         echo "SENTRY_IMAGE_SHA=$SENTRY_IMAGE_SHA" >> $GITHUB_OUTPUT
         SNUBA_IMAGE_SHA=$(docker buildx imagetools inspect $SNUBA_IMAGE --format "{{println .Manifest.Digest}}")
@@ -88,6 +85,7 @@ runs:
         SKIP_DB_MIGRATIONS: ${{ steps.restore_cache.outputs.cache-hit == 'true' && '1' || '' }}
       shell: bash
       run: |
+        cd ${{ github.action_path }}
         # This is for the cache restore on Kafka to work in older releases
         docker run --rm -v "sentry-kafka:/data" busybox chown -R 1000:1000 /data
         # Add some customizations to test that path
@@ -132,6 +130,7 @@ runs:
           /var/lib/docker/volumes/sentry-clickhouse \
           /var/lib/docker/volumes/sentry-kafka \
           "$RUNNER_TEMP/volumes/"
+        cd ${{ github.action_path }}
         docker compose up --wait
         pytest -x --cov --junitxml=junit.xml _integration-test/
 
@@ -139,6 +138,7 @@ runs:
       uses: codecov/codecov-action@v5
       if: inputs.CODECOV_TOKEN
       with:
+        directory: ${{ github.action_path }}
         token: ${{ inputs.CODECOV_TOKEN }}
         slug: getsentry/self-hosted
 
@@ -146,4 +146,5 @@ runs:
       if: inputs.CODECOV_TOKEN && !cancelled()
       uses: codecov/test-results-action@v1
       with:
+        directory: ${{ github.action_path }}
         token: ${{ inputs.CODECOV_TOKEN }}
