@@ -247,7 +247,7 @@ jobs:
 
       - name: Integration Test
         run: |
-          rsync -am --no-compress --mkpath \
+          rsync -aW --no-compress --mkpath \
             /var/lib/docker/volumes/sentry-postgres \
             /var/lib/docker/volumes/sentry-clickhouse \
             /var/lib/docker/volumes/sentry-kafka \
