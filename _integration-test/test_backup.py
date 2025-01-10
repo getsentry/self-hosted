@@ -44,6 +44,10 @@ def test_backup(setup_backup_restore_env_variables):
 def test_import(setup_backup_restore_env_variables):
     # Bring postgres down and recreate the docker volume
     subprocess.run(["docker", "compose", "--ansi", "never", "down"], check=True)
+    # We reset all DB-related volumes here and not just Postgres although the backups
+    # are only for Postgres. The reason is to get a "clean slate" as we need the Kafka
+    # and Clickhouse volumes to be back to their initial state as well ( without any events)
+    # We cannot just rm and create them as they still need migrations.
     for name in ("postgres", "clickhouse", "kafka"):
         subprocess.run(["docker", "volume", "rm", f"sentry-{name}"], check=True)
         subprocess.run(
