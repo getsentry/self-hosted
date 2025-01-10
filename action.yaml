@@ -133,7 +133,7 @@ runs:
           /var/lib/docker/volumes/sentry-kafka \
           "$RUNNER_TEMP/volumes/"
         docker compose up --wait
-        pytest -x --cov --junitxml=junit.xml _integration-test/
+        TEST_CUSTOMIZATIONS=enabled pytest -x --cov --junitxml=junit.xml _integration-test/
 
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v5
