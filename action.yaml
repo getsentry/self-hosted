@@ -143,7 +143,7 @@ runs:
         slug: getsentry/self-hosted
 
     - name: Upload test results to Codecov
-      if: !cancelled() && inputs.CODECOV_TOKEN
+      if: inputs.CODECOV_TOKEN && !cancelled()
       uses: codecov/test-results-action@v1
       with:
         token: ${{ inputs.CODECOV_TOKEN }}
