@@ -6,6 +6,9 @@ inputs:
   image_url:
     required: false
     description: "The URL to the built relay, snuba, sentry image to test against."
+  CODECOV_TOKEN:
+    required: false
+    description: "The Codecov token to upload coverage."
 
 runs:
   using: "composite"
@@ -134,12 +137,13 @@ runs:
 
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v5
+      if: inputs.CODECOV_TOKEN
       with:
-        token: ${{ secrets.CODECOV_TOKEN }}
+        token: ${{ inputs.CODECOV_TOKEN }}
         slug: getsentry/self-hosted
 
     - name: Upload test results to Codecov
-      if: ${{ !cancelled() }}
+      if: !cancelled() && inputs.CODECOV_TOKEN
       uses: codecov/test-results-action@v1
       with:
-        token: ${{ secrets.CODECOV_TOKEN }}
+        token: ${{ inputs.CODECOV_TOKEN }}

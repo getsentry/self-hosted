@@ -137,6 +137,8 @@ jobs:
 
       - name: Use action from local checkout
         uses: './'
+        with:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
       - name: Inspect failure
         if: failure()
