@@ -9,14 +9,9 @@ SENTRY_TEST_HOST = os.getenv("SENTRY_TEST_HOST", "http://localhost:9000")
 TEST_USER = "test@example.com"
 TEST_PASS = "test123TEST"
 
+
 @pytest.fixture(scope="session", autouse=True)
 def configure_self_hosted_environment(request):
-    subprocess.run(
-        ["docker", "compose", "--ansi", "never", "up", "--wait"],
-        check=True,
-        capture_output=True,
-    )
-
     # Create test user
     subprocess.run(
         [
