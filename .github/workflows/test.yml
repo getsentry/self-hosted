@@ -19,20 +19,20 @@ defaults:
   run:
     shell: bash
 jobs:
-  # e2e-test:
-  #   if: github.repository_owner == 'getsentry'
-  #   runs-on: ubuntu-22.04
-  #   name: "Sentry self-hosted end-to-end tests"
-  #   steps:
-  #     - name: Checkout
-  #       uses: actions/checkout@v4
-  #       with:
-  #         path: self-hosted
+  e2e-test:
+    if: github.repository_owner == 'getsentry'
+    runs-on: ubuntu-22.04
+    name: "Sentry self-hosted end-to-end tests"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          path: self-hosted
 
-  #     - name: End to end tests
-  #       uses: getsentry/action-self-hosted-e2e-tests@main
-  #       with:
-  #         project_name: self-hosted
+      - name: End to end tests
+        uses: getsentry/action-self-hosted-e2e-tests@main
+        with:
+          project_name: self-hosted
 
   unit-test:
     if: github.repository_owner == 'getsentry'
