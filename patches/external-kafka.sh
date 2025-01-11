@@ -79,7 +79,24 @@ KAFKA_SECURITY_PROTOCOL=PLAINTEXT
 # KAFKA_SSL_KEY_LOCATION=/kafka-certificates/client.key
 EOF
 
-#TODO: Modify relay config file
+patch -p1 $RELAY_CONFIG_YML <<"EOF"
+@@ -7,8 +7,15 @@
+ processing:
+   enabled: true
+   kafka_config:
+-    - {name: "bootstrap.servers", value: "kafka:9092"}
++    - {name: "bootstrap.servers", value: "kafka-node1:9092,kafka-node2:9092,kafka-node3:9092"}
+     - {name: "message.max.bytes", value: 50000000} # 50MB
++    - {name: "security.protocol", value: "PLAINTEXT"}
++    - {name: "sasl.mechanism", value: "PLAIN"}
++    - {name: "sasl.username", value: "username"}
++    - {name: "sasl.password", value: "password"}
++    - {name: "ssl.ca.location", value: "/kafka-certificates/ca.pem"}
++    - {name: "ssl.certificate.location", value: "/kafka-certificates/client.pem"}
++    - {name: "ssl.key.location", value: "/kafka-certificates/client.key"}
+   redis: redis://redis:6379
+   geoip_path: "/geoip/GeoLite2-City.mmdb"
+EOF
 
 COMPOSE_OVERRIDE_CONTENT=$(
   cat <<-EOF
@@ -122,6 +139,9 @@ services:
       SENTRY_KAFKA_SASL_MECHANISM: \${KAFKA_SASL_MECHANISM:-}
       SENTRY_KAFKA_SASL_USERNAME: \${KAFKA_SASL_USERNAME:-}
       SENTRY_KAFKA_SASL_PASSWORD: \${KAFKA_SASL_PASSWORD:-}
+    volumes:
+      - ./certificates/kafka:/kafka-certificates:ro
+  relay:
     volumes:
       - ./certificates/kafka:/kafka-certificates:ro
   snuba-api:
@@ -222,8 +242,9 @@ fi
 
 echo ""
 echo ""
-echo "--------------------------------------------------------------"
-echo "-   Finished patching external-kafka.sh"
-echo "-   Modify the Kafka credentials on your $ENV_FILE file"
+echo "------------------------------------------------------------------------"
+echo "-   Finished patching external-kafka.sh. Some things you'll need to do:"
+echo "-   Modify the Kafka credentials on your $ENV_FILE file."
+echo "-   Modify the Kafka credentials on your $RELAY_CONFIG_YML file."
 echo "-   Then, run ./install.sh"
-echo "--------------------------------------------------------------"
+echo "------------------------------------------------------------------------"
