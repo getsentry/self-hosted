@@ -54,13 +54,10 @@ runs:
         sudo curl -L https://github.com/docker/compose/releases/download/${{ env.COMPOSE_VERSION }}/docker-compose-`uname -s`-`uname -m` -o "${{ env.COMPOSE_PATH }}/docker-compose"
         sudo chmod +x "${{ env.COMPOSE_PATH }}/docker-compose"
 
-    - name: Prepare Docker Volume Caching
+    - name: Compute Docker Volume Cache Key
       id: cache_key
       shell: bash
       run: |
-        # Set permissions for docker volumes so we can cache and restore
-        sudo chmod o+x /var/lib/docker
-        sudo chmod -R o+rwx /var/lib/docker/volumes
         source ${{ github.action_path }}/.env
         SENTRY_IMAGE_SHA=$(docker buildx imagetools inspect $SENTRY_IMAGE --format "{{println .Manifest.Digest}}")
         echo "SENTRY_IMAGE_SHA=$SENTRY_IMAGE_SHA" >> $GITHUB_OUTPUT
@@ -69,16 +66,16 @@ runs:
 
     - name: Restore DB Volumes Cache
       id: restore_cache
-      uses: actions/cache/restore@v4
+      uses: BYK/docker-volume-cache-action/restore@main
       with:
         key: db-volumes-v4-${{ steps.cache_key.outputs.SENTRY_IMAGE_SHA }}-${{ steps.cache_key.outputs.SNUBA_IMAGE_SHA }}
         restore-keys: |
           db-volumes-v4-${{ steps.cache_key.outputs.SENTRY_IMAGE_SHA }}
           db-volumes-v4-
-        path: |
-          /var/lib/docker/volumes/sentry-postgres/_data
-          /var/lib/docker/volumes/sentry-clickhouse/_data
-          /var/lib/docker/volumes/sentry-kafka/_data
+        volumes: |
+          sentry-postgres
+          sentry-clickhouse
+          sentry-kafka
 
     - name: Install self-hosted
       env:
@@ -100,31 +97,20 @@ runs:
 
         ./install.sh --no-report-self-hosted-issues --skip-commit-check
 
-    - name: Prepare Docker Volume Caching
-      shell: bash
-      run: |
-        # Set permissions for docker volumes so we can cache and restore
-        # We need these for the backup/restore test snapshotting too
-        sudo chmod o+x /var/lib/docker
-        sudo chmod -R o+rx /var/lib/docker/volumes
-        # Set tar ownership for it to be able to read
-        # From: https://github.com/actions/toolkit/issues/946#issuecomment-1726311681
-        sudo chown root /usr/bin/tar && sudo chmod u+s /usr/bin/tar
-        sudo chown root /usr/bin/rsync && sudo chmod u+s /usr/bin/rsync
-
     - name: Save DB Volumes Cache
       if: steps.restore_cache.outputs.cache-hit != 'true'
-      uses: actions/cache/save@v4
+      uses: BYK/docker-volume-cache-action/save@main
       with:
         key: ${{ steps.restore_cache.outputs.cache-primary-key }}
-        path: |
-          /var/lib/docker/volumes/sentry-postgres/_data
-          /var/lib/docker/volumes/sentry-clickhouse/_data
-          /var/lib/docker/volumes/sentry-kafka/_data
+        volumes: |
+          sentry-postgres
+          sentry-clickhouse
+          sentry-kafka
 
     - name: Integration Test
       shell: bash
       run: |
+        sudo chown root /usr/bin/rsync && sudo chmod u+s /usr/bin/rsync
         rsync -aW --no-compress --mkpath \
           /var/lib/docker/volumes/sentry-postgres \
           /var/lib/docker/volumes/sentry-clickhouse \
