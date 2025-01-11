@@ -24,23 +24,23 @@ source patches/_lib.sh
 # Otherwise, we'll use `sentry/sentry.conf.example.py`.
 SENTRY_CONFIG_PY="sentry/sentry.conf.py"
 if [[ ! -f "$SENTRY_CONFIG_PY" ]]; then
-    SENTRY_CONFIG_PY="sentry/sentry.conf.example.py"
+  SENTRY_CONFIG_PY="sentry/sentry.conf.example.py"
 fi
 
 ENV_FILE=".env.custom"
-if [[ -f "$ENV_FILE" ]]; then
-    ENV_FILE=".env"
+if [[ ! -f "$ENV_FILE" ]]; then
+  ENV_FILE=".env"
 fi
 
 RELAY_CONFIG_YML="relay/config.yml"
 if [[ ! -f "$RELAY_CONFIG_YML" ]]; then
-    RELAY_CONFIG_YML="relay/config.example.yml"
+  RELAY_CONFIG_YML="relay/config.example.yml"
 fi
 
 patch -p1 $SENTRY_CONFIG_PY <<"EOF"
 @@ -136,9 +136,17 @@
  SENTRY_CACHE = "sentry.cache.redis.RedisCache"
- 
+
  DEFAULT_KAFKA_OPTIONS = {
 -    "bootstrap.servers": "kafka:9092",
 +    "bootstrap.servers": env("KAFKA_BOOTSTRAP_SERVERS", "kafka:9092"),
@@ -55,12 +55,13 @@ patch -p1 $SENTRY_CONFIG_PY <<"EOF"
 +    "ssl.certificate.location": env("KAFKA_SSL_CERTIFICATE_LOCATION", None), # Remove this line if SSL is not used.
 +    "ssl.key.location": env("KAFKA_SSL_KEY_LOCATION", None), # Remove this line if SSL is not used.
  }
- 
+
  SENTRY_EVENTSTREAM = "sentry.eventstream.kafka.KafkaEventStream"
 EOF
 
 # Add additional Kafka options to the ENV_FILE
 cat <<EOF >>"$ENV_FILE"
+
 ################################################################################
 ## Additional External Kafka options
 ################################################################################
@@ -80,7 +81,8 @@ EOF
 
 #TODO: Modify relay config file
 
-COMPOSE_OVERRIDE_CONTENT=$(cat <<-EOF
+COMPOSE_OVERRIDE_CONTENT=$(
+  cat <<-EOF
 x-snuba-defaults: &snuba_defaults
   environment:
     DEFAULT_BROKERS: \${KAFKA_BOOTSTRAP_SERVERS:-kafka:9092}
@@ -211,11 +213,11 @@ services:
 EOF
 )
 if [[ -f "docker-compose.override.yml" ]]; then
-    echo "🚨 docker-compose.override.yml already exists. You will need to modify it manually:"
-    echo "$COMPOSE_OVERRIDE_CONTENT"
+  echo "🚨 docker-compose.override.yml already exists. You will need to modify it manually:"
+  echo "$COMPOSE_OVERRIDE_CONTENT"
 else
-    echo "🚨 docker-compose.override.yml  does not exist. Creating it now."
-    echo "$COMPOSE_OVERRIDE_CONTENT" >docker-compose.override.yml
+  echo "🚨 docker-compose.override.yml  does not exist. Creating it now."
+  echo "$COMPOSE_OVERRIDE_CONTENT" >docker-compose.override.yml
 fi
 
 echo ""
