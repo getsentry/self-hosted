@@ -132,7 +132,7 @@ runs:
           "$RUNNER_TEMP/volumes/"
         cd ${{ github.action_path }}
         docker compose up --wait
-        TEST_CUSTOMIZATIONS=enabled pytest -x --cov --junitxml=junit.xml _integration-test/
+        pytest -x --cov --junitxml=junit.xml _integration-test/
 
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v5
