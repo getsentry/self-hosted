@@ -20,7 +20,7 @@ else
   echo "You're all done! Run the following command to get Sentry running:"
   echo ""
   if [[ "${_ENV}" =~ ".env.custom" ]]; then
-    echo "  $dc_base --env-file ${_ENV} up --wait"
+    echo "  $dc_base --env-file .env --env-file ${_ENV} up --wait"
   else
     echo "  $dc_base up --wait"
   fi
