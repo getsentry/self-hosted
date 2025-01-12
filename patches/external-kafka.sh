@@ -241,7 +241,9 @@ services:
 EOF
 )
 if [[ -f "docker-compose.override.yml" ]]; then
-  echo "🚨 docker-compose.override.yml already exists. You will need to modify it manually:"
+  echo "🚨 docker-compose.override.yml already exists. You will need to modify it manually with the following content."
+  echo "Changes: Reset the 'kafka' service block, add additional Kafka-related environment variables to 'vroom', 'relay', 'sentry'-related and 'snuba'-related services."
+  echo ""
   echo "$COMPOSE_OVERRIDE_CONTENT"
 else
   echo "🚨 docker-compose.override.yml  does not exist. Creating it now."
@@ -257,4 +259,6 @@ echo "-   2. Modify the Kafka credentials on your $RELAY_CONFIG_YML file."
 echo "-   3. Run ./install.sh"
 echo "-"
 echo "-   NOTE: Remove or comment the corresponding line if you don't use it."
+echo "-         It is also safe to prune/delete 'sentry-kafka'"
+echo "-         and 'sentry-kafka-log' Docker volumes."
 echo "------------------------------------------------------------------------"

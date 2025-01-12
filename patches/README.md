@@ -11,7 +11,7 @@ to modify the existing configuration to achieve the desired goal.
 
 ## How to use patches
 
-The patches are designed mostly to help modify the existing configuration files. You will need to run the `install.sh` script afterwards. 
+The patches are designed mostly to help modify the existing configuration files. You will need to run the `install.sh` script afterwards.
 They should be run from the root directory. For example, the `external-kafka.sh` patch should be run as:
 ```bash
 ./patches/external-kafka.sh
