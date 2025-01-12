@@ -82,6 +82,10 @@ jobs:
         env:
           SKIP_DB_MIGRATIONS: ${{ steps.restore_cache.outputs.cache-hit == 'true' && '1' || '' }}
         run: |
+          # This is to compensate for a bug in upgrade-clickhouse where
+          # if we have sentry-clickhouse volume without the rest, it fails
+          # We may get sentry-clickhouse from the cache step above
+          install/create-docker-volumes.sh
           ./install.sh
 
       - name: Save DB Volumes Cache
