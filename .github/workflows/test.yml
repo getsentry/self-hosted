@@ -82,8 +82,6 @@ jobs:
         env:
           SKIP_DB_MIGRATIONS: ${{ steps.restore_cache.outputs.cache-hit == 'true' && '1' || '' }}
         run: |
-          # This is for the cache restore on Kafka to work in older releases
-          docker run --rm -v "sentry-kafka:/data" busybox chown -R 1000:1000 /data
           ./install.sh
 
       - name: Save DB Volumes Cache
