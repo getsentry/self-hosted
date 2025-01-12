@@ -18,7 +18,7 @@ runs:
       shell: bash
       run: |
         image_var=$(echo ${{ inputs.project_name }}_IMAGE | tr '[:lower:]' '[:upper:]')
-        echo "${image_var}=${{ inputs.image_url }}" >> ${{ github.action_path }}/.env
+        echo "${image_var}=${{ inputs.image_url }}" >> ${{ github.action_path }}.env
 
     - name: Setup dev environment
       shell: bash
@@ -58,7 +58,7 @@ runs:
       id: cache_key
       shell: bash
       run: |
-        source ${{ github.action_path }}/.env
+        source ${{ github.action_path }}.env
         SENTRY_IMAGE_SHA=$(docker buildx imagetools inspect $SENTRY_IMAGE --format "{{println .Manifest.Digest}}")
         echo "SENTRY_IMAGE_SHA=$SENTRY_IMAGE_SHA" >> $GITHUB_OUTPUT
         SNUBA_IMAGE_SHA=$(docker buildx imagetools inspect $SNUBA_IMAGE --format "{{println .Manifest.Digest}}")
