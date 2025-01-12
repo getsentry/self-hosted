@@ -64,8 +64,9 @@ EOF
 
 # Add additional Kafka options to the ENV_FILE
 # Only patch this when "KAFKA_BOOTSTRAP_SERVERS" is not set.
-if [[ grep -q "KAFKA_BOOTSTRAP_SERVERS" "${ENV_FILE}" ]]; then
-  echo "🚨 Skipping patching of ${ENV_FILE}"
+kafka_config_exists_on_env=$(grep -c "KAFKA_BOOTSTRAP_SERVERS" "${ENV_FILE}")
+if [[ "$kafka_config_exists_on_env" -ne 0 ]]; then
+  echo "🚨 Skipping patching of ${ENV_FILE}. You may already have Kafka-related environment variables set."
 else
   cat <<EOF >>"$ENV_FILE"
 
