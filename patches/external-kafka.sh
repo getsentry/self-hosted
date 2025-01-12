@@ -22,6 +22,7 @@ source patches/_lib.sh
 
 # If `sentry/sentry.conf.py` exists, we'll modify it.
 # Otherwise, we'll use `sentry/sentry.conf.example.py`.
+# This kind of conditional logic will be used with other files.
 SENTRY_CONFIG_PY="sentry/sentry.conf.py"
 if [[ ! -f "$SENTRY_CONFIG_PY" ]]; then
   SENTRY_CONFIG_PY="sentry/sentry.conf.example.py"
@@ -37,6 +38,8 @@ if [[ ! -f "$RELAY_CONFIG_YML" ]]; then
   RELAY_CONFIG_YML="relay/config.example.yml"
 fi
 
+## XXX(aldy505): Create the diff by running `diff -u sentry/sentry.conf.py sentry/sentry.conf.example.py`.
+##               But you'll need to have your own `sentry/sentry.conf.py` file with the changes already set.
 patch -p1 $SENTRY_CONFIG_PY <<"EOF"
 @@ -136,9 +136,17 @@
  SENTRY_CACHE = "sentry.cache.redis.RedisCache"
@@ -60,7 +63,11 @@ patch -p1 $SENTRY_CONFIG_PY <<"EOF"
 EOF
 
 # Add additional Kafka options to the ENV_FILE
-cat <<EOF >>"$ENV_FILE"
+# Only patch this when "KAFKA_BOOTSTRAP_SERVERS" is not set.
+if [[ grep -q "KAFKA_BOOTSTRAP_SERVERS" "${ENV_FILE}" ]]; then
+  echo "🚨 Skipping patching of ${ENV_FILE}"
+else
+  cat <<EOF >>"$ENV_FILE"
 
 ################################################################################
 ## Additional External Kafka options
@@ -78,6 +85,7 @@ KAFKA_SECURITY_PROTOCOL=PLAINTEXT
 # KAFKA_SSL_CERTIFICATE_LOCATION=/kafka-certificates/client.pem
 # KAFKA_SSL_KEY_LOCATION=/kafka-certificates/client.key
 EOF
+fi
 
 patch -p1 $RELAY_CONFIG_YML <<"EOF"
 @@ -7,8 +7,15 @@
@@ -88,12 +96,12 @@ patch -p1 $RELAY_CONFIG_YML <<"EOF"
 +    - {name: "bootstrap.servers", value: "kafka-node1:9092,kafka-node2:9092,kafka-node3:9092"}
      - {name: "message.max.bytes", value: 50000000} # 50MB
 +    - {name: "security.protocol", value: "PLAINTEXT"}
-+    - {name: "sasl.mechanism", value: "PLAIN"}
-+    - {name: "sasl.username", value: "username"}
-+    - {name: "sasl.password", value: "password"}
-+    - {name: "ssl.ca.location", value: "/kafka-certificates/ca.pem"}
-+    - {name: "ssl.certificate.location", value: "/kafka-certificates/client.pem"}
-+    - {name: "ssl.key.location", value: "/kafka-certificates/client.key"}
++    - {name: "sasl.mechanism", value: "PLAIN"} # Remove or comment this line if SASL is not used.
++    - {name: "sasl.username", value: "username"} # Remove or comment this line if SASL is not used.
++    - {name: "sasl.password", value: "password"} # Remove or comment this line if SASL is not used.
++    - {name: "ssl.ca.location", value: "/kafka-certificates/ca.pem"} # Remove or comment this line if SSL is not used.
++    - {name: "ssl.certificate.location", value: "/kafka-certificates/client.pem"} # Remove or comment this line if SSL is not used.
++    - {name: "ssl.key.location", value: "/kafka-certificates/client.key"} # Remove or comment this line if SSL is not used.
    redis: redis://redis:6379
    geoip_path: "/geoip/GeoLite2-City.mmdb"
 EOF
@@ -244,7 +252,9 @@ echo ""
 echo ""
 echo "------------------------------------------------------------------------"
 echo "-   Finished patching external-kafka.sh. Some things you'll need to do:"
-echo "-   Modify the Kafka credentials on your $ENV_FILE file."
-echo "-   Modify the Kafka credentials on your $RELAY_CONFIG_YML file."
-echo "-   Then, run ./install.sh"
+echo "-   1. Modify the Kafka credentials on your $ENV_FILE file."
+echo "-   2. Modify the Kafka credentials on your $RELAY_CONFIG_YML file."
+echo "-   3. Run ./install.sh"
+echo "-"
+echo "-   NOTE: Remove or comment the corresponding line if you don't use it."
 echo "------------------------------------------------------------------------"
