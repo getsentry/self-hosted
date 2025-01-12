@@ -83,8 +83,6 @@ runs:
       shell: bash
       run: |
         cd ${{ github.action_path }}
-        # This is for the cache restore on Kafka to work in older releases
-        docker run --rm -v "sentry-kafka:/data" busybox chown -R 1000:1000 /data
         # Add some customizations to test that path
         cat <<EOT >> sentry/enhance-image.sh
         #!/bin/bash
@@ -98,7 +96,7 @@ runs:
         ./install.sh --no-report-self-hosted-issues --skip-commit-check
 
     - name: Save DB Volumes Cache
-      # if: steps.restore_cache.outputs.cache-hit != 'true'
+      if: steps.restore_cache.outputs.cache-hit != 'true'
       uses: BYK/docker-volume-cache-action/save@main
       with:
         key: ${{ steps.restore_cache.outputs.cache-primary-key }}
