@@ -326,7 +326,15 @@ def test_custom_certificate_authorities():
         )
 
     subprocess.run(
-        ["docker", "compose", "--ansi", "never", "up", "-d", "fixture-custom-ca-roots"],
+        [
+            "docker",
+            "compose",
+            "--ansi",
+            "never",
+            "up",
+            "--wait",
+            "fixture-custom-ca-roots",
+        ],
         check=True,
     )
     subprocess.run(
@@ -448,7 +456,4 @@ def test_customizations():
     ]
     for command in commands:
         result = subprocess.run(command, check=False)
-        if os.getenv("TEST_CUSTOMIZATIONS", "disabled") == "enabled":
-            assert result.returncode == 0
-        else:
-            assert result.returncode != 0
+        assert result.returncode == 0
