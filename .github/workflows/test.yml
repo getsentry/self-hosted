@@ -69,10 +69,10 @@ jobs:
         id: restore_cache
         uses: BYK/docker-volume-cache-action/restore@main
         with:
-          key: db-volumes-v4-beta-${{ steps.cache_key.outputs.SENTRY_IMAGE_SHA }}-${{ steps.cache_key.outputs.SNUBA_IMAGE_SHA }}
+          key: db-volumes-v4-b.1-${{ steps.cache_key.outputs.SENTRY_IMAGE_SHA }}-${{ steps.cache_key.outputs.SNUBA_IMAGE_SHA }}
           restore-keys: |
-            db-volumes-v4-beta-${{ steps.cache_key.outputs.SENTRY_IMAGE_SHA }}
-            db-volumes-v4-beta-
+            db-volumes-v4-b.1-${{ steps.cache_key.outputs.SENTRY_IMAGE_SHA }}
+            db-volumes-v4-b.1-
           volumes: |
             sentry-postgres
             sentry-clickhouse
