@@ -67,7 +67,7 @@ jobs:
 
       - name: Restore DB Volumes Cache
         id: restore_cache
-        uses: BYK/docker-volume-cache-action/restore@main
+        uses: BYK/docker-volume-cache-action/restore@be89365902126f508dcae387a32ec3712df6b1cd
         with:
           key: db-volumes-v6-${{ steps.cache_key.outputs.SNUBA_MIGRATIONS_MD5 }}-${{ steps.cache_key.outputs.SENTRY_MIGRATIONS_MD5 }}
           restore-keys: |
@@ -90,7 +90,7 @@ jobs:
 
       - name: Save DB Volumes Cache
         if: steps.restore_cache.outputs.cache-hit != 'true'
-        uses: BYK/docker-volume-cache-action/save@main
+        uses: BYK/docker-volume-cache-action/save@be89365902126f508dcae387a32ec3712df6b1cd
         with:
           key: ${{ steps.restore_cache.outputs.cache-primary-key }}
           volumes: |
