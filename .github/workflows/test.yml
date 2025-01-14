@@ -56,12 +56,9 @@ jobs:
           sudo curl -L https://github.com/docker/compose/releases/download/v2.26.0/docker-compose-`uname -s`-`uname -m` -o "/usr/local/lib/docker/cli-plugins/docker-compose"
           sudo chmod +x "/usr/local/lib/docker/cli-plugins/docker-compose"
 
-      - name: Prepare Docker Volume Caching
+      - name: Compute Docker Volume Cache Key
         id: cache_key
         run: |
-          # Set permissions for docker volumes so we can cache and restore
-          sudo chmod o+x /var/lib/docker
-          sudo chmod -R o+rwx /var/lib/docker/volumes
           source .env
           SENTRY_MIGRATIONS_MD5=$(docker run --rm --entrypoint bash $SENTRY_IMAGE -c 'ls -Rv1rpq src/sentry/migrations/' | md5sum | cut -d ' ' -f 1)
           echo "SENTRY_MIGRATIONS_MD5=$SENTRY_MIGRATIONS_MD5" >> $GITHUB_OUTPUT
@@ -70,44 +67,36 @@ jobs:
 
       - name: Restore DB Volumes Cache
         id: restore_cache
-        uses: actions/cache/restore@v4
+        uses: BYK/docker-volume-cache-action/restore@be89365902126f508dcae387a32ec3712df6b1cd
         with:
-          key: db-volumes-v5-${{ steps.cache_key.outputs.SNUBA_MIGRATIONS_MD5 }}-${{ steps.cache_key.outputs.SENTRY_MIGRATIONS_MD5 }}
+          key: db-volumes-v6-${{ steps.cache_key.outputs.SNUBA_MIGRATIONS_MD5 }}-${{ steps.cache_key.outputs.SENTRY_MIGRATIONS_MD5 }}
           restore-keys: |
-            db-volumes-v5-${{ steps.cache_key.outputs.SNUBA_MIGRATIONS_MD5 }}
-            db-volumes-v5-
-          path: |
-            /var/lib/docker/volumes/sentry-postgres/_data
-            /var/lib/docker/volumes/sentry-clickhouse/_data
-            /var/lib/docker/volumes/sentry-kafka/_data
+            db-volumes-v6-${{ steps.cache_key.outputs.SNUBA_MIGRATIONS_MD5 }}
+            db-volumes-v6-
+          volumes: |
+            sentry-postgres
+            sentry-clickhouse
+            sentry-kafka
 
       - name: Install ${{ env.LATEST_TAG }}
         env:
           SKIP_DB_MIGRATIONS: ${{ steps.restore_cache.outputs.cache-hit == 'true' && '1' || '' }}
         run: |
-          # This is for the cache restore on Kafka to work in older releases
-          docker run --rm -v "sentry-kafka:/data" busybox chown -R 1000:1000 /data
+          # This is to compensate for a bug in upgrade-clickhouse where
+          # if we have sentry-clickhouse volume without the rest, it fails
+          # We may get sentry-clickhouse from the cache step above
+          source install/create-docker-volumes.sh
           ./install.sh
-
-      - name: Prepare Docker Volume Caching
-        run: |
-          # Set permissions for docker volumes so we can cache and restore
-          # We need these for the backup/restore test snapshotting too
-          sudo chmod o+x /var/lib/docker
-          sudo chmod -R o+rx /var/lib/docker/volumes
-          # Set tar ownership for it to be able to read
-          # From: https://github.com/actions/toolkit/issues/946#issuecomment-1726311681
-          sudo chown root /usr/bin/tar && sudo chmod u+s /usr/bin/tar
 
       - name: Save DB Volumes Cache
         if: steps.restore_cache.outputs.cache-hit != 'true'
-        uses: actions/cache/save@v4
+        uses: BYK/docker-volume-cache-action/save@be89365902126f508dcae387a32ec3712df6b1cd
         with:
           key: ${{ steps.restore_cache.outputs.cache-primary-key }}
-          path: |
-            /var/lib/docker/volumes/sentry-postgres/_data
-            /var/lib/docker/volumes/sentry-clickhouse/_data
-            /var/lib/docker/volumes/sentry-kafka/_data
+          volumes: |
+            sentry-postgres
+            sentry-clickhouse
+            sentry-kafka
 
       - name: Checkout current ref
         uses: actions/checkout@v4
