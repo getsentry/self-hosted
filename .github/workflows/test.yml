@@ -37,13 +37,22 @@ jobs:
     if: github.repository_owner == 'getsentry'
     runs-on: ubuntu-22.04
     name: "Sentry upgrade test"
+    strategy:
+      fail-fast: false
+      matrix:
+        version: ["latest", "hard-stop"]
     env:
       REPORT_SELF_HOSTED_ISSUES: 0
     steps:
-      - name: Get latest self-hosted release version
+      - name: Get self-hosted release version
         run: |
-          LATEST_TAG=$(curl -s https://api.github.com/repos/getsentry/self-hosted/releases/latest | jq -r '.tag_name')
-          echo "LATEST_TAG=$LATEST_TAG" >> $GITHUB_ENV
+          if [ "${{ matrix.version }}" = "latest" ]; then
+            LATEST_TAG=$(curl -s https://api.github.com/repos/getsentry/self-hosted/releases/latest | jq -r '.tag_name')
+            echo "LATEST_TAG=$LATEST_TAG" >> $GITHUB_ENV
+          else
+            # Use latest hard stop version
+            echo "LATEST_TAG=24.1.0" >> $GITHUB_ENV
+          fi
 
       - name: Get Compose
         uses: getsentry/self-hosted/get-compose-action@master
