@@ -67,9 +67,9 @@ jobs:
         id: restore_cache
         uses: BYK/docker-volume-cache-action/restore@be89365902126f508dcae387a32ec3712df6b1cd
         with:
-          key: db-volumes-v6-${{ steps.cache_key.outputs.SNUBA_MIGRATIONS_MD5 }}-${{ steps.cache_key.outputs.SENTRY_MIGRATIONS_MD5 }}
+          key: db-volumes-v6-${{ env.LATEST_TAG }}
           restore-keys: |
-            db-volumes-v6-${{ steps.cache_key.outputs.SNUBA_MIGRATIONS_MD5 }}
+            db-volumes-v6-${{ env.LATEST_TAG }}
             db-volumes-v6-
           volumes: |
             sentry-postgres
@@ -78,7 +78,10 @@ jobs:
 
       - name: Install ${{ env.LATEST_TAG }}
         env:
+          # Remove SKIP_DB_MIGRATIONS after releasing 25.1.1 or 25.2.0
           SKIP_DB_MIGRATIONS: ${{ steps.restore_cache.outputs.cache-hit == 'true' && '1' || '' }}
+          SKIP_SENTRY_MIGRATIONS: ${{ steps.restore_cache.outputs.cache-hit == 'true' && '1' || '' }}
+          SKIP_SNUBA_MIGRATIONS: ${{ steps.restore_cache.outputs.cache-hit == 'true' && '1' || '' }}
         run: |
           # This is to compensate for a bug in upgrade-clickhouse where
           # if we have sentry-clickhouse volume without the rest, it fails
