@@ -50,9 +50,9 @@ def test_02_import(setup_backup_restore_env_variables):
     # We cannot just rm and create them as they still need the migrations.
     for name in ("postgres", "clickhouse", "kafka"):
         subprocess.run(["docker", "volume", "rm", f"sentry-{name}"], check=True)
+        subprocess.run(["docker", "volume", "create", f"sentry-{name}"], check=True)
         subprocess.run(
             [
-                "sudo",
                 "rsync",
                 "-aW",
                 "--super",
@@ -65,7 +65,6 @@ def test_02_import(setup_backup_restore_env_variables):
             check=True,
             capture_output=True,
         )
-        subprocess.run(["docker", "volume", "create", f"sentry-{name}"], check=True)
 
     subprocess.run(
         ["docker", "compose", "--ansi", "never", "up", "--wait"],
