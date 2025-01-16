@@ -53,7 +53,7 @@ jobs:
           sudo rm -f "/usr/local/bin/docker-compose"
           sudo rm -f "/usr/local/lib/docker/cli-plugins/docker-compose"
           sudo mkdir -p "/usr/local/lib/docker/cli-plugins"
-          sudo curl -L https://github.com/docker/compose/releases/download/v2.26.0/docker-compose-`uname -s`-`uname -m` -o "/usr/local/lib/docker/cli-plugins/docker-compose"
+          sudo curl -L https://github.com/docker/compose/releases/download/v2.32.3/docker-compose-`uname -s`-`uname -m` -o "/usr/local/lib/docker/cli-plugins/docker-compose"
           sudo chmod +x "/usr/local/lib/docker/cli-plugins/docker-compose"
 
       - name: Compute Docker Volume Cache Key

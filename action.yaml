@@ -41,7 +41,7 @@ runs:
     - name: Get Compose
       env:
         COMPOSE_PATH: /usr/local/lib/docker/cli-plugins
-        COMPOSE_VERSION: "v2.26.0"
+        COMPOSE_VERSION: "v2.32.3"
       shell: bash
       run: |
         # Always remove `docker compose` support as that's the newer version

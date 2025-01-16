@@ -22,7 +22,7 @@ on the host filesystem. Commands that write files should write them to the '/sen
 
 # Actual invocation that runs the command in the container.
 invocation() {
-  $dcr --quiet-pull -v "$VOLUME_MAPPING" -T -e SENTRY_LOG_LEVEL=CRITICAL web "$@" 2>&1
+  $dcr -v "$VOLUME_MAPPING" -T -e SENTRY_LOG_LEVEL=CRITICAL web "$@" 2>&1
 }
 
 # Function to modify lines starting with `Usage: sentry` to say `Usage: ./sentry-admin.sh` instead.
