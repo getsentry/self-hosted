@@ -39,26 +39,13 @@ runs:
         fi
 
     - name: Get Compose
-      env:
-        COMPOSE_PATH: /usr/local/lib/docker/cli-plugins
-        COMPOSE_VERSION: "v2.26.0"
-      shell: bash
-      run: |
-        # Always remove `docker compose` support as that's the newer version
-        # and comes installed by default nowadays.
-        sudo rm -f "/usr/local/lib/docker/cli-plugins/docker-compose"
-        # Docker Compose v1 is installed here, remove it
-        sudo rm -f "/usr/local/bin/docker-compose"
-        sudo rm -f "${{ env.COMPOSE_PATH }}/docker-compose"
-        sudo mkdir -p "${{ env.COMPOSE_PATH }}"
-        sudo curl -L https://github.com/docker/compose/releases/download/${{ env.COMPOSE_VERSION }}/docker-compose-`uname -s`-`uname -m` -o "${{ env.COMPOSE_PATH }}/docker-compose"
-        sudo chmod +x "${{ env.COMPOSE_PATH }}/docker-compose"
+      uses: ./get-compose-action
 
     - name: Compute Docker Volume Cache Keys
       id: cache_key
       shell: bash
       run: |
-        source ${{ github.action_path }}/.env
+        source ${{ github.action_path }}.env
         # See https://explainshell.com/explain?cmd=ls%20-Rv1rpq
         # for that long `ls` command
         SENTRY_MIGRATIONS_MD5=$(docker run --rm --entrypoint bash $SENTRY_IMAGE -c '{ ls -Rv1rpq src/sentry/migrations/; sed -n "/KAFKA_TOPIC_TO_CLUSTER/,/}/p" src/sentry/conf/server.py; }' | md5sum | cut -d ' ' -f 1)

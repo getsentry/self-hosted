@@ -27,6 +27,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Get Compose
+        uses: ./get-compose-action
+
       - name: Unit Tests
         run: ./unit-test.sh
 
@@ -42,19 +45,14 @@ jobs:
           LATEST_TAG=$(curl -s https://api.github.com/repos/getsentry/self-hosted/releases/latest | jq -r '.tag_name')
           echo "LATEST_TAG=$LATEST_TAG" >> $GITHUB_ENV
 
+      - name: Get Compose
+        # TODO: Replace this with `@master` after landing
+        uses: getsentry/self-hosted/get-compose-action@byk/ref/upgrade-compose
+
       - name: Checkout latest release
         uses: actions/checkout@v4
         with:
           ref: ${{ env.LATEST_TAG }}
-
-      - name: Get Compose
-        run: |
-          # Docker Compose v1 is installed here, remove it
-          sudo rm -f "/usr/local/bin/docker-compose"
-          sudo rm -f "/usr/local/lib/docker/cli-plugins/docker-compose"
-          sudo mkdir -p "/usr/local/lib/docker/cli-plugins"
-          sudo curl -L https://github.com/docker/compose/releases/download/v2.26.0/docker-compose-`uname -s`-`uname -m` -o "/usr/local/lib/docker/cli-plugins/docker-compose"
-          sudo chmod +x "/usr/local/lib/docker/cli-plugins/docker-compose"
 
       - name: Restore DB Volumes Cache
         id: restore_cache
