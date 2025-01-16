@@ -111,7 +111,7 @@ runs:
       shell: bash
       run: |
         sudo chown root /usr/bin/rsync && sudo chmod u+s /usr/bin/rsync
-        rsync -aW --numeric-ids --no-compress --mkpath \
+        rsync -aW --fake-super --numeric-ids --no-compress --mkpath \
           /var/lib/docker/volumes/sentry-postgres \
           /var/lib/docker/volumes/sentry-clickhouse \
           /var/lib/docker/volumes/sentry-kafka \
