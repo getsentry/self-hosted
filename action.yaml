@@ -111,13 +111,12 @@ runs:
       shell: bash
       run: |
         sudo chown root /usr/bin/rsync && sudo chmod u+s /usr/bin/rsync
-        rsync -aW --no-compress --mkpath \
+        rsync -aW --super --numeric-ids --no-compress --mkpath \
           /var/lib/docker/volumes/sentry-postgres \
           /var/lib/docker/volumes/sentry-clickhouse \
           /var/lib/docker/volumes/sentry-kafka \
           "$RUNNER_TEMP/volumes/"
         cd ${{ github.action_path }}
-        docker compose up --wait
         pytest -x --cov --junitxml=junit.xml _integration-test/
 
     - name: Upload coverage to Codecov
