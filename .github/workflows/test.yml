@@ -46,8 +46,7 @@ jobs:
           echo "LATEST_TAG=$LATEST_TAG" >> $GITHUB_ENV
 
       - name: Get Compose
-        # TODO: Replace this with `@master` after landing
-        uses: getsentry/self-hosted/get-compose-action@byk/ref/upgrade-compose
+        uses: getsentry/self-hosted/get-compose-action@master
 
       - name: Checkout latest release
         uses: actions/checkout@v4
