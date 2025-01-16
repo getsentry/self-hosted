@@ -54,34 +54,58 @@ runs:
         sudo curl -L https://github.com/docker/compose/releases/download/${{ env.COMPOSE_VERSION }}/docker-compose-`uname -s`-`uname -m` -o "${{ env.COMPOSE_PATH }}/docker-compose"
         sudo chmod +x "${{ env.COMPOSE_PATH }}/docker-compose"
 
-    - name: Compute Docker Volume Cache Key
+    - name: Compute Docker Volume Cache Keys
       id: cache_key
       shell: bash
       run: |
         source ${{ github.action_path }}/.env
         # See https://explainshell.com/explain?cmd=ls%20-Rv1rpq
         # for that long `ls` command
-        SENTRY_MIGRATIONS_MD5=$(docker run --rm --entrypoint bash $SENTRY_IMAGE -c 'ls -Rv1rpq src/sentry/migrations/' | md5sum | cut -d ' ' -f 1)
+        SENTRY_MIGRATIONS_MD5=$(docker run --rm --entrypoint bash $SENTRY_IMAGE -c '{ ls -Rv1rpq src/sentry/migrations/; sed -n "/KAFKA_TOPIC_TO_CLUSTER/,/}/p" src/sentry/conf/server.py; }' | md5sum | cut -d ' ' -f 1)
         echo "SENTRY_MIGRATIONS_MD5=$SENTRY_MIGRATIONS_MD5" >> $GITHUB_OUTPUT
-        SNUBA_MIGRATIONS_MD5=$(docker run --rm --entrypoint bash $SNUBA_IMAGE -c 'ls -Rv1rpq snuba/snuba_migrations/**/*.py' | md5sum | cut -d ' ' -f 1)
+        SNUBA_MIGRATIONS_MD5=$(docker run --rm --entrypoint bash $SNUBA_IMAGE -c '{ ls -Rv1rpq snuba/snuba_migrations/**/*.py; sed -n "/^class Topic(Enum):/,/\\n\\n/p" snuba/utils/streams/topics.py; }' | md5sum | cut -d ' ' -f 1)
         echo "SNUBA_MIGRATIONS_MD5=$SNUBA_MIGRATIONS_MD5" >> $GITHUB_OUTPUT
 
-    - name: Restore DB Volumes Cache
-      id: restore_cache
+    - name: Restore Sentry Volume Cache
+      id: restore_cache_sentry
       uses: BYK/docker-volume-cache-action/restore@be89365902126f508dcae387a32ec3712df6b1cd
       with:
-        key: db-volumes-v6-${{ steps.cache_key.outputs.SNUBA_MIGRATIONS_MD5 }}-${{ steps.cache_key.outputs.SENTRY_MIGRATIONS_MD5 }}
+        key: db-volumes-sentry-v1-${{ steps.cache_key.outputs.SENTRY_MIGRATIONS_MD5 }}
         restore-keys: |
-          db-volumes-v6-${{ steps.cache_key.outputs.SNUBA_MIGRATIONS_MD5 }}
-          db-volumes-v6-
+          db-volumes-sentry-v1-
         volumes: |
           sentry-postgres
+
+    - name: Restore Snuba Volume Cache
+      id: restore_cache_snuba
+      uses: BYK/docker-volume-cache-action/restore@be89365902126f508dcae387a32ec3712df6b1cd
+      with:
+        key: db-volumes-snuba-v1-${{ steps.cache_key.outputs.SNUBA_MIGRATIONS_MD5 }}
+        restore-keys: |
+          db-volumes-snuba-v1-
+        volumes: |
           sentry-clickhouse
+
+    - name: Restore Kafka Volume Cache
+      id: restore_cache_kafka
+      uses: BYK/docker-volume-cache-action/restore@be89365902126f508dcae387a32ec3712df6b1cd
+      with:
+        key: db-volumes-kafka-v1-${{ steps.cache_key.outputs.SENTRY_MIGRATIONS_MD5 }}-${{ steps.cache_key.outputs.SNUBA_MIGRATIONS_MD5 }}
+        restore-keys: |
+          db-volumes-kafka-v1-${{ steps.cache_key.outputs.SENTRY_MIGRATIONS_MD5 }}-${{ steps.cache_key.outputs.SNUBA_MIGRATIONS_MD5 }}
+          db-volumes-kafka-v1-${{ steps.cache_key.outputs.SENTRY_MIGRATIONS_MD5 }}-
+          db-volumes-kafka-v1-
+        volumes: |
           sentry-kafka
 
     - name: Install self-hosted
       env:
-        SKIP_DB_MIGRATIONS: ${{ steps.restore_cache.outputs.cache-hit == 'true' && '1' || '' }}
+        # Note that cache keys for Sentry and Snuba have their respective Kafka configs built into them
+        # and the Kafka volume cache is comprises both keys. This way we can omit the Kafka cache hit
+        # in here to still avoid running Sentry or Snuba migrations if only one of their Kafka config has
+        # changed. Heats up your head a bit but if you think about it, it makes sense.
+        SKIP_SENTRY_MIGRATIONS: ${{ steps.restore_cache_sentry.outputs.cache-hit == 'true' && '1' || '' }}
+        SKIP_SNUBA_MIGRATIONS: ${{ steps.restore_cache_snuba.outputs.cache-hit == 'true' && '1' || '' }}
       shell: bash
       run: |
         cd ${{ github.action_path }}
@@ -97,14 +121,28 @@ runs:
 
         ./install.sh --no-report-self-hosted-issues --skip-commit-check
 
-    - name: Save DB Volumes Cache
-      if: steps.restore_cache.outputs.cache-hit != 'true'
+    - name: Save Sentry Volume Cache
+      if: steps.restore_cache_sentry.outputs.cache-hit != 'true'
       uses: BYK/docker-volume-cache-action/save@be89365902126f508dcae387a32ec3712df6b1cd
       with:
-        key: ${{ steps.restore_cache.outputs.cache-primary-key }}
+        key: ${{ steps.restore_cache_sentry.outputs.cache-primary-key }}
         volumes: |
           sentry-postgres
+
+    - name: Save Snuba Volume Cache
+      if: steps.restore_cache_snuba.outputs.cache-hit != 'true'
+      uses: BYK/docker-volume-cache-action/save@be89365902126f508dcae387a32ec3712df6b1cd
+      with:
+        key: ${{ steps.restore_cache_snuba.outputs.cache-primary-key }}
+        volumes: |
           sentry-clickhouse
+
+    - name: Save Kafka Volume Cache
+      if: steps.restore_cache_kafka.outputs.cache-hit != 'true'
+      uses: BYK/docker-volume-cache-action/save@be89365902126f508dcae387a32ec3712df6b1cd
+      with:
+        key: ${{ steps.restore_cache_kafka.outputs.cache-primary-key }}
+        volumes: |
           sentry-kafka
 
     - name: Integration Test
