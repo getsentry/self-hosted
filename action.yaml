@@ -110,8 +110,7 @@ runs:
     - name: Integration Test
       shell: bash
       run: |
-        sudo chown root /usr/bin/rsync && sudo chmod u+s /usr/bin/rsync
-        rsync -aW --super --numeric-ids --no-compress --mkpath \
+        sudo rsync -aW --super --numeric-ids --no-compress --mkpath \
           /var/lib/docker/volumes/sentry-postgres \
           /var/lib/docker/volumes/sentry-clickhouse \
           /var/lib/docker/volumes/sentry-kafka \

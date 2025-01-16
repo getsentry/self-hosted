@@ -52,6 +52,7 @@ def test_02_import(setup_backup_restore_env_variables):
         subprocess.run(["docker", "volume", "rm", f"sentry-{name}"], check=True)
         subprocess.run(
             [
+                "sudo",
                 "rsync",
                 "-aW",
                 "--super",
