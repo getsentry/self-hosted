@@ -54,7 +54,7 @@ def test_02_import(setup_backup_restore_env_variables):
             [
                 "rsync",
                 "-aW",
-                "--fake-super",
+                "--super",
                 "--numeric-ids",
                 "--no-compress",
                 "--mkpath",
