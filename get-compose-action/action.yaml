@@ -9,6 +9,7 @@ runs:
   using: "composite"
   steps:
     - name: Get Compose
+      shell: bash
       run: |
         # Docker Compose v1 is installed here, remove it
         sudo rm -f "/usr/local/bin/docker-compose"

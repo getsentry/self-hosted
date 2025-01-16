@@ -39,7 +39,7 @@ runs:
         fi
 
     - name: Get Compose
-      uses: ${{ github.action_path }}get-compose-action
+      uses: ./get-compose-action
 
     - name: Compute Docker Volume Cache Key
       id: cache_key

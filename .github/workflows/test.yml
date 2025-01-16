@@ -45,13 +45,14 @@ jobs:
           LATEST_TAG=$(curl -s https://api.github.com/repos/getsentry/self-hosted/releases/latest | jq -r '.tag_name')
           echo "LATEST_TAG=$LATEST_TAG" >> $GITHUB_ENV
 
+      - name: Get Compose
+        # TODO: Replace this with `@master` after landing
+        uses: getsentry/self-hosted/get-compose-action@byk/ref/upgrade-compose
+
       - name: Checkout latest release
         uses: actions/checkout@v4
         with:
           ref: ${{ env.LATEST_TAG }}
-
-      - name: Get Compose
-        uses: ./get-compose-action
 
       - name: Compute Docker Volume Cache Key
         id: cache_key
