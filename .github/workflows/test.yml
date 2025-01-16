@@ -71,6 +71,8 @@ jobs:
 
       - name: Install ${{ env.LATEST_TAG }}
         env:
+          # Remove SKIP_DB_MIGRATIONS after releasing 25.1.1 or 25.2.0
+          SKIP_DB_MIGRATIONS: ${{ steps.restore_cache.outputs.cache-hit == 'true' && '1' || '' }}
           SKIP_SENTRY_MIGRATIONS: ${{ steps.restore_cache.outputs.cache-hit == 'true' && '1' || '' }}
           SKIP_SNUBA_MIGRATIONS: ${{ steps.restore_cache.outputs.cache-hit == 'true' && '1' || '' }}
         run: |
