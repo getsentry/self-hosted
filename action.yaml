@@ -18,7 +18,7 @@ runs:
       shell: bash
       run: |
         image_var=$(echo ${{ inputs.project_name }}_IMAGE | tr '[:lower:]' '[:upper:]')
-        echo "${image_var}=${{ inputs.image_url }}" >> ${{ github.action_path }}.env
+        echo "${image_var}=${{ inputs.image_url }}" >> ${{ github.action_path }}/.env
 
     - name: Setup dev environment
       shell: bash
@@ -45,7 +45,7 @@ runs:
       id: cache_key
       shell: bash
       run: |
-        source ${{ github.action_path }}.env
+        source ${{ github.action_path }}/.env
         # See https://explainshell.com/explain?cmd=ls%20-Rv1rpq
         # for that long `ls` command
         SENTRY_MIGRATIONS_MD5=$(docker run --rm --entrypoint bash $SENTRY_IMAGE -c '{ ls -Rv1rpq src/sentry/**/migrations/*; sed -n "/KAFKA_TOPIC_TO_CLUSTER/,/}/p" src/sentry/conf/server.py; }' | md5sum | cut -d ' ' -f 1)
