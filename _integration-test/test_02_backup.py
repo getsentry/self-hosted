@@ -66,11 +66,6 @@ def test_02_import(setup_backup_restore_env_variables):
             capture_output=True,
         )
 
-    subprocess.run(
-        ["docker", "compose", "--ansi", "never", "up", "--wait"],
-        check=True,
-        capture_output=True,
-    )
     sentry_admin_sh = os.path.join(os.getcwd(), "sentry-admin.sh")
     subprocess.run(
         [
