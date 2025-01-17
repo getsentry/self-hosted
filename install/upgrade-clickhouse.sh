@@ -1,7 +1,7 @@
 echo "${_group}Upgrading Clickhouse ..."
 
 # First check to see if user is upgrading by checking for existing clickhouse volume
-if [[ -n "$(docker volume ls -q --filter name=sentry-clickhouse)" ]]; then
+if docker compose ps -a | grep -q clickhouse; then
   # Start clickhouse if it is not already running
   $dc up --wait clickhouse
 
