@@ -19,10 +19,12 @@ runs:
         PROJECT_NAME: ${{ inputs.project_name }}
         IMAGE_URL: ${{ inputs.image_url }}
       run: |
-        if [[ -n $PROJECT_NAME && -n $IMAGE_URL ]]; then
+        if [[ -n "$PROJECT_NAME" && -n "$IMAGE_URL" ]]; then
           image_var=$(echo "${PROJECT_NAME}_IMAGE" | tr '[:lower:]' '[:upper:]')
           echo "${image_var}=$IMAGE_URL" >> ${{ github.action_path }}/.env
-        elif [[ -z $PROJECT_NAME || -z $IMAGE_URL ]]; then
+        elif [[ -z $PROJECT_NAME && -z $IMAGE_URL ]]; then
+          echo "No project name and image URL set. Skipping image configuration."
+        else
           echo "You must set both project_name and image_url or unset both."
           echo "project_name: $PROJECT_NAME, image_url: $IMAGE_URL"
           exit 1
