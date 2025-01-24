@@ -13,8 +13,7 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - name: Configure to use the test image
-      if: inputs.project_name && inputs.image_url
+    - name: Validate inputs and configure test image
       shell: bash
       env:
         PROJECT_NAME: ${{ inputs.project_name }}
