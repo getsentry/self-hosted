@@ -21,7 +21,7 @@ t=$(mktemp) && export -p >"$t" && set -a && . ".env" && set +a && . "$t" && rm "
 
 if [[ -f .env.custom ]]; then
   # Read .env.custom file to override the defaults environment variables
-  local q=$(mktemp) && export -p >"$q" && set -a && . ".env.custom" && set +a && . "$q" && rm "$q" && unset q
+  q=$(mktemp) && export -p >"$q" && set -a && . ".env.custom" && set +a && . "$q" && rm "$q" && unset q
 fi
 
 if [ "${GITHUB_ACTIONS:-}" = "true" ]; then
