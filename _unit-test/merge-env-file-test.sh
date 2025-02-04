@@ -16,7 +16,7 @@ echo "Pass"
 echo "Expecting SENTRY_BIND to be 9000, got ${SENTRY_BIND}"
 test "$SENTRY_BIND" == "9000"
 echo "Pass"
-echo "Expecting COMPOSE_PROJECT_NAME to be sentry-self-hosted, got ${COMPOSE_PROJECT_NAME}" 
+echo "Expecting COMPOSE_PROJECT_NAME to be sentry-self-hosted, got ${COMPOSE_PROJECT_NAME}"
 test "$COMPOSE_PROJECT_NAME" == "sentry-self-hosted"
 echo "Pass"
 
