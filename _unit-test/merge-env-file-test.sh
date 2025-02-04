@@ -10,6 +10,8 @@ EOF
 # The `_test_setup.sh` script sources `install/_lib.sh`, so.. finger crossed this should works.
 source _unit-test/_test_setup.sh
 
+rm -f .env.custom
+
 echo "Expecting SENTRY_EVENT_RETENTION_DAYS to be 10, got ${SENTRY_EVENT_RETENTION_DAYS}"
 test "$SENTRY_EVENT_RETENTION_DAYS" == "10"
 echo "Pass"
@@ -19,7 +21,5 @@ echo "Pass"
 echo "Expecting COMPOSE_PROJECT_NAME to be sentry-self-hosted, got ${COMPOSE_PROJECT_NAME}"
 test "$COMPOSE_PROJECT_NAME" == "sentry-self-hosted"
 echo "Pass"
-
-rm .env.custom
 
 report_success
