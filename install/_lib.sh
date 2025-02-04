@@ -19,7 +19,6 @@ fi
 # Reading .env.custom has to come first. The value won't be overriden, instead
 # it would persist because of `export -p> >"$t"` later, which exports current
 # environment variables to a temporary file with a `declare -x KEY=value` format.
-# 
 # The new values on `.env` would be set only if they are not already set.
 if [[ "$_ENV" == ".env.custom" ]]; then
   q=$(mktemp) && export -p >"$q" && set -a && . ".env.custom" && set +a && . "$q" && rm "$q" && unset q
@@ -27,7 +26,6 @@ fi
 
 # Read .env for default values with a tip o' the hat to https://stackoverflow.com/a/59831605/90297
 t=$(mktemp) && export -p >"$t" && set -a && . ".env" && set +a && . "$t" && rm "$t" && unset t
-
 
 if [ "${GITHUB_ACTIONS:-}" = "true" ]; then
   _group="::group::"
