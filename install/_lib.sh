@@ -20,6 +20,7 @@ fi
 t=$(mktemp) && export -p >"$t" && set -a && . ".env" && set +a && . "$t" && rm "$t" && unset t
 
 if [[ -f .env.custom ]]; then
+  echo "Reading .env.custom ..." # TODO: Remove this
   # Read .env.custom file to override the defaults environment variables
   q=$(mktemp) && export -p >"$q" && set -a && . ".env.custom" && set +a && . "$q" && rm "$q" && unset q
 fi
