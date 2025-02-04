@@ -19,10 +19,10 @@ fi
 # Read .env for default values with a tip o' the hat to https://stackoverflow.com/a/59831605/90297
 t=$(mktemp) && export -p >"$t" && set -a && . ".env" && set +a && . "$t" && rm "$t" && unset t
 
-if [[ -f .env.custom ]]; then
-  echo "Reading .env.custom ..." # TODO: Remove this
+if [[ "$_ENV" == ".env.custom" ]]; then
   # Read .env.custom file to override the defaults environment variables
   q=$(mktemp) && export -p >"$q" && set -a && . ".env.custom" && set +a && . "$q" && rm "$q" && unset q
+  printenv
 fi
 
 if [ "${GITHUB_ACTIONS:-}" = "true" ]; then

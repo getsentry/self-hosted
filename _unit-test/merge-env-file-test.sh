@@ -7,8 +7,6 @@ cat <<EOF >".env.custom"
 SENTRY_EVENT_RETENTION_DAYS=10
 EOF
 
-ls -lah # for debugging
-
 # The `_test_setup.sh` script sources `install/_lib.sh`, so.. finger crossed this should works.
 source _unit-test/_test_setup.sh
 
