@@ -20,6 +20,7 @@ body:
           - [ ] Check to make sure the new release branch in self-hosted includes the appropriate CalVer images.
           - [ ] Accept (publish) the release.
           - [ ] Edit [release notes](https://github.com/getsentry/self-hosted/releases).
+            - [ ] Add a link to the corresponding [Sentry release](https://github.com/getsentry/sentry/releases).
         - [ ] Follow up.
           - [ ] [Create the next release issue](https://github.com/getsentry/self-hosted/issues/new?assignees=&labels=&projects=&template=release.yml) and link it from this one.
             - _replace with link_
