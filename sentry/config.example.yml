@@ -45,6 +45,10 @@ mail.host: 'smtp'
 # System Settings #
 ###################
 
+# The URL prefix in which Sentry is accessible
+# system.url-prefix: https://example.sentry.com
+system.internal-url-prefix: 'http://web:9000'
+
 # If this file ever becomes compromised, it's important to generate a new key.
 # Changing this value will result in all current sessions being invalidated.
 # A new key can be generated with `$ sentry config generate-secret-key`
@@ -79,9 +83,6 @@ releasefile.cache-path: '/data/releasefile-cache'
 #   secret_key: 'XXXXXXX'
 #   bucket_name: 's3-bucket-name'
 
-# The URL prefix in which Sentry is accessible
-# system.url-prefix: https://example.sentry.com
-system.internal-url-prefix: 'http://web:9000'
 symbolicator.enabled: true
 symbolicator.options:
   url: "http://symbolicator:3021"
