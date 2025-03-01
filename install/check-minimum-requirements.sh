@@ -26,6 +26,12 @@ if [[ -z "$COMPOSE_VERSION" ]]; then
   exit 1
 fi
 
+STANDALONE_COMPOSE_VERSION=$($dc_base_standalone version --short || echo '')
+if [[ "$(vergte ${COMPOSE_VERSION//v/} ${STANDALONE_COMPOSE_VERSION//v/})" -eq 1 ]]; then
+  COMPOSE_VERSION="${STANDALONE_COMPOSE_VERSION}"
+  dc_base='docker-compose'
+fi
+
 if [[ "$(vergte ${COMPOSE_VERSION//v/} $MIN_COMPOSE_VERSION)" -eq 1 ]]; then
   echo "FAIL: Expected minimum $dc_base version to be $MIN_COMPOSE_VERSION but found $COMPOSE_VERSION"
   exit 1
