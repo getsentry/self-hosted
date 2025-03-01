@@ -26,10 +26,12 @@ if [[ -z "$COMPOSE_VERSION" ]]; then
   exit 1
 fi
 
-STANDALONE_COMPOSE_VERSION=$($dc_base_standalone version --short || echo '')
-if [[ "$(vergte ${COMPOSE_VERSION//v/} ${STANDALONE_COMPOSE_VERSION//v/})" -eq 1 ]]; then
-  COMPOSE_VERSION="${STANDALONE_COMPOSE_VERSION}"
-  dc_base='docker-compose'
+STANDALONE_COMPOSE_VERSION=$($dc_base_standalone version --short &>/dev/null || echo '')
+if [[ ! -z "${STANDALONE_COMPOSE_VERSION}" ]]; then
+  if [[ "$(vergte ${COMPOSE_VERSION//v/} ${STANDALONE_COMPOSE_VERSION//v/})" -eq 1 ]]; then
+    COMPOSE_VERSION="${STANDALONE_COMPOSE_VERSION}"
+    dc_base='docker-compose'
+  fi
 fi
 
 if [[ "$(vergte ${COMPOSE_VERSION//v/} $MIN_COMPOSE_VERSION)" -eq 1 ]]; then
