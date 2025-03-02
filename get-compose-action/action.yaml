@@ -2,7 +2,7 @@ name: "Get Docker Compose"
 inputs:
   version:
     required: false
-    default: 2.32.3
+    default: 2.33.1
     description: "Docker Compose version"
 
 runs:
