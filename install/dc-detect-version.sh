@@ -6,11 +6,32 @@ else
   _endgroup=""
 fi
 
+# Check the version of $1 is greater than or equal to $2 using sort. Note: versions must be stripped of "v"
+function vergte() {
+  printf "%s\n%s" $1 $2 | sort --version-sort --check=quiet --reverse
+  echo $?
+}
+
 echo "${_group}Initializing Docker Compose ..."
 
 # To support users that are symlinking to docker-compose
 dc_base="$(docker compose version &>/dev/null && echo 'docker compose' || echo 'docker-compose')"
 dc_base_standalone="$(docker-compose version &>/dev/null && echo 'docker-compose' || echo '')"
+
+COMPOSE_VERSION=$($dc_base version --short || echo '')
+if [[ -z "$COMPOSE_VERSION" ]]; then
+  echo "FAIL: Docker compose is required to run self-hosted"
+  exit 1
+fi
+
+STANDALONE_COMPOSE_VERSION=$($dc_base_standalone version --short &>/dev/null || echo '')
+if [[ ! -z "${STANDALONE_COMPOSE_VERSION}" ]]; then
+  if [[ "$(vergte ${COMPOSE_VERSION//v/} ${STANDALONE_COMPOSE_VERSION//v/})" -eq 1 ]]; then
+    COMPOSE_VERSION="${STANDALONE_COMPOSE_VERSION}"
+    dc_base='docker-compose'
+  fi
+fi
+
 if [[ "$(basename $0)" = "install.sh" ]]; then
   dc="$dc_base --ansi never --env-file ${_ENV}"
 else
