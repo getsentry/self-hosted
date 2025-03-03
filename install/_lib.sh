@@ -53,6 +53,12 @@ function ensure_file_from_example {
   fi
 }
 
+# Check the version of $1 is greater than or equal to $2 using sort. Note: versions must be stripped of "v"
+function vergte() {
+  printf "%s\n%s" $1 $2 | sort --version-sort --check=quiet --reverse
+  echo $?
+}
+
 SENTRY_CONFIG_PY=sentry/sentry.conf.py
 SENTRY_CONFIG_YML=sentry/config.yml
 

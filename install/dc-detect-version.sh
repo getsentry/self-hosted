@@ -6,12 +6,6 @@ else
   _endgroup=""
 fi
 
-# Check the version of $1 is greater than or equal to $2 using sort. Note: versions must be stripped of "v"
-function vergte() {
-  printf "%s\n%s" $1 $2 | sort --version-sort --check=quiet --reverse
-  echo $?
-}
-
 echo "${_group}Initializing Docker Compose ..."
 
 # To support users that are symlinking to docker-compose
