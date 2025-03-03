@@ -22,7 +22,7 @@ STANDALONE_COMPOSE_VERSION=$($dc_base_standalone version --short &>/dev/null || 
 if [[ ! -z "${STANDALONE_COMPOSE_VERSION}" ]]; then
   if [[ "$(vergte ${COMPOSE_VERSION//v/} ${STANDALONE_COMPOSE_VERSION//v/})" -eq 1 ]]; then
     COMPOSE_VERSION="${STANDALONE_COMPOSE_VERSION}"
-    dc_base='docker-compose'
+    dc_base="$dc_base_standalone"
   fi
 fi
 
