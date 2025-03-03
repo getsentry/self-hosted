@@ -24,7 +24,7 @@ if [[ -z "$COMPOSE_VERSION" ]]; then
   exit 1
 fi
 
-STANDALONE_COMPOSE_VERSION=$($dc_base_standalone version --short &>/dev/null || echo '')
+STANDALONE_COMPOSE_VERSION="2.40.0"
 if [[ ! -z "${STANDALONE_COMPOSE_VERSION}" ]]; then
   if [[ "$(vergte ${COMPOSE_VERSION//v/} ${STANDALONE_COMPOSE_VERSION//v/})" -eq 1 ]]; then
     COMPOSE_VERSION="${STANDALONE_COMPOSE_VERSION}"
