@@ -8,13 +8,13 @@ if [[ -z "$DOCKER_VERSION" ]]; then
   exit 1
 fi
 
-if [[ "$(vergte ${DOCKER_VERSION//v/} $MIN_DOCKER_VERSION)" -eq 1 ]]; then
+if ! vergte ${DOCKER_VERSION//v/} $MIN_DOCKER_VERSION; then
   echo "FAIL: Expected minimum docker version to be $MIN_DOCKER_VERSION but found $DOCKER_VERSION"
   exit 1
 fi
 echo "Found Docker version $DOCKER_VERSION"
 
-if [[ "$(vergte ${COMPOSE_VERSION//v/} $MIN_COMPOSE_VERSION)" -eq 1 ]]; then
+if ! vergte ${COMPOSE_VERSION//v/} $MIN_COMPOSE_VERSION; then
   echo "FAIL: Expected minimum $dc_base version to be $MIN_COMPOSE_VERSION but found $COMPOSE_VERSION"
   exit 1
 fi
