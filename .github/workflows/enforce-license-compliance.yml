@@ -1,3 +1,4 @@
+---
 name: Enforce License Compliance
 
 on:
@@ -8,6 +9,7 @@ on:
 
 jobs:
   enforce-license-compliance:
+    if: github.repository_owner == 'getsentry'
     runs-on: ubuntu-latest
     steps:
       - name: 'Enforce License Compliance'
