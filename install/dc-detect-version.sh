@@ -9,7 +9,7 @@ fi
 echo "${_group}Initializing Docker Compose ..."
 
 # To support users that are symlinking to docker-compose
-dc_base="$(docker compose version &>/dev/null && echo 'docker compose' || echo '')"
+dc_base="$(docker compose version --short &>/dev/null && echo 'docker compose' || echo '')"
 dc_base_standalone="$(docker-compose version &>/dev/null && echo 'docker-compose' || echo '')"
 
 COMPOSE_VERSION=$([ -n "$dc_base" ] && $dc_base version --short || echo '')
