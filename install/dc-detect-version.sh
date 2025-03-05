@@ -20,7 +20,7 @@ if [[ -z "$COMPOSE_VERSION" && -z "$STANDALONE_COMPOSE_VERSION" ]]; then
   exit 1
 fi
 
-if [[ -z "$COMPOSE_VERSION" || -n "$STANDALONE_COMPOSE_VERSION" && "$(vergte ${COMPOSE_VERSION//v/} ${STANDALONE_COMPOSE_VERSION//v/})" -eq 1 ]]; then
+if [[ -z "$COMPOSE_VERSION" ]] || [[ -n "$STANDALONE_COMPOSE_VERSION" ]] && ! vergte ${COMPOSE_VERSION//v/} ${STANDALONE_COMPOSE_VERSION//v/}; then
   COMPOSE_VERSION="${STANDALONE_COMPOSE_VERSION}"
   dc_base="$dc_base_standalone"
 fi
