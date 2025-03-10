@@ -6,3 +6,10 @@ logging:
 metrics:
   statsd: null
 sentry_dsn: null # TODO: Automatically fill this with the internal project DSN
+
+# If you have statsd server, you can utilize that to monitor self-hosted Symbolicator.
+# To start, uncomment the following line and adjust the options as needed.
+#
+# metrics:
+#   statsd: "100.100.123.123:8125" # It is recommended to use IP address instead of domain name
+#   prefix: "sentry.symbolicator" # Adjust this to your needs, default is "symbolicator"

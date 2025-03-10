@@ -396,3 +396,21 @@ JS_SDK_LOADER_DEFAULT_SDK_URL = "https://browser.sentry-cdn.com/%s/bundle%s.min.
 # to allow specific hosts. It might be IP addresses or domain names (without `http://` or `https://`).
 
 # SENTRY_OPTIONS["relay.span-normalization.allowed_hosts"] = ["example.com", "192.168.10.1"]
+
+##############
+# Monitoring #
+##############
+
+# By default, Sentry uses dummy statsd monitoring backend that is a no-op.
+# If you have a statsd server, you can utilize that to monitor self-hosted
+# Sentry for "sentry"-related containers.
+#
+# To start, uncomment the following line and adjust the options as needed.
+
+# SENTRY_METRICS_BACKEND = 'sentry.metrics.statsd.StatsdMetricsBackend'
+# SENTRY_METRICS_OPTIONS: dict[str, Any] = {
+#     'host': '100.100.123.123', # It is recommended to use IP address instead of domain name
+#     'port': 8125,
+# }
+# SENTRY_METRICS_SAMPLE_RATE = 1.0   # Adjust this to your needs, default is 1.0
+# SENTRY_METRICS_PREFIX = "sentry."  # Adjust this to your needs, default is "sentry."
