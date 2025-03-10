@@ -18,3 +18,14 @@ processing:
 #
 # health:
 #  max_memory_percent: 1.0
+
+# If you have statsd server, you can utilize that to monitor self-hosted Relay.
+# To start, uncomment the following line and adjust the options as needed.
+#
+# metrics:
+#  statsd: "100.100.123.123:8125" # It is recommended to use IP address instead of domain name
+#  prefix: "sentry.relay" # Adjust this to your needs, default is "sentry.relay"
+#  sample_rate: 1.0 # Adjust this to your needs, default is 1.0
+#  # `periodic_secs` is the interval for periodic metrics emitted from Relay.
+#  #  Setting it to `0` seconds disables the periodic metrics.
+#  periodic_secs: 5
