@@ -84,6 +84,10 @@ x-snuba-defaults: &snuba_defaults
     # Leaving the value empty to just pass whatever is set
     # on the host system (or in the .env file)
     SENTRY_EVENT_RETENTION_DAYS:
+    # If you have statsd server, you can utilize that to monitor self-hosted Snuba containers.
+    # To start, state these environment variables below on your `.env.` file and adjust the options as needed.
+    SNUBA_STATSD_HOST: # Example value: "100.100.123.123". Must be an IP address, not domain name
+    SNUBA_STATSD_PORT: # Example value: 8125
 services:
   smtp:
     <<: *restart_policy
