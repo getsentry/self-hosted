@@ -36,5 +36,10 @@ if [[ "${SETUP_JS_SDK_ASSETS:-}" == "1" ]]; then
   # Download those versions & variants using curl
   $dcr --no-deps --rm -v "sentry-nginx-www:/var/www" nginx curl -w '%{response_code} %{url}\n' --no-progress-meter --compressed --retry 3 --create-dirs -fLo "/var/www/js-sdk/#1/#2.min.js" "https://browser.sentry-cdn.com/${versions}/${variants}.min.js" || true
 
+  # Make sure permissions are correct
+  # See https://github.com/getsentry/self-hosted/issues/3614 for reported issue
+  $dcr --no-deps --rm -v "sentry-nginx-www:/var/www" nginx find /var/www/js-sdk -type d -exec chmod 755 {} \;
+  $dcr --no-deps --rm -v "sentry-nginx-www:/var/www" nginx find /var/www/js-sdk -type f -exec chmod 644 {} \;
+
   echo "${_endgroup}"
 fi
