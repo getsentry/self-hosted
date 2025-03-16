@@ -38,8 +38,8 @@ if [[ "${SETUP_JS_SDK_ASSETS:-}" == "1" ]]; then
 
   # Make sure permissions are correct
   # See https://github.com/getsentry/self-hosted/issues/3614 for reported issue
-  $dcr --no-deps --rm -v "sentry-nginx-www:/var/www" nginx find /var/www/js-sdk -type d -exec chmod 755 {} \;
-  $dcr --no-deps --rm -v "sentry-nginx-www:/var/www" nginx find /var/www/js-sdk -type f -exec chmod 644 {} \;
+  #$dcr --no-deps --rm -v "sentry-nginx-www:/var/www" nginx find /var/www/js-sdk -type d -exec chmod 755 {} \;
+  #$dcr --no-deps --rm -v "sentry-nginx-www:/var/www" nginx find /var/www/js-sdk -type f -exec chmod 644 {} \;
 
   echo "${_endgroup}"
 fi
