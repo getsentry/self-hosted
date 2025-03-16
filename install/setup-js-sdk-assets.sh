@@ -34,7 +34,7 @@ if [[ "${SETUP_JS_SDK_ASSETS:-}" == "1" ]]; then
   variants="{bundle,bundle.tracing,bundle.tracing.replay,bundle.replay,bundle.tracing.replay.feedback,bundle.feedback}"
 
   # Download those versions & variants using curl
-  $dcr --no-deps --rm -v "sentry-nginx-www:/var/www" nginx curl -w '%{response_code} %{url}\n' --no-progress-meter --compressed --retry 3 --create-dirs -fLo "/var/www/js-sdk/#1/#2.min.js" "https://browser.sentry-cdn.com/${versions}/${variants}.min.js" || true
+  $dcr --no-deps --rm -v "sentry-nginx-www:/var/www" --user=nginx nginx curl -w '%{response_code} %{url}\n' --no-progress-meter --compressed --retry 3 --create-dirs -fLo "/var/www/js-sdk/#1/#2.min.js" "https://browser.sentry-cdn.com/${versions}/${variants}.min.js" || true
 
   # Make sure permissions are correct
   # See https://github.com/getsentry/self-hosted/issues/3614 for reported issue
