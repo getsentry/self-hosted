@@ -290,6 +290,8 @@ SENTRY_FEATURES.update(
             "organizations:performance-view",
             "organizations:advanced-search",
             "organizations:session-replay",
+            "organizations:session-replay-enable-canvas",
+            "organizations:session-replay-enable-canvas-replayer",
             "organizations:issue-platform",
             "organizations:profiling",
             "organizations:monitors",
