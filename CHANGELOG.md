@@ -1,5 +1,21 @@
 # Changelog
 
+## 25.3.0
+
+### Various fixes & improvements
+
+- feat(features): enable trace view (#3617) by @aldy505
+- feat: provide monitoring-related configurations (#3611) by @aldy505
+- Enforce license compliance only on getsentry repository (#3606) by @aminvakil
+- Fix unbound variable error in install script (#3601) by @brettdh
+- Add --short to docker-compose version (#3605) by @aminvakil
+- ref: Less complicated docker compose detection (#3604) by @BYK
+- Use docker-compose if version is gte docker compose (#3595) by @aminvakil
+- build(deps): bump actions/create-github-app-token from 1.11.3 to 1.11.6 (#3598) by @dependabot
+- build(deps): bump getsentry/action-release from 1 to 3 (#3599) by @dependabot
+- Bump docker-compose 2.33.1 (#3597) by @aminvakil
+- refactor: move system.url-prefix under systems settings section (#3588) by @leeoocca
+
 ## 25.2.0
 
 ### Various fixes & improvements
