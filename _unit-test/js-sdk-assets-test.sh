@@ -32,7 +32,7 @@ echo "Pass"
 
 # Files should be owned by the nginx user
 echo "Testing file ownership"
-test $($sdk_files | awk '$3=="nginx" { print $0 }' | wc -l) == "6"
+test $($sdk_files | awk '$3=="root" { print $0 }' | wc -l) == "6"
 echo "Pass"
 
 report_success
