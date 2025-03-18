@@ -30,9 +30,11 @@ echo "Testing file sizes"
 test "23" == "$non_empty_file_count"
 echo "Pass"
 
-# Files should be owned by the nginx user
+# Files should be owned by the root user
 echo "Testing file ownership"
-test $($sdk_files | awk '$3=="root" { print $0 }' | wc -l) == "6"
+directory_owners=$(echo "$sdk_files" | awk '$3=="root" { print $0 }' | wc -l)
+echo "$directory_owners"
+test "$directory_owners" == "6"
 echo "Pass"
 
 report_success
