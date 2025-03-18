@@ -20,14 +20,21 @@ echo $total_directories
 test "5" == "$total_directories"
 echo "Pass"
 
-# `sdk_tree` should output "5 directories, 17 files"
+# `sdk_tree` should output "6 directories, 23 files"
 echo "$sdk_tree"
-test "5 directories, 17 files" == "$(echo "$sdk_tree")"
+test "6 directories, 23 files" == "$(echo "$sdk_tree")"
 echo "Pass"
 
 # Files should all be >1k (ensure they are not empty)
 echo "Testing file sizes"
-test "17" == "$non_empty_file_count"
+test "23" == "$non_empty_file_count"
+echo "Pass"
+
+# Files should be owned by the root user
+echo "Testing file ownership"
+directory_owners=$(echo "$sdk_files" | awk '$3=="root" { print $0 }' | wc -l)
+echo "$directory_owners"
+test "$directory_owners" == "8"
 echo "Pass"
 
 report_success
