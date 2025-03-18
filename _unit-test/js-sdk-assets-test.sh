@@ -34,7 +34,7 @@ echo "Pass"
 echo "Testing file ownership"
 directory_owners=$(echo "$sdk_files" | awk '$3=="root" { print $0 }' | wc -l)
 echo "$directory_owners"
-test "$directory_owners" == "6"
+test "$directory_owners" == "8"
 echo "Pass"
 
 report_success
