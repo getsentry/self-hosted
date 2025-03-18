@@ -133,3 +133,12 @@ transaction-events.force-disable-internal-project: true
 # discord.public-key: "<public key>"
 # discord.client-secret: "<client secret>"
 # discord.bot-token: "<bot token>"
+
+###############
+# Google Auth #
+###############
+
+# Refer to https://develop.sentry.dev/self-hosted/sso/#google-auth
+
+# auth-google.client-id: "<client id>"
+# auth-google.client-secret: "<client secret>"
