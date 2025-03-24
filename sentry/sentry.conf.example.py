@@ -299,6 +299,7 @@ SENTRY_FEATURES.update(
             "organizations:metrics-extraction",
             "organizations:transaction-metrics-extraction",
             "organizations:trace-view-v1",
+            "organizations:dynamic-sampling",
             "projects:custom-inbound-filters",
             "projects:data-forwarding",
             "projects:discard-groups",
