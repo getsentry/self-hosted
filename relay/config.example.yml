@@ -21,6 +21,7 @@ processing:
 #  max_memory_percent: 1.0
 # spool:
 #   envelopes:
+#     path: "/your/path"
 #     max_backpressure_memory_percent: 1.0
 
 # If you have statsd server, you can utilize that to monitor self-hosted Relay.
