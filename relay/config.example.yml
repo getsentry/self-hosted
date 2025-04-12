@@ -14,13 +14,18 @@ processing:
 
 # In some cases, relay might fail to find out the actual machine memory
 # therefore it makes the healthcheck fail and events can't be submitted.
-# As a workaround, uncomment the following line:
+# See https://github.com/getsentry/self-hosted/issues/3330 for more details.
+# As a workaround, uncomment the following `health` and `spool` sections:
 #
 # health:
 #  max_memory_percent: 1.0
+# spool:
+#   envelopes:
+#     path: "/tmp/relay-spool-envelopes"
+#     max_backpressure_memory_percent: 1.0
 
 # If you have statsd server, you can utilize that to monitor self-hosted Relay.
-# To start, uncomment the following line and adjust the options as needed.
+# To start, uncomment the following `metrics` section and adjust the options as needed.
 #
 # metrics:
 #  statsd: "100.100.123.123:8125" # It is recommended to use IP address instead of domain name
