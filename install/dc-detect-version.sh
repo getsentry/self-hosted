@@ -13,7 +13,7 @@ dc_base="$(docker compose version --short &>/dev/null && echo 'docker compose' |
 dc_base_standalone="$(docker-compose version --short &>/dev/null && echo 'docker-compose' || echo '')"
 
 COMPOSE_VERSION=$([ -n "$dc_base" ] && $dc_base version --short || echo '')
-STANDALONE_COMPOSE_VERSION=$([ -n "$dc_base_standalone" ] && $dc_base_standalone version --short &>/dev/null || echo '')
+STANDALONE_COMPOSE_VERSION=$([ -n "$dc_base_standalone" ] && $dc_base_standalone version --short || echo '')
 
 if [[ -z "$COMPOSE_VERSION" && -z "$STANDALONE_COMPOSE_VERSION" ]]; then
   echo "FAIL: Docker Compose is required to run self-hosted"
