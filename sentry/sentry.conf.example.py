@@ -45,11 +45,11 @@ INTERNAL_SYSTEM_IPS = (get_internal_network(),)
 DATABASES = {
     "default": {
         "ENGINE": "sentry.db.postgres",
-        "NAME": "postgres",
-        "USER": "postgres",
-        "PASSWORD": "",
-        "HOST": "postgres",
-        "PORT": "",
+        "NAME": env("SENTRY_DB_NAME", "postgres"),
+        "USER": env("SENTRY_DB_USER", "postgres"),
+        "PASSWORD": env("SENTRY_DB_PASSWORD", ""),
+        "HOST": env("SENTRY_DB_HOST", "postgres"),
+        "PORT": env("SENTRY_DB_PORT", ""),
     }
 }
 
@@ -66,7 +66,7 @@ SENTRY_USE_BIG_INTS = True
 
 # Instruct Sentry that this install intends to be run by a single organization
 # and thus various UI optimizations should be enabled.
-SENTRY_SINGLE_ORGANIZATION = True
+SENTRY_SINGLE_ORGANIZATION = env("SENTRY_SINGLE_ORGANIZATION", "false").lower() in ("true")
 
 SENTRY_OPTIONS["system.event-retention-days"] = int(
     env("SENTRY_EVENT_RETENTION_DAYS", "90")
@@ -123,14 +123,17 @@ else:
 # Sentry currently utilizes two separate mechanisms. While CACHES is not a
 # requirement, it will optimize several high throughput patterns.
 
-CACHES = {
-    "default": {
-        "BACKEND": "django.core.cache.backends.memcached.PyMemcacheCache",
-        "LOCATION": ["memcached:11211"],
-        "TIMEOUT": 3600,
-        "OPTIONS": {"ignore_exc": True},
+# If you wish to use memcached, use ENABLE_MEMCACHED=true
+
+if env("ENABLE_MEMCACHED", "false").lower() in ("true"):
+    CACHES = {
+        "default": {
+            "BACKEND": "django.core.cache.backends.memcached.PyMemcacheCache",
+            "LOCATION": ["memcached:11211"],
+            "TIMEOUT": 3600,
+            "OPTIONS": {"ignore_exc": True},
+        }
     }
-}
 
 # A primary cache is required for things such as processing events
 SENTRY_CACHE = "sentry.cache.redis.RedisCache"
@@ -213,8 +216,8 @@ SENTRY_RELEASE_MONITOR = (
 # Web Server #
 ##############
 
-SENTRY_WEB_HOST = "0.0.0.0"
-SENTRY_WEB_PORT = 9000
+SENTRY_WEB_HOST = env("SENTRY_WEB_HOST", "0.0.0.0")
+SENTRY_WEB_PORT = env("SENTRY_WEB_PORT", 9000)
 SENTRY_WEB_OPTIONS = {
     "http": "%s:%s" % (SENTRY_WEB_HOST, SENTRY_WEB_PORT),
     "protocol": "uwsgi",
@@ -265,13 +268,18 @@ SENTRY_WEB_OPTIONS = {
 ########
 
 SENTRY_OPTIONS["mail.list-namespace"] = env("SENTRY_MAIL_HOST", "localhost")
-SENTRY_OPTIONS["mail.from"] = f"sentry@{SENTRY_OPTIONS['mail.list-namespace']}"
+SENTRY_OPTIONS["mail.from"] = env('SENTRY_MAIL_FROM', f"sentry@{SENTRY_OPTIONS['mail.list-namespace']}")
+SENTRY_OPTIONS["mail.port"] = env('SENTRY_MAIL_PORT', 465)
+SENTRY_OPTIONS["mail.username"] = env('SENTRY_MAIL_USERNAME', '')
+SENTRY_OPTIONS["mail.password"] = env('SENTRY_MAIL_PASSWORD', '')
+SENTRY_OPTIONS["mail.use-tls"] = env('SENTRY_MAIL_USE_TLS', 'false').lower() in ('true')
+SENTRY_OPTIONS["mail.use-ssl"] = env('SENTRY_MAIL_USE_SSL', 'false').lower() in ('true')
 
 ############
 # Features #
 ############
 
-SENTRY_FEATURES["projects:sample-events"] = False
+# Enable features
 SENTRY_FEATURES.update(
     {
         feature: True
@@ -284,6 +292,7 @@ SENTRY_FEATURES.update(
             "organizations:integrations-issue-sync",
             "organizations:invite-members",
             "organizations:metric-alert-builder-aggregate",
+            # Required feature !
             "organizations:sso-basic",
             "organizations:sso-rippling",
             "organizations:sso-saml2",
@@ -338,6 +347,24 @@ SENTRY_FEATURES.update(
     }
 )
 
+# Disable features
+SENTRY_FEATURES.update(
+    {
+        feature: False
+        for feature in tuple(part for part in env("SENTRY_DISABLE_FEATURES", "").split(',') if part) + (
+            "projects:sample-events",
+        )
+    }
+)
+
+# Enable features
+SENTRY_FEATURES.update(
+    {
+        feature: True
+        for feature in tuple(part for part in env("SENTRY_ENABLE_FEATURES", "").split(',') if part)
+    }
+)
+
 #######################
 # MaxMind Integration #
 #######################
@@ -387,7 +414,7 @@ CSP_REPORT_ONLY = True
 # to keep the old assets, set `SETUP_JS_SDK_KEEP_OLD_ASSETS` environment variable to any value on
 # your `.env` or `.env.custom` file. The files should only be a few KBs, and this might be useful
 # if you're using it directly like a CDN instead of using the loader script.
-JS_SDK_LOADER_DEFAULT_SDK_URL = "https://browser.sentry-cdn.com/%s/bundle%s.min.js"
+JS_SDK_LOADER_DEFAULT_SDK_URL = env("JS_SDK_LOADER_DEFAULT_SDK_URL", "https://browser.sentry-cdn.com/%s/bundle%s.min.js")
 
 #####################
 # Insights Settings #
