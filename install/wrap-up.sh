@@ -6,7 +6,7 @@ if [[ "$MINIMIZE_DOWNTIME" ]]; then
   $dc restart relay
   $dc exec -T nginx nginx -s reload
 
-  docker run --rm --network="${COMPOSE_PROJECT_NAME}_default" alpine ash \
+  $CONTAINER_TECHNOLOGY run --rm --network="${COMPOSE_PROJECT_NAME}_default" alpine ash \
     -c 'while [[ "$(wget -T 1 -q -O- http://web:9000/_health/)" != "ok" ]]; do sleep 0.5; done'
 
   # Make sure everything is up. This should only touch relay and nginx

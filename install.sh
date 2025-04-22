@@ -11,6 +11,7 @@ source install/_lib.sh
 
 # Pre-flight. No impact yet.
 source install/parse-cli.sh
+source install/detect-container-technology.sh
 source install/detect-platform.sh
 source install/dc-detect-version.sh
 source install/error-handling.sh

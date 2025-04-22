@@ -6,8 +6,8 @@ fi
 
 $dbuild -t sentry-self-hosted-jq-local --platform="$DOCKER_PLATFORM" jq
 
-jq="docker run --rm -i sentry-self-hosted-jq-local"
-sentry_cli="docker run --rm -v /tmp:/work -e SENTRY_DSN=$SENTRY_DSN getsentry/sentry-cli"
+jq="$CONTAINER_TECHNOLOGY run --rm -i sentry-self-hosted-jq-local"
+sentry_cli="$CONTAINER_TECHNOLOGY run --rm -v /tmp:/work -e SENTRY_DSN=$SENTRY_DSN getsentry/sentry-cli"
 
 send_envelope() {
   # Send envelope
