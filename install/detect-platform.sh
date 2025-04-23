@@ -13,13 +13,13 @@ echo "${_group}Detecting Docker platform"
 # See https://github.com/docker/cli/issues/3286 for the Docker bug.
 
 FORMAT=""
-if [[ $CONTAINER_TECHNOLOGY == "podman" ]]; then
+if [[ $CONTAINER_ENGINE == "podman" ]]; then
   FORMAT="{{.Host.Arch}}"
-elif [[ $CONTAINER_TECHNOLOGY == "docker" ]]; then
+elif [[ $CONTAINER_ENGINE == "docker" ]]; then
   FORMAT="{{.Architecture}}"
 fi
 
-export DOCKER_ARCH=$($CONTAINER_TECHNOLOGY info --format "$FORMAT")
+export DOCKER_ARCH=$($CONTAINER_ENGINE info --format "$FORMAT")
 if [[ "$DOCKER_ARCH" = "x86_64" ]]; then
   export DOCKER_PLATFORM="linux/amd64"
 elif [[ "$DOCKER_ARCH" = "aarch64" ]]; then

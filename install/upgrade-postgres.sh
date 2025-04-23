@@ -1,23 +1,23 @@
 echo "${_group}Ensuring proper PostgreSQL version ..."
 
-if [[ -n "$($CONTAINER_TECHNOLOGY volume ls -q --filter name=sentry-postgres)" && "$($CONTAINER_TECHNOLOGY run --rm -v sentry-postgres:/db busybox cat /db/PG_VERSION 2>/dev/null)" == "9.6" ]]; then
-  $CONTAINER_TECHNOLOGY volume rm sentry-postgres-new || true
+if [[ -n "$($CONTAINER_ENGINE volume ls -q --filter name=sentry-postgres)" && "$($CONTAINER_ENGINE run --rm -v sentry-postgres:/db busybox cat /db/PG_VERSION 2>/dev/null)" == "9.6" ]]; then
+  $CONTAINER_ENGINE volume rm sentry-postgres-new || true
   # If this is Postgres 9.6 data, start upgrading it to 14.0 in a new volume
-  $CONTAINER_TECHNOLOGY run --rm \
+  $CONTAINER_ENGINE run --rm \
     -v sentry-postgres:/var/lib/postgresql/9.6/data \
     -v sentry-postgres-new:/var/lib/postgresql/14/data \
     tianon/postgres-upgrade:9.6-to-14
 
   # Get rid of the old volume as we'll rename the new one to that
-  $CONTAINER_TECHNOLOGY volume rm sentry-postgres
-  $CONTAINER_TECHNOLOGY volume create --name sentry-postgres
+  $CONTAINER_ENGINE volume rm sentry-postgres
+  $CONTAINER_ENGINE volume create --name sentry-postgres
   # There's no rename volume in Docker so copy the contents from old to new name
   # Also append the `host all all all trust` line as `tianon/postgres-upgrade:9.6-to-14`
   # doesn't do that automatically.
-  $CONTAINER_TECHNOLOGY run --rm -v sentry-postgres-new:/from -v sentry-postgres:/to alpine ash -c \
+  $CONTAINER_ENGINE run --rm -v sentry-postgres-new:/from -v sentry-postgres:/to alpine ash -c \
     "cd /from ; cp -av . /to ; echo 'host all all all trust' >> /to/pg_hba.conf"
   # Finally, remove the new old volume as we are all in sentry-postgres now.
-  $CONTAINER_TECHNOLOGY volume rm sentry-postgres-new
+  $CONTAINER_ENGINE volume rm sentry-postgres-new
   echo "Re-indexing due to glibc change, this may take a while..."
   echo "Starting up new PostgreSQL version"
   $dc up --wait postgres
