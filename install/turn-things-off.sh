@@ -5,7 +5,12 @@ if [[ -n "$MINIMIZE_DOWNTIME" ]]; then
   $dc rm -fsv $($dc config --services | grep -v -E '^(nginx|relay)$')
 else
   # Clean up old stuff and ensure nothing is working while we install/update
-  $dc down -t $STOP_TIMEOUT --rmi local --remove-orphans
+  if [ "$CONTAINER_ENGINE" = "docker" ]; then
+    $dc down -t $STOP_TIMEOUT --rmi local --remove-orphans
+  elif [ "$CONTAINER_ENGINE" = "podman" ]; then
+    $dc down -t $STOP_TIMEOUT --remove-orphans
+    $CONTAINER_ENGINE rmi -f $($CONTAINER_ENGINE images --quiet --filter dangling=true)
+  fi
 fi
 
 echo "${_endgroup}"
