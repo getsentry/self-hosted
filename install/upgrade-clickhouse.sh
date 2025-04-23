@@ -1,7 +1,13 @@
 echo "${_group}Upgrading Clickhouse ..."
 
 # First check to see if user is upgrading by checking for existing clickhouse volume
-if $dc ps -a | grep -q clickhouse; then
+ps_command="$dc ps"
+if [ "$CONTAINER_ENGINE" = "docker" ]; then
+  # docker compose needs to be run with the -a flag to show all containers
+  ps_command="$ps_command -a"
+fi
+
+if $ps_command | grep -q clickhouse; then
   # Start clickhouse if it is not already running
   $dc up --wait clickhouse
 
