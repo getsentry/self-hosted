@@ -37,10 +37,11 @@ else
   dc="$dc_base $NO_ANSI"
 fi
 
+proxy_args="--build-arg http_proxy=${http_proxy:-} --build-arg https_proxy=${https_proxy:-} --build-arg no_proxy=${no_proxy:-}"
 if [[ "$CONTAINER_ENGINE" == "docker" ]]; then
-  proxy_args="--build-arg http_proxy=${http_proxy:-} --build-arg https_proxy=${https_proxy:-} --build-arg no_proxy=${no_proxy:-}"
+  proxy_args_dc=$proxy_args
 elif [[ "$CONTAINER_ENGINE" == "podman" ]]; then
-  proxy_args="--podman-build-args http_proxy=${http_proxy:-},https_proxy=${https_proxy:-},no_proxy=${no_proxy:-}"
+  proxy_args_dc="--podman-build-args http_proxy=${http_proxy:-},https_proxy=${https_proxy:-},no_proxy=${no_proxy:-}"
 fi
 dcr="$dc run --pull=never --rm"
 dcb="$dc build $proxy_args"

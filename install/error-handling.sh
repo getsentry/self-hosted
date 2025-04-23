@@ -27,7 +27,7 @@ send_event() {
   local breadcrumbs=$5
   local fingerprint_value=$(
     echo -n "$cmd_exit $error_msg $traceback" |
-      docker run -i --rm busybox md5sum |
+      $CONTAINER_ENGINE run -i --rm busybox md5sum |
       cut -d' ' -f1
   )
   local envelope_file="sentry-envelope-${fingerprint_value}"
@@ -151,7 +151,7 @@ fi
 
 # Make sure we can use sentry-cli if we need it.
 if [ "$REPORT_SELF_HOSTED_ISSUES" == 1 ]; then
-  if ! docker pull getsentry/sentry-cli:latest; then
+  if ! $CONTAINER_ENGINE pull getsentry/sentry-cli:latest; then
     echo "Failed to pull sentry-cli, won't report to Sentry after all."
     export REPORT_SELF_HOSTED_ISSUES=0
   fi
