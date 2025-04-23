@@ -20,7 +20,7 @@ elif [[ $CONTAINER_ENGINE == "docker" ]]; then
 fi
 
 export DOCKER_ARCH=$($CONTAINER_ENGINE info --format "$FORMAT")
-if [[ "$DOCKER_ARCH" = "x86_64" ]]; then
+if [[ "$DOCKER_ARCH" = "x86_64" || "$DOCKER_ARCH" = "amd64" ]]; then
   export DOCKER_PLATFORM="linux/amd64"
 elif [[ "$DOCKER_ARCH" = "aarch64" ]]; then
   export DOCKER_PLATFORM="linux/arm64"
