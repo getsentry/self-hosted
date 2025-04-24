@@ -20,7 +20,7 @@ if [[ -n "$($CONTAINER_ENGINE volume ls -q --filter name=sentry-postgres)" && "$
   $CONTAINER_ENGINE volume rm sentry-postgres-new
   echo "Re-indexing due to glibc change, this may take a while..."
   echo "Starting up new PostgreSQL version"
-  $dc up --wait postgres
+  start_service_and_wait_ready postgres
 
   # Wait for postgres
   RETRIES=5

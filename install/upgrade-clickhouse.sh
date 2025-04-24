@@ -10,17 +10,6 @@ else
   build_arg="--podman-build-args"
 fi
 
-function start_service_and_wait_ready() {
-  if [ "$CONTAINER_ENGINE" = "docker" ]; then
-    $dc up --wait $1
-  else
-    $dc up $1
-    while ! $CONTAINER_ENGINE ps --filter "health=healthy" | grep $1; do
-        sleep 2
-    done
-  fi
-}
-
 if $ps_command | grep -q clickhouse; then
   # Start clickhouse if it is not already running
   start_service_and_wait_ready clickhouse
