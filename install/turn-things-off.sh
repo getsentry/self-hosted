@@ -9,7 +9,11 @@ else
     $dc down -t $STOP_TIMEOUT --rmi local --remove-orphans
   elif [ "$CONTAINER_ENGINE" = "podman" ]; then
     $dc down -t $STOP_TIMEOUT --remove-orphans
-    $CONTAINER_ENGINE rmi -f $($CONTAINER_ENGINE images --quiet --filter dangling=true)
+    dangling_images=$($CONTAINER_ENGINE images --quiet --filter dangling=true)
+    if [ -n "$dangling_images" ]; then
+      # Remove dangling images
+      $CONTAINER_ENGINE rmi -f $dangling_images
+    fi
   fi
 fi
 
