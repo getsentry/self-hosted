@@ -40,11 +40,41 @@ fi
 proxy_args="--build-arg http_proxy=${http_proxy:-} --build-arg https_proxy=${https_proxy:-} --build-arg no_proxy=${no_proxy:-}"
 if [[ "$CONTAINER_ENGINE" == "docker" ]]; then
   proxy_args_dc=$proxy_args
+  dcr="$dc run --pull=never --rm"
 elif [[ "$CONTAINER_ENGINE" == "podman" ]]; then
   proxy_args_dc="--podman-build-args http_proxy=${http_proxy:-},https_proxy=${https_proxy:-},no_proxy=${no_proxy:-}"
+  dcr="$dc run --rm"
 fi
-dcr="$dc run --pull=never --rm"
 dcb="$dc build $proxy_args"
 dbuild="$CONTAINER_ENGINE build $proxy_args"
+
+# Utility function to handle --wait with docker and podman
+function start_service_and_wait_ready() {
+  local options=()
+  local services=()
+  local found_service=0
+
+  for arg in "$@"; do
+    if [[ $found_service -eq 0 && "$arg" == -* ]]; then
+      options+=("$arg")
+    else
+      found_service=1
+      services+=("$arg")
+    fi
+  done
+
+  if [ "$CONTAINER_ENGINE" = "docker" ]; then
+    $dc up --wait "${options[@]}" "${services[@]}"
+  else
+    $dc up --no-recreate "${options[@]}" "${services[@]}"
+    for service in "${services[@]}"; do
+      while ! $CONTAINER_ENGINE ps --filter "health=healthy" | grep "$service"; do
+        sleep 2
+      done
+    done
+  fi
+}
+
+
 
 echo "${_endgroup}"

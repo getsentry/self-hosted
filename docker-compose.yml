@@ -1,5 +1,7 @@
 x-restart-policy: &restart_policy
   restart: unless-stopped
+x-pull-policy: &pull_policy
+  pull_policy: never
 x-depends_on-healthy: &depends_on-healthy
   condition: service_healthy
 x-depends_on-default: &depends_on-default
@@ -16,6 +18,7 @@ x-healthcheck-defaults: &healthcheck_defaults
   start_period: 10s
 x-sentry-defaults: &sentry_defaults
   <<: *restart_policy
+  <<: *pull_policy
   image: sentry-self-hosted-local
   # Set the platform to build for linux/arm64 when needed on Apple silicon Macs.
   platform: ${DOCKER_PLATFORM:-}
@@ -66,6 +69,7 @@ x-sentry-defaults: &sentry_defaults
     - "./certificates:/usr/local/share/ca-certificates:ro"
 x-snuba-defaults: &snuba_defaults
   <<: *restart_policy
+  <<: *pull_policy
   depends_on:
     clickhouse:
       <<: *depends_on-healthy
@@ -91,6 +95,7 @@ x-snuba-defaults: &snuba_defaults
 services:
   smtp:
     <<: *restart_policy
+    <<: *pull_policy
     platform: linux/amd64
     image: tianon/exim4
     hostname: "${SENTRY_MAIL_HOST:-}"
@@ -99,6 +104,7 @@ services:
       - "sentry-smtp-log:/var/log/exim4"
   memcached:
     <<: *restart_policy
+    <<: *pull_policy
     image: "memcached:1.6.26-alpine"
     command: ["-I", "${SENTRY_MAX_EXTERNAL_SOURCEMAP_SIZE:-1M}"]
     healthcheck:
@@ -107,6 +113,7 @@ services:
       test: echo stats | nc 127.0.0.1 11211
   redis:
     <<: *restart_policy
+    <<: *pull_policy
     image: "redis:6.2.14-alpine"
     healthcheck:
       <<: *healthcheck_defaults
@@ -124,6 +131,7 @@ services:
     command: ["redis-server", "/usr/local/etc/redis/redis.conf"]
   postgres:
     <<: *restart_policy
+    <<: *pull_policy
     # Using the same postgres version as Sentry dev for consistency purposes
     image: "postgres:14.11"
     healthcheck:
@@ -142,6 +150,7 @@ services:
       - "sentry-postgres:/var/lib/postgresql/data"
   kafka:
     <<: *restart_policy
+    <<: *pull_policy
     image: "confluentinc/cp-kafka:7.6.1"
     environment:
       # https://docs.confluent.io/platform/current/installation/docker/config-reference.html#cp-kakfa-example
@@ -179,6 +188,7 @@ services:
       retries: 30
   clickhouse:
     <<: *restart_policy
+    <<: *pull_policy
     image: clickhouse-self-hosted-local
     build:
       context: ./clickhouse
@@ -306,6 +316,7 @@ services:
       - feature-complete
   symbolicator:
     <<: *restart_policy
+    <<: *pull_policy
     image: "$SYMBOLICATOR_IMAGE"
     volumes:
       - "sentry-symbolicator:/data"
@@ -316,6 +327,7 @@ services:
     command: run -c /etc/symbolicator/config.yml
   symbolicator-cleanup:
     <<: *restart_policy
+    <<: *pull_policy
     image: symbolicator-cleanup-self-hosted-local
     build:
       context: ./cron
@@ -450,6 +462,7 @@ services:
     command: '"0 0 * * * gosu sentry sentry cleanup --days $SENTRY_EVENT_RETENTION_DAYS"'
   nginx:
     <<: *restart_policy
+    <<: *pull_policy
     ports:
       - "$SENTRY_BIND:80/tcp"
     image: "nginx:1.25.4-alpine"
@@ -465,6 +478,7 @@ services:
       - relay
   relay:
     <<: *restart_policy
+    <<: *pull_policy
     image: "$RELAY_IMAGE"
     volumes:
       - type: bind
@@ -484,6 +498,7 @@ services:
         <<: *depends_on-healthy
   vroom:
     <<: *restart_policy
+    <<: *pull_policy
     image: "$VROOM_IMAGE"
     environment:
       SENTRY_KAFKA_BROKERS_PROFILING: "kafka:9092"
@@ -499,6 +514,7 @@ services:
       - feature-complete
   vroom-cleanup:
     <<: *restart_policy
+    <<: *pull_policy
     image: vroom-cleanup-self-hosted-local
     build:
       context: ./cron
