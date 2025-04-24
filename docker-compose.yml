@@ -17,8 +17,7 @@ x-healthcheck-defaults: &healthcheck_defaults
   retries: $HEALTHCHECK_RETRIES
   start_period: 10s
 x-sentry-defaults: &sentry_defaults
-  <<: *restart_policy
-  <<: *pull_policy
+  <<: [*restart_policy, *pull_policy]
   image: sentry-self-hosted-local
   # Set the platform to build for linux/arm64 when needed on Apple silicon Macs.
   platform: ${DOCKER_PLATFORM:-}
@@ -68,8 +67,7 @@ x-sentry-defaults: &sentry_defaults
     - "./geoip:/geoip:ro"
     - "./certificates:/usr/local/share/ca-certificates:ro"
 x-snuba-defaults: &snuba_defaults
-  <<: *restart_policy
-  <<: *pull_policy
+  <<: [*restart_policy, *pull_policy]
   depends_on:
     clickhouse:
       <<: *depends_on-healthy
@@ -94,8 +92,7 @@ x-snuba-defaults: &snuba_defaults
     SNUBA_STATSD_PORT: # Example value: 8125
 services:
   smtp:
-    <<: *restart_policy
-    <<: *pull_policy
+    <<: [*restart_policy, *pull_policy]
     platform: linux/amd64
     image: tianon/exim4
     hostname: "${SENTRY_MAIL_HOST:-}"
@@ -103,8 +100,7 @@ services:
       - "sentry-smtp:/var/spool/exim4"
       - "sentry-smtp-log:/var/log/exim4"
   memcached:
-    <<: *restart_policy
-    <<: *pull_policy
+    <<: [*restart_policy, *pull_policy]
     image: "memcached:1.6.26-alpine"
     command: ["-I", "${SENTRY_MAX_EXTERNAL_SOURCEMAP_SIZE:-1M}"]
     healthcheck:
@@ -112,8 +108,7 @@ services:
       # From: https://stackoverflow.com/a/31877626/5155484
       test: echo stats | nc 127.0.0.1 11211
   redis:
-    <<: *restart_policy
-    <<: *pull_policy
+    <<: [*restart_policy, *pull_policy]
     image: "redis:6.2.14-alpine"
     healthcheck:
       <<: *healthcheck_defaults
@@ -130,8 +125,7 @@ services:
         hard: 10032
     command: ["redis-server", "/usr/local/etc/redis/redis.conf"]
   postgres:
-    <<: *restart_policy
-    <<: *pull_policy
+    <<: [*restart_policy, *pull_policy]
     # Using the same postgres version as Sentry dev for consistency purposes
     image: "postgres:14.11"
     healthcheck:
@@ -149,8 +143,7 @@ services:
     volumes:
       - "sentry-postgres:/var/lib/postgresql/data"
   kafka:
-    <<: *restart_policy
-    <<: *pull_policy
+    <<: [*restart_policy, *pull_policy]
     image: "confluentinc/cp-kafka:7.6.1"
     environment:
       # https://docs.confluent.io/platform/current/installation/docker/config-reference.html#cp-kakfa-example
@@ -187,8 +180,7 @@ services:
       timeout: 10s
       retries: 30
   clickhouse:
-    <<: *restart_policy
-    <<: *pull_policy
+    <<: [*restart_policy, *pull_policy]
     image: clickhouse-self-hosted-local
     build:
       context: ./clickhouse
@@ -315,8 +307,7 @@ services:
     profiles:
       - feature-complete
   symbolicator:
-    <<: *restart_policy
-    <<: *pull_policy
+    <<: [*restart_policy, *pull_policy]
     image: "$SYMBOLICATOR_IMAGE"
     volumes:
       - "sentry-symbolicator:/data"
@@ -326,8 +317,7 @@ services:
         target: /etc/symbolicator
     command: run -c /etc/symbolicator/config.yml
   symbolicator-cleanup:
-    <<: *restart_policy
-    <<: *pull_policy
+    <<: [*restart_policy, *pull_policy]
     image: symbolicator-cleanup-self-hosted-local
     build:
       context: ./cron
@@ -461,8 +451,7 @@ services:
     entrypoint: "/entrypoint.sh"
     command: '"0 0 * * * gosu sentry sentry cleanup --days $SENTRY_EVENT_RETENTION_DAYS"'
   nginx:
-    <<: *restart_policy
-    <<: *pull_policy
+    <<: [*restart_policy, *pull_policy]
     ports:
       - "$SENTRY_BIND:80/tcp"
     image: "nginx:1.25.4-alpine"
@@ -477,8 +466,7 @@ services:
       - web
       - relay
   relay:
-    <<: *restart_policy
-    <<: *pull_policy
+    <<: [*restart_policy, *pull_policy]
     image: "$RELAY_IMAGE"
     volumes:
       - type: bind
@@ -497,8 +485,7 @@ services:
       web:
         <<: *depends_on-healthy
   vroom:
-    <<: *restart_policy
-    <<: *pull_policy
+    <<: [*restart_policy, *pull_policy]
     image: "$VROOM_IMAGE"
     environment:
       SENTRY_KAFKA_BROKERS_PROFILING: "kafka:9092"
@@ -513,8 +500,7 @@ services:
     profiles:
       - feature-complete
   vroom-cleanup:
-    <<: *restart_policy
-    <<: *pull_policy
+    <<: [*restart_policy, *pull_policy]
     image: vroom-cleanup-self-hosted-local
     build:
       context: ./cron
