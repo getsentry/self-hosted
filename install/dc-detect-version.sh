@@ -66,7 +66,7 @@ function start_service_and_wait_ready() {
   if [ "$CONTAINER_ENGINE" = "docker" ]; then
     $dc up --wait "${options[@]}" "${services[@]}"
   else
-    $dc up --no-recreate "${options[@]}" "${services[@]}"
+    $dc up --force-recreate "${options[@]}" "${services[@]}"
     for service in "${services[@]}"; do
       while ! $CONTAINER_ENGINE ps --filter "health=healthy" | grep "$service"; do
         sleep 2
