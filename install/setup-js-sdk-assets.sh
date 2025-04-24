@@ -12,8 +12,10 @@ if [[ "${SETUP_JS_SDK_ASSETS:-}" == "1" ]]; then
     $dcr --no-deps --rm -v "sentry-nginx-www:/var/www" nginx rm -rf /var/www/js-sdk/*
   fi
 
-  $dbuild -t sentry-self-hosted-jq-local --platform="$DOCKER_PLATFORM" jq
-
+  if [ -z ${NO_BUILD_LOCALLY:-} ]; then
+    $dbuild -t sentry-self-hosted-jq-local --platform="$DOCKER_PLATFORM" jq
+  fi
+  
   jq="$CONTAINER_ENGINE run --rm -i sentry-self-hosted-jq-local"
 
   loader_registry=$($dcr --no-deps --rm -T web cat /usr/src/sentry/src/sentry/loader/_registry.json)
