@@ -2,10 +2,10 @@ echo "${_group}Creating volumes for persistent storage ..."
 
 create_volume() {
   create_command="$CONTAINER_ENGINE volume create"
-  if [ "$CONTAINER_ENGINE" = "docker" ]; then
-    create_command="$create_command --name=$1"
-  else
+  if [ "$CONTAINER_ENGINE" = "podman" ]; then
     create_command="$create_command --ignore $1"
+  else
+    create_command="$create_command --name=$1"
   fi
 
   $create_command
