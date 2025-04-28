@@ -1,5 +1,3 @@
-source install/_detect-container-engine.sh
-
 if [ "${GITHUB_ACTIONS:-}" = "true" ]; then
   _group="::group::"
   _endgroup="::endgroup::"
@@ -12,7 +10,7 @@ echo "${_group}Initializing Docker|Podman Compose ..."
 
 export CONTAINER_ENGINE="docker"
 if [[ "${CONTAINER_ENGINE_PODMAN:-0}" -eq 1 ]]; then
-  if command -v podman &> /dev/null; then
+  if command -v podman &>/dev/null; then
     export CONTAINER_ENGINE="podman"
   else
     echo "FAIL: Podman is not installed on the system."
@@ -86,7 +84,5 @@ function start_service_and_wait_ready() {
     done
   fi
 }
-
-
 
 echo "${_endgroup}"

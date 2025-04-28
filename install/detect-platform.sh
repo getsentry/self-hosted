@@ -1,3 +1,5 @@
+source install/_detect-container-engine.sh
+
 echo "${_group}Detecting Docker platform"
 
 # Sentry SaaS uses stock Yandex ClickHouse, but they don't provide images that
