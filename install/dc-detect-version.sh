@@ -8,6 +8,16 @@ fi
 
 echo "${_group}Initializing Docker|Podman Compose ..."
 
+export CONTAINER_ENGINE="docker"
+if [[ "${CONTAINER_ENGINE_PODMAN:-0}" -eq 1 ]]; then
+  if command -v podman &> /dev/null; then
+    export CONTAINER_ENGINE="podman"
+  else
+    echo "FAIL: Podman is not installed on the system."
+    exit 1
+  fi
+fi
+
 # To support users that are symlinking to docker-compose
 dc_base="$(${CONTAINER_ENGINE} compose version --short &>/dev/null && echo "$CONTAINER_ENGINE compose" || echo '')"
 dc_base_standalone="$(${CONTAINER_ENGINE}-compose version --short &>/dev/null && echo "$CONTAINER_ENGINE-compose" || echo '')"
