@@ -12,11 +12,9 @@ echo "${_group}Detecting Docker platform"
 # linux/amd64 by default due to virtualization.
 # See https://github.com/docker/cli/issues/3286 for the Docker bug.
 
-FORMAT=""
+FORMAT="{{.Architecture}}"
 if [[ $CONTAINER_ENGINE == "podman" ]]; then
   FORMAT="{{.Host.Arch}}"
-elif [[ $CONTAINER_ENGINE == "docker" ]]; then
-  FORMAT="{{.Architecture}}"
 fi
 
 export DOCKER_ARCH=$($CONTAINER_ENGINE info --format "$FORMAT")

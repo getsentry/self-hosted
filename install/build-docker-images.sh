@@ -4,7 +4,7 @@ echo ""
 # Build any service that provides the image sentry-self-hosted-local first,
 # as it is used as the base image for sentry-cleanup-self-hosted-local.
 dcb_force="$dcb --force-rm"
-if [[ "$CONTAINER_ENGINE" == "docker" ]]; then
+if [[ "$CONTAINER_ENGINE" == "podman" ]]; then
   dcb_force="$dcb --podman-rm-args='--force'"
 fi
 $dcb_force web
