@@ -36,13 +36,24 @@ jobs:
   integration-test:
     if: github.repository_owner == 'getsentry'
     runs-on: ubuntu-22.04
-    name: integration test
+    strategy:
+      fail-fast: false
+      matrix:
+        container_engine: ['docker', 'podman']
+    name: integration test (${{ matrix.container_engine }})
     env:
       REPORT_SELF_HOSTED_ISSUES: 0
       SELF_HOSTED_TESTING_DSN: ${{ vars.SELF_HOSTED_TESTING_DSN }}
+      CONTAINER_ENGINE_PODMAN: ${{ matrix.container_engine == 'podman' && '1' || '0' }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Install Podman
+        if: matrix.container_engine == 'podman'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends podman
 
       - name: Use action from local checkout
         uses: './'
