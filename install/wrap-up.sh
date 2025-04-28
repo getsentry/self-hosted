@@ -22,10 +22,10 @@ else
   if [[ "${_ENV}" =~ ".env.custom" ]]; then
     echo "  $dc_base --env-file .env --env-file ${_ENV} up --wait"
   else
-    if [[ "$CONTAINER_ENGINE" == "docker" ]]; then
-      echo "  $dc_base up --wait"
-    else
+    if [[ "$CONTAINER_ENGINE" == "podman" ]]; then
       echo "  $dc_base up --force-recreate -d"
+    else
+      echo "  $dc_base up --wait"
     fi
   fi
   echo ""
