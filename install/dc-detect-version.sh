@@ -1,3 +1,5 @@
+source install/_detect-container-engine.sh
+
 if [ "${GITHUB_ACTIONS:-}" = "true" ]; then
   _group="::group::"
   _endgroup="::endgroup::"
