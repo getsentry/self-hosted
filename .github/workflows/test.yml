@@ -52,9 +52,7 @@ jobs:
       - name: Install Podman
         if: matrix.container_engine == 'podman'
         run: |
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends podman
-          pip3 install --user podman-compose
+          brew install podman
 
       - name: Use action from local checkout
         uses: './'
