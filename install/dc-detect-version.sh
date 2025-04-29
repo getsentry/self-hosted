@@ -35,10 +35,10 @@ if [[ -z "$COMPOSE_VERSION" ]] || [[ -n "$STANDALONE_COMPOSE_VERSION" ]] && ! ve
   dc_base="$dc_base_standalone"
 fi
 
-if [[ "$CONTAINER_ENGINE" == "docker" ]]; then
-  NO_ANSI="--ansi never"
-elif [[ "$CONTAINER_ENGINE" == "podman" ]]; then
+if [[ "$CONTAINER_ENGINE" == "podman" ]]; then
   NO_ANSI="--no-ansi"
+else
+  NO_ANSI="--ansi never"
 fi
 
 if [[ "$(basename $0)" = "install.sh" ]]; then
@@ -48,12 +48,12 @@ else
 fi
 
 proxy_args="--build-arg http_proxy=${http_proxy:-} --build-arg https_proxy=${https_proxy:-} --build-arg no_proxy=${no_proxy:-}"
-if [[ "$CONTAINER_ENGINE" == "docker" ]]; then
-  proxy_args_dc=$proxy_args
-  dcr="$dc run --pull=never --rm"
-elif [[ "$CONTAINER_ENGINE" == "podman" ]]; then
+if [[ "$CONTAINER_ENGINE" == "podman" ]]; then
   proxy_args_dc="--podman-build-args http_proxy=${http_proxy:-},https_proxy=${https_proxy:-},no_proxy=${no_proxy:-}"
   dcr="$dc run --rm"
+else
+  proxy_args_dc=$proxy_args
+  dcr="$dc run --pull=never --rm"
 fi
 dcb="$dc build $proxy_args"
 dbuild="$CONTAINER_ENGINE build $proxy_args"
@@ -73,15 +73,15 @@ function start_service_and_wait_ready() {
     fi
   done
 
-  if [ "$CONTAINER_ENGINE" = "docker" ]; then
-    $dc up --wait "${options[@]}" "${services[@]}"
-  else
+  if [ "$CONTAINER_ENGINE" = "podman" ]; then
     $dc up --force-recreate -d "${options[@]}" "${services[@]}"
     for service in "${services[@]}"; do
       while ! $CONTAINER_ENGINE ps --filter "health=healthy" | grep "$service"; do
         sleep 2
       done
     done
+  else
+    $dc up --wait "${options[@]}" "${services[@]}"
   fi
 }
 
