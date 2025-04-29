@@ -54,7 +54,9 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends podman
-          pip3 install --user podman-compose
+          # TODO: Replace below with podman-compose
+          #       We need this commit to be able to work: https://github.com/containers/podman-compose/commit/8206cc3ea277eee6c2e87d4cd66eba8eae3d44eb
+          pip3 install --user https://github.com/containers/podman-compose/archive/main.tar.gz
           echo "PODMAN_COMPOSE_PROVIDER=podman-compose" >> $GITHUB_ENV
 
       - name: Use action from local checkout
