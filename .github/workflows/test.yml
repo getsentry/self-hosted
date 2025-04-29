@@ -54,6 +54,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends podman
+          pip3 install --user podman-compose
 
       - name: Use action from local checkout
         uses: './'
