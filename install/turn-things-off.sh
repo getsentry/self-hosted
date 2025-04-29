@@ -13,7 +13,7 @@ else
       $CONTAINER_ENGINE rmi -f $dangling_images
     fi
   else
-    $dc down -t $STOP_TIMEOUT --rmi local --remove-orphans      
+    $dc down -t $STOP_TIMEOUT --rmi local --remove-orphans
   fi
 fi
 

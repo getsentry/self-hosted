@@ -13,7 +13,7 @@ if [[ "${SETUP_JS_SDK_ASSETS:-}" == "1" ]]; then
   fi
 
   $dbuild -t sentry-self-hosted-jq-local --platform="$DOCKER_PLATFORM" jq
-  
+
   jq="$CONTAINER_ENGINE run --rm -i sentry-self-hosted-jq-local"
 
   loader_registry=$($dcr --no-deps --rm -T web cat /usr/src/sentry/src/sentry/loader/_registry.json)
