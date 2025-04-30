@@ -1,0 +1,8 @@
+dj-database-url
+django-bcrypt
+django-secure
+ndg-httpsclient  # required by requests
+psycopg2
+sentry
+sentry-flowdock
+sentry-github

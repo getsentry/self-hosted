@@ -1,0 +1,37 @@
+{
+  "name": "Sentry",
+  "description": "Sentry is a realtime event logging and aggregation platform",
+  "repository": "https://github.com/flybaseio/sentry-on-heroku",
+  "website": "http://getsentry.com",
+  "keywords": [
+    "logging",
+    "error"
+  ],
+  "addons": [
+    "heroku-postgresql:hobby-dev",
+    "heroku-redis:hobby-dev",
+    "sendgrid:starter"
+  ],
+  "env": {
+    "SECRET_KEY": {
+      "description": "A secret key for a particular Django installation. This is used to provide cryptographic signing, and should be set to a unique, unpredictable value.",
+      "generator": "secret"
+    },
+    "SENTRY_URL_PREFIX": {
+      "description": "Your applications URL, no trailing slash",
+      "value": "https://YOURAPPNAME.herokuapp.com"
+    },
+    "SERVER_EMAIL": {
+      "description": "Reply to address for outgoing email",
+      "value": "root@localhost"
+    },
+    "SENTRY_ADMIN_EMAIL": {
+      "description": "The administrative email for this installation. Note: This will be reported back to getsentry.com as the point of contact. See the beacon documentation for more information.",
+      "value": "",
+      "required": false
+    }
+  },
+  "scripts": {
+    "postdeploy": "sentry --config=sentry.conf.py upgrade --noinput"
+  }
+}
