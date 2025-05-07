@@ -53,7 +53,10 @@ if [[ "$CONTAINER_ENGINE" == "podman" ]]; then
   dcr="$dc run --rm"
 else
   proxy_args_dc=$proxy_args
-  dcr="$dc run --pull=never --rm"
+  # Disable pod creation as these are one-off commands and creating a pod
+  # prints its pod id to stdout which is messing with the output that we
+  # rely on various places such as configuration generation
+  dcr="$dc --in-pod=false run --rm"
 fi
 dcb="$dc build $proxy_args"
 dbuild="$CONTAINER_ENGINE build $proxy_args"
