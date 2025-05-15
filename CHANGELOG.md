@@ -1,5 +1,59 @@
 # Changelog
 
+## 25.4.0
+
+### Stand-alone Docker Compose Fixes
+
+By: @aminvakil (#3658, #3654)
+
+### Various fixes & improvements
+
+- chore(relay): specify spool.enveloppe.max_backpressure_memory_percent configuration for handling relay's failing healthcheck (#3635) by @aldy505
+- build(deps): bump actions/create-github-app-token from 1.12.0 to 2.0.2 (#3649) by @dependabot
+- build(deps): bump actions/create-github-app-token from 1.11.7 to 1.12.0 (#3639) by @dependabot
+- Minimum requirements for 'errors-only' profile (#3634) by @madest92
+- build(deps): bump actions/create-github-app-token from 1.11.6 to 1.11.7 (#3632) by @dependabot
+- feat(sentry): add dynamic sampling feature to config (#3631) by @aldy505
+- docs(config): add example config for Google Auth (#3623) by @junsung-cho
+- fix: js-sdk directory/file permission should be set correctly (#3616) by @aldy505
+- feat(features): enable session replay canvas (#3619) by @aldy505
+
+## 25.3.0
+
+### Various fixes & improvements
+
+- feat(features): enable trace view (#3617) by @aldy505
+- feat: provide monitoring-related configurations (#3611) by @aldy505
+- Enforce license compliance only on getsentry repository (#3606) by @aminvakil
+- Fix unbound variable error in install script (#3601) by @brettdh
+- Add --short to docker-compose version (#3605) by @aminvakil
+- ref: Less complicated docker compose detection (#3604) by @BYK
+- Use docker-compose if version is gte docker compose (#3595) by @aminvakil
+- build(deps): bump actions/create-github-app-token from 1.11.3 to 1.11.6 (#3598) by @dependabot
+- build(deps): bump getsentry/action-release from 1 to 3 (#3599) by @dependabot
+- Bump docker-compose 2.33.1 (#3597) by @aminvakil
+- refactor: move system.url-prefix under systems settings section (#3588) by @leeoocca
+
+## 25.2.0
+
+### Various fixes & improvements
+
+- build(deps): bump actions/create-github-app-token from 1.11.2 to 1.11.3 (#3569) by @dependabot
+- feat: merge `.env` and `.env.custom` file during installation (#3564) by @aldy505
+- build(deps): bump actions/create-github-app-token from 1.11.1 to 1.11.2 (#3561) by @dependabot
+- feat: Require both inputs to be set on action (#3554) by @BYK
+- ref: Simpler and more accurate cache keys (#3553) by @BYK
+- Hand off open-source to dev-infra (#3549) by @chadwhitacre
+- ci: Remove obsolete `dcr up -w` from import test (#3544) by @BYK
+- fix: github.action_path may not have trailing slash (#3547) by @BYK
+- chore: Remove upgrade test (#3541) by @hubertdeng123
+- fix: Use correct path for get compose action (#3539) by @hubertdeng123
+- fix: Caching of sentry migrations should cover additional folders (#3542) by @hubertdeng123
+- ci: Move self-contained action reference to master branch (#3538) by @BYK
+- breaking: Upgrade min Compose version to 2.23.2 (#3535) by @BYK
+- ci: Even better cache keys and granular caching (#3534) by @BYK
+- test: Reorganize backup/restore tests for speed and reliability (#3537) by @BYK
+
 ## 25.1.0
 
 ### Various fixes & improvements
