@@ -4,6 +4,7 @@
 cd $(dirname $0)
 
 # Detect docker and platform state.
+source install/_lib.sh
 source install/dc-detect-version.sh
 source install/detect-platform.sh
 
