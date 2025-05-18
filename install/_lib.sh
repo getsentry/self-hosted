@@ -1,9 +1,3 @@
-set -euo pipefail
-test "${DEBUG:-}" && set -x
-
-# Override any user-supplied umask that could cause problems, see #1222
-umask 002
-
 # Allow `.env` overrides using the `.env.custom` file.
 # We pass this to docker compose in a couple places.
 if [[ -f .env.custom ]]; then

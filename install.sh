@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
-set -eE
+set -eEuo pipefail
+test "${DEBUG:-}" && set -x
+
+# Override any user-supplied umask that could cause problems, see #1222
+umask 002
 
 # Pre-pre-flight? 🤷
 if [[ -n "$MSYSTEM" ]]; then
