@@ -7,6 +7,7 @@ if [[ -n "$MSYSTEM" ]]; then
   exit 1
 fi
 
+source install/_logging.sh
 source install/_lib.sh
 
 # Pre-flight. No impact yet.
