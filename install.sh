@@ -6,7 +6,7 @@ test "${DEBUG:-}" && set -x
 umask 002
 
 # Pre-pre-flight? 🤷
-if [[ -n "$MSYSTEM" ]]; then
+if [[ -n "${MSYSTEM:-}" ]]; then
   echo "Seems like you are using an MSYS2-based system (such as Git Bash) which is not supported. Please use WSL instead."
   exit 1
 fi
