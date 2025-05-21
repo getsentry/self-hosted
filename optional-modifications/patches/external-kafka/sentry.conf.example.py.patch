@@ -1,0 +1,21 @@
+--- sentry/sentry.conf.example.py	2025-05-15 08:27:40.427876868 +0700
++++ sentry/sentry.conf.example.external-kafka.py	2025-05-15 08:32:44.845127931 +0700
+@@ -132,9 +132,17 @@
+ SENTRY_CACHE = "sentry.cache.redis.RedisCache"
+ 
+ DEFAULT_KAFKA_OPTIONS = {
+-    "bootstrap.servers": "kafka:9092",
++    "bootstrap.servers": env("KAFKA_BOOTSTRAP_SERVERS", "kafka:9092"),
+     "message.max.bytes": 50000000,
+     "socket.timeout.ms": 1000,
++    "security.protocol": env("KAFKA_SECURITY_PROTOCOL", "PLAINTEXT"), # Valid options are PLAINTEXT, SSL, SASL_PLAINTEXT, SASL_SSL
++    # If you don't use any of these options below, you can remove them or set them to `None`.
++    "sasl.mechanism": env("KAFKA_SASL_MECHANISM", None), # Valid options are PLAIN, SCRAM-SHA-256, SCRAM-SHA-512. Other mechanism might be unavailable.
++    "sasl.username": env("KAFKA_SASL_USERNAME", None),
++    "sasl.password": env("KAFKA_SASL_PASSWORD", None),
++    "ssl.ca.location": env("KAFKA_SSL_CA_LOCATION", None), # Remove this line if SSL is not used.
++    "ssl.certificate.location": env("KAFKA_SSL_CERTIFICATE_LOCATION", None), # Remove this line if SSL is not used.
++    "ssl.key.location": env("KAFKA_SSL_KEY_LOCATION", None), # Remove this line if SSL is not used.
+ }
+ 
+ SENTRY_EVENTSTREAM = "sentry.eventstream.kafka.KafkaEventStream"
