@@ -1,5 +1,12 @@
 # Changelog
 
+## 25.5.1
+
+### Various fixes & improvements
+
+- Add missing lib script to sentry-admin.sh (#3693) by @djakielski
+- chore: cleanup obsolete feature flags (#3701) by @doc-sheet
+
 ## 25.5.0
 
 ### Various fixes & improvements
