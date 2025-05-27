@@ -123,8 +123,10 @@ def test_login(client_login):
 def test_receive_event(client_login):
     event_id = None
     client, _ = client_login
-    with sentry_sdk.init(dsn=get_sentry_dsn(client)):
-        event_id = sentry_sdk.capture_exception(Exception("a failure"))
+
+    sentry_sdk.init(dsn=get_sentry_dsn(client))
+
+    event_id = sentry_sdk.capture_exception(Exception("a failure"))
     assert event_id is not None
     response = poll_for_response(
         f"{SENTRY_TEST_HOST}/api/0/projects/sentry/internal/events/{event_id}/", client
@@ -377,18 +379,19 @@ def test_custom_certificate_authorities():
 
 def test_receive_transaction_events(client_login):
     client, _ = client_login
-    with sentry_sdk.init(
+    sentry_sdk.init(
         dsn=get_sentry_dsn(client), profiles_sample_rate=1.0, traces_sample_rate=1.0
-    ):
+    )
 
-        def placeholder_fn():
-            sum = 0
-            for i in range(5):
-                sum += i
-                time.sleep(0.25)
+    def placeholder_fn():
+        sum = 0
+        for i in range(5):
+            sum += i
+            time.sleep(0.25)
 
-        with sentry_sdk.start_transaction(op="task", name="Test Transactions"):
-            placeholder_fn()
+    with sentry_sdk.start_transaction(op="task", name="Test Transactions"):
+        placeholder_fn()
+
     poll_for_response(
         f"{SENTRY_TEST_HOST}/api/0/organizations/sentry/events/?dataset=profiles&field=profile.id&project=1&statsPeriod=1h",
         client,
