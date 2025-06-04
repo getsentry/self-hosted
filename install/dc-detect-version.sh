@@ -34,5 +34,5 @@ proxy_args="--build-arg http_proxy=${http_proxy:-} --build-arg https_proxy=${htt
 dcr="$dc run --pull=never --rm"
 dcb="$dc build $proxy_args"
 dbuild="docker build $proxy_args"
-
+echo "$dcr"
 echo "${_endgroup}"

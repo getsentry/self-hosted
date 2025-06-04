@@ -1,5 +1,20 @@
 # Changelog
 
+## 25.5.1
+
+### Various fixes & improvements
+
+- Add missing lib script to sentry-admin.sh (#3693) by @djakielski
+- chore: cleanup obsolete feature flags (#3701) by @doc-sheet
+
+## 25.5.0
+
+### Various fixes & improvements
+
+- build(deps): bump actions/create-github-app-token from 2.0.2 to 2.0.6 (#3690) by @dependabot
+- Resolve datetime deprecation warnings (#3686) by @emmanuel-ferdman
+- ref: remove SENTRY_USE_BIG_INTS (always True) (#3687) by @asottile-sentry
+
 ## 25.4.0
 
 ### Stand-alone Docker Compose Fixes

@@ -196,15 +196,6 @@ SENTRY_TAGSTORE_OPTIONS = {}
 
 SENTRY_DIGESTS = "sentry.digests.backends.redis.RedisBackend"
 
-###################
-# Metrics Backend #
-###################
-
-SENTRY_RELEASE_HEALTH = "sentry.release_health.metrics.MetricsReleaseHealthBackend"
-SENTRY_RELEASE_MONITOR = (
-    "sentry.release_health.release_monitor.metrics.MetricReleaseMonitorBackend"
-)
-
 ##############
 # Web Server #
 ##############
@@ -273,21 +264,17 @@ SENTRY_FEATURES.update(
         feature: True
         for feature in (
             "organizations:discover",
-            "organizations:events",
             "organizations:global-views",
             "organizations:incidents",
             "organizations:integrations-issue-basic",
             "organizations:integrations-issue-sync",
             "organizations:invite-members",
-            "organizations:metric-alert-builder-aggregate",
             "organizations:sso-basic",
             "organizations:sso-rippling",
             "organizations:sso-saml2",
             "organizations:performance-view",
             "organizations:advanced-search",
             "organizations:session-replay",
-            "organizations:session-replay-enable-canvas",
-            "organizations:session-replay-enable-canvas-replayer",
             "organizations:issue-platform",
             "organizations:profiling",
             "organizations:monitors",
