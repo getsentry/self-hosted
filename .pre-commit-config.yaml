@@ -12,6 +12,7 @@ repos:
       files: .*\.sh
       stages: [commit, merge-commit, push, manual]
 - repo: https://github.com/pre-commit/pre-commit-hooks
+  exclude: '\\.patch$'
   rev: v4.3.0
   hooks:
   - id: check-case-conflict
@@ -20,5 +21,4 @@ repos:
   - id: check-symlinks
   - id: end-of-file-fixer
   - id: trailing-whitespace
-    exclude: '\\.patch$'
   - id: check-yaml
