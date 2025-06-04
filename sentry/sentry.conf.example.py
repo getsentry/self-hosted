@@ -294,20 +294,11 @@ SENTRY_FEATURES.update(
         )
         # Starfish related flags
         + (
-            "organizations:deprecate-fid-from-performance-score",
             "organizations:indexed-spans-extraction",
             "organizations:insights-entry-points",
             "organizations:insights-initial-modules",
             "organizations:insights-addon-modules",
-            "organizations:mobile-ttid-ttfd-contribution",
-            "organizations:performance-calculate-score-relay",
             "organizations:standalone-span-ingestion",
-            "organizations:starfish-browser-resource-module-image-view",
-            "organizations:starfish-browser-resource-module-ui",
-            "organizations:starfish-browser-webvitals",
-            "organizations:starfish-browser-webvitals-pageoverview-v2",
-            "organizations:starfish-browser-webvitals-replace-fid-with-inp",
-            "organizations:starfish-browser-webvitals-use-backend-scores",
             "organizations:starfish-mobile-appstart",
             "projects:span-metrics-extraction",
             "projects:span-metrics-extraction-addons",
