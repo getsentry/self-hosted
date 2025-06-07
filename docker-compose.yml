@@ -299,6 +299,11 @@ services:
     command: rust-consumer --storage functions_raw --consumer-group snuba-consumers --auto-offset-reset=latest --max-batch-time-ms 1000 --no-strict-offset-reset
     profiles:
       - feature-complete
+  snuba-profiling-profile-chunks-consumer:
+    <<: *snuba_defaults
+    command: rust-consumer --storage profile_chunks --consumer-group snuba-consumers --auto-offset-reset=latest --max-batch-time-ms 1000 --no-strict-offset-reset
+    profiles:
+      - feature-complete
   snuba-spans-consumer:
     <<: *snuba_defaults
     command: rust-consumer --storage spans --consumer-group snuba-spans-consumers --auto-offset-reset=latest --max-batch-time-ms 1000 --no-strict-offset-reset
