@@ -489,8 +489,6 @@ services:
       TASKBROKER_KAFKA_CLUSTER: "kafka:9092"
       TASKBROKER_KAFKA_DEADLETTER_CLUSTER: "kafka:9092"
       TASKBROKER_DB_PATH: "/opt/sqlite/taskbroker-activations.sqlite"
-    ports:
-      - "$SENTRY_BIND:50051/tcp"
     volumes:
       - sentry-taskbroker:/opt/sqlite
     depends_on:
