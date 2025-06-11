@@ -487,6 +487,24 @@ services:
         <<: *depends_on-healthy
       web:
         <<: *depends_on-healthy
+  taskbroker:
+    <<: *restart_policy
+    image: "$TASKBROKER_IMAGE"
+    environment:
+      TASKBROKER_KAFKA_CLUSTER: "kafka:9092"
+      TASKBROKER_KAFKA_DEADLETTER_CLUSTER: "kafka:9092"
+      TASKBROKER_DB_PATH: "/opt/sqlite/taskbroker-activations.sqlite"
+    volumes:
+      - sentry-taskbroker:/opt/sqlite
+    depends_on:
+      kafka:
+        <<: *depends_on-healthy
+  taskscheduler:
+    <<: *sentry_defaults
+    command: run taskworker-scheduler
+  taskworker:
+    <<: *sentry_defaults
+    command: run taskworker --concurrency=4 --rpc-host=taskbroker:50051 --num-brokers=1
   vroom:
     <<: *restart_policy
     image: "$VROOM_IMAGE"
@@ -541,6 +559,10 @@ volumes:
   # Not being external will still persist data across restarts.
   # It won't persist if someone does a docker compose down -v.
   sentry-vroom:
+  # This volume stores task data that is inflight
+  # It should persist across restarts. If this volume is
+  # deleted, up to ~2048 tasks will be lost.
+  sentry-taskbroker:
   # These store ephemeral data that needn't persist across restarts.
   # That said, volumes will be persisted across restarts until they are deleted.
   sentry-secrets:
