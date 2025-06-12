@@ -15,6 +15,7 @@ body:
           - [ ] [`snuba`](https://github.com/getsentry/snuba/actions/workflows/release.yml)
           - [ ] [`symbolicator`](https://github.com/getsentry/symbolicator/actions/workflows/release.yml)
           - [ ] [`vroom`](https://github.com/getsentry/vroom/actions/workflows/release.yaml)
+          - [ ] [`taskbroker`](https://github.com/getsentry/taskbroker/actions/workflows/release.yml)
         - [ ] Release self-hosted.
           - [ ] [Prepare the `self-hosted` release](https://github.com/getsentry/self-hosted/actions/workflows/release.yml) (_replace with publish issue repo link_).
           - [ ] Check to make sure the new release branch in self-hosted includes the appropriate CalVer images.
