@@ -309,6 +309,11 @@ SENTRY_FEATURES.update(
             "organizations:user-feedback-replay-clip",
             "organizations:user-feedback-ui",
         )
+        # Continuous Profiling related flags
+        + (
+            "organizations:continuous-profiling",
+            "organizations:continuous-profiling-stats",
+        )
     }
 )
 
