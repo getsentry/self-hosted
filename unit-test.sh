@@ -5,7 +5,7 @@ export REPORT_SELF_HOSTED_ISSUES=0 # will be over-ridden in the relevant test
 FORCE_CLEAN=1 "./scripts/reset.sh"
 fail=0
 for test_file in _unit-test/*-test.sh; do
-  if [ "$1" -a "$1" != "$test_file" ]; then
+  if [ -n "$1" ] && [ "$1" != "$test_file" ]; then
     echo "🙊 Skipping $test_file ..."
     continue
   fi
