@@ -91,12 +91,12 @@ x-snuba-defaults: &snuba_defaults
 services:
   smtp:
     <<: *restart_policy
-    platform: linux/amd64
-    image: tianon/exim4
-    hostname: "${SENTRY_MAIL_HOST:-}"
+    image: registry.gitlab.com/egos-tech/smtp
     volumes:
       - "sentry-smtp:/var/spool/exim4"
       - "sentry-smtp-log:/var/log/exim4"
+    environment:
+      - MAILNAME=${SENTRY_MAIL_HOST:-}
   memcached:
     <<: *restart_policy
     image: "memcached:1.6.26-alpine"
