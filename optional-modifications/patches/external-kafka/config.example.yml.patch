@@ -1,0 +1,19 @@
+--- relay/config.example.yml	2025-05-15 08:27:40.426876887 +0700
++++ relay/config.example.external-kafka.yml	2025-05-15 08:34:21.113311217 +0700
+@@ -7,8 +7,15 @@
+ processing:
+   enabled: true
+   kafka_config:
+-    - {name: "bootstrap.servers", value: "kafka:9092"}
++    - {name: "bootstrap.servers", value: "kafka-node1:9092,kafka-node2:9092,kafka-node3:9092"}
+     - {name: "message.max.bytes", value: 50000000} # 50MB
++    - {name: "security.protocol", value: "PLAINTEXT"}
++    - {name: "sasl.mechanism", value: "PLAIN"} # Remove or comment this line if SASL is not used.
++    - {name: "sasl.username", value: "username"} # Remove or comment this line if SASL is not used.
++    - {name: "sasl.password", value: "password"} # Remove or comment this line if SASL is not used.
++    - {name: "ssl.ca.location", value: "/kafka-certificates/ca.pem"} # Remove or comment this line if SSL is not used.
++    - {name: "ssl.certificate.location", value: "/kafka-certificates/client.pem"} # Remove or comment this line if SSL is not used.
++    - {name: "ssl.key.location", value: "/kafka-certificates/client.key"} # Remove or comment this line if SSL is not used.
+   redis: redis://redis:6379
+   geoip_path: "/geoip/GeoLite2-City.mmdb"
+ 
