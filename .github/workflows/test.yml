@@ -21,7 +21,10 @@ defaults:
 jobs:
   unit-test:
     if: github.repository_owner == 'getsentry'
-    runs-on: ubuntu-22.04
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-24.04, ubuntu-24.04-arm64]
     name: "unit tests"
     steps:
       - name: Checkout
@@ -35,7 +38,10 @@ jobs:
 
   integration-test:
     if: github.repository_owner == 'getsentry'
-    runs-on: ubuntu-22.04
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-24.04, ubuntu-24.04-arm64]
     name: integration test
     env:
       REPORT_SELF_HOSTED_ISSUES: 0
