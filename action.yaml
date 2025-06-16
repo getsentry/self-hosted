@@ -67,9 +67,9 @@ runs:
       id: restore_cache_sentry
       uses: BYK/docker-volume-cache-action/restore@be89365902126f508dcae387a32ec3712df6b1cd
       with:
-        key: db-volumes-sentry-v2-${{ steps.cache_key.outputs.SENTRY_MIGRATIONS_MD5 }}
+        key: db-volumes-sentry-v3-${{ steps.cache_key.outputs.SENTRY_MIGRATIONS_MD5 }}
         restore-keys: |
-          db-volumes-sentry-v1-
+          db-volumes-sentry-v3-
         volumes: |
           sentry-postgres
 
