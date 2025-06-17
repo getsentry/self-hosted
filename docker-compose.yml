@@ -514,8 +514,6 @@ services:
   vroom:
     <<: *restart_policy
     image: "$VROOM_IMAGE"
-    depends_on:
-      - vroom-init
     environment:
       SENTRY_KAFKA_BROKERS_PROFILING: "kafka:9092"
       SENTRY_KAFKA_BROKERS_OCCURRENCES: "kafka:9092"
@@ -526,6 +524,8 @@ services:
     depends_on:
       kafka:
         <<: *depends_on-healthy
+      vroom-init:
+        <<: *depends_on-default
     profiles:
       - feature-complete
   vroom-cleanup:
