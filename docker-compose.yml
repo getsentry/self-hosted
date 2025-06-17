@@ -525,7 +525,6 @@ services:
       kafka:
         <<: *depends_on-healthy
       vroom-init:
-        <<: *depends_on-default
     profiles:
       - feature-complete
   vroom-cleanup:
