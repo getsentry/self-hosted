@@ -507,7 +507,7 @@ services:
     environment:
       SENTRY_KAFKA_BROKERS_PROFILING: "kafka:9092"
       SENTRY_KAFKA_BROKERS_OCCURRENCES: "kafka:9092"
-      SENTRY_BUCKET_PROFILES: file://localhost/var/vroom/sentry-profiles
+      SENTRY_BUCKET_PROFILES: file:///var/vroom/sentry-profiles
       SENTRY_SNUBA_HOST: "http://snuba-api:1218"
     volumes:
       - sentry-vroom:/var/vroom/sentry-profiles
