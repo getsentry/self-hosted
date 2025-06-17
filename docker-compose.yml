@@ -505,9 +505,17 @@ services:
   taskworker:
     <<: *sentry_defaults
     command: run taskworker --concurrency=4 --rpc-host=taskbroker:50051 --num-brokers=1
+  vroom-init:
+    image: busybox
+    command: chown -R 1000:1000 /var/lib/sentry-profiles
+    volumes:
+      - sentry-vroom:/var/lib/sentry-profiles
+    restart: "no"
   vroom:
     <<: *restart_policy
     image: "$VROOM_IMAGE"
+    depends_on:
+      - vroom-init
     environment:
       SENTRY_KAFKA_BROKERS_PROFILING: "kafka:9092"
       SENTRY_KAFKA_BROKERS_OCCURRENCES: "kafka:9092"
