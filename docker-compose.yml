@@ -508,7 +508,7 @@ services:
   vroom:
     <<: *restart_policy
     image: "$VROOM_IMAGE"
-    user: "1000:1000" # vroom user and group
+    user: "vroom:vroom" # vroom user and group
     environment:
       SENTRY_KAFKA_BROKERS_PROFILING: "kafka:9092"
       SENTRY_KAFKA_BROKERS_OCCURRENCES: "kafka:9092"
@@ -524,7 +524,7 @@ services:
   vroom-cleanup:
     <<: *restart_policy
     image: vroom-cleanup-self-hosted-local
-    user: "1000:1000" # vroom user and group
+    user: "vroom:vroom" # vroom user and group
     build:
       context: ./cron
       args:
