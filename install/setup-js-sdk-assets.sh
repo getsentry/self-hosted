@@ -9,7 +9,7 @@ if [[ "${SETUP_JS_SDK_ASSETS:-}" == "1" ]]; then
   # `SETUP_JS_SDK_KEEP_OLD_ASSETS` to any value.
   if [[ -z "${SETUP_JS_SDK_KEEP_OLD_ASSETS:-}" ]]; then
     echo "Cleaning up old JS SDK assets..."
-    $dcr --no-deps --rm -v "sentry-nginx-www:/var/www" nginx rm -rf /var/www/js-sdk/*
+    $dcr --no-deps nginx rm -rf /var/www/js-sdk/*
   fi
 
   $dbuild -t sentry-self-hosted-jq-local --platform="$DOCKER_PLATFORM" jq
@@ -35,12 +35,12 @@ if [[ "${SETUP_JS_SDK_ASSETS:-}" == "1" ]]; then
   variants="{bundle,bundle.tracing,bundle.tracing.replay,bundle.replay,bundle.tracing.replay.feedback,bundle.feedback}"
 
   # Download those versions & variants using curl
-  $dcr --no-deps --rm -v "sentry-nginx-www:/var/www" nginx curl -w '%{response_code} %{url}\n' --no-progress-meter --compressed --retry 3 --create-dirs -fLo "/var/www/js-sdk/#1/#2.min.js" "https://browser.sentry-cdn.com/${versions}/${variants}.min.js" || true
+  $dcr --no-deps nginx curl -w '%{response_code} %{url}\n' --no-progress-meter --compressed --retry 3 --create-dirs -fLo "/var/www/js-sdk/#1/#2.min.js" "https://browser.sentry-cdn.com/${versions}/${variants}.min.js" || true
 
   # Make sure permissions are correct
   # See https://github.com/getsentry/self-hosted/issues/3614 for reported issue
-  $dcr --no-deps --rm -v "sentry-nginx-www:/var/www" nginx find /var/www/js-sdk -type d -exec chmod 755 {} \;
-  $dcr --no-deps --rm -v "sentry-nginx-www:/var/www" nginx find /var/www/js-sdk -type f -exec chmod 644 {} \;
+  $dcr --no-deps nginx find /var/www/js-sdk -type d -exec chmod 755 {} \;
+  $dcr --no-deps nginx find /var/www/js-sdk -type f -exec chmod 644 {} \;
 
   echo "${_endgroup}"
 fi
