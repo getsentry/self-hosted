@@ -511,7 +511,7 @@ services:
     environment:
       SENTRY_KAFKA_BROKERS_PROFILING: "kafka:9092"
       SENTRY_KAFKA_BROKERS_OCCURRENCES: "kafka:9092"
-      SENTRY_BUCKET_PROFILES: file://localhost//var/lib/sentry-profiles
+      PROFILES_DIR: "/var/lib/sentry-profiles"
       SENTRY_SNUBA_HOST: "http://snuba-api:1218"
     volumes:
       - sentry-vroom:/var/lib/sentry-profiles
@@ -529,6 +529,10 @@ services:
         BASE_IMAGE: "$VROOM_IMAGE"
     entrypoint: "/entrypoint.sh"
     environment:
+      SENTRY_KAFKA_BROKERS_PROFILING: "kafka:9092"
+      SENTRY_KAFKA_BROKERS_OCCURRENCES: "kafka:9092"
+      PROFILES_DIR: "/var/lib/sentry-profiles"
+      SENTRY_SNUBA_HOST: "http://snuba-api:1218"
       # Leaving the value empty to just pass whatever is set
       # on the host system (or in the .env file)
       SENTRY_EVENT_RETENTION_DAYS:
