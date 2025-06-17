@@ -3,5 +3,5 @@
 # TODO: Remove this after the next hard-stop
 
 echo "${_group}Ensuring correct permissions on profiles directory ..."
-$dcr --no-deps --entrypoint /bin/bash --user root vroom -c 'chown -R vroom:vroom /var/lib/sentry-profiles && chmod -R 755 /var/lib/sentry-profiles'
+$dcr --no-deps --entrypoint /bin/bash --user root vroom -c 'chown -R vroom:vroom /var/lib/sentry-profiles && sudo chmod o+x /var/lib/ && chmod -R o+rwx /var/lib/sentry-profiles'
 echo "${_endgroup}"
