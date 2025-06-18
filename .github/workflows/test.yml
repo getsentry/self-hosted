@@ -25,7 +25,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-24.04, ubuntu-24.04-arm]
-    name: "unit tests"
+    name: ${{ matrix.os == 'ubuntu-24.04-arm' && 'unit tests (arm64)' || 'unit tests' }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -42,7 +42,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-24.04, ubuntu-24.04-arm]
-    name: integration test
+    name: ${{ matrix.os == 'ubuntu-24.04-arm' && 'integration tests (arm64)' || 'integration tests' }}
     env:
       REPORT_SELF_HOSTED_ISSUES: 0
       SELF_HOSTED_TESTING_DSN: ${{ vars.SELF_HOSTED_TESTING_DSN }}
