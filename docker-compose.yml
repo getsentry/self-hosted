@@ -131,11 +131,7 @@ services:
       # Using default user "postgres" from sentry/sentry.conf.example.py or value of POSTGRES_USER if provided
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
     command:
-      [
-        "postgres",
-        "-c",
-        "max_connections=${POSTGRES_MAX_CONNECTIONS:-100}",
-      ]
+      ["postgres", "-c", "max_connections=${POSTGRES_MAX_CONNECTIONS:-100}"]
     environment:
       POSTGRES_HOST_AUTH_METHOD: "trust"
     volumes:
@@ -511,10 +507,10 @@ services:
     environment:
       SENTRY_KAFKA_BROKERS_PROFILING: "kafka:9092"
       SENTRY_KAFKA_BROKERS_OCCURRENCES: "kafka:9092"
-      SENTRY_BUCKET_PROFILES: file://localhost//var/lib/sentry-profiles
+      SENTRY_BUCKET_PROFILES: file:///var/vroom/sentry-profiles
       SENTRY_SNUBA_HOST: "http://snuba-api:1218"
     volumes:
-      - sentry-vroom:/var/lib/sentry-profiles
+      - sentry-vroom:/var/vroom/sentry-profiles
     depends_on:
       kafka:
         <<: *depends_on-healthy
@@ -532,9 +528,9 @@ services:
       # Leaving the value empty to just pass whatever is set
       # on the host system (or in the .env file)
       SENTRY_EVENT_RETENTION_DAYS:
-    command: '"0 0 * * * find /var/lib/sentry-profiles -type f -mtime +$SENTRY_EVENT_RETENTION_DAYS -delete"'
+    command: '"0 0 * * * find /var/vroom/sentry-profiles -type f -mtime +$SENTRY_EVENT_RETENTION_DAYS -delete"'
     volumes:
-      - sentry-vroom:/var/lib/sentry-profiles
+      - sentry-vroom:/var/vroom/sentry-profiles
     profiles:
       - feature-complete
 

@@ -120,10 +120,10 @@
 +      SENTRY_KAFKA_SASL_MECHANISM: ${KAFKA_SASL_MECHANISM:-}
 +      SENTRY_KAFKA_SASL_USERNAME: ${KAFKA_SASL_USERNAME:-}
 +      SENTRY_KAFKA_SASL_PASSWORD: ${KAFKA_SASL_PASSWORD:-}
-       SENTRY_BUCKET_PROFILES: file://localhost//var/lib/sentry-profiles
+       SENTRY_BUCKET_PROFILES: file:///var/vroom/sentry-profiles
        SENTRY_SNUBA_HOST: "http://snuba-api:1218"
      volumes:
-       - sentry-vroom:/var/lib/sentry-profiles
+       - sentry-vroom:/var/vroom/sentry-profiles
 -    depends_on:
 -      kafka:
 -        <<: *depends_on-healthy
