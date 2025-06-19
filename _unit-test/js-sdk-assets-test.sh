@@ -9,9 +9,9 @@ export SETUP_JS_SDK_ASSETS=1
 
 source install/setup-js-sdk-assets.sh
 
-sdk_files=$($dcr --no-deps -v "sentry-nginx-www:/var/www" nginx ls -lah /var/www/js-sdk/)
-sdk_tree=$($dcr --no-deps -v "sentry-nginx-www:/var/www" nginx tree /var/www/js-sdk/ | tail -n 1)
-non_empty_file_count=$($dcr --no-deps -v "sentry-nginx-www:/var/www" nginx find /var/www/js-sdk/ -type f -size +1k | wc -l)
+sdk_files=$($dcr --no-deps nginx ls -lah /var/www/js-sdk/)
+sdk_tree=$($dcr --no-deps nginx tree /var/www/js-sdk/ | tail -n 1)
+non_empty_file_count=$($dcr --no-deps nginx find /var/www/js-sdk/ -type f -size +1k | wc -l)
 
 # `sdk_files` should contains 5 lines, '4.*', '5.*', '6.*', `7.*` and `8.*`
 echo $sdk_files

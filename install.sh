@@ -1,12 +1,17 @@
 #!/usr/bin/env bash
-set -eE
+set -eEuo pipefail
+test "${DEBUG:-}" && set -x
+
+# Override any user-supplied umask that could cause problems, see #1222
+umask 002
 
 # Pre-pre-flight? 🤷
-if [[ -n "$MSYSTEM" ]]; then
+if [[ -n "${MSYSTEM:-}" ]]; then
   echo "Seems like you are using an MSYS2-based system (such as Git Bash) which is not supported. Please use WSL instead."
   exit 1
 fi
 
+source install/_logging.sh
 source install/_lib.sh
 
 # Pre-flight. No impact yet.
@@ -33,6 +38,7 @@ source install/update-docker-images.sh
 source install/build-docker-images.sh
 source install/bootstrap-snuba.sh
 source install/upgrade-postgres.sh
+source install/ensure-correct-permissions-profiles-dir.sh
 source install/set-up-and-migrate-database.sh
 source install/geoip.sh
 source install/setup-js-sdk-assets.sh

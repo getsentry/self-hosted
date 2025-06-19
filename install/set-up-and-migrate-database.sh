@@ -10,15 +10,6 @@ if [[ -z "${SKIP_SENTRY_MIGRATIONS:-}" ]]; then
     exit 1
   fi
 
-  # Using django ORM to provide broader support for users with external databases
-  $dcr web shell -c "
-from django.db import connection
-
-with connection.cursor() as cursor:
-  cursor.execute('ALTER TABLE IF EXISTS sentry_groupedmessage DROP CONSTRAINT IF EXISTS sentry_groupedmessage_project_id_id_515aaa7e_uniq;')
-  cursor.execute('DROP INDEX IF EXISTS sentry_groupedmessage_project_id_id_515aaa7e_uniq;')
-"
-
   if [[ -n "${CI:-}" || "${SKIP_USER_CREATION:-0}" == 1 ]]; then
     $dcr web upgrade --noinput --create-kafka-topics
     echo ""

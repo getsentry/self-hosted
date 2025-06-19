@@ -60,7 +60,7 @@ else
 fi
 dcb="$dc build $proxy_args"
 dbuild="$CONTAINER_ENGINE build $proxy_args"
-
+echo "$dcr"
 # Utility function to handle --wait with docker and podman
 function start_service_and_wait_ready() {
   local options=()

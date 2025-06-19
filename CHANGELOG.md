@@ -1,5 +1,36 @@
 # Changelog
 
+## 25.6.0
+
+### Various fixes & improvements
+
+- enable shell linter for more scripts (#3748) by @doc-sheet
+- feat: migrate to arm64-compatible smtp image (#3746) by @ezhevita
+- Introduce patches with external kafka (#3521) by @aldy505
+- add shellcheck action to lint bash scripts (#3710) by @doc-sheet
+- tests: Install version 2.x of Python SDK (#3745) by @sentrivana
+- feat(features): enable continuous profiling (#3742) by @aldy505
+- feat: Add taskbroker + worker + scheduler (#3738) by @markstory
+- fix(profiles): Run the profile chunks consumer (#3739) by @phacops
+- chore: prune removed feature flags on main repository (#3731) by @aldy505
+- remove index workaround (#3730) by @asottile-sentry
+- Make usage of Python SDK future proof (#3714) by @antonpirker
+
+## 25.5.1
+
+### Various fixes & improvements
+
+- Add missing lib script to sentry-admin.sh (#3693) by @djakielski
+- chore: cleanup obsolete feature flags (#3701) by @doc-sheet
+
+## 25.5.0
+
+### Various fixes & improvements
+
+- build(deps): bump actions/create-github-app-token from 2.0.2 to 2.0.6 (#3690) by @dependabot
+- Resolve datetime deprecation warnings (#3686) by @emmanuel-ferdman
+- ref: remove SENTRY_USE_BIG_INTS (always True) (#3687) by @asottile-sentry
+
 ## 25.4.0
 
 ### Stand-alone Docker Compose Fixes
