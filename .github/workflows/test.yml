@@ -21,8 +21,11 @@ defaults:
 jobs:
   unit-test:
     if: github.repository_owner == 'getsentry'
-    runs-on: ubuntu-22.04
-    name: "unit tests"
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-24.04, ubuntu-24.04-arm]
+    name: ${{ matrix.os == 'ubuntu-24.04-arm' && 'unit tests (arm64)' || 'unit tests' }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -35,8 +38,11 @@ jobs:
 
   integration-test:
     if: github.repository_owner == 'getsentry'
-    runs-on: ubuntu-22.04
-    name: integration test
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-24.04, ubuntu-24.04-arm]
+    name: ${{ matrix.os == 'ubuntu-24.04-arm' && 'integration test (arm64)' || 'integration test' }}
     env:
       REPORT_SELF_HOSTED_ISSUES: 0
       SELF_HOSTED_TESTING_DSN: ${{ vars.SELF_HOSTED_TESTING_DSN }}
