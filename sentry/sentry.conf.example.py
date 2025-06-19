@@ -341,6 +341,14 @@ CSP_REPORT_ONLY = True
 # https://django-csp.readthedocs.io/en/latest/configuration.html
 # CSP_SCRIPT_SRC += ["example.com"]
 
+############################
+# Sentry Endpoint Settings #
+############################
+
+# URI Prefixes for generating DSN URLs
+# (default is URL_PREFIX)
+# SENTRY_ENDPOINT = "https://sentry.ingest.example.com"
+
 #################
 # CSRF Settings #
 #################
