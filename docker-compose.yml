@@ -500,7 +500,7 @@ services:
     command: run taskworker-scheduler
   taskworker:
     <<: *sentry_defaults
-    command: run taskworker --concurrency=4 --rpc-host=taskbroker:50051 --num-brokers=1
+    command: run taskworker --concurrency=4 --rpc-host=taskbroker:50051
   vroom:
     <<: *restart_policy
     image: "$VROOM_IMAGE"
