@@ -23,8 +23,8 @@ on the host filesystem. Commands that write files should write them to the '/sen
 
 # Actual invocation that runs the command in the container.
 invocation() {
-  $dc up postgres --wait
-  $dc up redis --wait
+  start_service_and_wait_ready postgres
+  start_service_and_wait_ready redis --wait
   $dcr --no-deps -v "$VOLUME_MAPPING" -T -e SENTRY_LOG_LEVEL=CRITICAL web "$@" 2>&1
 }
 
