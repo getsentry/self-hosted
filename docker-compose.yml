@@ -305,6 +305,11 @@ services:
     command: rust-consumer --storage spans --consumer-group snuba-spans-consumers --auto-offset-reset=latest --max-batch-time-ms 1000 --no-strict-offset-reset
     profiles:
       - feature-complete
+  snuba-items-consumer:
+    <<: *snuba_defaults
+    command: rust-consumer --storage eap_items --consumer-group snuba-items-consumers --auto-offset-reset=latest --max-batch-time-ms 1000 --no-strict-offset-reset
+    profiles:
+      - feature-complete
   symbolicator:
     <<: *restart_policy
     image: "$SYMBOLICATOR_IMAGE"
