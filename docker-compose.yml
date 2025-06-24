@@ -305,6 +305,11 @@ services:
     command: rust-consumer --storage spans --consumer-group snuba-spans-consumers --auto-offset-reset=latest --max-batch-time-ms 1000 --no-strict-offset-reset
     profiles:
       - feature-complete
+  snuba-eap-items-consumer:
+    <<: *snuba_defaults
+    command: rust-consumer --storage eap_items --consumer-group eap_items_group --auto-offset-reset=latest --max-batch-time-ms 1000 --no-strict-offset-reset --use-rust-processor
+    profiles:
+      - feature-complete
   symbolicator:
     <<: *restart_policy
     image: "$SYMBOLICATOR_IMAGE"
@@ -405,6 +410,11 @@ services:
     command: run consumer ingest-feedback-events --consumer-group ingest-feedback
     profiles:
       - feature-complete
+  process-spans:
+    <<: *sentry_defaults
+    command: run consumer --no-strict-offset-reset process-spans --consumer-group process-spans
+    profiles:
+      - feature-complete
   monitors-clock-tick:
     <<: *sentry_defaults
     command: run consumer monitors-clock-tick --consumer-group monitors-clock-tick
@@ -428,6 +438,11 @@ services:
   subscription-consumer-transactions:
     <<: *sentry_defaults
     command: run consumer transactions-subscription-results --consumer-group query-subscription-consumer
+    profiles:
+      - feature-complete
+  subscription-consumer-eap-items:
+    <<: *sentry_defaults
+    command: run consumer subscription-results-eap-items --consumer-group subscription-results-eap-items
     profiles:
       - feature-complete
   subscription-consumer-metrics:
