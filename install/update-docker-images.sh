@@ -3,7 +3,7 @@ echo "${_group}Fetching and updating $CONTAINER_ENGINE images ..."
 if [ "$CONTAINER_ENGINE" = "podman" ]; then
   # podman compose doesn't have the --ignore-pull-failures option, so can just
   # run the command normally
-  $dc pull || true
+  $dc --profile feature-complete pull || true
 else
   # We tag locally built images with a '-self-hosted-local' suffix. `docker
   # compose pull` tries to pull these too and shows a 404 error on the console
