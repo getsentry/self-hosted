@@ -40,7 +40,7 @@ jobs:
       fail-fast: false
       matrix:
         container_engine: ['docker', 'podman']
-    name: integration test (${{ matrix.container_engine }})
+    name: ${{ matrix.container_engine == 'docker' && 'integration test' || 'integration test (podman)' }}
     env:
       REPORT_SELF_HOSTED_ISSUES: 0
       SELF_HOSTED_TESTING_DSN: ${{ vars.SELF_HOSTED_TESTING_DSN }}
@@ -59,6 +59,7 @@ jobs:
           pip3 install --user https://github.com/containers/podman-compose/archive/main.tar.gz
           echo "PODMAN_COMPOSE_PROVIDER=podman-compose" >> $GITHUB_ENV
           echo "PODMAN_COMPOSE_WARNING_LOGS=false" >> $GITHUB_ENV
+          echo "COMPOSE_PROFILE=feature-complete" >> $GITHUB_ENV
 
       - name: Use action from local checkout
         uses: './'
