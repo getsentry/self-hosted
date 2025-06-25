@@ -420,6 +420,11 @@ services:
     command: run consumer --no-strict-offset-reset process-spans --consumer-group process-spans
     profiles:
       - feature-complete
+  process-segments:
+    <<: *sentry_defaults
+    command: run consumer --no-strict-offset-reset process-segments --consumer-group process-segments
+    profiles:
+      - feature-complete
   monitors-clock-tick:
     <<: *sentry_defaults
     command: run consumer monitors-clock-tick --consumer-group monitors-clock-tick
