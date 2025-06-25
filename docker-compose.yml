@@ -310,6 +310,11 @@ services:
     command: rust-consumer --storage eap_items --consumer-group eap_items_group --auto-offset-reset=latest --max-batch-time-ms 1000 --no-strict-offset-reset --use-rust-processor
     profiles:
       - feature-complete
+  snuba-subscription-consumer-eap-items:
+    <<: *snuba_defaults
+    command: subscriptions-scheduler-executor --dataset events_analytics_platform --entity eap_items --auto-offset-reset=latest --no-strict-offset-reset --consumer-group=snuba-eap-items-subscriptions-consumers --followed-consumer-group=eap_items_group --schedule-ttl=60 --stale-threshold-seconds=900
+    profiles:
+      - feature-complete
   symbolicator:
     <<: *restart_policy
     image: "$SYMBOLICATOR_IMAGE"
