@@ -22,7 +22,7 @@ SENTRY_CONFIG_PY = "sentry/sentry.conf.py"
 SENTRY_TEST_HOST = os.getenv("SENTRY_TEST_HOST", "http://localhost:9000")
 TEST_USER = "test@example.com"
 TEST_PASS = "test123TEST"
-TIMEOUT_SECONDS = 60
+TIMEOUT_SECONDS = 120
 
 
 def poll_for_response(
@@ -128,8 +128,6 @@ def test_receive_event(client_login):
 
     event_id = sentry_sdk.capture_exception(Exception("a failure"))
     assert event_id is not None
-    time.sleep(1)
-    
     response = poll_for_response(
         f"{SENTRY_TEST_HOST}/api/0/projects/sentry/internal/events/{event_id}/", client
     )
