@@ -23,7 +23,11 @@ else
     echo "  $dc_base --env-file .env --env-file ${_ENV} up --wait"
   else
     if [[ "$CONTAINER_ENGINE" == "podman" ]]; then
-      echo "  $dc_base up --force-recreate -d"
+      if [[ "$COMPOSE_PROFILES" == "feature-complete" ]]; then
+        echo "  $dc_base --profile=feature-complete up --force-recreate -d"
+      else
+        echo "  $dc_base up --force-recreate -d"
+      fi
     else
       echo "  $dc_base up --wait"
     fi
