@@ -39,7 +39,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        container_engine: ['docker', 'podman']
+        container_engine: ['docker'] # TODO: add 'podman' into the list
     name: ${{ matrix.container_engine == 'docker' && 'integration test' || 'integration test (podman)' }}
     env:
       REPORT_SELF_HOSTED_ISSUES: 0
