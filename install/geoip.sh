@@ -21,7 +21,7 @@ install_geoip() {
   else
     echo "IP address geolocation is configured for updates."
     echo "Updating IP address geolocation database ... "
-    if ! docker run --rm -v "./geoip:/sentry" --entrypoint '/usr/bin/geoipupdate' "ghcr.io/maxmind/geoipupdate:v6.1.0" "-d" "/sentry" "-f" "/sentry/GeoIP.conf"; then
+    if ! $CONTAINER_ENGINE run --rm -v "./geoip:/sentry" --entrypoint '/usr/bin/geoipupdate' "ghcr.io/maxmind/geoipupdate:v6.1.0" "-d" "/sentry" "-f" "/sentry/GeoIP.conf"; then
       result='Error'
     fi
     echo "$result updating IP address geolocation database."

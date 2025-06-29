@@ -14,7 +14,7 @@ if [[ "${SETUP_JS_SDK_ASSETS:-}" == "1" ]]; then
 
   $dbuild -t sentry-self-hosted-jq-local --platform="$DOCKER_PLATFORM" jq
 
-  jq="docker run --rm -i sentry-self-hosted-jq-local"
+  jq="$CONTAINER_ENGINE run --rm -i sentry-self-hosted-jq-local"
 
   loader_registry=$($dcr --no-deps --rm -T web cat /usr/src/sentry/src/sentry/loader/_registry.json)
   # The `loader_registry` should start with "Updating certificates...", we want to delete that and the subsequent ca-certificates related lines.
