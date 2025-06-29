@@ -21,19 +21,18 @@ if [ -f $SENTRY_CONFIG_PY ]; then
     # Does `.env.custom` exist?
     if [ ! -f ".env.custom" ]; then
       echo "Creating .env.custom ..."
-      touch .env.custom
+      touch ".env.custom"
     fi
 
-    # Does SENTRY_SYSTEM_SECRET_KEY exist on `.env.custom`?
-    if grep -q "SENTRY_SYSTEM_SECRET_KEY=" .env.custom; then
+    # Does SENTRY_SYSTEM_SECRET_KEY not exist on `.env.custom`?
+    if ! grep -q "SENTRY_SYSTEM_SECRET_KEY=" ".env.custom"; then
       # Generate a new secret key
       SECRET_KEY=$(
         export LC_ALL=C
         head /dev/urandom | tr -dc "a-z0-9@#%^&*(-_=+)" | head -c 50 | sed -e 's/[\/&]/\\&/g'
       )
-      echo "SENTRY_SYSTEM_SECRET_KEY=$SECRET_KEY" >>.env.custom
+      echo "SENTRY_SYSTEM_SECRET_KEY=\"$SECRET_KEY\"" >>".env.custom"
       echo "Secret key written to .env.custom"
-
     fi
   fi
 elif grep -xq "system.secret-key: '!!changeme!!'" $SENTRY_CONFIG_YML; then
