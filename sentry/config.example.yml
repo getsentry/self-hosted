@@ -49,10 +49,16 @@ mail.host: 'smtp'
 # system.url-prefix: https://example.sentry.com
 system.internal-url-prefix: 'http://web:9000'
 
+# DEPRECATED: Set `SENTRY_SYSTEM_SECRET_KEY` on your `.env` or `.env.custom` file
+#             instead. If you are coming from a previous version of self-hosted,
+#             it's okay to not change this value & not change the configuration
+#             file. Just make sure this key is not exposed publicly though
+#             Git repository or any other public place.
+#
 # If this file ever becomes compromised, it's important to generate a new key.
 # Changing this value will result in all current sessions being invalidated.
 # A new key can be generated with `$ sentry config generate-secret-key`
-system.secret-key: '!!changeme!!'
+# system.secret-key: '!!changeme!!'
 
 # The ``redis.clusters`` setting is used, unsurprisingly, to configure Redis
 # clusters. These clusters can be then referred to by name when configuring
