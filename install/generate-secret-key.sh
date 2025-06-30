@@ -16,8 +16,8 @@ echo "${_group}Generating secret key ..."
 # ```yaml
 # system.secret-key: '!!changeme!!'
 # ```
-if [ -f $SENTRY_CONFIG_PY ]; then
-  if grep -xq "SENTRY_OPTIONS\["system.secret-key"\] = env\("SENTRY_SYSTEM_SECRET_KEY"\, "!!changeme!!"\)" $SENTRY_CONFIG_PY; then
+if [ -f "$SENTRY_CONFIG_PY" ]; then
+  if grep -xq "SENTRY_OPTIONS\[\"system.secret-key\"\] = env\(\"SENTRY_SYSTEM_SECRET_KEY\"\, \"!!changeme!!\"\)" $SENTRY_CONFIG_PY; then
     # Does `.env.custom` exist?
     if [ ! -f ".env.custom" ]; then
       echo "Creating .env.custom ..."
