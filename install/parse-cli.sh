@@ -4,7 +4,7 @@ show_help() {
   cat <<EOF
 Usage: $0 [options]
 
-Install Sentry with \`docker compose\`.
+Install Sentry with \`docker|podman compose\`.
 
 Options:
  -h, --help             Show this message and exit.
@@ -29,6 +29,8 @@ Options:
  --no-report-self-hosted-issues
                         Do not report error and performance data about your
                           self-hosted instance upstream to Sentry.
+ --container-engine-podman
+                        Use podman as the container engine.
 EOF
 }
 
@@ -46,6 +48,7 @@ MINIMIZE_DOWNTIME="${MINIMIZE_DOWNTIME:-}"
 SKIP_COMMIT_CHECK="${SKIP_COMMIT_CHECK:-}"
 REPORT_SELF_HOSTED_ISSUES="${REPORT_SELF_HOSTED_ISSUES:-}"
 SKIP_SSE42_REQUIREMENTS="${SKIP_SSE42_REQUIREMENTS:-}"
+CONTAINER_ENGINE_PODMAN="${CONTAINER_ENGINE_PODMAN:-}"
 
 while (($#)); do
   case "$1" in
@@ -67,6 +70,7 @@ while (($#)); do
   --report-self-hosted-issues) REPORT_SELF_HOSTED_ISSUES=1 ;;
   --no-report-self-hosted-issues) REPORT_SELF_HOSTED_ISSUES=0 ;;
   --skip-sse42-requirements) SKIP_SSE42_REQUIREMENTS=1 ;;
+  --container-engine-podman) CONTAINER_ENGINE_PODMAN=1 ;;
   --) ;;
   *)
     echo "Unexpected argument: $1. Use --help for usage information."
