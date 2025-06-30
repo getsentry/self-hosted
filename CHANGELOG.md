@@ -1,5 +1,12 @@
 # Changelog
 
+## 25.6.2
+
+### Various fixes & improvements
+
+- fix: Increase timeout for flakey test (#3781) by @tobias-wilfert
+- chore: provide detailed note for sentry endpoint settings (#3780) by @aldy505
+
 ## 25.6.1
 
 ### Various fixes & improvements
