@@ -1,5 +1,22 @@
 # Changelog
 
+## 25.6.2
+
+### Various fixes & improvements
+
+- fix: Increase timeout for flakey test (#3781) by @tobias-wilfert
+- chore: provide detailed note for sentry endpoint settings (#3780) by @aldy505
+
+## 25.6.1
+
+### Various fixes & improvements
+
+- fix(taskworker) Remove num-brokers (#3769) by @markstory
+- feat: enable customization sentry DSN endpoint (#3747) by @yildizozgur
+- ref(js-assets): Simplify how we call nginx container (#3761) by @BYK
+- Revert "fix(vroom): Explicitly set PROFILES_DIR for upcoming change" (#3760) by @hubertdeng123
+- fix(vroom): Explicitly set PROFILES_DIR for upcoming change (#3759) by @BYK
+
 ## 25.6.0
 
 ### Various fixes & improvements

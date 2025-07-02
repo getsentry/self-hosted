@@ -341,6 +341,18 @@ CSP_REPORT_ONLY = True
 # https://django-csp.readthedocs.io/en/latest/configuration.html
 # CSP_SCRIPT_SRC += ["example.com"]
 
+############################
+# Sentry Endpoint Settings #
+############################
+
+# If your Sentry installation has different hostnames for ingestion and web UI,
+# in which your web UI is accessible via private corporate network, yet your
+# ingestion hostname is accessible from the public internet, you can uncomment
+# this following options in order to have the ingestion hostname rendered
+# correctly on the SDK configuration UI.
+#
+# SENTRY_ENDPOINT = "https://sentry.ingest.example.com"
+
 #################
 # CSRF Settings #
 #################
