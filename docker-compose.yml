@@ -305,6 +305,11 @@ services:
     command: rust-consumer --storage spans --consumer-group snuba-spans-consumers --auto-offset-reset=latest --max-batch-time-ms 1000 --no-strict-offset-reset
     profiles:
       - feature-complete
+  snuba-uptime-results-consumer:
+    <<: *snuba_defaults
+    command: rust-consumer --storage uptime_monitor_checks --consumer-group snuba-uptime-results --auto-offset-reset=latest --max-batch-time-ms 750 --no-strict-offset-reset
+    profiles:
+      - feature-complete
   symbolicator:
     <<: *restart_policy
     image: "$SYMBOLICATOR_IMAGE"
@@ -413,6 +418,11 @@ services:
   monitors-clock-tasks:
     <<: *sentry_defaults
     command: run consumer monitors-clock-tasks --consumer-group monitors-clock-tasks
+    profiles:
+      - feature-complete
+  uptime-results:
+    <<: *sentry_defaults
+    command: run consumer uptime-results --consumer-group uptime-results
     profiles:
       - feature-complete
   post-process-forwarder-transactions:
@@ -531,6 +541,28 @@ services:
     command: '"0 0 * * * find /var/vroom/sentry-profiles -type f -mtime +$SENTRY_EVENT_RETENTION_DAYS -delete"'
     volumes:
       - sentry-vroom:/var/vroom/sentry-profiles
+    profiles:
+      - feature-complete
+  uptime-checker:
+    <<: *restart_policy
+    image: "$UPTIME_CHECKER_IMAGE"
+    command: run
+    environment:
+      UPTIME_CHECKER_RESULTS_KAFKA_CLUSTER: kafka:9092
+      UPTIME_CHECKER_REDIS_HOST: redis://redis:6379
+      # Set to `true` will allow uptime checks against private IP addresses
+      UPTIME_CHECKER_ALLOW_INTERNAL_IPS: "false"
+      # The number of times to retry failed checks before reporting them as failed
+      UPTIME_CHECKER_FAILURE_RETRIES: "1"
+      # DNS name servers to use when making checks in the http checker.
+      # Separated by commas. Leaving this unset will default to the systems dns
+      # resolver.
+      #UPTIME_CHECKER_HTTP_CHECKER_DNS_NAMESERVERS: "8.8.8.8,8.8.4.4"
+    depends_on:
+      kafka:
+        <<: *depends_on-healthy
+      redis:
+        <<: *depends_on-healthy
     profiles:
       - feature-complete
 
