@@ -47,9 +47,9 @@ jobs:
             issue_body=("Failure during applying patches for $patch_dir:")
 
             for patch_file in "$patch_dir"/*.patch; do
-              echo "::debug::Checking for existing issue for $patch_file"
+              echo "Checking for existing issue for $patch_file"
               patch_base_file_name=$(basename "$patch_file" .patch)
-              if ! patch -f --dry-run < "$patch_file"; then
+              if ! patch -s -f --dry-run < "$patch_file"; then
                 problem=$(patch -f --dry-run < "$patch_file")
                 issue_body+=($problem)
                 echo "::error::Patch $patch_file failed to apply"
@@ -61,7 +61,7 @@ jobs:
             if [ "${#issue_body[@]}" -gt 1 ]; then
               issue_exists=$(gh issue list --search "$issue_title in:title" --state open --json title --jq 'if length == 0 then empty end')
               if [ -z "$issue_exists" ]; then
-                echo "::debug::Creating issue for $patch_dir"
+                echo "Creating issue for $patch_dir"
                 gh issue create --title "$issue_title" --body "${issue_body[*]}"
               fi
             fi
