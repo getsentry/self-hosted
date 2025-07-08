@@ -1,8 +1,6 @@
 name: Optional Modifications
 
 on:
-  # NOTE(reinaldy): This `pull_request` trigger should be removed once we have it tested on the PR.
-  pull_request:
   workflow_dispatch:
   schedule:
     - cron: "0 0 */7 * *"
