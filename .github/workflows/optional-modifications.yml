@@ -49,8 +49,8 @@ jobs:
             for patch_file in "$patch_dir"/*.patch; do
               echo "Checking for existing issue for $patch_file"
               patch_base_file_name=$(basename "$patch_file" .patch)
-              if ! patch -s -f --dry-run < "$patch_file"; then
-                problem=$(patch -f --dry-run < "$patch_file")
+              if ! patch -p0 -s -f --dry-run < "$patch_file"; then
+                problem=$(patch -p0 -f --dry-run < "$patch_file")
                 issue_body+=($problem)
                 echo "::error::Patch $patch_file failed to apply"
               fi
