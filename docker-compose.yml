@@ -305,6 +305,14 @@ services:
     command: rust-consumer --storage spans --consumer-group snuba-spans-consumers --auto-offset-reset=latest --max-batch-time-ms 1000 --no-strict-offset-reset
     profiles:
       - feature-complete
+  snuba-eap-items-consumer:
+    <<: *snuba_defaults
+    command: rust-consumer --storage eap_items --consumer-group eap_items_group --auto-offset-reset=latest --max-batch-time-ms 1000 --no-strict-offset-reset --use-rust-processor
+    profiles:
+      - feature-complete
+  snuba-subscription-consumer-eap-items:
+    <<: *snuba_defaults
+    command: subscriptions-scheduler-executor --dataset events_analytics_platform --entity eap_items --auto-offset-reset=latest --no-strict-offset-reset --consumer-group=snuba-eap-items-subscriptions-consumers --followed-consumer-group=eap_items_group --schedule-ttl=60 --stale-threshold-seconds=900
   snuba-uptime-results-consumer:
     <<: *snuba_defaults
     command: rust-consumer --storage uptime_monitor_checks --consumer-group snuba-uptime-results --auto-offset-reset=latest --max-batch-time-ms 750 --no-strict-offset-reset
@@ -410,6 +418,16 @@ services:
     command: run consumer ingest-feedback-events --consumer-group ingest-feedback
     profiles:
       - feature-complete
+  process-spans:
+    <<: *sentry_defaults
+    command: run consumer --no-strict-offset-reset process-spans --consumer-group process-spans
+    profiles:
+      - feature-complete
+  process-segments:
+    <<: *sentry_defaults
+    command: run consumer --no-strict-offset-reset process-segments --consumer-group process-segments
+    profiles:
+      - feature-complete
   monitors-clock-tick:
     <<: *sentry_defaults
     command: run consumer monitors-clock-tick --consumer-group monitors-clock-tick
@@ -438,6 +456,11 @@ services:
   subscription-consumer-transactions:
     <<: *sentry_defaults
     command: run consumer transactions-subscription-results --consumer-group query-subscription-consumer
+    profiles:
+      - feature-complete
+  subscription-consumer-eap-items:
+    <<: *sentry_defaults
+    command: run consumer subscription-results-eap-items --consumer-group subscription-results-eap-items
     profiles:
       - feature-complete
   subscription-consumer-metrics:
