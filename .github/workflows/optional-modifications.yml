@@ -8,7 +8,7 @@ on:
     - cron: "0 0 */7 * *"
 
 concurrency:
-  group: ${{ github.ref_name || github.sha }}
+  group: self-hosted-optional-modifications
   cancel-in-progress: true
 
 defaults:
