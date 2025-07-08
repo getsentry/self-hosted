@@ -19,6 +19,9 @@ jobs:
   test-apply-patch:
     name: Test Apply Patch
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
