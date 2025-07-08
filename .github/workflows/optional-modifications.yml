@@ -1,0 +1,69 @@
+name: Optional Modifications
+
+on:
+  # NOTE(reinaldy): This `pull_request` trigger should be removed once we have it tested on the PR.
+  pull_request:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 0 */7 * *"
+
+concurrency:
+  group: ${{ github.ref_name || github.sha }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  test-apply-patch:
+    name: Test Apply Patch
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Apply patches
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -e
+
+          # For each directory in `optional-modifications/patches/`, we will try to execute:
+          # `patch < optional-modifications/patches/<dir>/<file>.patch`
+          # with `<file>` being the name of the file in the directory that we loop through.
+          #
+          # If the patch fails, we will open a GitHub issue with the failing patch file.
+          # To prevent so many issues created, we will check first whether there is already
+          # an issue open with the same patch `<dir>` (without the file name).
+
+          for patch_dir in optional-modifications/patches/*; do
+            echo "::group::Checking for existing issue for $patch_dir"
+
+            issue_title="[Optional Modification Failure] $patch_dir"
+            issue_body=("Failure during applying patches for $patch_dir:")
+
+            for patch_file in "$patch_dir"/*.patch; do
+              echo "::debug::Checking for existing issue for $patch_file"
+              patch_base_file_name=$(basename "$patch_file" .patch)
+              if ! patch -f --dry-run < "$patch_file"; then
+                problem=$(patch -f --dry-run < "$patch_file")
+                issue_body+=($problem)
+                echo "::error::Patch $patch_file failed to apply"
+              fi
+            done
+
+            # If the length of `issue_body` array is greater than 1,
+            # then we have a problem and we need to open an issue.
+            if [ "${#issue_body[@]}" -gt 1 ]; then
+              issue_exists=$(gh issue list --search "$issue_title in:title" --state open --json title --jq 'if length == 0 then empty end')
+              if [ -z "$issue_exists" ]; then
+                echo "::debug::Creating issue for $patch_dir"
+                gh issue create --title "$issue_title" --body "${issue_body[*]}"
+            fi
+
+            echo "::debug::Reset the repository state"
+            git reset --hard
+
+            echo "::endgroup::"
+          done
