@@ -230,6 +230,9 @@ SENTRY_WEB_OPTIONS = {
     "workers": 3,
     "threads": 4,
     "memory-report": False,
+    # Kills requests that take longer than 30s
+    # which can help avoid stuck workers caused by GIL issues or deadlocks
+    "harakiri": 30,
     # Some stuff so uwsgi will cycle workers sensibly
     "max-requests": 100000,
     "max-requests-delta": 500,
