@@ -63,6 +63,7 @@ jobs:
               if [ -z "$issue_exists" ]; then
                 echo "::debug::Creating issue for $patch_dir"
                 gh issue create --title "$issue_title" --body "${issue_body[*]}"
+              fi
             fi
 
             echo "::debug::Reset the repository state"
