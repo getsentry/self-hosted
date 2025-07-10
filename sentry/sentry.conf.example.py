@@ -235,7 +235,7 @@ SENTRY_WEB_OPTIONS = {
     # caused by GIL issues or deadlocks.
     # Ensure nginx `proxy_read_timeout` configuration (default: 30)
     # on your `nginx.conf` file to be at least 5 seconds longer than this.
-    # "harakiri": 30,
+    # "harakiri": 25,
     # Some stuff so uwsgi will cycle workers sensibly
     "max-requests": 100000,
     "max-requests-delta": 500,
