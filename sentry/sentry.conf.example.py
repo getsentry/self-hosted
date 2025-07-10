@@ -233,7 +233,7 @@ SENTRY_WEB_OPTIONS = {
     # The `harakiri` option terminates requests that take longer than the
     # defined amount of time (in seconds) which can help avoid stuck workers
     # caused by GIL issues or deadlocks.
-    # Modifying this value will also require you to modify `proxy_read_timeout`
+    # Ensure nginx `proxy_read_timeout` configuration (default: 30)
     # on your `nginx.conf` file to be at least 5 seconds longer than this.
     # "harakiri": 30,
     # Some stuff so uwsgi will cycle workers sensibly
