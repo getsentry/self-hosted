@@ -298,7 +298,7 @@ SENTRY_FEATURES.update(
             "organizations:dashboards-rh-widget",
             "organizations:metrics-extraction",
             "organizations:transaction-metrics-extraction",
-            "organizations:trace-view-v1",
+            "organizations:visibility-explore-view",
             "organizations:dynamic-sampling",
             "projects:custom-inbound-filters",
             "projects:data-forwarding",
