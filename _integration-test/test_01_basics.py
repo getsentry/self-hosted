@@ -398,7 +398,7 @@ def test_receive_transaction_events(client_login):
         lambda x: len(json.loads(x)["data"]) > 0,
     )
     poll_for_response(
-        f"{SENTRY_TEST_HOST}/api/0/organizations/sentry/events/?dataset=spansIndexed&field=id&project=1&statsPeriod=1h",
+        f"{SENTRY_TEST_HOST}/api/0/organizations/sentry/events/?dataset=spans&field=id&project=1&statsPeriod=1h",
         client,
         lambda x: len(json.loads(x)["data"]) > 0,
     )
