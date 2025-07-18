@@ -54,9 +54,3 @@ jobs:
         uses: './'
         with:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-
-      - name: Inspect failure
-        if: failure()
-        run: |
-          docker compose ps
-          docker compose logs
