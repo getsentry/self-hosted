@@ -171,6 +171,7 @@ runs:
 
     - name: Inspect failure
       if: failure()
+      shell: bash
       run: |
         echo "::group::Inspect failure - docker compose ps"
         docker compose ps
