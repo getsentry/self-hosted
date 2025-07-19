@@ -168,3 +168,14 @@ runs:
       with:
         directory: ${{ github.action_path }}
         token: ${{ inputs.CODECOV_TOKEN }}
+
+    - name: Inspect failure
+      if: failure()
+      shell: bash
+      run: |
+        echo "::group::Inspect failure - docker compose ps"
+        docker compose ps
+        echo "::endgroup::"
+        echo "::group::Inspect failure - docker compose logs"
+        docker compose logs
+        echo "::endgroup::"
