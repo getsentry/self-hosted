@@ -291,7 +291,6 @@ SENTRY_FEATURES.update(
             "organizations:integrations-issue-sync",
             "organizations:invite-members",
             "organizations:sso-basic",
-            "organizations:sso-rippling",
             "organizations:sso-saml2",
             "organizations:performance-view",
             "organizations:advanced-search",
