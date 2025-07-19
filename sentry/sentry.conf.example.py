@@ -301,7 +301,6 @@ SENTRY_FEATURES.update(
             "organizations:dashboards-mep",
             "organizations:mep-rollout-flag",
             "organizations:dashboards-rh-widget",
-            "organizations:metrics-extraction",
             "organizations:transaction-metrics-extraction",
             "organizations:visibility-explore-view",
             "organizations:dynamic-sampling",
