@@ -650,3 +650,4 @@ volumes:
   sentry-kafka-log:
   sentry-smtp-log:
   sentry-clickhouse-log:
+  sentry-garage:

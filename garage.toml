@@ -1,0 +1,19 @@
+metadata_dir = "/var/lib/garage/meta"
+data_dir = "/var/lib/garage/data"
+db_engine = "sqlite"
+
+replication_factor = 1
+# idk why rcp_ is needed without replication but ok
+rpc_bind_addr = "[::]:3901"
+rpc_public_addr = "0.0.0.0:3901"
+# This secret will not ever be used as we are in a single node setup
+# so this static value is OK. Don't forget to change it if you ever
+# decide to use garage in a multi-node setup.
+rpc_secret = "28f2fc651d4f280cea95e166f9113fe589039f9711d6c4f461872c1c5aaf7dec"
+
+# Setting 0 chooses the default which is 3 for now
+compression_level = 0
+
+[s3_api]
+s3_region = "garage"
+api_bind_addr = "[::]:3900"
