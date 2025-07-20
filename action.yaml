@@ -1,0 +1,181 @@
+name: "Sentry self-hosted end-to-end tests"
+inputs:
+  project_name:
+    required: false
+    description: "e.g. snuba, sentry, relay, self-hosted"
+  image_url:
+    required: false
+    description: "The URL to the built relay, snuba, sentry image to test against."
+  CODECOV_TOKEN:
+    required: false
+    description: "The Codecov token to upload coverage."
+
+runs:
+  using: "composite"
+  steps:
+    - name: Validate inputs and configure test image
+      shell: bash
+      env:
+        PROJECT_NAME: ${{ inputs.project_name }}
+        IMAGE_URL: ${{ inputs.image_url }}
+      run: |
+        if [[ -n "$PROJECT_NAME" && -n "$IMAGE_URL" ]]; then
+          image_var=$(echo "${PROJECT_NAME}_IMAGE" | tr '[:lower:]' '[:upper:]')
+          echo "${image_var}=$IMAGE_URL" >> ${{ github.action_path }}/.env
+        elif [[ -z "$PROJECT_NAME" && -z "$IMAGE_URL" ]]; then
+          echo "No project name and image URL set. Skipping image configuration."
+        else
+          echo "You must set both project_name and image_url or unset both."
+          echo "project_name: $PROJECT_NAME, image_url: $IMAGE_URL"
+          exit 1
+        fi
+
+    - name: Setup dev environment
+      shell: bash
+      run: |
+        cd ${{ github.action_path }}
+        pip install -r requirements-dev.txt
+        echo "PY_COLORS=1" >> "$GITHUB_ENV"
+        ### pytest-sentry configuration ###
+        if [ "$GITHUB_REPOSITORY" = "getsentry/self-hosted" ]; then
+          echo "PYTEST_SENTRY_DSN=$SELF_HOSTED_TESTING_DSN" >> $GITHUB_ENV
+          echo "PYTEST_SENTRY_TRACES_SAMPLE_RATE=0" >> $GITHUB_ENV
+
+          # This records failures on master to sentry in order to detect flakey tests, as it's
+          # expected that people have failing tests on their PRs
+          if [ "$GITHUB_REF" = "refs/heads/master" ]; then
+            echo "PYTEST_SENTRY_ALWAYS_REPORT=1" >> $GITHUB_ENV
+          fi
+        fi
+
+    - name: Get Compose
+      uses: getsentry/self-hosted/get-compose-action@master
+
+    - name: Compute Docker Volume Cache Keys
+      id: cache_key
+      shell: bash
+      run: |
+        source ${{ github.action_path }}/.env
+        # See https://explainshell.com/explain?cmd=ls%20-Rv1rpq
+        # for that long `ls` command
+        SENTRY_MIGRATIONS_MD5=$(docker run --rm --entrypoint bash $SENTRY_IMAGE -c '{ cat migrations_lockfile.txt; grep -Poz "(?s)(?<=class Topic\\(Enum\\):\\n).+?(?=\\n\\n\\n)" src/sentry/conf/types/kafka_definition.py; }' | md5sum | cut -d ' ' -f 1)
+        echo "SENTRY_MIGRATIONS_MD5=$SENTRY_MIGRATIONS_MD5" >> $GITHUB_OUTPUT
+        SNUBA_MIGRATIONS_MD5=$(docker run --rm --entrypoint bash $SNUBA_IMAGE -c '{ ls -Rv1rpq snuba/snuba_migrations/**/*.py; grep -Poz "(?s)(?<=class Topic\\(Enum\\):\\n).+?(?=\\n\\n\\n)" snuba/utils/streams/topics.py; }' | md5sum | cut -d ' ' -f 1)
+        echo "SNUBA_MIGRATIONS_MD5=$SNUBA_MIGRATIONS_MD5" >> $GITHUB_OUTPUT
+
+    - name: Restore Sentry Volume Cache
+      id: restore_cache_sentry
+      uses: BYK/docker-volume-cache-action/restore@be89365902126f508dcae387a32ec3712df6b1cd
+      with:
+        key: db-volumes-sentry-v2-${{ steps.cache_key.outputs.SENTRY_MIGRATIONS_MD5 }}
+        restore-keys: |
+          db-volumes-sentry-v1-
+        volumes: |
+          sentry-postgres
+
+    - name: Restore Snuba Volume Cache
+      id: restore_cache_snuba
+      uses: BYK/docker-volume-cache-action/restore@be89365902126f508dcae387a32ec3712df6b1cd
+      with:
+        key: db-volumes-snuba-v2-${{ steps.cache_key.outputs.SNUBA_MIGRATIONS_MD5 }}
+        restore-keys: |
+          db-volumes-snuba-v1-
+        volumes: |
+          sentry-clickhouse
+
+    - name: Restore Kafka Volume Cache
+      id: restore_cache_kafka
+      uses: BYK/docker-volume-cache-action/restore@be89365902126f508dcae387a32ec3712df6b1cd
+      with:
+        key: db-volumes-kafka-v1-${{ steps.cache_key.outputs.SENTRY_MIGRATIONS_MD5 }}-${{ steps.cache_key.outputs.SNUBA_MIGRATIONS_MD5 }}
+        restore-keys: |
+          db-volumes-kafka-v1-${{ steps.cache_key.outputs.SENTRY_MIGRATIONS_MD5 }}-${{ steps.cache_key.outputs.SNUBA_MIGRATIONS_MD5 }}
+          db-volumes-kafka-v1-${{ steps.cache_key.outputs.SENTRY_MIGRATIONS_MD5 }}-
+          db-volumes-kafka-v1-
+        volumes: |
+          sentry-kafka
+
+    - name: Install self-hosted
+      env:
+        # Note that cache keys for Sentry and Snuba have their respective Kafka configs built into them
+        # and the Kafka volume cache is comprises both keys. This way we can omit the Kafka cache hit
+        # in here to still avoid running Sentry or Snuba migrations if only one of their Kafka config has
+        # changed. Heats up your head a bit but if you think about it, it makes sense.
+        SKIP_SENTRY_MIGRATIONS: ${{ steps.restore_cache_sentry.outputs.cache-hit == 'true' && '1' || '' }}
+        SKIP_SNUBA_MIGRATIONS: ${{ steps.restore_cache_snuba.outputs.cache-hit == 'true' && '1' || '' }}
+      shell: bash
+      run: |
+        cd ${{ github.action_path }}
+        # Add some customizations to test that path
+        cat <<EOT >> sentry/enhance-image.sh
+        #!/bin/bash
+        touch /created-by-enhance-image
+        apt-get update
+        apt-get install -y gcc libsasl2-dev python-dev-is-python3 libldap2-dev libssl-dev
+        EOT
+        chmod 755 sentry/enhance-image.sh
+        echo "python-ldap" > sentry/requirements.txt
+
+        ./install.sh --no-report-self-hosted-issues --skip-commit-check
+
+    - name: Save Sentry Volume Cache
+      if: steps.restore_cache_sentry.outputs.cache-hit != 'true'
+      uses: BYK/docker-volume-cache-action/save@be89365902126f508dcae387a32ec3712df6b1cd
+      with:
+        key: ${{ steps.restore_cache_sentry.outputs.cache-primary-key }}
+        volumes: |
+          sentry-postgres
+
+    - name: Save Snuba Volume Cache
+      if: steps.restore_cache_snuba.outputs.cache-hit != 'true'
+      uses: BYK/docker-volume-cache-action/save@be89365902126f508dcae387a32ec3712df6b1cd
+      with:
+        key: ${{ steps.restore_cache_snuba.outputs.cache-primary-key }}
+        volumes: |
+          sentry-clickhouse
+
+    - name: Save Kafka Volume Cache
+      if: steps.restore_cache_kafka.outputs.cache-hit != 'true'
+      uses: BYK/docker-volume-cache-action/save@be89365902126f508dcae387a32ec3712df6b1cd
+      with:
+        key: ${{ steps.restore_cache_kafka.outputs.cache-primary-key }}
+        volumes: |
+          sentry-kafka
+
+    - name: Integration Test
+      shell: bash
+      run: |
+        sudo chown root /usr/bin/rsync && sudo chmod u+s /usr/bin/rsync
+        rsync -aW --super --numeric-ids --no-compress --mkpath \
+          /var/lib/docker/volumes/sentry-postgres \
+          /var/lib/docker/volumes/sentry-clickhouse \
+          /var/lib/docker/volumes/sentry-kafka \
+          "$RUNNER_TEMP/volumes/"
+        cd ${{ github.action_path }}
+        pytest -x --cov --junitxml=junit.xml _integration-test/
+
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v5
+      if: inputs.CODECOV_TOKEN
+      with:
+        directory: ${{ github.action_path }}
+        token: ${{ inputs.CODECOV_TOKEN }}
+        slug: getsentry/self-hosted
+
+    - name: Upload test results to Codecov
+      if: inputs.CODECOV_TOKEN && !cancelled()
+      uses: codecov/test-results-action@v1
+      with:
+        directory: ${{ github.action_path }}
+        token: ${{ inputs.CODECOV_TOKEN }}
+
+    - name: Inspect failure
+      if: failure()
+      shell: bash
+      run: |
+        echo "::group::Inspect failure - docker compose ps"
+        docker compose ps
+        echo "::endgroup::"
+        echo "::group::Inspect failure - docker compose logs"
+        docker compose logs
+        echo "::endgroup::"

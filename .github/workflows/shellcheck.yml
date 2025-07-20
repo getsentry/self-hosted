@@ -1,0 +1,44 @@
+---
+name: "ShellCheck"
+on:
+  push:
+    paths:
+      - "**.sh"
+    branches: [master]
+  pull_request:
+    paths:
+      - "**.sh"
+    branches: [master]
+
+jobs:
+  shellcheck:
+    name: ShellCheck
+    runs-on: ubuntu-latest
+    steps:
+      - name: Repository checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run ShellCheck
+        run: |
+          git diff --name-only -z `git merge-base origin/master HEAD` -- \
+            install/_lib.sh \
+            'optional-modifications/**.sh' \
+            'scripts/**.sh' \
+            unit-test.sh \
+            'workstation/**.sh' \
+          | xargs -0 -r -- \
+            shellcheck \
+              --shell=bash \
+              --format=json1 \
+              --external-sources \
+          | jq -r '
+            .comments
+            | map(.level |= if ([.] | inside(["info", "style"])) then "notice" else . end)
+            | .[] as $note
+            | "::\($note.level) file=\($note.file),line=\($note.line),endLine=\($note.endLine),col=\($note.column),endColumn=\($note.endColumn)::[SC\($note.code)] \($note.message)"
+          ' \
+          | grep . >&2 && exit 1
+
+          exit 0

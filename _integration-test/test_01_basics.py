@@ -22,7 +22,7 @@ SENTRY_CONFIG_PY = "sentry/sentry.conf.py"
 SENTRY_TEST_HOST = os.getenv("SENTRY_TEST_HOST", "http://localhost:9000")
 TEST_USER = "test@example.com"
 TEST_PASS = "test123TEST"
-TIMEOUT_SECONDS = 60
+TIMEOUT_SECONDS = 120
 
 
 def poll_for_response(
@@ -123,8 +123,10 @@ def test_login(client_login):
 def test_receive_event(client_login):
     event_id = None
     client, _ = client_login
-    with sentry_sdk.init(dsn=get_sentry_dsn(client)):
-        event_id = sentry_sdk.capture_exception(Exception("a failure"))
+
+    sentry_sdk.init(dsn=get_sentry_dsn(client))
+
+    event_id = sentry_sdk.capture_exception(Exception("a failure"))
     assert event_id is not None
     response = poll_for_response(
         f"{SENTRY_TEST_HOST}/api/0/projects/sentry/internal/events/{event_id}/", client
@@ -177,8 +179,8 @@ def test_custom_certificate_authorities():
         .issuer_name(ca_name)
         .public_key(ca_key.public_key())
         .serial_number(x509.random_serial_number())
-        .not_valid_before(datetime.datetime.utcnow())
-        .not_valid_after(datetime.datetime.utcnow() + datetime.timedelta(days=1))
+        .not_valid_before(datetime.datetime.now(datetime.timezone.utc))
+        .not_valid_after(datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(days=1))
         .add_extension(x509.BasicConstraints(ca=True, path_length=None), critical=True)
         .add_extension(
             x509.KeyUsage(
@@ -326,7 +328,15 @@ def test_custom_certificate_authorities():
         )
 
     subprocess.run(
-        ["docker", "compose", "--ansi", "never", "up", "-d", "fixture-custom-ca-roots"],
+        [
+            "docker",
+            "compose",
+            "--ansi",
+            "never",
+            "up",
+            "--wait",
+            "fixture-custom-ca-roots",
+        ],
         check=True,
     )
     subprocess.run(
@@ -369,18 +379,19 @@ def test_custom_certificate_authorities():
 
 def test_receive_transaction_events(client_login):
     client, _ = client_login
-    with sentry_sdk.init(
+    sentry_sdk.init(
         dsn=get_sentry_dsn(client), profiles_sample_rate=1.0, traces_sample_rate=1.0
-    ):
+    )
 
-        def placeholder_fn():
-            sum = 0
-            for i in range(5):
-                sum += i
-                time.sleep(0.25)
+    def placeholder_fn():
+        sum = 0
+        for i in range(5):
+            sum += i
+            time.sleep(0.25)
 
-        with sentry_sdk.start_transaction(op="task", name="Test Transactions"):
-            placeholder_fn()
+    with sentry_sdk.start_transaction(op="task", name="Test Transactions"):
+        placeholder_fn()
+
     poll_for_response(
         f"{SENTRY_TEST_HOST}/api/0/organizations/sentry/events/?dataset=profiles&field=profile.id&project=1&statsPeriod=1h",
         client,
@@ -448,7 +459,4 @@ def test_customizations():
     ]
     for command in commands:
         result = subprocess.run(command, check=False)
-        if os.getenv("TEST_CUSTOMIZATIONS", "disabled") == "enabled":
-            assert result.returncode == 0
-        else:
-            assert result.returncode != 0
+        assert result.returncode == 0

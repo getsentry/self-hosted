@@ -86,15 +86,19 @@ x-snuba-defaults: &snuba_defaults
     # Leaving the value empty to just pass whatever is set
     # on the host system (or in the .env file)
     SENTRY_EVENT_RETENTION_DAYS:
+    # If you have statsd server, you can utilize that to monitor self-hosted Snuba containers.
+    # To start, state these environment variables below on your `.env.` file and adjust the options as needed.
+    SNUBA_STATSD_HOST: # Example value: "100.100.123.123". Must be an IP address, not domain name
+    SNUBA_STATSD_PORT: # Example value: 8125
 services:
   smtp:
     <<: *restart_policy
-    platform: linux/amd64
-    image: tianon/exim4
-    hostname: "${SENTRY_MAIL_HOST:-}"
+    image: registry.gitlab.com/egos-tech/smtp
     volumes:
       - "sentry-smtp:/var/spool/exim4"
       - "sentry-smtp-log:/var/log/exim4"
+    environment:
+      - MAILNAME=${SENTRY_MAIL_HOST:-}
   memcached:
     <<: *restart_policy
     image: "memcached:1.6.26-alpine"
@@ -129,11 +133,7 @@ services:
       # Using default user "postgres" from sentry/sentry.conf.example.py or value of POSTGRES_USER if provided
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
     command:
-      [
-        "postgres",
-        "-c",
-        "max_connections=${POSTGRES_MAX_CONNECTIONS:-100}",
-      ]
+      ["postgres", "-c", "max_connections=${POSTGRES_MAX_CONNECTIONS:-100}"]
     environment:
       POSTGRES_HOST_AUTH_METHOD: "trust"
     volumes:
@@ -311,9 +311,27 @@ services:
     command: rust-consumer --storage functions_raw --consumer-group snuba-consumers --auto-offset-reset=latest --max-batch-time-ms 1000 --no-strict-offset-reset
     profiles:
       - feature-complete
+  snuba-profiling-profile-chunks-consumer:
+    <<: *snuba_defaults
+    command: rust-consumer --storage profile_chunks --consumer-group snuba-consumers --auto-offset-reset=latest --max-batch-time-ms 1000 --no-strict-offset-reset
+    profiles:
+      - feature-complete
   snuba-spans-consumer:
     <<: *snuba_defaults
     command: rust-consumer --storage spans --consumer-group snuba-spans-consumers --auto-offset-reset=latest --max-batch-time-ms 1000 --no-strict-offset-reset
+    profiles:
+      - feature-complete
+  snuba-eap-items-consumer:
+    <<: *snuba_defaults
+    command: rust-consumer --storage eap_items --consumer-group eap_items_group --auto-offset-reset=latest --max-batch-time-ms 1000 --no-strict-offset-reset --use-rust-processor
+    profiles:
+      - feature-complete
+  snuba-subscription-consumer-eap-items:
+    <<: *snuba_defaults
+    command: subscriptions-scheduler-executor --dataset events_analytics_platform --entity eap_items --auto-offset-reset=latest --no-strict-offset-reset --consumer-group=snuba-eap-items-subscriptions-consumers --followed-consumer-group=eap_items_group --schedule-ttl=60 --stale-threshold-seconds=900
+  snuba-uptime-results-consumer:
+    <<: *snuba_defaults
+    command: rust-consumer --storage uptime_monitor_checks --consumer-group snuba-uptime-results --auto-offset-reset=latest --max-batch-time-ms 750 --no-strict-offset-reset
     profiles:
       - feature-complete
   symbolicator:
@@ -416,6 +434,16 @@ services:
     command: run consumer ingest-feedback-events --consumer-group ingest-feedback
     profiles:
       - feature-complete
+  process-spans:
+    <<: *sentry_defaults
+    command: run consumer --no-strict-offset-reset process-spans --consumer-group process-spans
+    profiles:
+      - feature-complete
+  process-segments:
+    <<: *sentry_defaults
+    command: run consumer --no-strict-offset-reset process-segments --consumer-group process-segments
+    profiles:
+      - feature-complete
   monitors-clock-tick:
     <<: *sentry_defaults
     command: run consumer monitors-clock-tick --consumer-group monitors-clock-tick
@@ -424,6 +452,11 @@ services:
   monitors-clock-tasks:
     <<: *sentry_defaults
     command: run consumer monitors-clock-tasks --consumer-group monitors-clock-tasks
+    profiles:
+      - feature-complete
+  uptime-results:
+    <<: *sentry_defaults
+    command: run consumer uptime-results --consumer-group uptime-results
     profiles:
       - feature-complete
   post-process-forwarder-transactions:
@@ -439,6 +472,11 @@ services:
   subscription-consumer-transactions:
     <<: *sentry_defaults
     command: run consumer transactions-subscription-results --consumer-group query-subscription-consumer
+    profiles:
+      - feature-complete
+  subscription-consumer-eap-items:
+    <<: *sentry_defaults
+    command: run consumer subscription-results-eap-items --consumer-group subscription-results-eap-items
     profiles:
       - feature-complete
   subscription-consumer-metrics:
@@ -494,16 +532,34 @@ services:
         <<: *depends_on-healthy
       web:
         <<: *depends_on-healthy
+  taskbroker:
+    <<: *restart_policy
+    image: "$TASKBROKER_IMAGE"
+    environment:
+      TASKBROKER_KAFKA_CLUSTER: "kafka:9092"
+      TASKBROKER_KAFKA_DEADLETTER_CLUSTER: "kafka:9092"
+      TASKBROKER_DB_PATH: "/opt/sqlite/taskbroker-activations.sqlite"
+    volumes:
+      - sentry-taskbroker:/opt/sqlite
+    depends_on:
+      kafka:
+        <<: *depends_on-healthy
+  taskscheduler:
+    <<: *sentry_defaults
+    command: run taskworker-scheduler
+  taskworker:
+    <<: *sentry_defaults
+    command: run taskworker --concurrency=4 --rpc-host=taskbroker:50051
   vroom:
     <<: *restart_policy
     image: "$VROOM_IMAGE"
     environment:
       SENTRY_KAFKA_BROKERS_PROFILING: "kafka:9092"
       SENTRY_KAFKA_BROKERS_OCCURRENCES: "kafka:9092"
-      SENTRY_BUCKET_PROFILES: file://localhost//var/lib/sentry-profiles
+      SENTRY_BUCKET_PROFILES: file:///var/vroom/sentry-profiles
       SENTRY_SNUBA_HOST: "http://snuba-api:1218"
     volumes:
-      - sentry-vroom:/var/lib/sentry-profiles
+      - sentry-vroom:/var/vroom/sentry-profiles
     depends_on:
       kafka:
         <<: *depends_on-healthy
@@ -521,9 +577,31 @@ services:
       # Leaving the value empty to just pass whatever is set
       # on the host system (or in the .env file)
       SENTRY_EVENT_RETENTION_DAYS:
-    command: '"0 0 * * * find /var/lib/sentry-profiles -type f -mtime +$SENTRY_EVENT_RETENTION_DAYS -delete"'
+    command: '"0 0 * * * find /var/vroom/sentry-profiles -type f -mtime +$SENTRY_EVENT_RETENTION_DAYS -delete"'
     volumes:
-      - sentry-vroom:/var/lib/sentry-profiles
+      - sentry-vroom:/var/vroom/sentry-profiles
+    profiles:
+      - feature-complete
+  uptime-checker:
+    <<: *restart_policy
+    image: "$UPTIME_CHECKER_IMAGE"
+    command: run
+    environment:
+      UPTIME_CHECKER_RESULTS_KAFKA_CLUSTER: kafka:9092
+      UPTIME_CHECKER_REDIS_HOST: redis://redis:6379
+      # Set to `true` will allow uptime checks against private IP addresses
+      UPTIME_CHECKER_ALLOW_INTERNAL_IPS: "false"
+      # The number of times to retry failed checks before reporting them as failed
+      UPTIME_CHECKER_FAILURE_RETRIES: "1"
+      # DNS name servers to use when making checks in the http checker.
+      # Separated by commas. Leaving this unset will default to the systems dns
+      # resolver.
+      #UPTIME_CHECKER_HTTP_CHECKER_DNS_NAMESERVERS: "8.8.8.8,8.8.4.4"
+    depends_on:
+      kafka:
+        <<: *depends_on-healthy
+      redis:
+        <<: *depends_on-healthy
     profiles:
       - feature-complete
 
@@ -548,6 +626,10 @@ volumes:
   # Not being external will still persist data across restarts.
   # It won't persist if someone does a docker compose down -v.
   sentry-vroom:
+  # This volume stores task data that is inflight
+  # It should persist across restarts. If this volume is
+  # deleted, up to ~2048 tasks will be lost.
+  sentry-taskbroker:
   # These store ephemeral data that needn't persist across restarts.
   # That said, volumes will be persisted across restarts until they are deleted.
   sentry-secrets:
