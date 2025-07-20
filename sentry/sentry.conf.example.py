@@ -291,7 +291,6 @@ SENTRY_FEATURES.update(
             "organizations:integrations-issue-sync",
             "organizations:invite-members",
             "organizations:sso-basic",
-            "organizations:sso-rippling",
             "organizations:sso-saml2",
             "organizations:performance-view",
             "organizations:advanced-search",
@@ -302,7 +301,6 @@ SENTRY_FEATURES.update(
             "organizations:dashboards-mep",
             "organizations:mep-rollout-flag",
             "organizations:dashboards-rh-widget",
-            "organizations:metrics-extraction",
             "organizations:transaction-metrics-extraction",
             "organizations:visibility-explore-view",
             "organizations:dynamic-sampling",
@@ -326,8 +324,6 @@ SENTRY_FEATURES.update(
         )
         # User Feedback related flags
         + (
-            "organizations:user-feedback-ingest",
-            "organizations:user-feedback-replay-clip",
             "organizations:user-feedback-ui",
         )
         # Continuous Profiling related flags
