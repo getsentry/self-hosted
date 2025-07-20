@@ -34,7 +34,7 @@ x-sentry-defaults: &sentry_defaults
       <<: *depends_on-default
     smtp:
       <<: *depends_on-default
-    garage:
+    blob-storage:
       <<: *depends_on-default
     snuba-api:
       <<: *depends_on-default
@@ -210,19 +210,29 @@ services:
       interval: 10s
       timeout: 10s
       retries: 30
-  garage:
-    image: dxflrs/garage:v1.0.1
+  blob-storage:
+    image: "rustfs/rustfs:1.0.0-alpha.33"
+    environment:
+      RUSTFS_VOLUMES: "/data/rustfs0"
+      RUSTFS_ADDRESS: ":7000"
+      RUSTFS_CONSOLE_ENABLE: false
+      RUSTFS_CONSOLE_ADDRESS: ":7001"
+      RUSTFS_ACCESS_KEY: "self-hosted-sentry"
+      RUSTFS_SECRET_KEY: "self-hosted-sentry"
+      RUSTFS_LOG_LEVEL: "info"
     volumes:
-      - type: bind
-        read_only: true
-        source: ./garage.toml
-        target: /etc/garage.toml
-      - "sentry-garage:/var/lib/garage/"
+      - "sentry-blob-storage:/data/rustfs0"
     healthcheck:
-      test: ["CMD", "/garage", "status"]
-      interval: 10s
-      timeout: 2s
-      retries: 2
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:9000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+  minio-cli:
+    image: "minio/mc:RELEASE.2025-07-16T15-35-03Z-cpuv1"
+    command: ["exit", "0"]
+    environment:
+      MC_HOST_BLOB: "http://self-hosted-sentry:self-hosted-sentry@blob-storage:7000"
   snuba-api:
     <<: *snuba_defaults
   # Kafka consumer responsible for feeding events into Clickhouse
@@ -619,6 +629,8 @@ volumes:
     external: true
   sentry-symbolicator:
     external: true
+  sentry-blob-storage:
+    external: true
   # This volume stores JS SDK assets and the data inside this volume should
   # be cleaned periodically on upgrades.
   sentry-nginx-www:
@@ -638,4 +650,3 @@ volumes:
   sentry-kafka-log:
   sentry-smtp-log:
   sentry-clickhouse-log:
-  sentry-garage:
