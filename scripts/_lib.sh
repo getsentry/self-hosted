@@ -7,7 +7,7 @@ if [ -n "${DEBUG:-}" ]; then
 fi
 
 function confirm() {
-  read -p "$1 [y/n] " confirmation
+  read -r -p "$1 [y/n] " confirmation
   if [ "$confirmation" != "y" ]; then
     echo "Canceled. 😅"
     exit
@@ -26,8 +26,7 @@ function reset() {
   # we're targeting a valid tag here. Do this early in order to fail fast.
   if [ -n "$version" ]; then
     set +e
-    git rev-parse --verify --quiet "refs/tags/$version" >/dev/null
-    if [ $? -gt 0 ]; then
+    if ! git rev-parse --verify --quiet "refs/tags/$version" >/dev/null; then
       echo "Bad version: $version"
       exit
     fi
@@ -43,12 +42,15 @@ function reset() {
     echo "Okay ... good luck! 😰"
   fi
 
+  # assert that commands are defined
+  : "${dc:?}" "${cmd:?}"
+
   # Hit the reset button.
   $dc down --volumes --remove-orphans --rmi local
 
   # Remove any remaining (likely external) volumes with name matching 'sentry-.*'.
   for volume in $(docker volume list --format '{{ .Name }}' | grep '^sentry-'); do
-    docker volume remove $volume >/dev/null &&
+    docker volume remove "$volume" >/dev/null &&
       echo "Removed volume: $volume" ||
       echo "Skipped volume: $volume"
   done
@@ -60,30 +62,34 @@ function reset() {
 }
 
 function backup() {
+  local type
+
   type=${1:-"global"}
-  touch $(pwd)/sentry/backup.json
-  chmod 666 $(pwd)/sentry/backup.json
-  $dc run -v $(pwd)/sentry:/sentry-data/backup --rm -T -e SENTRY_LOG_LEVEL=CRITICAL web export $type /sentry-data/backup/backup.json
+  touch "${PWD}/sentry/backup.json"
+  chmod 666 "${PWD}/sentry/backup.json"
+  $dc run -v "${PWD}/sentry:/sentry-data/backup" --rm -T -e SENTRY_LOG_LEVEL=CRITICAL web export "$type" /sentry-data/backup/backup.json
 }
 
 function restore() {
-  type=${1:-"global"}
-  $dc run --rm -T web import $type /etc/sentry/backup.json
+  local type
+
+  type="${1:-global}"
+  $dc run --rm -T web import "$type" /etc/sentry/backup.json
 }
 
 # Needed variables to source error-handling script
 MINIMIZE_DOWNTIME="${MINIMIZE_DOWNTIME:-}"
-STOP_TIMEOUT=60
+export STOP_TIMEOUT=60
 
 # Save logs in order to send envelope to Sentry
-log_file=sentry_"${cmd%% *}"_log-$(date +'%Y-%m-%d_%H-%M-%S').txt
+log_file="sentry_${cmd%% *}_log-$(date +%Y-%m-%d_%H-%M-%S).txt"
 exec &> >(tee -a "$log_file")
 version=""
 
 while (($#)); do
   case "$1" in
-  --report-self-hosted-issues) REPORT_SELF_HOSTED_ISSUES=1 ;;
-  --no-report-self-hosted-issues) REPORT_SELF_HOSTED_ISSUES=0 ;;
+  --report-self-hosted-issues) export REPORT_SELF_HOSTED_ISSUES=1 ;;
+  --no-report-self-hosted-issues) export REPORT_SELF_HOSTED_ISSUES=0 ;;
   *) version=$1 ;;
   esac
   shift

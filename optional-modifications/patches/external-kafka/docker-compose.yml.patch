@@ -1,0 +1,192 @@
+--- docker-compose.yml	2025-07-08 10:22:36.600616503 +0700
++++ docker-compose.external-kafka.yml	2025-07-08 10:36:44.069900011 +0700
+@@ -26,8 +26,6 @@
+   depends_on:
+     redis:
+       <<: *depends_on-healthy
+-    kafka:
+-      <<: *depends_on-healthy
+     postgres:
+       <<: *depends_on-healthy
+     memcached:
+@@ -59,6 +57,14 @@
+     SENTRY_EVENT_RETENTION_DAYS:
+     SENTRY_MAIL_HOST:
+     SENTRY_MAX_EXTERNAL_SOURCEMAP_SIZE:
++    KAFKA_BOOTSTRAP_SERVERS: ${KAFKA_BOOTSTRAP_SERVERS:-kafka:9092}
++    KAFKA_SECURITY_PROTOCOL: ${KAFKA_SECURITY_PROTOCOL:-PLAINTEXT}
++    KAFKA_SSL_CA_LOCATION: ${KAFKA_SSL_CA_LOCATION:-}
++    KAFKA_SSL_CERTIFICATE_LOCATION: ${KAFKA_SSL_CERTIFICATE_LOCATION:-}
++    KAFKA_SSL_KEY_LOCATION: ${KAFKA_SSL_KEY_LOCATION:-}
++    KAFKA_SASL_MECHANISM: ${KAFKA_SASL_MECHANISM:-}
++    KAFKA_SASL_USERNAME: ${KAFKA_SASL_USERNAME:-}
++    KAFKA_SASL_PASSWORD: ${KAFKA_SASL_PASSWORD:-}
+   volumes:
+     - "sentry-data:/data"
+     - "./sentry:/etc/sentry"
+@@ -69,15 +75,20 @@
+   depends_on:
+     clickhouse:
+       <<: *depends_on-healthy
+-    kafka:
+-      <<: *depends_on-healthy
+     redis:
+       <<: *depends_on-healthy
+   image: "$SNUBA_IMAGE"
+   environment:
+     SNUBA_SETTINGS: self_hosted
+     CLICKHOUSE_HOST: clickhouse
+-    DEFAULT_BROKERS: "kafka:9092"
++    DEFAULT_BROKERS: ${KAFKA_BOOTSTRAP_SERVERS:-kafka:9092}
++    KAFKA_SECURITY_PROTOCOL: ${KAFKA_SECURITY_PROTOCOL:-PLAINTEXT}
++    KAFKA_SSL_CA_PATH: ${KAFKA_SSL_CA_LOCATION:-}
++    KAFKA_SSL_CERT_PATH: ${KAFKA_SSL_CERTIFICATE_LOCATION:-}
++    KAFKA_SSL_KEY_PATH: ${KAFKA_SSL_KEY_LOCATION:-}
++    KAFKA_SASL_MECHANISM: ${KAFKA_SASL_MECHANISM:-}
++    KAFKA_SASL_USERNAME: ${KAFKA_SASL_USERNAME:-}
++    KAFKA_SASL_PASSWORD: ${KAFKA_SASL_PASSWORD:-}
+     REDIS_HOST: redis
+     UWSGI_MAX_REQUESTS: "10000"
+     UWSGI_DISABLE_LOGGING: "true"
+@@ -136,43 +147,7 @@
+       POSTGRES_HOST_AUTH_METHOD: "trust"
+     volumes:
+       - "sentry-postgres:/var/lib/postgresql/data"
+-  kafka:
+-    <<: *restart_policy
+-    image: "confluentinc/cp-kafka:7.6.1"
+-    environment:
+-      # https://docs.confluent.io/platform/current/installation/docker/config-reference.html#cp-kakfa-example
+-      KAFKA_PROCESS_ROLES: "broker,controller"
+-      KAFKA_CONTROLLER_QUORUM_VOTERS: "1001@127.0.0.1:29093"
+-      KAFKA_CONTROLLER_LISTENER_NAMES: "CONTROLLER"
+-      KAFKA_NODE_ID: "1001"
+-      CLUSTER_ID: "MkU3OEVBNTcwNTJENDM2Qk"
+-      KAFKA_LISTENERS: "PLAINTEXT://0.0.0.0:29092,INTERNAL://0.0.0.0:9093,EXTERNAL://0.0.0.0:9092,CONTROLLER://0.0.0.0:29093"
+-      KAFKA_ADVERTISED_LISTENERS: "PLAINTEXT://127.0.0.1:29092,INTERNAL://kafka:9093,EXTERNAL://kafka:9092"
+-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: "PLAINTEXT:PLAINTEXT,INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT,CONTROLLER:PLAINTEXT"
+-      KAFKA_INTER_BROKER_LISTENER_NAME: "PLAINTEXT"
+-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: "1"
+-      KAFKA_OFFSETS_TOPIC_NUM_PARTITIONS: "1"
+-      KAFKA_LOG_RETENTION_HOURS: "24"
+-      KAFKA_MESSAGE_MAX_BYTES: "50000000" #50MB or bust
+-      KAFKA_MAX_REQUEST_SIZE: "50000000" #50MB on requests apparently too
+-      CONFLUENT_SUPPORT_METRICS_ENABLE: "false"
+-      KAFKA_LOG4J_LOGGERS: "kafka.cluster=WARN,kafka.controller=WARN,kafka.coordinator=WARN,kafka.log=WARN,kafka.server=WARN,state.change.logger=WARN"
+-      KAFKA_LOG4J_ROOT_LOGLEVEL: "WARN"
+-      KAFKA_TOOLS_LOG4J_LOGLEVEL: "WARN"
+-    ulimits:
+-      nofile:
+-        soft: 4096
+-        hard: 4096
+-    volumes:
+-      - "sentry-kafka:/var/lib/kafka/data"
+-      - "sentry-kafka-log:/var/lib/kafka/log"
+-      - "sentry-secrets:/etc/kafka/secrets"
+-    healthcheck:
+-      <<: *healthcheck_defaults
+-      test: ["CMD-SHELL", "nc -z localhost 9092"]
+-      interval: 10s
+-      timeout: 10s
+-      retries: 30
++  kafka: !reset null
+   clickhouse:
+     <<: *restart_policy
+     image: clickhouse-self-hosted-local
+@@ -509,9 +484,8 @@
+         read_only: true
+         source: ./geoip
+         target: /geoip
++      - ./certificates/kafka:/kafka-certificates:ro
+     depends_on:
+-      kafka:
+-        <<: *depends_on-healthy
+       redis:
+         <<: *depends_on-healthy
+       web:
+@@ -520,8 +494,22 @@
+     <<: *restart_policy
+     image: "$TASKBROKER_IMAGE"
+     environment:
+-      TASKBROKER_KAFKA_CLUSTER: "kafka:9092"
+-      TASKBROKER_KAFKA_DEADLETTER_CLUSTER: "kafka:9092"
++      TASKBROKER_KAFKA_CLUSTER: ${KAFKA_BOOTSTRAP_SERVERS:-kafka:9092}
++      TASKBROKER_KAFKA_SECURITY_PROTOCOL: ${KAFKA_SECURITY_PROTOCOL:-PLAINTEXT}
++      TASKBROKER_KAFKA_SSL_CA_LOCATION: ${KAFKA_SSL_CA_LOCATION:-}
++      TASKBROKER_KAFKA_SSL_CERTIFICATE_LOCATION: ${KAFKA_SSL_CERTIFICATE_LOCATION:-}
++      TASKBROKER_KAFKA_SSL_KEY_LOCATION: ${KAFKA_SSL_KEY_LOCATION:-}
++      TASKBROKER_KAFKA_SASL_MECHANISM: ${KAFKA_SASL_MECHANISM:-}
++      TASKBROKER_KAFKA_SASL_USERNAME: ${KAFKA_SASL_USERNAME:-}
++      TASKBROKER_KAFKA_SASL_PASSWORD: ${KAFKA_SASL_PASSWORD:-}
++      TASKBROKER_KAFKA_DEADLETTER_CLUSTER: ${KAFKA_BOOTSTRAP_SERVERS:-kafka:9092}
++      TASKBROKER_KAFKA_DEADLETTER_SECURITY_PROTOCOL: ${KAFKA_SECURITY_PROTOCOL:-PLAINTEXT}
++      TASKBROKER_KAFKA_DEADLETTER_SSL_CA_LOCATION: ${KAFKA_SSL_CA_LOCATION:-}
++      TASKBROKER_KAFKA_DEADLETTER_SSL_CERTIFICATE_LOCATION: ${KAFKA_SSL_CERTIFICATE_LOCATION:-}
++      TASKBROKER_KAFKA_DEADLETTER_SSL_KEY_LOCATION: ${KAFKA_SSL_KEY_LOCATION:-}
++      TASKBROKER_KAFKA_DEADLETTER_SASL_MECHANISM: ${KAFKA_SASL_MECHANISM:-}
++      TASKBROKER_KAFKA_DEADLETTER_SASL_USERNAME: ${KAFKA_SASL_USERNAME:-}
++      TASKBROKER_KAFKA_DEADLETTER_SASL_PASSWORD: ${KAFKA_SASL_PASSWORD:-}
+       TASKBROKER_DB_PATH: "/opt/sqlite/taskbroker-activations.sqlite"
+     volumes:
+       - sentry-taskbroker:/opt/sqlite
+@@ -538,15 +526,21 @@
+     <<: *restart_policy
+     image: "$VROOM_IMAGE"
+     environment:
+-      SENTRY_KAFKA_BROKERS_PROFILING: "kafka:9092"
+-      SENTRY_KAFKA_BROKERS_OCCURRENCES: "kafka:9092"
++      SENTRY_KAFKA_BROKERS_PROFILING: ${KAFKA_BOOTSTRAP_SERVERS:-kafka:9092}
++      SENTRY_KAFKA_BROKERS_OCCURRENCES: ${KAFKA_BOOTSTRAP_SERVERS:-kafka:9092}
++      SENTRY_KAFKA_BROKERS_SPANS: ${KAFKA_BOOTSTRAP_SERVERS:-kafka:9092}
++      SENTRY_KAFKA_SECURITY_PROTOCOL: ${KAFKA_SECURITY_PROTOCOL:-PLAINTEXT}
++      SENTRY_KAFKA_SSL_CA_PATH: ${KAFKA_SSL_CA_LOCATION:-}
++      SENTRY_KAFKA_SSL_CERT_PATH: ${KAFKA_SSL_CERTIFICATE_LOCATION:-}
++      SENTRY_KAFKA_SSL_KEY_PATH: ${KAFKA_SSL_KEY_LOCATION:-}
++      SENTRY_KAFKA_SASL_MECHANISM: ${KAFKA_SASL_MECHANISM:-}
++      SENTRY_KAFKA_SASL_USERNAME: ${KAFKA_SASL_USERNAME:-}
++      SENTRY_KAFKA_SASL_PASSWORD: ${KAFKA_SASL_PASSWORD:-}
+       SENTRY_BUCKET_PROFILES: file:///var/vroom/sentry-profiles
+       SENTRY_SNUBA_HOST: "http://snuba-api:1218"
+     volumes:
+       - sentry-vroom:/var/vroom/sentry-profiles
+-    depends_on:
+-      kafka:
+-        <<: *depends_on-healthy
++      - ./certificates/kafka:/kafka-certificates:ro
+     profiles:
+       - feature-complete
+   vroom-cleanup:
+@@ -571,7 +565,14 @@
+     image: "$UPTIME_CHECKER_IMAGE"
+     command: run
+     environment:
+-      UPTIME_CHECKER_RESULTS_KAFKA_CLUSTER: kafka:9092
++      UPTIME_CHECKER_RESULTS_KAFKA_CLUSTER: ${KAFKA_BOOTSTRAP_SERVERS:-kafka:9092}
++      UPTIME_CHECKER_KAFKA_SECURITY_PROTOCOL: ${KAFKA_SECURITY_PROTOCOL:-PLAINTEXT}
++      UPTIME_CHECKER_KAFKA_SSL_CA_LOCATION: ${KAFKA_SSL_CA_LOCATION:-}
++      UPTIME_CHECKER_KAFKA_SSL_CERT_LOCATION: ${KAFKA_SSL_CERTIFICATE_LOCATION:-}
++      UPTIME_CHECKER_KAFKA_SSL_KEY_LOCATION: ${KAFKA_SSL_KEY_LOCATION:-}
++      UPTIME_CHECKER_KAFKA_SASL_MECHANISM: ${KAFKA_SASL_MECHANISM:-}
++      UPTIME_CHECKER_KAFKA_SASL_USERNAME: ${KAFKA_SASL_USERNAME:-}
++      UPTIME_CHECKER_KAFKA_SASL_PASSWORD: ${KAFKA_SASL_PASSWORD:-}
+       UPTIME_CHECKER_REDIS_HOST: redis://redis:6379
+       # Set to `true` will allow uptime checks against private IP addresses
+       UPTIME_CHECKER_ALLOW_INTERNAL_IPS: "false"
+@@ -582,8 +583,6 @@
+       # resolver.
+       #UPTIME_CHECKER_HTTP_CHECKER_DNS_NAMESERVERS: "8.8.8.8,8.8.4.4"
+     depends_on:
+-      kafka:
+-        <<: *depends_on-healthy
+       redis:
+         <<: *depends_on-healthy
+     profiles:
+@@ -597,8 +596,6 @@
+     external: true
+   sentry-redis:
+     external: true
+-  sentry-kafka:
+-    external: true
+   sentry-clickhouse:
+     external: true
+   sentry-symbolicator:

@@ -1,5 +1,5 @@
 #!/bin/bash
-#
+set -eo pipefail
 
 # Create getsentry folder and enter.
 mkdir /home/user/getsentry

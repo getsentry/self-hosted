@@ -19,250 +19,38 @@ defaults:
   run:
     shell: bash
 jobs:
-  e2e-test:
-    if: github.repository_owner == 'getsentry'
-    runs-on: ubuntu-22.04
-    name: "Sentry self-hosted end-to-end tests"
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          path: self-hosted
-
-      - name: End to end tests
-        uses: getsentry/action-self-hosted-e2e-tests@main
-        with:
-          project_name: self-hosted
-
   unit-test:
     if: github.repository_owner == 'getsentry'
-    runs-on: ubuntu-22.04
-    name: "unit tests"
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-24.04, ubuntu-24.04-arm]
+    name: ${{ matrix.os == 'ubuntu-24.04-arm' && 'unit tests (arm64)' || 'unit tests' }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Get Compose
+        uses: ./get-compose-action
 
       - name: Unit Tests
         run: ./unit-test.sh
 
-  upgrade-test:
-    if: github.repository_owner == 'getsentry'
-    runs-on: ubuntu-22.04
-    name: "Sentry upgrade test"
-    env:
-      REPORT_SELF_HOSTED_ISSUES: 0
-    steps:
-      - name: Get latest self-hosted release version
-        run: |
-          LATEST_TAG=$(curl -s https://api.github.com/repos/getsentry/self-hosted/releases/latest | jq -r '.tag_name')
-          echo "LATEST_TAG=$LATEST_TAG" >> $GITHUB_ENV
-
-      - name: Checkout latest release
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ env.LATEST_TAG }}
-
-      - name: Get Compose
-        run: |
-          # Docker Compose v1 is installed here, remove it
-          sudo rm -f "/usr/local/bin/docker-compose"
-          sudo rm -f "/usr/local/lib/docker/cli-plugins/docker-compose"
-          sudo mkdir -p "/usr/local/lib/docker/cli-plugins"
-          sudo curl -L https://github.com/docker/compose/releases/download/v2.26.0/docker-compose-`uname -s`-`uname -m` -o "/usr/local/lib/docker/cli-plugins/docker-compose"
-          sudo chmod +x "/usr/local/lib/docker/cli-plugins/docker-compose"
-
-      - name: Prepare Docker Volume Caching
-        id: cache_key
-        run: |
-          # Set permissions for docker volumes so we can cache and restore
-          sudo chmod o+x /var/lib/docker
-          sudo chmod -R o+rwx /var/lib/docker/volumes
-          source .env
-          SENTRY_IMAGE_SHA=$(docker buildx imagetools inspect $SENTRY_IMAGE --format "{{println .Manifest.Digest}}")
-          echo "SENTRY_IMAGE_SHA=$SENTRY_IMAGE_SHA" >> $GITHUB_OUTPUT
-          SNUBA_IMAGE_SHA=$(docker buildx imagetools inspect $SNUBA_IMAGE --format "{{println .Manifest.Digest}}")
-          echo "SNUBA_IMAGE_SHA=$SNUBA_IMAGE_SHA" >> $GITHUB_OUTPUT
-
-      - name: Restore DB Volumes Cache
-        id: restore_cache
-        uses: actions/cache/restore@v4
-        with:
-          key: db-volumes-v4-${{ steps.cache_key.outputs.SENTRY_IMAGE_SHA }}-${{ steps.cache_key.outputs.SNUBA_IMAGE_SHA }}
-          restore-keys: |
-            db-volumes-v4-${{ steps.cache_key.outputs.SENTRY_IMAGE_SHA }}
-            db-volumes-v4-
-          path: |
-            /var/lib/docker/volumes/sentry-postgres/_data
-            /var/lib/docker/volumes/sentry-clickhouse/_data
-            /var/lib/docker/volumes/sentry-kafka/_data
-
-      - name: Install ${{ env.LATEST_TAG }}
-        env:
-          SKIP_DB_MIGRATIONS: ${{ steps.restore_cache.outputs.cache-hit == 'true' && '1' || '' }}
-        run: |
-          # This is for the cache restore on Kafka to work in older releases
-          docker run --rm -v "sentry-kafka:/data" busybox chown -R 1000:1000 /data
-          ./install.sh
-
-      - name: Prepare Docker Volume Caching
-        run: |
-          # Set permissions for docker volumes so we can cache and restore
-          sudo chmod o+x /var/lib/docker
-          sudo chmod -R o+rx /var/lib/docker/volumes
-          # Set tar ownership for it to be able to read
-          # From: https://github.com/actions/toolkit/issues/946#issuecomment-1726311681
-          sudo chown root /usr/bin/tar && sudo chmod u+s /usr/bin/tar
-
-      - name: Save DB Volumes Cache
-        if: steps.restore_cache.outputs.cache-hit != 'true'
-        uses: actions/cache/save@v4
-        with:
-          key: ${{ steps.restore_cache.outputs.cache-primary-key }}
-          path: |
-            /var/lib/docker/volumes/sentry-postgres/_data
-            /var/lib/docker/volumes/sentry-clickhouse/_data
-            /var/lib/docker/volumes/sentry-kafka/_data
-
-      - name: Checkout current ref
-        uses: actions/checkout@v4
-
-      - name: Install current ref
-        run: |
-          # This is for the cache restore on Kafka to work in older releases
-          docker run --rm -v "sentry-kafka:/data" busybox chown -R 1000:1000 /data
-          ./install.sh
-
-      - name: Inspect failure
-        if: failure()
-        run: |
-          docker compose ps
-          docker compose logs
-
   integration-test:
     if: github.repository_owner == 'getsentry'
-    runs-on: ubuntu-22.04
-    name: integration test ${{ matrix.compose_version }} - customizations ${{ matrix.customizations }}
+    runs-on: ${{ matrix.os }}
     strategy:
-      fail-fast: false
       matrix:
-        customizations: ["disabled", "enabled"]
-        compose_version: ["v2.19.0", "v2.26.0"]
-        include:
-          - compose_version: "v2.19.0"
-            compose_path: "/usr/local/lib/docker/cli-plugins"
-          - compose_version: "v2.26.0"
-            compose_path: "/usr/local/lib/docker/cli-plugins"
+        os: [ubuntu-24.04, ubuntu-24.04-arm]
+    name: ${{ matrix.os == 'ubuntu-24.04-arm' && 'integration test (arm64)' || 'integration test' }}
     env:
-      COMPOSE_PROJECT_NAME: self-hosted-${{ strategy.job-index }}
       REPORT_SELF_HOSTED_ISSUES: 0
       SELF_HOSTED_TESTING_DSN: ${{ vars.SELF_HOSTED_TESTING_DSN }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup dev environment
-        run: |
-          pip install -r requirements-dev.txt
-          echo "PY_COLORS=1" >> "$GITHUB_ENV"
-          ### pytest-sentry configuration ###
-          if [ "$GITHUB_REPOSITORY" = "getsentry/self-hosted" ]; then
-            echo "PYTEST_SENTRY_DSN=$SELF_HOSTED_TESTING_DSN" >> $GITHUB_ENV
-            echo "PYTEST_SENTRY_TRACES_SAMPLE_RATE=0" >> $GITHUB_ENV
-
-            # This records failures on master to sentry in order to detect flakey tests, as it's
-            # expected that people have failing tests on their PRs
-            if [ "$GITHUB_REF" = "refs/heads/master" ]; then
-              echo "PYTEST_SENTRY_ALWAYS_REPORT=1" >> $GITHUB_ENV
-            fi
-          fi
-
-      - name: Get Compose
-        run: |
-          # Always remove `docker compose` support as that's the newer version
-          # and comes installed by default nowadays.
-          sudo rm -f "/usr/local/lib/docker/cli-plugins/docker-compose"
-          # Docker Compose v1 is installed here, remove it
-          sudo rm -f "/usr/local/bin/docker-compose"
-          sudo rm -f "${{ matrix.compose_path }}/docker-compose"
-          sudo mkdir -p "${{ matrix.compose_path }}"
-          sudo curl -L https://github.com/docker/compose/releases/download/${{ matrix.compose_version }}/docker-compose-`uname -s`-`uname -m` -o "${{ matrix.compose_path }}/docker-compose"
-          sudo chmod +x "${{ matrix.compose_path }}/docker-compose"
-
-      - name: Prepare Docker Volume Caching
-        id: cache_key
-        run: |
-          # Set permissions for docker volumes so we can cache and restore
-          sudo chmod o+x /var/lib/docker
-          sudo chmod -R o+rwx /var/lib/docker/volumes
-          source .env
-          SENTRY_IMAGE_SHA=$(docker buildx imagetools inspect $SENTRY_IMAGE --format "{{println .Manifest.Digest}}")
-          echo "SENTRY_IMAGE_SHA=$SENTRY_IMAGE_SHA" >> $GITHUB_OUTPUT
-          SNUBA_IMAGE_SHA=$(docker buildx imagetools inspect $SNUBA_IMAGE --format "{{println .Manifest.Digest}}")
-          echo "SNUBA_IMAGE_SHA=$SNUBA_IMAGE_SHA" >> $GITHUB_OUTPUT
-
-      - name: Restore DB Volumes Cache
-        id: restore_cache
-        uses: actions/cache/restore@v4
+      - name: Use action from local checkout
+        uses: './'
         with:
-          key: db-volumes-v4-${{ steps.cache_key.outputs.SENTRY_IMAGE_SHA }}-${{ steps.cache_key.outputs.SNUBA_IMAGE_SHA }}
-          restore-keys: |
-            db-volumes-v4-${{ steps.cache_key.outputs.SENTRY_IMAGE_SHA }}
-            db-volumes-v4-
-          path: |
-            /var/lib/docker/volumes/sentry-postgres/_data
-            /var/lib/docker/volumes/sentry-clickhouse/_data
-            /var/lib/docker/volumes/sentry-kafka/_data
-
-      - name: Install self-hosted
-        env:
-          SKIP_DB_MIGRATIONS: ${{ steps.restore_cache.outputs.cache-hit == 'true' && '1' || '' }}
-        run: |
-          # This is for the cache restore on Kafka to work in older releases
-          docker run --rm -v "sentry-kafka:/data" busybox chown -R 1000:1000 /data
-          ./install.sh
-
-      - name: Prepare Docker Volume Caching
-        run: |
-          # Set permissions for docker volumes so we can cache and restore
-          sudo chmod o+x /var/lib/docker
-          sudo chmod -R o+rx /var/lib/docker/volumes
-          # Set tar ownership for it to be able to read
-          # From: https://github.com/actions/toolkit/issues/946#issuecomment-1726311681
-          sudo chown root /usr/bin/tar && sudo chmod u+s /usr/bin/tar
-
-      - name: Save DB Volumes Cache
-        if: steps.restore_cache.outputs.cache-hit != 'true'
-        uses: actions/cache/save@v4
-        with:
-          key: ${{ steps.restore_cache.outputs.cache-primary-key }}
-          path: |
-            /var/lib/docker/volumes/sentry-postgres/_data
-            /var/lib/docker/volumes/sentry-clickhouse/_data
-            /var/lib/docker/volumes/sentry-kafka/_data
-
-      - name: Integration Test
-        run: |
-          docker compose up --wait
-          if [ "${{ matrix.compose_version }}" = "v2.19.0" ]; then
-            pytest --reruns 3 --cov --junitxml=junit.xml _integration-test/ --customizations=${{ matrix.customizations }}
-          else
-            pytest --cov --junitxml=junit.xml _integration-test/ --customizations=${{ matrix.customizations }}
-          fi
-
-      - name: Inspect failure
-        if: failure()
-        run: |
-          docker compose ps
-          docker compose logs
-
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v5
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          slug: getsentry/self-hosted
-
-      - name: Upload test results to Codecov
-        if: ${{ !cancelled() }}
-        uses: codecov/test-results-action@v1
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
