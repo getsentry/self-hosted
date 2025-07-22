@@ -21,8 +21,11 @@ defaults:
 jobs:
   unit-test:
     if: github.repository_owner == 'getsentry'
-    runs-on: ubuntu-latest
-    name: "unit tests"
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-24.04, ubuntu-24.04-arm]
+    name: ${{ matrix.os == 'ubuntu-24.04-arm' && 'unit tests (arm64)' || 'unit tests' }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -35,12 +38,13 @@ jobs:
 
   integration-test:
     if: github.repository_owner == 'getsentry'
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
+        os: [ubuntu-24.04, ubuntu-24.04-arm]
         container_engine: ['docker'] # TODO: add 'podman' into the list
-    name: ${{ matrix.container_engine == 'docker' && 'integration test' || 'integration test (podman)' }}
+    name: ${{ matrix.os == 'ubuntu-24.04-arm' && (matrix.container_engine == 'docker' && 'integration test (arm64)' || 'integration test (arm64 podman)') || (matrix.container_engine == 'docker' && 'integration test' || 'integration test (podman)') }}
     env:
       REPORT_SELF_HOSTED_ISSUES: 0
       SELF_HOSTED_TESTING_DSN: ${{ vars.SELF_HOSTED_TESTING_DSN }}
@@ -64,9 +68,3 @@ jobs:
         uses: './'
         with:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-
-      - name: Inspect failure
-        if: failure()
-        run: |
-          docker compose ps
-          docker compose logs

@@ -1,5 +1,25 @@
 # Changelog
 
+## 25.7.0
+
+### Various fixes & improvements
+
+- feat: Swap `trace-view-v1` feature flag with `visibility-explore-view` (#3801) by @aldy505
+- fix: set harakiri Django option to 30s (#3792) by @aldy505
+- feat(images):Cutover images to ghcr (#3800) by @hubertdeng123
+- docs: encourage community patches (#3794) by @aldy505
+- feat: run EAP-related containers (#3778) by @aldy505
+- feat(uptime): Enable uptime in self-hosted (#3787) by @evanpurkhiser
+- feat: make `system.secret-key` configurable from environment variables (#3783) by @aldy505
+- ci: run tests on arm64 (#3750) by @aldy505
+
+## 25.6.2
+
+### Various fixes & improvements
+
+- fix: Increase timeout for flakey test (#3781) by @tobias-wilfert
+- chore: provide detailed note for sentry endpoint settings (#3780) by @aldy505
+
 ## 25.6.1
 
 ### Various fixes & improvements

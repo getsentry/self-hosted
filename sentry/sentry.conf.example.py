@@ -64,9 +64,24 @@ DATABASES = {
 # and thus various UI optimizations should be enabled.
 SENTRY_SINGLE_ORGANIZATION = True
 
+# Sentry event retention days specifies how long events are retained in the database.
+# This should be set on your `.env` or `.env.custom` file, instead of modifying
+# the value here.
+# NOTE: The longer the days, the more disk space is required.
 SENTRY_OPTIONS["system.event-retention-days"] = int(
     env("SENTRY_EVENT_RETENTION_DAYS", "90")
 )
+
+# The secret key is being used for various cryptographic operations, such as
+# generating a CSRF token, session token, and registering Relay instances.
+# The secret key value should be set on your `.env` or `.env.custom` file
+# instead of modifying the value here.
+#
+# If the key ever becomes compromised, it's important to generate a new key.
+# Changing this value will result in all current sessions being invalidated.
+# A new key can be generated with `$ sentry config generate-secret-key`
+if env("SENTRY_SYSTEM_SECRET_KEY"):
+    SENTRY_OPTIONS["system.secret-key"] = env("SENTRY_SYSTEM_SECRET_KEY", "")
 
 # Self-hosted Sentry infamously has a lot of Docker containers required to make
 # all the features work. Oftentimes, users don't use the full feature set that
@@ -215,6 +230,12 @@ SENTRY_WEB_OPTIONS = {
     "workers": 3,
     "threads": 4,
     "memory-report": False,
+    # The `harakiri` option terminates requests that take longer than the
+    # defined amount of time (in seconds) which can help avoid stuck workers
+    # caused by GIL issues or deadlocks.
+    # Ensure nginx `proxy_read_timeout` configuration (default: 30)
+    # on your `nginx.conf` file to be at least 5 seconds longer than this.
+    # "harakiri": 25,
     # Some stuff so uwsgi will cycle workers sensibly
     "max-requests": 100000,
     "max-requests-delta": 500,
@@ -270,7 +291,6 @@ SENTRY_FEATURES.update(
             "organizations:integrations-issue-sync",
             "organizations:invite-members",
             "organizations:sso-basic",
-            "organizations:sso-rippling",
             "organizations:sso-saml2",
             "organizations:performance-view",
             "organizations:advanced-search",
@@ -281,9 +301,8 @@ SENTRY_FEATURES.update(
             "organizations:dashboards-mep",
             "organizations:mep-rollout-flag",
             "organizations:dashboards-rh-widget",
-            "organizations:metrics-extraction",
             "organizations:transaction-metrics-extraction",
-            "organizations:trace-view-v1",
+            "organizations:visibility-explore-view",
             "organizations:dynamic-sampling",
             "projects:custom-inbound-filters",
             "projects:data-forwarding",
@@ -305,8 +324,6 @@ SENTRY_FEATURES.update(
         )
         # User Feedback related flags
         + (
-            "organizations:user-feedback-ingest",
-            "organizations:user-feedback-replay-clip",
             "organizations:user-feedback-ui",
         )
         # Continuous Profiling related flags
@@ -314,8 +331,23 @@ SENTRY_FEATURES.update(
             "organizations:continuous-profiling",
             "organizations:continuous-profiling-stats",
         )
+        # Uptime related flags
+        + (
+            "organizations:uptime",
+            "organizations:uptime-create-issues",
+            # TODO(epurkhiser): We can remove remove these in 25.8.0 since
+            # we'll have released this issue group type
+            # (https://github.com/getsentry/sentry/pull/94827)
+            "organizations:issue-uptime-domain-failure-visible",
+            "organizations:issue-uptime-domain-failure-ingest",
+            "organizations:issue-uptime-domain-failure-post-process-group",
+        )
     }
 )
+
+# TODO(epurkhiser): In 25.8.0 we can drop this option override as we've made it
+# default in sentry (https://github.com/getsentry/sentry/pull/94822)
+SENTRY_OPTIONS["uptime.snuba_uptime_results.enabled"] = True
 
 #######################
 # MaxMind Integration #

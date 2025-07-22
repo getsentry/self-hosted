@@ -1,5 +1,5 @@
---- docker-compose.yml	2025-03-17 13:32:15.120328412 +0700
-+++ docker-compose.external-kafka.yml	2025-05-15 08:39:05.509951068 +0700
+--- docker-compose.yml	2025-07-08 10:22:36.600616503 +0700
++++ docker-compose.external-kafka.yml	2025-07-08 10:36:44.069900011 +0700
 @@ -26,8 +26,6 @@
    depends_on:
      redis:
@@ -48,7 +48,7 @@
      REDIS_HOST: redis
      UWSGI_MAX_REQUESTS: "10000"
      UWSGI_DISABLE_LOGGING: "true"
-@@ -140,43 +151,7 @@
+@@ -136,43 +147,7 @@
        POSTGRES_HOST_AUTH_METHOD: "trust"
      volumes:
        - "sentry-postgres:/var/lib/postgresql/data"
@@ -93,7 +93,7 @@
    clickhouse:
      <<: *restart_policy
      image: clickhouse-self-hosted-local
-@@ -475,9 +450,8 @@
+@@ -509,9 +484,8 @@
          read_only: true
          source: ./geoip
          target: /geoip
@@ -104,7 +104,32 @@
        redis:
          <<: *depends_on-healthy
        web:
-@@ -486,15 +460,21 @@
+@@ -520,8 +494,22 @@
+     <<: *restart_policy
+     image: "$TASKBROKER_IMAGE"
+     environment:
+-      TASKBROKER_KAFKA_CLUSTER: "kafka:9092"
+-      TASKBROKER_KAFKA_DEADLETTER_CLUSTER: "kafka:9092"
++      TASKBROKER_KAFKA_CLUSTER: ${KAFKA_BOOTSTRAP_SERVERS:-kafka:9092}
++      TASKBROKER_KAFKA_SECURITY_PROTOCOL: ${KAFKA_SECURITY_PROTOCOL:-PLAINTEXT}
++      TASKBROKER_KAFKA_SSL_CA_LOCATION: ${KAFKA_SSL_CA_LOCATION:-}
++      TASKBROKER_KAFKA_SSL_CERTIFICATE_LOCATION: ${KAFKA_SSL_CERTIFICATE_LOCATION:-}
++      TASKBROKER_KAFKA_SSL_KEY_LOCATION: ${KAFKA_SSL_KEY_LOCATION:-}
++      TASKBROKER_KAFKA_SASL_MECHANISM: ${KAFKA_SASL_MECHANISM:-}
++      TASKBROKER_KAFKA_SASL_USERNAME: ${KAFKA_SASL_USERNAME:-}
++      TASKBROKER_KAFKA_SASL_PASSWORD: ${KAFKA_SASL_PASSWORD:-}
++      TASKBROKER_KAFKA_DEADLETTER_CLUSTER: ${KAFKA_BOOTSTRAP_SERVERS:-kafka:9092}
++      TASKBROKER_KAFKA_DEADLETTER_SECURITY_PROTOCOL: ${KAFKA_SECURITY_PROTOCOL:-PLAINTEXT}
++      TASKBROKER_KAFKA_DEADLETTER_SSL_CA_LOCATION: ${KAFKA_SSL_CA_LOCATION:-}
++      TASKBROKER_KAFKA_DEADLETTER_SSL_CERTIFICATE_LOCATION: ${KAFKA_SSL_CERTIFICATE_LOCATION:-}
++      TASKBROKER_KAFKA_DEADLETTER_SSL_KEY_LOCATION: ${KAFKA_SSL_KEY_LOCATION:-}
++      TASKBROKER_KAFKA_DEADLETTER_SASL_MECHANISM: ${KAFKA_SASL_MECHANISM:-}
++      TASKBROKER_KAFKA_DEADLETTER_SASL_USERNAME: ${KAFKA_SASL_USERNAME:-}
++      TASKBROKER_KAFKA_DEADLETTER_SASL_PASSWORD: ${KAFKA_SASL_PASSWORD:-}
+       TASKBROKER_DB_PATH: "/opt/sqlite/taskbroker-activations.sqlite"
+     volumes:
+       - sentry-taskbroker:/opt/sqlite
+@@ -538,15 +526,21 @@
      <<: *restart_policy
      image: "$VROOM_IMAGE"
      environment:
@@ -131,7 +156,32 @@
      profiles:
        - feature-complete
    vroom-cleanup:
-@@ -523,8 +503,6 @@
+@@ -571,7 +565,14 @@
+     image: "$UPTIME_CHECKER_IMAGE"
+     command: run
+     environment:
+-      UPTIME_CHECKER_RESULTS_KAFKA_CLUSTER: kafka:9092
++      UPTIME_CHECKER_RESULTS_KAFKA_CLUSTER: ${KAFKA_BOOTSTRAP_SERVERS:-kafka:9092}
++      UPTIME_CHECKER_KAFKA_SECURITY_PROTOCOL: ${KAFKA_SECURITY_PROTOCOL:-PLAINTEXT}
++      UPTIME_CHECKER_KAFKA_SSL_CA_LOCATION: ${KAFKA_SSL_CA_LOCATION:-}
++      UPTIME_CHECKER_KAFKA_SSL_CERT_LOCATION: ${KAFKA_SSL_CERTIFICATE_LOCATION:-}
++      UPTIME_CHECKER_KAFKA_SSL_KEY_LOCATION: ${KAFKA_SSL_KEY_LOCATION:-}
++      UPTIME_CHECKER_KAFKA_SASL_MECHANISM: ${KAFKA_SASL_MECHANISM:-}
++      UPTIME_CHECKER_KAFKA_SASL_USERNAME: ${KAFKA_SASL_USERNAME:-}
++      UPTIME_CHECKER_KAFKA_SASL_PASSWORD: ${KAFKA_SASL_PASSWORD:-}
+       UPTIME_CHECKER_REDIS_HOST: redis://redis:6379
+       # Set to `true` will allow uptime checks against private IP addresses
+       UPTIME_CHECKER_ALLOW_INTERNAL_IPS: "false"
+@@ -582,8 +583,6 @@
+       # resolver.
+       #UPTIME_CHECKER_HTTP_CHECKER_DNS_NAMESERVERS: "8.8.8.8,8.8.4.4"
+     depends_on:
+-      kafka:
+-        <<: *depends_on-healthy
+       redis:
+         <<: *depends_on-healthy
+     profiles:
+@@ -597,8 +596,6 @@
      external: true
    sentry-redis:
      external: true
