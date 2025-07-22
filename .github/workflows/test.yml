@@ -40,15 +40,29 @@ jobs:
     if: github.repository_owner == 'getsentry'
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
         os: [ubuntu-24.04, ubuntu-24.04-arm]
-    name: ${{ matrix.os == 'ubuntu-24.04-arm' && 'integration test (arm64)' || 'integration test' }}
+        container_engine: ['docker'] # TODO: add 'podman' into the list
+    name: ${{ matrix.os == 'ubuntu-24.04-arm' && (matrix.container_engine == 'docker' && 'integration test (arm64)' || 'integration test (arm64 podman)') || (matrix.container_engine == 'docker' && 'integration test' || 'integration test (podman)') }}
     env:
       REPORT_SELF_HOSTED_ISSUES: 0
       SELF_HOSTED_TESTING_DSN: ${{ vars.SELF_HOSTED_TESTING_DSN }}
+      CONTAINER_ENGINE_PODMAN: ${{ matrix.container_engine == 'podman' && '1' || '0' }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Install Podman
+        if: matrix.container_engine == 'podman'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends podman
+          # TODO: Replace below with podman-compose
+          #       We need this commit to be able to work: https://github.com/containers/podman-compose/commit/8206cc3ea277eee6c2e87d4cd66eba8eae3d44eb
+          pip3 install --user https://github.com/containers/podman-compose/archive/main.tar.gz
+          echo "PODMAN_COMPOSE_PROVIDER=podman-compose" >> $GITHUB_ENV
+          echo "PODMAN_COMPOSE_WARNING_LOGS=false" >> $GITHUB_ENV
 
       - name: Use action from local checkout
         uses: './'

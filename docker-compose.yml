@@ -1,5 +1,7 @@
 x-restart-policy: &restart_policy
   restart: unless-stopped
+x-pull-policy: &pull_policy
+  pull_policy: never
 x-depends_on-healthy: &depends_on-healthy
   condition: service_healthy
 x-depends_on-default: &depends_on-default
@@ -15,7 +17,7 @@ x-healthcheck-defaults: &healthcheck_defaults
   retries: $HEALTHCHECK_RETRIES
   start_period: 10s
 x-sentry-defaults: &sentry_defaults
-  <<: *restart_policy
+  <<: [*restart_policy, *pull_policy]
   image: sentry-self-hosted-local
   # Set the platform to build for linux/arm64 when needed on Apple silicon Macs.
   platform: ${DOCKER_PLATFORM:-}
@@ -174,7 +176,7 @@ services:
       timeout: 10s
       retries: 30
   clickhouse:
-    <<: *restart_policy
+    <<: [*restart_policy, *pull_policy]
     image: clickhouse-self-hosted-local
     build:
       context: ./clickhouse
@@ -329,7 +331,7 @@ services:
         target: /etc/symbolicator
     command: run -c /etc/symbolicator/config.yml
   symbolicator-cleanup:
-    <<: *restart_policy
+    <<: [*restart_policy, *pull_policy]
     image: symbolicator-cleanup-self-hosted-local
     build:
       context: ./cron
@@ -550,7 +552,7 @@ services:
     profiles:
       - feature-complete
   vroom-cleanup:
-    <<: *restart_policy
+    <<: [*restart_policy, *pull_policy]
     image: vroom-cleanup-self-hosted-local
     build:
       context: ./cron
