@@ -46,7 +46,7 @@ mail.host: 'smtp'
 ###################
 
 # This is the main URL prefix where Sentry can be accessed.
-# Sentry will use this to create links to its different parts of the user interface.
+# Sentry will use this to create links to its different parts of the web UI.
 # This is most helpful if you are using an external reverse proxy.
 # system.url-prefix: https://example.sentry.com
 
