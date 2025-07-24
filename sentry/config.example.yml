@@ -52,7 +52,7 @@ mail.host: 'smtp'
 
 # Most of the time, this should NOT be changed. It's used for communication
 # between containers. `web` is the container's name, and `9000` is the
-# default port exposed by the Sentry image. If you want to change the
+# default port opened by the Sentry backend (this is NOT the public port). If you want to change the
 # publicly exposed domain or port, you should probably change
 # `system.url-prefix` instead.
 system.internal-url-prefix: 'http://web:9000'
