@@ -45,8 +45,18 @@ mail.host: 'smtp'
 # System Settings #
 ###################
 
-# The URL prefix in which Sentry is accessible
+# This is the main URL prefix where Sentry can be accessed.
+# Sentry will use this to create links to its different parts of the web UI.
+# This is most helpful if you are using an external reverse proxy.
 # system.url-prefix: https://example.sentry.com
+
+# Most of the time, this should NOT be changed. It's used for communication
+# between containers. `web` is the container's name, and `9000` is the
+# default port opened by the Sentry backend (this is NOT the public port).
+#
+# If you want to change the publicly exposed domain or port, you should change
+# `system.url-prefix` above instead, along with `SENTRY_BIND` in `.env` file.
+# Also see https://develop.sentry.dev/self-hosted/#productionalizing.
 system.internal-url-prefix: 'http://web:9000'
 
 # If this file ever becomes compromised, it's important to generate a new key.
