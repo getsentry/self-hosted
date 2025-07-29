@@ -297,6 +297,7 @@ SENTRY_FEATURES.update(
             "organizations:session-replay",
             "organizations:issue-platform",
             "organizations:profiling",
+            "organizations:profiling-view",
             "organizations:monitors",
             "organizations:dashboards-mep",
             "organizations:mep-rollout-flag",
