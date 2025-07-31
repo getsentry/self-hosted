@@ -1,3 +1,5 @@
+source install/_detect-container-engine.sh
+
 echo "${_group}Detecting Docker platform"
 
 # Sentry SaaS uses stock Yandex ClickHouse, but they don't provide images that
@@ -12,13 +14,13 @@ echo "${_group}Detecting Docker platform"
 # linux/amd64 by default due to virtualization.
 # See https://github.com/docker/cli/issues/3286 for the Docker bug.
 
-if ! command -v docker &>/dev/null; then
-  echo "FAIL: Could not find a \`docker\` binary on this system. Are you sure it's installed?"
-  exit 1
+FORMAT="{{.Architecture}}"
+if [[ $CONTAINER_ENGINE == "podman" ]]; then
+  FORMAT="{{.Host.Arch}}"
 fi
 
-export DOCKER_ARCH=$(docker info --format '{{.Architecture}}')
-if [[ "$DOCKER_ARCH" = "x86_64" ]]; then
+export DOCKER_ARCH=$($CONTAINER_ENGINE info --format "$FORMAT")
+if [[ "$DOCKER_ARCH" = "x86_64" || "$DOCKER_ARCH" = "amd64" ]]; then
   export DOCKER_PLATFORM="linux/amd64"
 elif [[ "$DOCKER_ARCH" = "aarch64" ]]; then
   export DOCKER_PLATFORM="linux/arm64"
