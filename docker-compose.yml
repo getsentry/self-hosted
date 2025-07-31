@@ -36,7 +36,7 @@ x-sentry-defaults: &sentry_defaults
       <<: *depends_on-default
     smtp:
       <<: *depends_on-default
-    garage:
+    seaweedfs:
       <<: *depends_on-default
     snuba-api:
       <<: *depends_on-default
@@ -212,19 +212,38 @@ services:
       interval: 10s
       timeout: 10s
       retries: 30
-  garage:
-    image: dxflrs/garage:v1.0.1
+  seaweedfs:
+    image: "chrislusf/seaweedfs:3.94_large_disk"
+    entrypoint: "weed"
+    command: >-
+        -filer=true
+        -filer.port=8888
+        -filer.defaultReplicaPlacement=000
+        -master.port=9333
+        -metricsPort=9091
+        -s3=true
+        -s3.port=8333
+        -volume=true
+        -volume.dir.idx=/data/idx
+        -volume.index=leveldbLarge
+        -volume.max=30
+        -volume.minFreeSpace=50GiB
+        -volume.preStopSeconds=8
+        -volume.readMode=redirect
+        -volume.port=8080
+        -master=true
+        -webdav=false
+    environment:
+      AWS_ACCESS_KEY_ID: sentry
+      AWS_SECRET_ACCESS_KEY: sentry
     volumes:
-      - type: bind
-        read_only: true
-        source: ./garage.toml
-        target: /etc/garage.toml
-      - "sentry-garage:/var/lib/garage/"
+      - "sentry-seaweedfs:/data"
     healthcheck:
-      test: ["CMD", "/garage", "status"]
-      interval: 10s
-      timeout: 2s
-      retries: 2
+      test: ["CMD", "wget", "-q", "-O-", "http://seaweedfs:8080/healthz"]
+      interval: 30s
+      timeout: 20s
+      retries: 5
+      start_period: 60s
   snuba-api:
     <<: *snuba_defaults
   # Kafka consumer responsible for feeding events into Clickhouse
@@ -621,6 +640,8 @@ volumes:
     external: true
   sentry-symbolicator:
     external: true
+  sentry-seaweedfs:
+    external: true
   # This volume stores JS SDK assets and the data inside this volume should
   # be cleaned periodically on upgrades.
   sentry-nginx-www:
@@ -640,4 +661,3 @@ volumes:
   sentry-kafka-log:
   sentry-smtp-log:
   sentry-clickhouse-log:
-  sentry-garage:
