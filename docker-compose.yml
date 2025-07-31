@@ -216,6 +216,7 @@ services:
     image: "chrislusf/seaweedfs:3.94_large_disk"
     entrypoint: "weed"
     command: >-
+        server
         -filer=true
         -filer.port=8888
         -filer.defaultReplicaPlacement=000
