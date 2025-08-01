@@ -279,6 +279,13 @@ SENTRY_OPTIONS["mail.from"] = f"sentry@{SENTRY_OPTIONS['mail.list-namespace']}"
 # Features #
 ############
 
+# Sentry uses feature flags to enable certain features. Some features may
+# require additional configuration or containers. To learn more about how
+# Sentry uses feature flags, see https://develop.sentry.dev/backend/application-domains/feature-flags/
+#
+# The features listed here are stable and generally available on SaaS.
+# To enable preview features, see https://develop.sentry.dev/self-hosted/configuration/#enabling-preview-features
+
 SENTRY_FEATURES["projects:sample-events"] = False
 SENTRY_FEATURES.update(
     {
@@ -292,18 +299,12 @@ SENTRY_FEATURES.update(
             "organizations:invite-members",
             "organizations:sso-basic",
             "organizations:sso-saml2",
-            "organizations:performance-view",
             "organizations:advanced-search",
-            "organizations:session-replay",
             "organizations:issue-platform",
-            "organizations:profiling",
-            "organizations:profiling-view",
             "organizations:monitors",
             "organizations:dashboards-mep",
             "organizations:mep-rollout-flag",
             "organizations:dashboards-rh-widget",
-            "organizations:transaction-metrics-extraction",
-            "organizations:visibility-explore-view",
             "organizations:dynamic-sampling",
             "projects:custom-inbound-filters",
             "projects:data-forwarding",
@@ -312,8 +313,11 @@ SENTRY_FEATURES.update(
             "projects:rate-limits",
             "projects:servicehooks",
         )
-        # Starfish related flags
+        # Performance/Tracing/Spans related flags
         + (
+            "organizations:performance-view",
+            "organizations:visibility-explore-view",
+            "organizations:transaction-metrics-extraction",
             "organizations:indexed-spans-extraction",
             "organizations:insights-entry-points",
             "organizations:insights-initial-modules",
@@ -323,32 +327,31 @@ SENTRY_FEATURES.update(
             "projects:span-metrics-extraction",
             "projects:span-metrics-extraction-addons",
         )
+        # Session Replay related flags
+        + (
+            "organizations:session-replay",
+        )
         # User Feedback related flags
         + (
             "organizations:user-feedback-ui",
+        )
+        # Profiling related flags
+        + (
+            "organizations:profiling",
+            "organizations:profiling-view",
         )
         # Continuous Profiling related flags
         + (
             "organizations:continuous-profiling",
             "organizations:continuous-profiling-stats",
         )
-        # Uptime related flags
+        # Uptime Monitoring related flags
         + (
             "organizations:uptime",
             "organizations:uptime-create-issues",
-            # TODO(epurkhiser): We can remove remove these in 25.8.0 since
-            # we'll have released this issue group type
-            # (https://github.com/getsentry/sentry/pull/94827)
-            "organizations:issue-uptime-domain-failure-visible",
-            "organizations:issue-uptime-domain-failure-ingest",
-            "organizations:issue-uptime-domain-failure-post-process-group",
         )
     }
 )
-
-# TODO(epurkhiser): In 25.8.0 we can drop this option override as we've made it
-# default in sentry (https://github.com/getsentry/sentry/pull/94822)
-SENTRY_OPTIONS["uptime.snuba_uptime_results.enabled"] = True
 
 #######################
 # MaxMind Integration #
