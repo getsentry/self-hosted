@@ -213,16 +213,17 @@ services:
       timeout: 10s
       retries: 30
   seaweedfs:
-    image: "chrislusf/seaweedfs:3.94_large_disk"
+    image: "chrislusf/seaweedfs:3.96_large_disk"
     entrypoint: "weed"
     command: >-
         server
         -filer=true
         -filer.port=8888
+        -filer.grpcPort=18888
         -filer.defaultReplicaPlacement=000
         -master=true
         -master.port=9333
-        -master.volumeSizeLimitMB=1024
+        -master.grpcPort=19333
         -metricsPort=9091
         -s3=true
         -s3.port=8333
@@ -233,6 +234,8 @@ services:
         -volume.preStopSeconds=8
         -volume.readMode=redirect
         -volume.port=8080
+        -volume.grpcPort=18080
+        -ip=seaweedfs
         -webdav=false
     environment:
       AWS_ACCESS_KEY_ID: sentry
