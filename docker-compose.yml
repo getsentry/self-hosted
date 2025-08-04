@@ -220,19 +220,19 @@ services:
         -filer=true
         -filer.port=8888
         -filer.defaultReplicaPlacement=000
+        -master=true
         -master.port=9333
+        -master.volumeSizeLimitMB=1024
         -metricsPort=9091
         -s3=true
         -s3.port=8333
         -volume=true
         -volume.dir.idx=/data/idx
         -volume.index=leveldbLarge
-        -volume.max=30
-        -volume.minFreeSpace=50GiB
+        -volume.max=0
         -volume.preStopSeconds=8
         -volume.readMode=redirect
         -volume.port=8080
-        -master=true
         -webdav=false
     environment:
       AWS_ACCESS_KEY_ID: sentry
