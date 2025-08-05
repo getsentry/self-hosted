@@ -14,8 +14,8 @@ sentry-data
 sentry-kafka
 sentry-postgres
 sentry-redis
-sentry-symbolicator
-sentry-seaweedfs"
+sentry-seaweedfs
+sentry-symbolicator"
 
 before=$(get_volumes)
 
@@ -24,7 +24,6 @@ test "$before" == "" || test "$before" == "$expected_volumes"
 source install/create-docker-volumes.sh
 
 after=$(get_volumes)
-echo "$after"
 test "$after" == "$expected_volumes"
 
 report_success
