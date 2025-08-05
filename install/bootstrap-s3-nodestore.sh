@@ -2,6 +2,7 @@ echo "${_group}Bootstrapping seaweedfs (node store)..."
 
 $dc up --wait seaweedfs postgres
 $dc exec seaweedfs apk add --no-cache s3cmd
+$dc exec seaweedfs mkdir -p /data/idx/
 s3cmd="$dc exec seaweedfs s3cmd"
 
 bucket_list=$($s3cmd --access_key=sentry --secret_key=sentry --no-ssl --region=us-east-1 --host=localhost:8333 --host-bucket='localhost:8333/%(bucket)' ls)

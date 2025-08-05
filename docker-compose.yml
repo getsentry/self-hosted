@@ -245,7 +245,7 @@ services:
     volumes:
       - "sentry-seaweedfs:/data"
     healthcheck:
-      test: ["CMD", "wget", "-q", "-O-", "http://seaweedfs:8080/healthz"]
+      test: ["CMD", "wget", "-q", "-O-", "http://seaweedfs:8080/healthz", "http://seaweedfs:9333/cluster/healthz", "http://seaweedfs:8333/healthz"]
       interval: 30s
       timeout: 20s
       retries: 5
