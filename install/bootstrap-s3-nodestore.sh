@@ -15,7 +15,7 @@ if [[ $($bucket_list | tail -1 | awk '{print $3}') != 's3://nodestore' ]]; then
     fi
     echo "$nodestore_config" >>$SENTRY_CONFIG_PY
   fi
-
+  $dc exec seaweedfs mkdir -p /data/idx/
   $s3cmd --access_key=sentry --secret_key=sentry --no-ssl --region=us-east-1 --host=localhost:8333 --host-bucket='localhost:8333/%(bucket)' mb s3://nodestore
 else
   echo "Node store already exists, skipping..."
