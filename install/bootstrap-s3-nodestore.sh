@@ -16,7 +16,7 @@ if [[ $($bucket_list | tail -1 | awk '{print $3}') != 's3://nodestore' ]]; then
     echo "$nodestore_config" >>$SENTRY_CONFIG_PY
   fi
 
-  $s3cmd --access_key=foo --secret_key=bar --no-ssl --region=us-east-1 --host=localhost:8333 --host-bucket='localhost:8333/%(bucket)' mb s3://nodestore
+  $s3cmd --access_key=sentry --secret_key=sentry --no-ssl --region=us-east-1 --host=localhost:8333 --host-bucket='localhost:8333/%(bucket)' mb s3://nodestore
 else
   echo "Node store already exists, skipping..."
 fi

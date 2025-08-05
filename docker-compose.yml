@@ -236,7 +236,7 @@ services:
         -volume.readMode=redirect
         -volume.port=8080
         -volume.port.grpc=18080
-        -ip=seaweedfs
+        -ip=127.0.0.1
         -ip.bind=0.0.0.0
         -webdav=false
     environment:
