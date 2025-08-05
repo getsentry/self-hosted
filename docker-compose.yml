@@ -219,14 +219,15 @@ services:
         server
         -filer=true
         -filer.port=8888
-        -filer.grpcPort=18888
+        -filer.port.grpc=18888
         -filer.defaultReplicaPlacement=000
         -master=true
         -master.port=9333
-        -master.grpcPort=19333
+        -master.port.grpc=19333
         -metricsPort=9091
         -s3=true
         -s3.port=8333
+        -s3.port.grpc=18333
         -volume=true
         -volume.dir.idx=/data/idx
         -volume.index=leveldbLarge
@@ -234,8 +235,9 @@ services:
         -volume.preStopSeconds=8
         -volume.readMode=redirect
         -volume.port=8080
-        -volume.grpcPort=18080
+        -volume.port.grpc=18080
         -ip=seaweedfs
+        -ip.bind=0.0.0.0
         -webdav=false
     environment:
       AWS_ACCESS_KEY_ID: sentry
