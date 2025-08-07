@@ -13,7 +13,7 @@ TEST_PASS = "test123TEST"
 @pytest.fixture(scope="session", autouse=True)
 def configure_self_hosted_environment(request):
     subprocess.run(
-        ["docker", "compose", "--ansi", "never", "up", "--wait"],
+        ["docker", "compose", "--ansi", "never", "up", "--wait", "--wait-timeout", "600"],
         check=True,
         capture_output=True,
     )
