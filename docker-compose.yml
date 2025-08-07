@@ -48,6 +48,8 @@ x-sentry-defaults: &sentry_defaults
       <<: *depends_on-default
   entrypoint: "/etc/sentry/entrypoint.sh"
   command: ["run", "web"]
+  healthcheck:
+    <<: *file_healthcheck_defaults
   environment:
     PYTHONUSERBASE: "/data/custom-packages"
     SENTRY_CONF: "/etc/sentry"
@@ -400,117 +402,117 @@ services:
     command: run worker
   events-consumer:
     <<: *sentry_defaults
-    command: run consumer ingest-events --consumer-group ingest-consumer
+    command: run consumer ingest-events --consumer-group ingest-consumer --healthcheck-file-path /tmp/health.txt
   attachments-consumer:
     <<: *sentry_defaults
-    command: run consumer ingest-attachments --consumer-group ingest-consumer
+    command: run consumer ingest-attachments --consumer-group ingest-consumer --healthcheck-file-path /tmp/health.txt
   post-process-forwarder-errors:
     <<: *sentry_defaults
-    command: run consumer --no-strict-offset-reset post-process-forwarder-errors --consumer-group post-process-forwarder --synchronize-commit-log-topic=snuba-commit-log --synchronize-commit-group=snuba-consumers
+    command: run consumer --no-strict-offset-reset post-process-forwarder-errors --consumer-group post-process-forwarder --synchronize-commit-log-topic=snuba-commit-log --synchronize-commit-group=snuba-consumers --healthcheck-file-path /tmp/health.txt
   subscription-consumer-events:
     <<: *sentry_defaults
-    command: run consumer events-subscription-results --consumer-group query-subscription-consumer
+    command: run consumer events-subscription-results --consumer-group query-subscription-consumer --healthcheck-file-path /tmp/health.txt
   ##############################################
   ## Feature Complete Sentry Ingest Consumers ##
   ##############################################
   transactions-consumer:
     <<: *sentry_defaults
-    command: run consumer ingest-transactions --consumer-group ingest-consumer
+    command: run consumer ingest-transactions --consumer-group ingest-consumer --healthcheck-file-path /tmp/health.txt
     profiles:
       - feature-complete
   metrics-consumer:
     <<: *sentry_defaults
-    command: run consumer ingest-metrics --consumer-group metrics-consumer
+    command: run consumer ingest-metrics --consumer-group metrics-consumer --healthcheck-file-path /tmp/health.txt
     profiles:
       - feature-complete
   generic-metrics-consumer:
     <<: *sentry_defaults
-    command: run consumer ingest-generic-metrics --consumer-group generic-metrics-consumer
+    command: run consumer ingest-generic-metrics --consumer-group generic-metrics-consumer --healthcheck-file-path /tmp/health.txt
     profiles:
       - feature-complete
   billing-metrics-consumer:
     <<: *sentry_defaults
-    command: run consumer billing-metrics-consumer --consumer-group billing-metrics-consumer
+    command: run consumer billing-metrics-consumer --consumer-group billing-metrics-consumer --healthcheck-file-path /tmp/health.txt
     profiles:
       - feature-complete
   ingest-replay-recordings:
     <<: *sentry_defaults
-    command: run consumer ingest-replay-recordings --consumer-group ingest-replay-recordings
+    command: run consumer ingest-replay-recordings --consumer-group ingest-replay-recordings --healthcheck-file-path /tmp/health.txt
     profiles:
       - feature-complete
   ingest-occurrences:
     <<: *sentry_defaults
-    command: run consumer ingest-occurrences --consumer-group ingest-occurrences
+    command: run consumer ingest-occurrences --consumer-group ingest-occurrences --healthcheck-file-path /tmp/health.txt
     profiles:
       - feature-complete
   ingest-profiles:
     <<: *sentry_defaults
-    command: run consumer ingest-profiles --consumer-group ingest-profiles
+    command: run consumer ingest-profiles --consumer-group ingest-profiles --healthcheck-file-path /tmp/health.txt
     profiles:
       - feature-complete
   ingest-monitors:
     <<: *sentry_defaults
-    command: run consumer ingest-monitors --consumer-group ingest-monitors
+    command: run consumer ingest-monitors --consumer-group ingest-monitors --healthcheck-file-path /tmp/health.txt
     profiles:
       - feature-complete
   ingest-feedback-events:
     <<: *sentry_defaults
-    command: run consumer ingest-feedback-events --consumer-group ingest-feedback
+    command: run consumer ingest-feedback-events --consumer-group ingest-feedback --healthcheck-file-path /tmp/health.txt
     profiles:
       - feature-complete
   process-spans:
     <<: *sentry_defaults
-    command: run consumer --no-strict-offset-reset process-spans --consumer-group process-spans
+    command: run consumer --no-strict-offset-reset process-spans --consumer-group process-spans --healthcheck-file-path /tmp/health.txt
     profiles:
       - feature-complete
   process-segments:
     <<: *sentry_defaults
-    command: run consumer --no-strict-offset-reset process-segments --consumer-group process-segments
+    command: run consumer --no-strict-offset-reset process-segments --consumer-group process-segments --healthcheck-file-path /tmp/health.txt
     profiles:
       - feature-complete
   monitors-clock-tick:
     <<: *sentry_defaults
-    command: run consumer monitors-clock-tick --consumer-group monitors-clock-tick
+    command: run consumer monitors-clock-tick --consumer-group monitors-clock-tick --healthcheck-file-path /tmp/health.txt
     profiles:
       - feature-complete
   monitors-clock-tasks:
     <<: *sentry_defaults
-    command: run consumer monitors-clock-tasks --consumer-group monitors-clock-tasks
+    command: run consumer monitors-clock-tasks --consumer-group monitors-clock-tasks --healthcheck-file-path /tmp/health.txt
     profiles:
       - feature-complete
   uptime-results:
     <<: *sentry_defaults
-    command: run consumer uptime-results --consumer-group uptime-results
+    command: run consumer uptime-results --consumer-group uptime-results --healthcheck-file-path /tmp/health.txt
     profiles:
       - feature-complete
   post-process-forwarder-transactions:
     <<: *sentry_defaults
-    command: run consumer --no-strict-offset-reset post-process-forwarder-transactions --consumer-group post-process-forwarder --synchronize-commit-log-topic=snuba-transactions-commit-log --synchronize-commit-group transactions_group
+    command: run consumer --no-strict-offset-reset post-process-forwarder-transactions --consumer-group post-process-forwarder --synchronize-commit-log-topic=snuba-transactions-commit-log --synchronize-commit-group transactions_group --healthcheck-file-path /tmp/health.txt
     profiles:
       - feature-complete
   post-process-forwarder-issue-platform:
     <<: *sentry_defaults
-    command: run consumer --no-strict-offset-reset post-process-forwarder-issue-platform --consumer-group post-process-forwarder --synchronize-commit-log-topic=snuba-generic-events-commit-log --synchronize-commit-group generic_events_group
+    command: run consumer --no-strict-offset-reset post-process-forwarder-issue-platform --consumer-group post-process-forwarder --synchronize-commit-log-topic=snuba-generic-events-commit-log --synchronize-commit-group generic_events_group --healthcheck-file-path /tmp/health.txt
     profiles:
       - feature-complete
   subscription-consumer-transactions:
     <<: *sentry_defaults
-    command: run consumer transactions-subscription-results --consumer-group query-subscription-consumer
+    command: run consumer transactions-subscription-results --consumer-group query-subscription-consumer --healthcheck-file-path /tmp/health.txt
     profiles:
       - feature-complete
   subscription-consumer-eap-items:
     <<: *sentry_defaults
-    command: run consumer subscription-results-eap-items --consumer-group subscription-results-eap-items
+    command: run consumer subscription-results-eap-items --consumer-group subscription-results-eap-items --healthcheck-file-path /tmp/health.txt
     profiles:
       - feature-complete
   subscription-consumer-metrics:
     <<: *sentry_defaults
-    command: run consumer metrics-subscription-results --consumer-group query-subscription-consumer
+    command: run consumer metrics-subscription-results --consumer-group query-subscription-consumer --healthcheck-file-path /tmp/health.txt
     profiles:
       - feature-complete
   subscription-consumer-generic-metrics:
     <<: *sentry_defaults
-    command: run consumer generic-metrics-subscription-results --consumer-group query-subscription-consumer
+    command: run consumer generic-metrics-subscription-results --consumer-group query-subscription-consumer --healthcheck-file-path /tmp/health.txt
     profiles:
       - feature-complete
   sentry-cleanup:
@@ -521,6 +523,8 @@ services:
       args:
         BASE_IMAGE: sentry-self-hosted-local
     entrypoint: "/entrypoint.sh"
+    healthcheck:
+      disable: true
     command: '"0 0 * * * gosu sentry sentry cleanup --days $SENTRY_EVENT_RETENTION_DAYS"'
   nginx:
     <<: *restart_policy
