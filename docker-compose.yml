@@ -247,7 +247,7 @@ services:
     <<: *snuba_defaults
     healthcheck:
       disable: true
-    command: replacer --storage errors --auto-offset-reset=latest --no-strict-offset-reset --health-check-file /tmp/health.txt
+    command: replacer --storage errors --auto-offset-reset=latest --no-strict-offset-reset
   snuba-subscription-consumer-events:
     <<: *snuba_defaults
     command: subscriptions-scheduler-executor --dataset events --entity events --auto-offset-reset=latest --no-strict-offset-reset --consumer-group=snuba-events-subscriptions-consumers --followed-consumer-group=snuba-consumers --schedule-ttl=60 --stale-threshold-seconds=900 --health-check-file /tmp/health.txt
