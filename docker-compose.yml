@@ -15,7 +15,7 @@ x-healthcheck-defaults: &healthcheck_defaults
   interval: "$HEALTHCHECK_INTERVAL"
   timeout: "$HEALTHCHECK_TIMEOUT"
   retries: $HEALTHCHECK_RETRIES
-  start_period: "$HEATLHCHECK_START_PERIOD"
+  start_period: "$HEALTHCHECK_START_PERIOD"
 x-file-healthcheck: &file_healthcheck_defaults
   test: ["CMD-SHELL", "rm /tmp/health.txt"]
   interval: "$HEALTHCHECK_FILE_INTERVAL"
