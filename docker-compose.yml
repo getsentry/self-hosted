@@ -397,9 +397,18 @@ services:
   cron:
     <<: *sentry_defaults
     command: run cron
+    healthcheck:
+      disable: true
   worker:
     <<: *sentry_defaults
     command: run worker
+    healthcheck:
+      command:
+        - CMD
+        - sentry
+        - exec
+        - -c
+        - 'from sentry.celery import app; import os; dest="celery@{}".format(os.environ["HOSTNAME"]); print(app.control.ping(destination=[dest], timeout=5)[0][dest]["ok"])'
   events-consumer:
     <<: *sentry_defaults
     command: run consumer ingest-events --consumer-group ingest-consumer --healthcheck-file-path /tmp/health.txt
@@ -575,9 +584,13 @@ services:
   taskscheduler:
     <<: *sentry_defaults
     command: run taskworker-scheduler
+    healthcheck:
+      disable: true
   taskworker:
     <<: *sentry_defaults
     command: run taskworker --concurrency=4 --rpc-host=taskbroker:50051
+    healthcheck:
+      disable: true
   vroom:
     <<: *restart_policy
     image: "$VROOM_IMAGE"
