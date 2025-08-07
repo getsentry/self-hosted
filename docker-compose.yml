@@ -403,7 +403,7 @@ services:
     <<: *sentry_defaults
     command: run worker
     healthcheck:
-      command:
+      test:
         - CMD
         - sentry
         - exec
