@@ -556,6 +556,12 @@ services:
         target: /etc/nginx/nginx.conf
       - sentry-nginx-cache:/var/cache/nginx
       - sentry-nginx-www:/var/www
+    healthcheck:
+      <<: *healthcheck_defaults
+      test:
+        - "CMD"
+        - "/usr/bin/curl"
+        - http://localhost
     depends_on:
       - web
       - relay
