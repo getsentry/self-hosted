@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Set the script directory as working directory.
 cd $(dirname $0)
