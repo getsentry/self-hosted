@@ -109,10 +109,10 @@ services:
       test: echo stats | nc 127.0.0.1 11211
   redis:
     <<: *restart_policy
-    image: "redis:6.2.14-alpine"
+    image: "docker.io/valkey/valkey:8.1.3-alpine"
     healthcheck:
       <<: *healthcheck_defaults
-      test: redis-cli ping | grep PONG
+      test: valkey-cli ping | grep PONG
     volumes:
       - "sentry-redis:/data"
       - type: bind
@@ -123,7 +123,7 @@ services:
       nofile:
         soft: 10032
         hard: 10032
-    command: ["redis-server", "/usr/local/etc/redis/redis.conf"]
+    command: ["valkey-server", "/usr/local/etc/redis/redis.conf"]
   postgres:
     <<: *restart_policy
     # Using the same postgres version as Sentry dev for consistency purposes
