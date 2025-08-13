@@ -180,7 +180,9 @@ def test_custom_certificate_authorities():
         .public_key(ca_key.public_key())
         .serial_number(x509.random_serial_number())
         .not_valid_before(datetime.datetime.now(datetime.timezone.utc))
-        .not_valid_after(datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(days=1))
+        .not_valid_after(
+            datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(days=1)
+        )
         .add_extension(x509.BasicConstraints(ca=True, path_length=None), critical=True)
         .add_extension(
             x509.KeyUsage(
@@ -398,7 +400,7 @@ def test_receive_transaction_events(client_login):
         lambda x: len(json.loads(x)["data"]) > 0,
     )
     poll_for_response(
-        f"{SENTRY_TEST_HOST}/api/0/organizations/sentry/events/?dataset=spansIndexed&field=id&project=1&statsPeriod=1h",
+        f"{SENTRY_TEST_HOST}/api/0/organizations/sentry/events/?dataset=spans&field=id&project=1&statsPeriod=1h",
         client,
         lambda x: len(json.loads(x)["data"]) > 0,
     )
