@@ -48,6 +48,12 @@ runs:
           fi
         fi
 
+    - name: Setup Linux process accounting
+      shell: bash
+      run: |
+        sudo apt-get install -y acct
+        sudo accton on
+
     - name: Get Compose
       uses: getsentry/self-hosted/get-compose-action@master
 
@@ -179,4 +185,7 @@ runs:
         echo "::endgroup::"
         echo "::group::Inspect failure - docker compose logs"
         docker compose logs
+        echo "::endgroup::"
+        echo "::group::Inspect failure - resource accounting usage"
+        sa --percentages --separate-times
         echo "::endgroup::"
