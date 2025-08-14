@@ -5,6 +5,8 @@ MIN_COMPOSE_VERSION='2.32.2'
 MIN_PODMAN_VERSION='4.9.3'
 MIN_PODMAN_COMPOSE_VERSION='1.3.0'
 
+MIN_BASH_VERSION='4.4.0'
+
 # 16 GB minimum host RAM, but there'll be some overhead outside of what
 # can be allotted to docker
 if [[ "$COMPOSE_PROFILES" == "errors-only" ]]; then
