@@ -142,6 +142,17 @@ runs:
         volumes: |
           sentry-kafka
 
+    - name: Setup swapfile
+      shell: bash
+      if: matrix.os == 'ubuntu-24.04'
+      run: |
+        sudo fallocate -l 16G /swapfile
+        sudo chmod 600 /swapfile
+        sudo mkswap /swapfile
+        sudo swapon /swapfile
+        sudo swapon --show
+        free -h
+
     - name: Integration Test
       shell: bash
       run: |
