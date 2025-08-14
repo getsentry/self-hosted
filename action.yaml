@@ -144,6 +144,7 @@ runs:
 
     - name: Setup swapfile
       shell: bash
+      if: matrix.os == 'ubuntu-24.04'
       run: |
         sudo fallocate -l 16G /swapfile
         sudo chmod 600 /swapfile
