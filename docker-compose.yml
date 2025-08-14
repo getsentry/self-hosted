@@ -674,6 +674,9 @@ services:
         <<: *depends_on-healthy
       web:
         <<: *depends_on-healthy
+    healthcheck:
+      <<: *healthcheck_defaults
+      test: ["CMD", "/bin/relay", "healthcheck"]
   taskbroker:
     <<: *restart_policy
     image: "$TASKBROKER_IMAGE"
