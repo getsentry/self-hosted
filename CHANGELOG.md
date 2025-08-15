@@ -1,5 +1,31 @@
 # Changelog
 
+## 25.8.0
+
+### Various fixes & improvements
+
+- feat: Relay healthcheck (#3875) by @aldy505
+- fix: setup swapfile only if runner architecture is X64 or X86 (#3876) by @aldy505
+- Set minimum bash version to 4.4.0 (#3873) by @aminvakil
+- fix: adjust file healthcheck durations (#3874) by @mzglinski
+- feat: healthchecks for sentry components (#3859) by @mzglinski
+- fix(eap): Fix dataset parameter to target spans (#3866) by @phacops
+- build(deps): bump actions/create-github-app-token from 2.0.6 to 2.1.0 (#3865) by @dependabot
+- fix(scripts): use `env` to find `bash` interpreter (#3861) by @Zaczero
+- fix(scripts): every known flags should be shifted before executing the sentry <foo> command (#3831) by @aldy505
+- fix: uptime checker image should be bumped to the tagged release (#3858) by @aldy505
+- fix(enhancement): ensure correct ownership check before setting permissions of profiles (#3855) by @LvckyAPI
+- chore(features): cleanup feature flags grouped by its' category (#3843) by @aldy505
+- fix: add schedulers for generic metrics subscriptions (#3847) by @mzglinski
+- feat: Continue using celery in self-hosted for now (#3845) by @markstory
+- feat(features): add `profiling-view` flag (#3837) by @aldy505
+- Potential fix for code scanning alert no. 12: Workflow does not contain permissions (#3822) by @aldy505
+- docs: clearly state that `system.internal-url-prefix` shouldn't be changed (#3829) by @aldy505
+- feat(install): Adds support for podman(compose) (#3673) by @DuncanConroy
+- fix(action): missing project directory path for failure inspection (#3825) by @aldy505
+- Cleanup unused feature flags (#3820) by @doc-sheet
+- feat: inspect docker compose failure on self-hosted e2e action (#3817) by @aldy505
+
 ## 25.7.0
 
 ### Various fixes & improvements
