@@ -17,5 +17,6 @@ echo "Created $(create_volume sentry-kafka)."
 echo "Created $(create_volume sentry-postgres)."
 echo "Created $(create_volume sentry-redis)."
 echo "Created $(create_volume sentry-symbolicator)."
+echo "Created $(create_volume sentry-seaweedfs)."
 
 echo "${_endgroup}"
