@@ -405,6 +405,30 @@ def test_receive_transaction_events(client_login):
         lambda x: len(json.loads(x)["data"]) > 0,
     )
 
+def test_receive_user_feedback_events(client_login):
+    client, _ = client_login
+    sentry_dsn = get_sentry_dsn(client)
+
+    # Execute `node --import instrument.js user-feedback.js` on the `nodejs` directory with the `SENTRY_DSN` env var set
+    subprocess.run(
+        ["node", "--import", "instrument.js", "user-feedback.js"],
+        check=True,
+        env={
+            "SENTRY_DSN": sentry_dsn,
+        },
+        cwd=f"_integration-test/nodejs",
+    )
+
+    poll_for_response(
+        f"{SENTRY_TEST_HOST}/api/0/organizations/sentry/issues/?query=issue.category%3Afeedback%20status%3Aunresolved",
+        client,
+        lambda x: len(json.loads(x)) > 0,
+    )
+    poll_for_response(
+        f"{SENTRY_TEST_HOST}/api/0/organizations/sentry/events/?dataset=issuePlatform&field=message&field=title&field=timestamp&project=1&statsPeriod=1h",
+        client,
+        lambda x: len(json.loads(x)["data"]) > 0,
+    )
 
 def test_customizations():
     commands = [
