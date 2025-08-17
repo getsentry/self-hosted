@@ -30,14 +30,6 @@ runs:
           exit 1
         fi
 
-    - name: Test things around
-      shell: bash
-      run: |
-        sudo df -h
-        sudo swapon --show
-        sudo free -h
-        exit 10
-
     - name: Setup dev environment
       shell: bash
       run: |
@@ -153,6 +145,7 @@ runs:
     - name: Setup swapfile
       shell: bash
       run: |
+        sudo swapoff -a
         sudo fallocate -l 16G /swapfile
         sudo chmod 600 /swapfile
         sudo mkswap /swapfile
