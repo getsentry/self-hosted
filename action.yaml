@@ -30,6 +30,14 @@ runs:
           exit 1
         fi
 
+    - name: Test things around
+      shell: bash
+      run: |
+        sudo df -h
+        sudo swapon --show
+        sudo free -h
+        exit 10
+
     - name: Setup dev environment
       shell: bash
       run: |
