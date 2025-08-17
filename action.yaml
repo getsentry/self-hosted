@@ -144,7 +144,6 @@ runs:
 
     - name: Setup swapfile
       shell: bash
-      if: runner.arch == 'X64' || runner.arch == 'X86'
       run: |
         sudo fallocate -l 16G /swapfile
         sudo chmod 600 /swapfile
