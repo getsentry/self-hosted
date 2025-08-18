@@ -8,7 +8,7 @@ index 826f43a..944dc63 100644
 -        "PASSWORD": "",
 +        "PASSWORD": "sentry",
 -        "HOST": "postgres",
-+        "HOST": "pgbouncer",
++        "HOST": "pgcat",
          "PORT": "",
      }
  }

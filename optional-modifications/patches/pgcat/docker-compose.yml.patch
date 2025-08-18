@@ -6,7 +6,7 @@ index 8873990..d2a8777 100644
        <<: *depends_on-healthy
      postgres:
        <<: *depends_on-healthy
-+    pgbouncer:
++    pgcat:
 +      <<: *depends_on-default
      memcached:
        <<: *depends_on-default
@@ -15,8 +15,8 @@ index 8873990..d2a8777 100644
        POSTGRES_HOST_AUTH_METHOD: "trust"
      volumes:
        - "sentry-postgres:/var/lib/postgresql/data"
-+  pgbouncer:
-+    image: edoburu/pgbouncer
++  pgcat:
++    image: "$PGCAT_IMAGE"
 +    environment:
 +      - DB_USER=${POSTGRES_USER:-postgres}
 +      - DB_PASSWORD=${POSTGRES_PASSWORD:-sentry}
