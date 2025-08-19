@@ -47,8 +47,8 @@ DATABASES = {
         "ENGINE": "sentry.db.postgres",
         "NAME": "postgres",
         "USER": "postgres",
-        "PASSWORD": "",
-        "HOST": "postgres",
+        "PASSWORD": "sentry",
+        "HOST": "pgcat",
         "PORT": "",
     }
 }

@@ -1,0 +1,21 @@
+# This is an example of the most basic config
+# that will mimic what PgBouncer does in transaction mode with one server.
+
+[general]
+host = "0.0.0.0"
+port = 6433
+admin_username = "sentry"
+admin_password = "sentry"
+
+[pools.sentry.users.0]
+username = "sentry"
+password = "sentry"
+pool_size = 100
+min_pool_size = 100
+pool_mode = "transaction"
+
+[pools.sentry.shards.0]
+servers = [
+  ["postgres", 5432, "primary"]
+]
+database = "postgres"
