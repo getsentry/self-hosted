@@ -1,5 +1,4 @@
-permissions:
-  contents: read
+
 name: Test
 on:
   # Run CI on all pushes to the master and release/** branches, and on all new
@@ -16,6 +15,9 @@ on:
 concurrency:
   group: ${{ github.ref_name || github.sha }}
   cancel-in-progress: true
+
+permissions:
+  contents: read
 
 defaults:
   run:
