@@ -13,6 +13,8 @@ on:
     # We also make this an hour after all others such as Sentry,
     # Snuba, and Relay to make sure their releases finish.
     - cron: "0 18 15 * *"
+permissions:
+  contents: read
 jobs:
   release:
     if: github.repository_owner == 'getsentry'
