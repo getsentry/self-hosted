@@ -30,7 +30,7 @@ jobs:
     name: ${{ matrix.os == 'ubuntu-24.04-arm' && 'unit tests (arm64)' || 'unit tests' }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Get Compose
         uses: ./get-compose-action
@@ -53,7 +53,7 @@ jobs:
       CONTAINER_ENGINE_PODMAN: ${{ matrix.container_engine == 'podman' && '1' || '0' }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Install Podman
         if: matrix.container_engine == 'podman'

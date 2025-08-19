@@ -54,4 +54,9 @@ if [[ ! "$SKIP_SSE42_REQUIREMENTS" -eq 1 && "$IS_KVM" -eq 0 && "$DOCKER_ARCH" = 
   fi
 fi
 
+if ! vergte "${BASH_VERSION}" "${MIN_BASH_VERSION}"; then
+  echo "FAIL: Expected minimum bash version to be ${MIN_BASH_VERSION} but found ${BASH_VERSION}"
+  exit 1
+fi
+
 echo "${_endgroup}"
