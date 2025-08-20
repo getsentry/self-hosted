@@ -7,7 +7,7 @@ port = 5432
 admin_username = "postgres"
 admin_password = "sentry"
 
-[pools.sentry.users.0]
+[pools.postgres.users.0]
 username = "postgres"
 password = "sentry"
 # Should be at most POSTGRES_MAX_CONNECTIONS from .env.
@@ -16,7 +16,7 @@ pool_size = 100
 min_pool_size = 100
 pool_mode = "transaction"
 
-[pools.sentry.shards.0]
+[pools.postgres.shards.0]
 servers = [
   ["postgres", 5432, "primary"]
 ]
