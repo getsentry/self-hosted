@@ -37,7 +37,7 @@ x-sentry-defaults: &sentry_defaults
     kafka:
       <<: *depends_on-healthy
     pgcat:
-      <<: *depends_on-default
+      <<: *depends_on-healthy
     memcached:
       <<: *depends_on-default
     smtp:
