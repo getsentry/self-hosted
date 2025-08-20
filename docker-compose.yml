@@ -142,6 +142,8 @@ services:
       ["postgres", "-c", "max_connections=${POSTGRES_MAX_CONNECTIONS:-100}"]
     environment:
       POSTGRES_HOST_AUTH_METHOD: "trust"
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "sentry"
     volumes:
       - "sentry-postgres:/var/lib/postgresql/data"
   pgcat:
