@@ -36,8 +36,6 @@ x-sentry-defaults: &sentry_defaults
       <<: *depends_on-healthy
     kafka:
       <<: *depends_on-healthy
-    postgres:
-      <<: *depends_on-healthy
     pgcat:
       <<: *depends_on-default
     memcached:
