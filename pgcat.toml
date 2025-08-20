@@ -4,11 +4,11 @@
 [general]
 host = "0.0.0.0"
 port = 5432
-admin_username = "sentry"
+admin_username = "postgres"
 admin_password = "sentry"
 
 [pools.sentry.users.0]
-username = "sentry"
+username = "postgres"
 password = "sentry"
 # Should be at most POSTGRES_MAX_CONNECTIONS from .env.
 pool_size = 100

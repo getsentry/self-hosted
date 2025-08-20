@@ -148,6 +148,10 @@ services:
       - "sentry-postgres:/var/lib/postgresql/data"
   pgcat:
     image: "ghcr.io/postgresml/pgcat:v1.2.0"
+    healthcheck:
+      <<: *healthcheck_defaults
+      # Using default user "postgres" from sentry/sentry.conf.example.py or value of POSTGRES_USER if provided
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
     depends_on:
       postgres:
         <<: *depends_on-healthy
