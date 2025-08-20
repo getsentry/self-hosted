@@ -11,9 +11,9 @@ admin_password = "sentry"
 username = "postgres"
 password = "sentry"
 # Should be at most POSTGRES_MAX_CONNECTIONS from .env.
-pool_size = 100
+pool_size = 90
 # We can always eagerly load connections because pgcat will be the only client to the postgres container.
-min_pool_size = 100
+min_pool_size = 90
 pool_mode = "transaction"
 
 [pools.postgres.shards.0]
