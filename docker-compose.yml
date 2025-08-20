@@ -148,10 +148,9 @@ services:
       - "sentry-postgres:/var/lib/postgresql/data"
   pgcat:
     image: "ghcr.io/postgresml/pgcat:v1.2.0"
-    ports:
-      - "5432:5432"
     depends_on:
-      - postgres
+      postgres:
+        <<: *depends_on-healthy
     volumes:
       - type: bind
         read_only: true
