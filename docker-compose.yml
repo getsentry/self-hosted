@@ -151,7 +151,7 @@ services:
     healthcheck:
       <<: *healthcheck_defaults
       # Using default user "postgres" from sentry/sentry.conf.example.py or value of POSTGRES_USER if provided
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
+      test: ["CMD-SHELL", "PGPASSWORD=\"sentry\" psql -U postgres -p 5432 -h 127.0.0.1 -tA -c \"show version;\" -d postgres >/dev/null"]
     depends_on:
       postgres:
         <<: *depends_on-healthy
