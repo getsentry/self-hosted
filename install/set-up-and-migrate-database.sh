@@ -3,7 +3,7 @@ echo "${_group}Setting up / migrating database ..."
 if [[ -z "${SKIP_SENTRY_MIGRATIONS:-}" ]]; then
   # Fixes https://github.com/getsentry/self-hosted/issues/2758, where a migration fails due to indexing issue
   start_service_and_wait_ready postgres
-  start_service_and_wait_ready pgcat
+  start_service_and_wait_ready pgbouncer
 
   os=$($dc exec postgres cat /etc/os-release | grep 'ID=debian')
   if [[ -z $os ]]; then

@@ -36,7 +36,7 @@ x-sentry-defaults: &sentry_defaults
       <<: *depends_on-healthy
     kafka:
       <<: *depends_on-healthy
-    pgcat:
+    pgbouncer:
       <<: *depends_on-healthy
     memcached:
       <<: *depends_on-default
@@ -146,8 +146,8 @@ services:
       POSTGRES_PASSWORD: "sentry"
     volumes:
       - "sentry-postgres:/var/lib/postgresql/data"
-  pgcat:
-    image: "ghcr.io/postgresml/pgcat:v1.2.0"
+  pgbouncer:
+    image: "edoburu/pgbouncer:v1.24.1-p1"
     healthcheck:
       <<: *healthcheck_defaults
       # Using default user "postgres" from sentry/sentry.conf.example.py or value of POSTGRES_USER if provided
@@ -155,11 +155,15 @@ services:
     depends_on:
       postgres:
         <<: *depends_on-healthy
-    volumes:
-      - type: bind
-        read_only: true
-        source: ./pgcat.toml
-        target: /etc/pgcat/pgcat.toml
+    environment:
+      DB_USER: ${POSTGRES_USER:-postgres}
+      DB_PASSWORD: sentry
+      DB_HOST: postgres
+      DB_NAME: postgres
+      POOL_MODE: transaction
+      ADMIN_USERS: postgres,sentry
+      MAX_CLIENT_CONN: 10000
+
   kafka:
     <<: *restart_policy
     image: "confluentinc/cp-kafka:7.6.1"

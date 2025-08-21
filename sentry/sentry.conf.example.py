@@ -48,7 +48,7 @@ DATABASES = {
         "NAME": "postgres",
         "USER": "postgres",
         "PASSWORD": "sentry",
-        "HOST": "pgcat",
+        "HOST": "pgbouncer",
         "PORT": "",
     }
 }

@@ -24,7 +24,7 @@ on the host filesystem. Commands that write files should write them to the '/sen
 # Actual invocation that runs the command in the container.
 invocation() {
   start_service_and_wait_ready postgres
-  start_service_and_wait_ready pgcat
+  start_service_and_wait_ready pgbouncer
   start_service_and_wait_ready redis --wait
   $dcr --no-deps -v "$VOLUME_MAPPING" -T -e SENTRY_LOG_LEVEL=CRITICAL web "$@" 2>&1
 }
