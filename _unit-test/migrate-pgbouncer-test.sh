@@ -6,8 +6,6 @@ source install/dc-detect-version.sh
 source install/ensure-files-from-examples.sh
 cp $SENTRY_CONFIG_PY /tmp/sentry_conf_py
 
-export SETUP_PGBOUNCER_MIGRATION=1
-
 # Declare expected content
 expected_db_config=$(
   cat <<'EOF'
@@ -193,7 +191,5 @@ fi
 
 # Remove the file
 rm $SENTRY_CONFIG_PY /tmp/sentry_conf_py
-
-export SETUP_PGBOUNCER_MIGRATION=0
 
 report_success
