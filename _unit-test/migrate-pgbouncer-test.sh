@@ -63,7 +63,7 @@ rm /tmp/sentry_conf_py_db_config
 source install/migrate-pgbouncer.sh
 
 # Extract actual content
-actual_db_config=$(sed -n '/^DATABASES = {$/,/^}$/p' filename.py)
+actual_db_config=$(sed -n '/^DATABASES = {$/,/^}$/p' $SENTRY_CONFIG_PY)
 
 # Compare
 if [ "$actual_db_config" = "$expected_db_config" ]; then
@@ -120,7 +120,7 @@ rm /tmp/sentry_conf_py_db_config
 source install/migrate-pgbouncer.sh
 
 # Extract actual content
-actual_db_config=$(sed -n '/^DATABASES = {$/,/^}$/p' filename.py)
+actual_db_config=$(sed -n '/^DATABASES = {$/,/^}$/p' $SENTRY_CONFIG_PY)
 
 # Compare
 if [ "$actual_db_config" = "$expected_db_config" ]; then
@@ -177,7 +177,7 @@ rm /tmp/sentry_conf_py_db_config
 source install/migrate-pgbouncer.sh
 
 # Extract actual content
-actual_db_config=$(sed -n '/^DATABASES = {$/,/^}$/p' filename.py)
+actual_db_config=$(sed -n '/^DATABASES = {$/,/^}$/p' $SENTRY_CONFIG_PY)
 
 # THe file should NOT be modified
 if [ "$actual_db_config" = "$expected_db_config" ]; then
