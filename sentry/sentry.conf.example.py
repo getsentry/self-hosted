@@ -48,7 +48,7 @@ DATABASES = {
         "NAME": "postgres",
         "USER": "postgres",
         "PASSWORD": "",
-        "HOST": "postgres",
+        "HOST": "pgbouncer",
         "PORT": "",
     }
 }
