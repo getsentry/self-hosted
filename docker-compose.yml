@@ -115,7 +115,7 @@ services:
       test: echo stats | nc 127.0.0.1 11211
   redis:
     <<: *restart_policy
-    image: "redis:6.2.14-alpine"
+    image: "redis:6.2.19-alpine"
     healthcheck:
       <<: *healthcheck_defaults
       test: redis-cli ping | grep PONG
@@ -133,13 +133,13 @@ services:
   postgres:
     <<: *restart_policy
     # Using the same postgres version as Sentry dev for consistency purposes
-    image: "postgres:14.11"
+    image: "postgres:14.19-bookworm"
     healthcheck:
       <<: *healthcheck_defaults
       # Using default user "postgres" from sentry/sentry.conf.example.py or value of POSTGRES_USER if provided
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
     command:
-      ["postgres", "-c", "max_connections=${POSTGRES_MAX_CONNECTIONS:-100}"]
+      ["postgres"]
     environment:
       POSTGRES_HOST_AUTH_METHOD: "trust"
     volumes:
@@ -164,7 +164,7 @@ services:
 
   kafka:
     <<: *restart_policy
-    image: "confluentinc/cp-kafka:7.6.1"
+    image: "confluentinc/cp-kafka:7.6.6"
     environment:
       # https://docs.confluent.io/platform/current/installation/docker/config-reference.html#cp-kakfa-example
       KAFKA_PROCESS_ROLES: "broker,controller"
@@ -656,7 +656,7 @@ services:
     <<: *restart_policy
     ports:
       - "$SENTRY_BIND:80/tcp"
-    image: "nginx:1.25.4-alpine"
+    image: "nginx:1.29.1-alpine"
     volumes:
       - type: bind
         read_only: true
