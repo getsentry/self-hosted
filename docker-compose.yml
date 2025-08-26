@@ -1,4 +1,3 @@
-```yaml
 x-restart-policy: &restart_policy
   restart: unless-stopped
 x-pull-policy: &pull_policy
