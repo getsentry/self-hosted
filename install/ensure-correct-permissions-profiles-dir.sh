@@ -2,6 +2,12 @@
 
 # TODO: Remove this after the next hard-stop
 
+# Should only run when `$COMPOSE_PROFILES` is set to `feature-complete`
+if [[ "$COMPOSE_PROFILES" == "errors-only" ]]; then
+  echo "Skipping permissions check for profiles directory."
+  exit 0
+fi
+
 echo "${_group}Ensuring correct permissions on profiles directory ..."
 
 # Check if the parent directory of /var/vroom/sentry-profiles is already owned by vroom:vroom
