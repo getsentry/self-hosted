@@ -350,6 +350,13 @@ SENTRY_FEATURES.update(
             "organizations:uptime",
             "organizations:uptime-create-issues",
         )
+        # Logs related flags
+        + (
+            "organizations:ourlogs-enabled",
+            "organizations:ourlogs-ingestion",
+            "organizations:ourlogs-stats",
+            "organizations:ourlogs-replay-ui",
+        )
     }
 )
 
