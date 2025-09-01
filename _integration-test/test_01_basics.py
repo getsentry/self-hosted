@@ -421,7 +421,7 @@ def test_receive_user_feedback_events(client_login):
     )
 
     poll_for_response(
-        f"{SENTRY_TEST_HOST}/api/0/organizations/sentry/issues/?query=issue.category%3Afeedback%20status%3Aunresolved",
+        f"{SENTRY_TEST_HOST}/api/0/organizations/sentry/issues/?query=issue.category%3Afeedback",
         client,
         lambda x: len(json.loads(x)) > 0,
     )

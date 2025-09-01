@@ -8,4 +8,5 @@ Sentry.init({
     profileLifecycle: "manual",
     sendClientReports: true,
     sendDefaultPii: true,
+    debug: true,
 });
