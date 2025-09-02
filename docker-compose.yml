@@ -673,8 +673,10 @@ services:
     depends_on:
       web:
         <<: *depends_on-healthy
+        restart: true
       relay:
         <<: *depends_on-healthy
+        restart: true
   relay:
     <<: *restart_policy
     image: "$RELAY_IMAGE"
