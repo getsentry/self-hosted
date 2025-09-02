@@ -671,8 +671,10 @@ services:
         - "/usr/bin/curl"
         - http://localhost
     depends_on:
-      - web
-      - relay
+      web:
+        <<: *depends_on-healthy
+      relay:
+        <<: *depends_on-healthy
   relay:
     <<: *restart_policy
     image: "$RELAY_IMAGE"
