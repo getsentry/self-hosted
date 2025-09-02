@@ -167,6 +167,8 @@ runs:
 
     - name: Integration Test
       shell: bash
+      env:
+        COMPOSE_PROFILES: ${{ inputs.compose_profiles }}
       run: |
         sudo chown root /usr/bin/rsync && sudo chmod u+s /usr/bin/rsync
         rsync -aW --super --numeric-ids --no-compress --mkpath \

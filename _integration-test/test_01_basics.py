@@ -379,6 +379,7 @@ def test_custom_certificate_authorities():
         del os.environ["COMPOSE_FILE"]
 
 
+@pytest.mark.skipif(os.environ.get("COMPOSE_PROFILES") != "feature-complete", reason="Only run if feature-complete")
 def test_receive_transaction_events(client_login):
     client, _ = client_login
     sentry_sdk.init(
