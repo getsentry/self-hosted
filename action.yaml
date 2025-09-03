@@ -6,6 +6,9 @@ inputs:
   image_url:
     required: false
     description: "The URL to the built relay, snuba, sentry image to test against."
+  compose_profiles:
+    required: false
+    description: "Docker Compose profile to use. Defaults to feature-complete."
   CODECOV_TOKEN:
     required: false
     description: "The Codecov token to upload coverage."
@@ -18,6 +21,7 @@ runs:
       env:
         PROJECT_NAME: ${{ inputs.project_name }}
         IMAGE_URL: ${{ inputs.image_url }}
+        COMPOSE_PROFILES: ${{ inputs.compose_profiles }}
       run: |
         if [[ -n "$PROJECT_NAME" && -n "$IMAGE_URL" ]]; then
           image_var=$(echo "${PROJECT_NAME}_IMAGE" | tr '[:lower:]' '[:upper:]')
@@ -28,6 +32,14 @@ runs:
           echo "You must set both project_name and image_url or unset both."
           echo "project_name: $PROJECT_NAME, image_url: $IMAGE_URL"
           exit 1
+        fi
+
+        # `COMPOSE_PROFILES` may only be `feature-complete` or `errors-only`
+        if [[ "$COMPOSE_PROFILES" != "" && "$COMPOSE_PROFILES" != "feature-complete" && "$COMPOSE_PROFILES" != "errors-only" ]]; then
+          echo "COMPOSE_PROFILES must be either unset, or set to either 'feature-complete' or 'errors-only'."
+          exit 1
+        else
+          echo "COMPOSE_PROFILES=$COMPOSE_PROFILES" >> ${{ github.action_path }}/.env
         fi
 
     - name: Setup dev environment
@@ -144,8 +156,8 @@ runs:
 
     - name: Setup swapfile
       shell: bash
-      if: runner.arch == 'X64' || runner.arch == 'X86'
       run: |
+        sudo swapoff -a
         sudo fallocate -l 16G /swapfile
         sudo chmod 600 /swapfile
         sudo mkswap /swapfile
@@ -155,6 +167,8 @@ runs:
 
     - name: Integration Test
       shell: bash
+      env:
+        COMPOSE_PROFILES: ${{ inputs.compose_profiles }}
       run: |
         sudo chown root /usr/bin/rsync && sudo chmod u+s /usr/bin/rsync
         rsync -aW --super --numeric-ids --no-compress --mkpath \

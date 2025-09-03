@@ -48,7 +48,7 @@ DATABASES = {
         "NAME": "postgres",
         "USER": "postgres",
         "PASSWORD": "",
-        "HOST": "postgres",
+        "HOST": "pgbouncer",
         "PORT": "",
     }
 }
@@ -349,6 +349,13 @@ SENTRY_FEATURES.update(
         + (
             "organizations:uptime",
             "organizations:uptime-create-issues",
+        )
+        # Logs related flags
+        + (
+            "organizations:ourlogs-enabled",
+            "organizations:ourlogs-ingestion",
+            "organizations:ourlogs-stats",
+            "organizations:ourlogs-replay-ui",
         )
     }
 )

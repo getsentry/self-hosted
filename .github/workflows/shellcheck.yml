@@ -1,4 +1,3 @@
----
 name: "ShellCheck"
 on:
   push:
@@ -10,13 +9,16 @@ on:
       - "**.sh"
     branches: [master]
 
+permissions:
+  contents: read
+
 jobs:
   shellcheck:
     name: ShellCheck
     runs-on: ubuntu-latest
     steps:
       - name: Repository checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
 

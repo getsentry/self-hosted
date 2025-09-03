@@ -11,6 +11,7 @@ from typing import Callable
 import httpx
 import pytest
 import sentry_sdk
+from sentry_sdk import logger as sentry_logger
 from bs4 import BeautifulSoup
 from cryptography import x509
 from cryptography.hazmat.backends import default_backend
@@ -379,6 +380,7 @@ def test_custom_certificate_authorities():
         del os.environ["COMPOSE_FILE"]
 
 
+@pytest.mark.skipif(os.environ.get("COMPOSE_PROFILES") != "feature-complete", reason="Only run if feature-complete")
 def test_receive_transaction_events(client_login):
     client, _ = client_login
     sentry_sdk.init(
@@ -405,6 +407,34 @@ def test_receive_transaction_events(client_login):
         lambda x: len(json.loads(x)["data"]) > 0,
     )
 
+
+def test_receive_logs_events(client_login):
+    client, _ = client_login
+    sentry_sdk.init(
+        dsn=get_sentry_dsn(client), profiles_sample_rate=1.0, traces_sample_rate=1.0, enable_logs=True,
+    )
+
+    sentry_logger.trace('Starting database connection {database}', database="users")
+    sentry_logger.debug('Cache miss for user {user_id}', user_id=123)
+    sentry_logger.info('Updated global cache')
+    sentry_logger.warning('Rate limit reached for endpoint {endpoint}', endpoint='/api/results/')
+    sentry_logger.error('Failed to process payment. Order: {order_id}. Amount: {amount}', order_id="or_2342", amount=99.99)
+    sentry_logger.fatal('Database {database} connection pool exhausted', database="users")
+    sentry_logger.error(
+        'Payment processing failed',
+        attributes={
+            'payment.provider': 'stripe',
+            'payment.method': 'credit_card',
+            'payment.currency': 'USD',
+            'user.subscription_tier': 'premium'
+        }
+    )
+
+    poll_for_response(
+        f"{SENTRY_TEST_HOST}/api/0/organizations/sentry/events/?dataset=ourlogs&field=sentry.item_id&field=project.id&field=trace&field=severity_number&field=severity&field=timestamp&field=timestamp_precise&field=observed_timestamp&field=message&project=1&statsPeriod=1h",
+        client,
+        lambda x: len(json.loads(x)["data"]) > 0,
+    )
 
 def test_customizations():
     commands = [
