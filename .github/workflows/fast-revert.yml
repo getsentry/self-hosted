@@ -19,7 +19,7 @@ jobs:
     if: |
       github.event_name == 'workflow_dispatch' || github.event.label.name == 'Trigger: Revert'
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           token: ${{ secrets.BUMP_SENTRY_TOKEN }}
       - uses: getsentry/action-fast-revert@v2.0.1
