@@ -408,6 +408,7 @@ def test_receive_transaction_events(client_login):
     )
 
 
+@pytest.mark.skipif(os.environ.get("COMPOSE_PROFILES") != "feature-complete", reason="Only run if feature-complete")
 def test_receive_logs_events(client_login):
     client, _ = client_login
     sentry_sdk.init(
