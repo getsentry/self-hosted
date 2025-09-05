@@ -5,6 +5,8 @@ source install/dc-detect-version.sh
 
 source install/ensure-files-from-examples.sh
 cp $SENTRY_CONFIG_PY /tmp/sentry_conf_py
+# Set the flag to apply automatic updates
+export APPLY_AUTOMATIC_CONFIG_UPDATES=1
 
 # Declare expected content
 expected_db_config=$(
