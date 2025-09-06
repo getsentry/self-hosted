@@ -293,6 +293,7 @@ SENTRY_FEATURES.update(
         for feature in (
             "organizations:discover",
             "organizations:global-views",
+            "organizations:issue-views",
             "organizations:incidents",
             "organizations:integrations-issue-basic",
             "organizations:integrations-issue-sync",
