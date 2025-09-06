@@ -147,6 +147,7 @@ services:
     volumes:
       - "sentry-postgres:/var/lib/postgresql/data"
   pgbouncer:
+    <<: *restart_policy
     image: "edoburu/pgbouncer:v1.24.1-p1"
     healthcheck:
       <<: *healthcheck_defaults
