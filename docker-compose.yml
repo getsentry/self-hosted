@@ -237,6 +237,7 @@ services:
       timeout: 10s
       retries: 30
   seaweedfs:
+    <<: *restart_policy
     image: "chrislusf/seaweedfs:3.96_large_disk"
     entrypoint: "weed"
     command: >-
