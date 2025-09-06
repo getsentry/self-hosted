@@ -594,6 +594,13 @@ services:
       <<: *file_healthcheck_defaults
     profiles:
       - feature-complete
+  monitors-incident-occurrences:
+    <<: *sentry_defaults
+    command: run consumer monitors-incident-occurrences --consumer-group monitors-incident-occurrences --healthcheck-file-path /tmp/health.txt
+    healthcheck:
+      <<: *file_healthcheck_defaults
+    profiles:
+      - feature-complete
   uptime-results:
     <<: *sentry_defaults
     command: run consumer uptime-results --consumer-group uptime-results --healthcheck-file-path /tmp/health.txt
