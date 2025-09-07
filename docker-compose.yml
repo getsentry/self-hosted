@@ -121,18 +121,15 @@ services:
       test: redis-cli ping | grep PONG
     volumes:
       - "sentry-redis:/data"
+      - type: bind
+        read_only: true
+        source: ./redis.conf
+        target: /usr/local/etc/redis/redis.conf
     ulimits:
       nofile:
         soft: 10032
         hard: 10032
-    # Configure Redis to use only 1/4 of the available memory inside the container
-    # We compute total memory from /proc/meminfo and pass it to redis-server as maxmemory
-    command:
-      - sh
-      - -c
-      - >
-        MAXMEM=$(awk '/MemTotal/ {printf "%d", $2*1024/4}' /proc/meminfo);
-        exec redis-server --maxmemory $$MAXMEM --maxmemory-policy volatile-lru
+    command: ["redis-server", "/usr/local/etc/redis/redis.conf"]
   postgres:
     <<: *restart_policy
     # Using the same postgres version as Sentry dev for consistency purposes
