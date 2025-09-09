@@ -29,9 +29,9 @@ echo "${_group}Migrating Postgres config to PGBouncer..."
 if sed -n '/^DATABASES = {$/,/^}$/p' "$SENTRY_CONFIG_PY" | grep -q '"HOST": "postgres"'; then
   if [[ -z "${APPLY_AUTOMATIC_CONFIG_UPDATES:-}" ]]; then
     echo
-    echo "We want to add PGBouncer to your Compose stack, and that would mean"
+    echo "We added PGBouncer to the default Compose stack, and to use that"
     echo "you will need to modify your sentry.conf.py file contents."
-    echo "Do you want us to do it automatically for you?"
+    echo "Do you want us to make this change automatically for you?"
     echo
 
     yn=""
@@ -46,7 +46,7 @@ if sed -n '/^DATABASES = {$/,/^}$/p' "$SENTRY_CONFIG_PY" | grep -q '"HOST": "pos
       n | no | 0)
         export APPLY_AUTOMATIC_CONFIG_UPDATES=0
         echo
-        echo -n "Alright, you will need to update your sentry.conf.py file manually before running 'docker compose up'."
+        echo -n "Alright, you will need to update your sentry.conf.py file manually before running 'docker compose up' or remove the `pgbouncer` service if you don't want to use that."
         ;;
       *) yn="" ;;
       esac
