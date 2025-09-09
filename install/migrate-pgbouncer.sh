@@ -46,7 +46,7 @@ if sed -n '/^DATABASES = {$/,/^}$/p' "$SENTRY_CONFIG_PY" | grep -q '"HOST": "pos
       n | no | 0)
         export APPLY_AUTOMATIC_CONFIG_UPDATES=0
         echo
-        echo -n "Alright, you will need to update your sentry.conf.py file manually before running 'docker compose up' or remove the `pgbouncer` service if you don't want to use that."
+        echo -n "Alright, you will need to update your sentry.conf.py file manually before running 'docker compose up' or remove the $(pgbouncer) service if you don't want to use that."
         ;;
       *) yn="" ;;
       esac
@@ -75,6 +75,7 @@ elif sed -n '/^DATABASES = {$/,/^}$/p' "$SENTRY_CONFIG_PY" | grep -q '"HOST": "p
   echo "Found pgbouncer in $SENTRY_CONFIG_PY, I'm assuming you're good! :)"
 else
   echo "⚠️ You don't have standard configuration for Postgres in $SENTRY_CONFIG_PY, skipping pgbouncer migration. I'm assuming you know what you're doing."
+  echo "   For more information about PGBouncer, refer to https://github.com/getsentry/self-hosted/pull/3884"
 fi
 
 echo "${_endgroup}"
