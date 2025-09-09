@@ -81,7 +81,7 @@ EOF
   $dc exec seaweedfs sh -c "printf '%s' '$lifecycle_policy' > /tmp/nodestore-lifecycle-policy.xml"
   $s3cmd --access_key=sentry --secret_key=sentry --no-ssl --region=us-east-1 --host=localhost:8333 --host-bucket='localhost:8333/%(bucket)' setlifecycle /tmp/nodestore-lifecycle-policy.xml s3://nodestore
 
-  echo "Debug..."
+  echo "Making sure the bucket lifecycle policy is all set up correctly..."
   $s3cmd --access_key=sentry --secret_key=sentry --no-ssl --region=us-east-1 --host=localhost:8333 --host-bucket='localhost:8333/%(bucket)' getlifecycle s3://nodestore
 else
   echo "Node store already exists, skipping..."
