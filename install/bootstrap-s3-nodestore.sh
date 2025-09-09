@@ -64,7 +64,7 @@ if [[ $($bucket_list | tail -1 | awk '{print $3}') != 's3://nodestore' ]]; then
 
   # XXX(aldy505): Should we refactor this?
   lifecycle_policy=$(printf '{"Rules":[{"ID":"Sentry-Nodestore-Rule","Prefix":"","Status":"Enabled","Filter":{},"Expiration":{"Days":%d}}]}' "$SENTRY_EVENT_RETENTION_DAYS")
-  $dc exec seaweedfs bash -c "echo '$lifecycle_policy' > /tmp/nodestore-lifecycle-policy.json"
+  $dc exec seaweedfs sh -c "printf '%s' '$lifecycle_policy' > /tmp/nodestore-lifecycle-policy.json"
   $s3cmd --access_key=sentry --secret_key=sentry --no-ssl --region=us-east-1 --host=localhost:8333 --host-bucket='localhost:8333/%(bucket)' setlifecycle /tmp/nodestore-lifecycle-policy.json s3://nodestore
 
   echo "Debug..."
