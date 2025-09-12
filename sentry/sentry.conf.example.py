@@ -293,6 +293,7 @@ SENTRY_FEATURES.update(
         for feature in (
             "organizations:discover",
             "organizations:global-views",
+            "organizations:issue-views",
             "organizations:incidents",
             "organizations:integrations-issue-basic",
             "organizations:integrations-issue-sync",
@@ -316,12 +317,15 @@ SENTRY_FEATURES.update(
         # Performance/Tracing/Spans related flags
         + (
             "organizations:performance-view",
+            "organizations:span-stats",
             "organizations:visibility-explore-view",
+            "organizations:visibility-explore-range-high",
             "organizations:transaction-metrics-extraction",
             "organizations:indexed-spans-extraction",
             "organizations:insights-entry-points",
             "organizations:insights-initial-modules",
             "organizations:insights-addon-modules",
+            "organizations:insights-modules-use-eap",
             "organizations:standalone-span-ingestion",
             "organizations:starfish-mobile-appstart",
             "projects:span-metrics-extraction",
