@@ -27,6 +27,7 @@ echo "${_group}Migrating Postgres config to PGBouncer..."
 # ```
 
 if sed -n '/^DATABASES = {$/,/^}$/p' "$SENTRY_CONFIG_PY" | grep -q '"HOST": "postgres"'; then
+  apply_config_changes_pgbouncer=0
   if [[ -z "${APPLY_AUTOMATIC_CONFIG_UPDATES:-}" ]]; then
     echo
     echo "We added PGBouncer to the default Compose stack, and to use that"
@@ -39,12 +40,12 @@ if sed -n '/^DATABASES = {$/,/^}$/p' "$SENTRY_CONFIG_PY" | grep -q '"HOST": "pos
       read -p "y or n? " yn
       case $yn in
       y | yes | 1)
-        export APPLY_AUTOMATIC_CONFIG_UPDATES=1
+        export apply_config_changes_pgbouncer=1
         echo
         echo -n "Thank you."
         ;;
       n | no | 0)
-        export APPLY_AUTOMATIC_CONFIG_UPDATES=0
+        export apply_config_changes_pgbouncer=0
         echo
         echo -n "Alright, you will need to update your sentry.conf.py file manually before running 'docker compose up' or remove the $(pgbouncer) service if you don't want to use that."
         ;;
@@ -66,7 +67,7 @@ if sed -n '/^DATABASES = {$/,/^}$/p' "$SENTRY_CONFIG_PY" | grep -q '"HOST": "pos
     sleep 5
   fi
 
-  if [[ "$APPLY_AUTOMATIC_CONFIG_UPDATES" == 1 ]]; then
+  if [[ "$APPLY_AUTOMATIC_CONFIG_UPDATES" == 1 || "$apply_config_changes_pgbouncer" == 1 ]]; then
     echo "Migrating $SENTRY_CONFIG_PY to use PGBouncer"
     sed -i 's/"HOST": "postgres"/"HOST": "pgbouncer"/' "$SENTRY_CONFIG_PY"
     echo "Migrated $SENTRY_CONFIG_PY to use PGBouncer"
