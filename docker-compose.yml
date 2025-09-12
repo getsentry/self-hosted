@@ -694,6 +694,8 @@ services:
         read_only: true
         source: ./geoip
         target: /geoip
+      - ./work:/work
+      - ./etc:/etc/relay
     depends_on:
       kafka:
         <<: *depends_on-healthy
