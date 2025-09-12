@@ -206,7 +206,7 @@ services:
     build:
       context: ./clickhouse
       args:
-        BASE_IMAGE: "altinity/clickhouse-server:23.8.11.29.altinitystable"
+        BASE_IMAGE: "altinity/clickhouse-server:25.3.6.10034.altinitystable"
     ulimits:
       nofile:
         soft: 262144
@@ -214,10 +214,14 @@ services:
     volumes:
       - "sentry-clickhouse:/var/lib/clickhouse"
       - "sentry-clickhouse-log:/var/log/clickhouse-server"
-      - type: bind
+      - type: "bind"
         read_only: true
-        source: ./clickhouse/config.xml
-        target: /etc/clickhouse-server/config.d/sentry.xml
+        source: "./clickhouse/config.xml"
+        target: "/etc/clickhouse-server/config.d/sentry.xml"
+      - type: "bind"
+        read_only: true
+        source: "./clickhouse/default-password.xml"
+        target: "/etc/clickhouse-server/users.d/default-password.xml"
     environment:
       # This limits Clickhouse's memory to 30% of the host memory
       # If you have high volume and your search return incomplete results
