@@ -96,10 +96,10 @@ if env("SENTRY_SYSTEM_SECRET_KEY"):
 SENTRY_SELF_HOSTED_ERRORS_ONLY = env("COMPOSE_PROFILES") != "feature-complete"
 
 # When running in an air-gapped environment, set this to True to entirely disable
-# external network calls and features that require internet connectivity.
+# external network calls and features that require Internet connectivity.
 #
 # Setting the value to False while running in an air-gapped environment will
-# cause some containers to raise an exception. One known example is fetching
+# cause some containers to raise exceptions. One known example is fetching
 # AI model prices from various public APIs.
 SENTRY_AIR_GAP = False
 
