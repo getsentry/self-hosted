@@ -8,6 +8,7 @@ s3cmd="$dc exec seaweedfs s3cmd"
 bucket_list=$($s3cmd --access_key=sentry --secret_key=sentry --no-ssl --region=us-east-1 --host=localhost:8333 --host-bucket='localhost:8333/%(bucket)' ls)
 
 if [[ $($bucket_list | tail -1 | awk '{print $3}') != 's3://nodestore' ]]; then
+  apply_config_changes_nodestore=0
   # Only touch if no existing nodestore config is found
   if ! grep -q "SENTRY_NODESTORE" $SENTRY_CONFIG_PY; then
     if [[ -z "${APPLY_AUTOMATIC_CONFIG_UPDATES:-}" ]]; then
@@ -23,12 +24,12 @@ if [[ $($bucket_list | tail -1 | awk '{print $3}') != 's3://nodestore' ]]; then
         read -p "y or n? " yn
         case $yn in
         y | yes | 1)
-          export APPLY_AUTOMATIC_CONFIG_UPDATES=1
+          export apply_config_changes_nodestore=1
           echo
           echo -n "Thank you."
           ;;
         n | no | 0)
-          export APPLY_AUTOMATIC_CONFIG_UPDATES=0
+          export apply_config_changes_nodestore=0
           echo
           echo -n "Alright, you will need to update your sentry.conf.py file manually before running 'docker compose up'."
           ;;
@@ -50,7 +51,7 @@ if [[ $($bucket_list | tail -1 | awk '{print $3}') != 's3://nodestore' ]]; then
       sleep 5
     fi
 
-    if [[ "$APPLY_AUTOMATIC_CONFIG_UPDATES" == 1 ]]; then
+    if [[ "$APPLY_AUTOMATIC_CONFIG_UPDATES" == 1 || "$apply_config_changes_nodestore" == 1 ]]; then
       nodestore_config=$(sed -n '/SENTRY_NODESTORE/,/[}]/{p}' sentry/sentry.conf.example.py)
       if [[ $($dc exec postgres psql -qAt -U postgres -c "select exists (select * from nodestore_node limit 1)") = "f" ]]; then
         nodestore_config=$(echo -e "$nodestore_config" | sed '$s/\}/    "read_through": True,\n    "delete_through": True,\n\}/')
