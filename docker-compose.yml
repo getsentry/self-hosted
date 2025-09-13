@@ -721,7 +721,9 @@ services:
     command: run taskworker-scheduler
   taskworker:
     <<: *sentry_defaults
-    command: run taskworker --concurrency=4 --rpc-host=taskbroker:50051
+    command: run taskworker --concurrency=4 --rpc-host=taskbroker:50051 --health-check-file-path=/tmp/health.txt
+    healthcheck:
+      <<: *file_healthcheck_defaults
   vroom:
     <<: *restart_policy
     image: "$VROOM_IMAGE"
