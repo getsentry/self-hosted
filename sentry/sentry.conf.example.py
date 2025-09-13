@@ -103,6 +103,31 @@ SENTRY_SELF_HOSTED_ERRORS_ONLY = env("COMPOSE_PROFILES") != "feature-complete"
 # AI model prices from various public APIs.
 SENTRY_AIR_GAP = False
 
+################
+# Node Storage #
+################
+
+# Sentry uses an abstraction layer called "node storage" to store raw events.
+# Previously, it used PostgreSQL as the backend, but this didn't scale for
+# high-throughput environments. Read more about this in the documentation:
+# https://develop.sentry.dev/backend/application-domains/nodestore/
+#
+# Through this setting, you can use the provided blob storage or
+# your own S3-compatible API from your infrastructure.
+# Other backend implementations for node storage developed by the community
+# are available in public GitHub repositories.
+
+SENTRY_NODESTORE = "sentry_nodestore_s3.S3PassthroughDjangoNodeStorage"
+SENTRY_NODESTORE_OPTIONS = {
+    "compression": True,
+    "endpoint_url": "http://seaweedfs:8333",
+    "bucket_path": "nodestore",
+    "bucket_name": "nodestore",
+    "region_name": "us-east-1",
+    "aws_access_key_id": "sentry",
+    "aws_secret_access_key": "sentry",
+}
+
 #########
 # Redis #
 #########

@@ -42,6 +42,8 @@ x-sentry-defaults: &sentry_defaults
       <<: *depends_on-default
     smtp:
       <<: *depends_on-default
+    seaweedfs:
+      <<: *depends_on-default
     snuba-api:
       <<: *depends_on-default
     symbolicator:
@@ -238,6 +240,45 @@ services:
       interval: 10s
       timeout: 10s
       retries: 30
+  seaweedfs:
+    <<: *restart_policy
+    image: "chrislusf/seaweedfs:3.96_large_disk"
+    entrypoint: "weed"
+    command: >-
+        server
+        -filer=true
+        -filer.port=8888
+        -filer.port.grpc=18888
+        -filer.defaultReplicaPlacement=000
+        -master=true
+        -master.port=9333
+        -master.port.grpc=19333
+        -metricsPort=9091
+        -s3=true
+        -s3.port=8333
+        -s3.port.grpc=18333
+        -volume=true
+        -volume.dir.idx=/data/idx
+        -volume.index=leveldbLarge
+        -volume.max=0
+        -volume.preStopSeconds=8
+        -volume.readMode=redirect
+        -volume.port=8080
+        -volume.port.grpc=18080
+        -ip=127.0.0.1
+        -ip.bind=0.0.0.0
+        -webdav=false
+    environment:
+      AWS_ACCESS_KEY_ID: sentry
+      AWS_SECRET_ACCESS_KEY: sentry
+    volumes:
+      - "sentry-seaweedfs:/data"
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O-", "http://seaweedfs:8080/healthz", "http://seaweedfs:9333/cluster/healthz", "http://seaweedfs:8333/healthz"]
+      interval: 30s
+      timeout: 20s
+      retries: 5
+      start_period: 60s
   snuba-api:
     <<: *snuba_defaults
     healthcheck:
@@ -800,6 +841,8 @@ volumes:
   sentry-clickhouse:
     external: true
   sentry-symbolicator:
+    external: true
+  sentry-seaweedfs:
     external: true
   # This volume stores JS SDK assets and the data inside this volume should
   # be cleaned periodically on upgrades.
