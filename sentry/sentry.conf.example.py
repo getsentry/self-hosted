@@ -481,9 +481,3 @@ JS_SDK_LOADER_DEFAULT_SDK_URL = "https://browser.sentry-cdn.com/%s/bundle%s.min.
 # }
 # SENTRY_METRICS_SAMPLE_RATE = 1.0   # Adjust this to your needs, default is 1.0
 # SENTRY_METRICS_PREFIX = "sentry."  # Adjust this to your needs, default is "sentry."
-
-#########
-# Tasks #
-#########
-# Disable taskworker and continue using celery.
-SENTRY_OPTIONS["taskworker.enabled"] = False
