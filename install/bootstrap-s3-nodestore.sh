@@ -7,7 +7,7 @@ s3cmd="$dc exec seaweedfs s3cmd"
 
 bucket_list=$($s3cmd --access_key=sentry --secret_key=sentry --no-ssl --region=us-east-1 --host=localhost:8333 --host-bucket='localhost:8333/%(bucket)' ls)
 
-if [[ $($bucket_list | tail -1 | awk '{print $3}') != 's3://nodestore' ]]; then
+if [[ $(echo "$bucket_list" | tail -1 | awk '{print $3}') != 's3://nodestore' ]]; then
   apply_config_changes_nodestore=0
   # Only touch if no existing nodestore config is found
   if ! grep -q "SENTRY_NODESTORE" $SENTRY_CONFIG_PY; then
