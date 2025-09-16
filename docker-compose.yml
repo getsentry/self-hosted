@@ -435,6 +435,16 @@ services:
     command: run consumer generic-metrics-subscription-results --consumer-group query-subscription-consumer
     profiles:
       - feature-complete
+  process-spans:
+    <<: *sentry_defaults
+    command: run consumer process-spans --consumer-group process-spans-consumer
+    profiles:
+      - feature-complete
+  process-segments:
+    <<: *sentry_defaults
+    command: run consumer process-segments --consumer-group process-segments-consumer
+    profiles:
+      - feature-complete
   sentry-cleanup:
     <<: *sentry_defaults
     image: sentry-cleanup-self-hosted-local
