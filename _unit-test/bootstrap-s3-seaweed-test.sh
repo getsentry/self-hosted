@@ -2,6 +2,7 @@
 
 source _unit-test/_test_setup.sh
 source install/dc-detect-version.sh
+source install/create-docker-volumes.sh
 
 # Set the flag to apply automatic updates
 export APPLY_AUTOMATIC_CONFIG_UPDATES=1
