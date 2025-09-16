@@ -1,5 +1,7 @@
 x-restart-policy: &restart_policy
   restart: unless-stopped
+x-pull-policy: &pull_policy
+  pull_policy: never
 x-depends_on-healthy: &depends_on-healthy
   condition: service_healthy
 x-depends_on-default: &depends_on-default
@@ -13,9 +15,15 @@ x-healthcheck-defaults: &healthcheck_defaults
   interval: "$HEALTHCHECK_INTERVAL"
   timeout: "$HEALTHCHECK_TIMEOUT"
   retries: $HEALTHCHECK_RETRIES
-  start_period: 10s
+  start_period: "$HEALTHCHECK_START_PERIOD"
+x-file-healthcheck: &file_healthcheck_defaults
+  test: ["CMD-SHELL", "rm /tmp/health.txt"]
+  interval: "$HEALTHCHECK_FILE_INTERVAL"
+  timeout: "$HEALTHCHECK_FILE_TIMEOUT"
+  retries: $HEALTHCHECK_FILE_RETRIES
+  start_period: "$HEALTHCHECK_FILE_START_PERIOD"
 x-sentry-defaults: &sentry_defaults
-  <<: *restart_policy
+  <<: [*restart_policy, *pull_policy]
   image: sentry-self-hosted-local
   # Set the platform to build for linux/arm64 when needed on Apple silicon Macs.
   platform: ${DOCKER_PLATFORM:-}
@@ -28,11 +36,13 @@ x-sentry-defaults: &sentry_defaults
       <<: *depends_on-healthy
     kafka:
       <<: *depends_on-healthy
-    postgres:
+    pgbouncer:
       <<: *depends_on-healthy
     memcached:
       <<: *depends_on-default
     smtp:
+      <<: *depends_on-default
+    seaweedfs:
       <<: *depends_on-default
     snuba-api:
       <<: *depends_on-default
@@ -84,15 +94,19 @@ x-snuba-defaults: &snuba_defaults
     # Leaving the value empty to just pass whatever is set
     # on the host system (or in the .env file)
     SENTRY_EVENT_RETENTION_DAYS:
+    # If you have statsd server, you can utilize that to monitor self-hosted Snuba containers.
+    # To start, state these environment variables below on your `.env.` file and adjust the options as needed.
+    SNUBA_STATSD_HOST: # Example value: "100.100.123.123". Must be an IP address, not domain name
+    SNUBA_STATSD_PORT: # Example value: 8125
 services:
   smtp:
     <<: *restart_policy
-    platform: linux/amd64
-    image: tianon/exim4
-    hostname: "${SENTRY_MAIL_HOST:-}"
+    image: registry.gitlab.com/egos-tech/smtp
     volumes:
       - "sentry-smtp:/var/spool/exim4"
       - "sentry-smtp-log:/var/log/exim4"
+    environment:
+      - MAILNAME=${SENTRY_MAIL_HOST:-}
   memcached:
     <<: *restart_policy
     image: "memcached:1.6.26-alpine"
@@ -103,7 +117,7 @@ services:
       test: echo stats | nc 127.0.0.1 11211
   redis:
     <<: *restart_policy
-    image: "redis:6.2.14-alpine"
+    image: "redis:6.2.19-alpine"
     healthcheck:
       <<: *healthcheck_defaults
       test: redis-cli ping | grep PONG
@@ -121,24 +135,39 @@ services:
   postgres:
     <<: *restart_policy
     # Using the same postgres version as Sentry dev for consistency purposes
-    image: "postgres:14.11"
+    image: "postgres:14.19-bookworm"
     healthcheck:
       <<: *healthcheck_defaults
       # Using default user "postgres" from sentry/sentry.conf.example.py or value of POSTGRES_USER if provided
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
     command:
-      [
-        "postgres",
-        "-c",
-        "max_connections=${POSTGRES_MAX_CONNECTIONS:-100}",
-      ]
+      ["postgres"]
     environment:
       POSTGRES_HOST_AUTH_METHOD: "trust"
     volumes:
       - "sentry-postgres:/var/lib/postgresql/data"
+  pgbouncer:
+    <<: *restart_policy
+    image: "edoburu/pgbouncer:v1.24.1-p1"
+    healthcheck:
+      <<: *healthcheck_defaults
+      # Using default user "postgres" from sentry/sentry.conf.example.py or value of POSTGRES_USER if provided
+      test: ["CMD-SHELL", "psql -U postgres -p 5432 -h 127.0.0.1 -tA -c \"select 1;\" -d postgres >/dev/null"]
+    depends_on:
+      postgres:
+        <<: *depends_on-healthy
+    environment:
+      DB_USER: ${POSTGRES_USER:-postgres}
+      DB_HOST: postgres
+      DB_NAME: postgres
+      AUTH_TYPE: trust
+      POOL_MODE: transaction
+      ADMIN_USERS: postgres,sentry
+      MAX_CLIENT_CONN: 10000
+
   kafka:
     <<: *restart_policy
-    image: "confluentinc/cp-kafka:7.6.1"
+    image: "confluentinc/cp-kafka:7.6.6"
     environment:
       # https://docs.confluent.io/platform/current/installation/docker/config-reference.html#cp-kakfa-example
       KAFKA_PROCESS_ROLES: "broker,controller"
@@ -174,12 +203,12 @@ services:
       timeout: 10s
       retries: 30
   clickhouse:
-    <<: *restart_policy
+    <<: [*restart_policy, *pull_policy]
     image: clickhouse-self-hosted-local
     build:
       context: ./clickhouse
       args:
-        BASE_IMAGE: "altinity/clickhouse-server:23.8.11.29.altinitystable"
+        BASE_IMAGE: "altinity/clickhouse-server:25.3.6.10034.altinitystable"
     ulimits:
       nofile:
         soft: 262144
@@ -187,10 +216,14 @@ services:
     volumes:
       - "sentry-clickhouse:/var/lib/clickhouse"
       - "sentry-clickhouse-log:/var/log/clickhouse-server"
-      - type: bind
+      - type: "bind"
         read_only: true
-        source: ./clickhouse/config.xml
-        target: /etc/clickhouse-server/config.d/sentry.xml
+        source: "./clickhouse/config.xml"
+        target: "/etc/clickhouse-server/config.d/sentry.xml"
+      - type: "bind"
+        read_only: true
+        source: "./clickhouse/default-password.xml"
+        target: "/etc/clickhouse-server/users.d/default-password.xml"
     environment:
       # This limits Clickhouse's memory to 30% of the host memory
       # If you have high volume and your search return incomplete results
@@ -207,97 +240,234 @@ services:
       interval: 10s
       timeout: 10s
       retries: 30
+  seaweedfs:
+    <<: *restart_policy
+    image: "chrislusf/seaweedfs:3.96_large_disk"
+    entrypoint: "weed"
+    command: >-
+        server
+        -filer=true
+        -filer.port=8888
+        -filer.port.grpc=18888
+        -filer.defaultReplicaPlacement=000
+        -master=true
+        -master.port=9333
+        -master.port.grpc=19333
+        -metricsPort=9091
+        -s3=true
+        -s3.port=8333
+        -s3.port.grpc=18333
+        -volume=true
+        -volume.dir.idx=/data/idx
+        -volume.index=leveldbLarge
+        -volume.max=0
+        -volume.preStopSeconds=8
+        -volume.readMode=redirect
+        -volume.port=8080
+        -volume.port.grpc=18080
+        -ip=127.0.0.1
+        -ip.bind=0.0.0.0
+        -webdav=false
+    environment:
+      AWS_ACCESS_KEY_ID: sentry
+      AWS_SECRET_ACCESS_KEY: sentry
+    volumes:
+      - "sentry-seaweedfs:/data"
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O-", "http://seaweedfs:8080/healthz", "http://seaweedfs:9333/cluster/healthz", "http://seaweedfs:8333/healthz"]
+      interval: 30s
+      timeout: 20s
+      retries: 5
+      start_period: 60s
   snuba-api:
     <<: *snuba_defaults
+    healthcheck:
+      <<: *healthcheck_defaults
+      test:
+        - "CMD"
+        - "/bin/bash"
+        - "-c"
+        # Courtesy of https://unix.stackexchange.com/a/234089/108960
+        - 'exec 3<>/dev/tcp/127.0.0.1/1218 && echo -e "GET /health HTTP/1.1\r\nhost: 127.0.0.1\r\n\r\n" >&3 && grep ok -s -m 1 <&3'
   # Kafka consumer responsible for feeding events into Clickhouse
   snuba-errors-consumer:
     <<: *snuba_defaults
-    command: rust-consumer --storage errors --consumer-group snuba-consumers --auto-offset-reset=latest --max-batch-time-ms 750 --no-strict-offset-reset
+    command: rust-consumer --storage errors --consumer-group snuba-consumers --auto-offset-reset=latest --max-batch-time-ms 750 --no-strict-offset-reset --health-check-file /tmp/health.txt
+    healthcheck:
+      <<: *file_healthcheck_defaults
   # Kafka consumer responsible for feeding outcomes into Clickhouse
   # Use --auto-offset-reset=earliest to recover up to 7 days of TSDB data
   # since we did not do a proper migration
   snuba-outcomes-consumer:
     <<: *snuba_defaults
-    command: rust-consumer --storage outcomes_raw --consumer-group snuba-consumers --auto-offset-reset=earliest --max-batch-time-ms 750 --no-strict-offset-reset
+    command: rust-consumer --storage outcomes_raw --consumer-group snuba-consumers --auto-offset-reset=earliest --max-batch-time-ms 750 --no-strict-offset-reset --health-check-file /tmp/health.txt
+    healthcheck:
+      <<: *file_healthcheck_defaults
   snuba-outcomes-billing-consumer:
     <<: *snuba_defaults
-    command: rust-consumer --storage outcomes_raw --consumer-group snuba-consumers --auto-offset-reset=earliest --max-batch-time-ms 750 --no-strict-offset-reset --raw-events-topic outcomes-billing
+    command: rust-consumer --storage outcomes_raw --consumer-group snuba-consumers --auto-offset-reset=earliest --max-batch-time-ms 750 --no-strict-offset-reset --raw-events-topic outcomes-billing --health-check-file /tmp/health.txt
+    healthcheck:
+      <<: *file_healthcheck_defaults
   snuba-group-attributes-consumer:
     <<: *snuba_defaults
-    command: rust-consumer --storage group_attributes --consumer-group snuba-group-attributes-consumers --auto-offset-reset=latest --max-batch-time-ms 750 --no-strict-offset-reset
+    command: rust-consumer --storage group_attributes --consumer-group snuba-group-attributes-consumers --auto-offset-reset=latest --max-batch-time-ms 750 --no-strict-offset-reset --health-check-file /tmp/health.txt
+    healthcheck:
+      <<: *file_healthcheck_defaults
   snuba-replacer:
     <<: *snuba_defaults
     command: replacer --storage errors --auto-offset-reset=latest --no-strict-offset-reset
   snuba-subscription-consumer-events:
     <<: *snuba_defaults
-    command: subscriptions-scheduler-executor --dataset events --entity events --auto-offset-reset=latest --no-strict-offset-reset --consumer-group=snuba-events-subscriptions-consumers --followed-consumer-group=snuba-consumers --schedule-ttl=60 --stale-threshold-seconds=900
+    command: subscriptions-scheduler-executor --dataset events --entity events --auto-offset-reset=latest --no-strict-offset-reset --consumer-group=snuba-events-subscriptions-consumers --followed-consumer-group=snuba-consumers --schedule-ttl=60 --stale-threshold-seconds=900 --health-check-file /tmp/health.txt
+    healthcheck:
+      <<: *file_healthcheck_defaults
   #############################################
   ## Feature Complete Sentry Snuba Consumers ##
   #############################################
   # Kafka consumer responsible for feeding transactions data into Clickhouse
   snuba-transactions-consumer:
     <<: *snuba_defaults
-    command: rust-consumer --storage transactions --consumer-group transactions_group --auto-offset-reset=latest --max-batch-time-ms 750 --no-strict-offset-reset
+    command: rust-consumer --storage transactions --consumer-group transactions_group --auto-offset-reset=latest --max-batch-time-ms 750 --no-strict-offset-reset --health-check-file /tmp/health.txt
+    healthcheck:
+      <<: *file_healthcheck_defaults
     profiles:
       - feature-complete
   snuba-replays-consumer:
     <<: *snuba_defaults
-    command: rust-consumer --storage replays --consumer-group snuba-consumers --auto-offset-reset=latest --max-batch-time-ms 750 --no-strict-offset-reset
+    command: rust-consumer --storage replays --consumer-group snuba-consumers --auto-offset-reset=latest --max-batch-time-ms 750 --no-strict-offset-reset --health-check-file /tmp/health.txt
+    healthcheck:
+      <<: *file_healthcheck_defaults
     profiles:
       - feature-complete
   snuba-issue-occurrence-consumer:
     <<: *snuba_defaults
-    command: rust-consumer --storage search_issues --consumer-group generic_events_group --auto-offset-reset=latest --max-batch-time-ms 750 --no-strict-offset-reset
+    command: rust-consumer --storage search_issues --consumer-group generic_events_group --auto-offset-reset=latest --max-batch-time-ms 750 --no-strict-offset-reset --health-check-file /tmp/health.txt
+    healthcheck:
+      <<: *file_healthcheck_defaults
     profiles:
       - feature-complete
   snuba-metrics-consumer:
     <<: *snuba_defaults
-    command: rust-consumer --storage metrics_raw --consumer-group snuba-metrics-consumers --auto-offset-reset=latest --max-batch-time-ms 750 --no-strict-offset-reset
+    command: rust-consumer --storage metrics_raw --consumer-group snuba-metrics-consumers --auto-offset-reset=latest --max-batch-time-ms 750 --no-strict-offset-reset --health-check-file /tmp/health.txt
+    healthcheck:
+      <<: *file_healthcheck_defaults
     profiles:
       - feature-complete
   snuba-subscription-consumer-transactions:
     <<: *snuba_defaults
-    command: subscriptions-scheduler-executor --dataset transactions --entity transactions --auto-offset-reset=latest --no-strict-offset-reset --consumer-group=snuba-transactions-subscriptions-consumers --followed-consumer-group=transactions_group --schedule-ttl=60 --stale-threshold-seconds=900
+    command: subscriptions-scheduler-executor --dataset transactions --entity transactions --auto-offset-reset=latest --no-strict-offset-reset --consumer-group=snuba-transactions-subscriptions-consumers --followed-consumer-group=transactions_group --schedule-ttl=60 --stale-threshold-seconds=900 --health-check-file /tmp/health.txt
+    healthcheck:
+      <<: *file_healthcheck_defaults
     profiles:
       - feature-complete
   snuba-subscription-consumer-metrics:
     <<: *snuba_defaults
-    command: subscriptions-scheduler-executor --dataset metrics --entity metrics_sets --entity metrics_counters --auto-offset-reset=latest --no-strict-offset-reset --consumer-group=snuba-metrics-subscriptions-consumers --followed-consumer-group=snuba-metrics-consumers --schedule-ttl=60 --stale-threshold-seconds=900
+    command: subscriptions-scheduler-executor --dataset metrics --entity metrics_sets --entity metrics_counters --auto-offset-reset=latest --no-strict-offset-reset --consumer-group=snuba-metrics-subscriptions-consumers --followed-consumer-group=snuba-metrics-consumers --schedule-ttl=60 --stale-threshold-seconds=900 --health-check-file /tmp/health.txt
+    healthcheck:
+      <<: *file_healthcheck_defaults
+    profiles:
+      - feature-complete
+  snuba-subscription-consumer-generic-metrics-distributions:
+    <<: *snuba_defaults
+    command: subscriptions-scheduler-executor --dataset generic_metrics --entity=generic_metrics_distributions   --auto-offset-reset=latest --no-strict-offset-reset --consumer-group=snuba-generic-metrics-distributions-subscriptions-schedulers --followed-consumer-group=snuba-gen-metrics-distributions-consumers --schedule-ttl=60 --stale-threshold-seconds=900 --health-check-file /tmp/health.txt
+    healthcheck:
+      <<: *file_healthcheck_defaults
+    profiles:
+      - feature-complete
+  snuba-subscription-consumer-generic-metrics-sets:
+    <<: *snuba_defaults
+    command: subscriptions-scheduler-executor --dataset generic_metrics --entity=generic_metrics_sets --auto-offset-reset=latest --no-strict-offset-reset --consumer-group=snuba-generic-metrics-sets-subscriptions-schedulers --followed-consumer-group=snuba-gen-metrics-sets-consumers --schedule-ttl=60 --stale-threshold-seconds=900 --health-check-file /tmp/health.txt
+    healthcheck:
+      <<: *file_healthcheck_defaults
+    profiles:
+      - feature-complete
+  snuba-subscription-consumer-generic-metrics-counters:
+    <<: *snuba_defaults
+    command: subscriptions-scheduler-executor --dataset generic_metrics --entity=generic_metrics_counters --auto-offset-reset=latest --no-strict-offset-reset --consumer-group=snuba-generic-metrics-counters-subscriptions-schedulers --followed-consumer-group=snuba-gen-metrics-counters-consumers --schedule-ttl=60 --stale-threshold-seconds=900 --health-check-file /tmp/health.txt
+    healthcheck:
+      <<: *file_healthcheck_defaults
+    profiles:
+      - feature-complete
+  snuba-subscription-consumer-generic-metrics-gauges:
+    <<: *snuba_defaults
+    command: subscriptions-scheduler-executor --dataset generic_metrics --entity=generic_metrics_gauges --auto-offset-reset=latest --no-strict-offset-reset --consumer-group=snuba-generic-metrics-gauges-subscriptions-schedulers --followed-consumer-group=snuba-gen-metrics-gauges-consumers --schedule-ttl=60 --stale-threshold-seconds=900 --health-check-file /tmp/health.txt
+    healthcheck:
+      <<: *file_healthcheck_defaults
     profiles:
       - feature-complete
   snuba-generic-metrics-distributions-consumer:
     <<: *snuba_defaults
-    command: rust-consumer --storage generic_metrics_distributions_raw --consumer-group snuba-gen-metrics-distributions-consumers --auto-offset-reset=latest --max-batch-time-ms 750 --no-strict-offset-reset
+    command: rust-consumer --storage generic_metrics_distributions_raw --consumer-group snuba-gen-metrics-distributions-consumers --auto-offset-reset=latest --max-batch-time-ms 750 --no-strict-offset-reset --health-check-file /tmp/health.txt
+    healthcheck:
+      <<: *file_healthcheck_defaults
     profiles:
       - feature-complete
   snuba-generic-metrics-sets-consumer:
     <<: *snuba_defaults
-    command: rust-consumer --storage generic_metrics_sets_raw --consumer-group snuba-gen-metrics-sets-consumers --auto-offset-reset=latest --max-batch-time-ms 750 --no-strict-offset-reset
+    command: rust-consumer --storage generic_metrics_sets_raw --consumer-group snuba-gen-metrics-sets-consumers --auto-offset-reset=latest --max-batch-time-ms 750 --no-strict-offset-reset --health-check-file /tmp/health.txt
+    healthcheck:
+      <<: *file_healthcheck_defaults
     profiles:
       - feature-complete
   snuba-generic-metrics-counters-consumer:
     <<: *snuba_defaults
-    command: rust-consumer --storage generic_metrics_counters_raw --consumer-group snuba-gen-metrics-counters-consumers --auto-offset-reset=latest --max-batch-time-ms 750 --no-strict-offset-reset
+    command: rust-consumer --storage generic_metrics_counters_raw --consumer-group snuba-gen-metrics-counters-consumers --auto-offset-reset=latest --max-batch-time-ms 750 --no-strict-offset-reset --health-check-file /tmp/health.txt
+    healthcheck:
+      <<: *file_healthcheck_defaults
     profiles:
       - feature-complete
   snuba-generic-metrics-gauges-consumer:
     <<: *snuba_defaults
-    command: rust-consumer --storage generic_metrics_gauges_raw --consumer-group snuba-gen-metrics-gauges-consumers --auto-offset-reset=latest --max-batch-time-ms 750 --no-strict-offset-reset
+    command: rust-consumer --storage generic_metrics_gauges_raw --consumer-group snuba-gen-metrics-gauges-consumers --auto-offset-reset=latest --max-batch-time-ms 750 --no-strict-offset-reset --health-check-file /tmp/health.txt
+    healthcheck:
+      <<: *file_healthcheck_defaults
     profiles:
       - feature-complete
   snuba-profiling-profiles-consumer:
     <<: *snuba_defaults
-    command: rust-consumer --storage profiles --consumer-group snuba-consumers --auto-offset-reset=latest --max-batch-time-ms 1000 --no-strict-offset-reset
+    command: rust-consumer --storage profiles --consumer-group snuba-consumers --auto-offset-reset=latest --max-batch-time-ms 1000 --no-strict-offset-reset --health-check-file /tmp/health.txt
+    healthcheck:
+      <<: *file_healthcheck_defaults
     profiles:
       - feature-complete
   snuba-profiling-functions-consumer:
     <<: *snuba_defaults
-    command: rust-consumer --storage functions_raw --consumer-group snuba-consumers --auto-offset-reset=latest --max-batch-time-ms 1000 --no-strict-offset-reset
+    command: rust-consumer --storage functions_raw --consumer-group snuba-consumers --auto-offset-reset=latest --max-batch-time-ms 1000 --no-strict-offset-reset --health-check-file /tmp/health.txt
+    healthcheck:
+      <<: *file_healthcheck_defaults
+    profiles:
+      - feature-complete
+  snuba-profiling-profile-chunks-consumer:
+    <<: *snuba_defaults
+    command: rust-consumer --storage profile_chunks --consumer-group snuba-consumers --auto-offset-reset=latest --max-batch-time-ms 1000 --no-strict-offset-reset --health-check-file /tmp/health.txt
+    healthcheck:
+      <<: *file_healthcheck_defaults
     profiles:
       - feature-complete
   snuba-spans-consumer:
     <<: *snuba_defaults
-    command: rust-consumer --storage spans --consumer-group snuba-spans-consumers --auto-offset-reset=latest --max-batch-time-ms 1000 --no-strict-offset-reset
+    command: rust-consumer --storage spans --consumer-group snuba-spans-consumers --auto-offset-reset=latest --max-batch-time-ms 1000 --no-strict-offset-reset --health-check-file /tmp/health.txt
+    healthcheck:
+      <<: *file_healthcheck_defaults
+    profiles:
+      - feature-complete
+  snuba-eap-items-consumer:
+    <<: *snuba_defaults
+    command: rust-consumer --storage eap_items --consumer-group eap_items_group --auto-offset-reset=latest --max-batch-time-ms 1000 --no-strict-offset-reset --use-rust-processor --health-check-file /tmp/health.txt
+    healthcheck:
+      <<: *file_healthcheck_defaults
+    profiles:
+      - feature-complete
+  snuba-subscription-consumer-eap-items:
+    <<: *snuba_defaults
+    command: subscriptions-scheduler-executor --dataset events_analytics_platform --entity eap_items --auto-offset-reset=latest --no-strict-offset-reset --consumer-group=snuba-eap-items-subscriptions-consumers --followed-consumer-group=eap_items_group --schedule-ttl=60 --stale-threshold-seconds=900 --health-check-file /tmp/health.txt
+    healthcheck:
+      <<: *file_healthcheck_defaults
+  snuba-uptime-results-consumer:
+    <<: *snuba_defaults
+    command: rust-consumer --storage uptime_monitor_checks --consumer-group snuba-uptime-results --auto-offset-reset=latest --max-batch-time-ms 750 --no-strict-offset-reset --health-check-file /tmp/health.txt
+    healthcheck:
+      <<: *file_healthcheck_defaults
     profiles:
       - feature-complete
   symbolicator:
@@ -309,9 +479,17 @@ services:
         read_only: true
         source: ./symbolicator
         target: /etc/symbolicator
+    healthcheck:
+      <<: *healthcheck_defaults
+      test:
+        - "CMD"
+        - "/bin/bash"
+        - "-c"
+        # Courtesy of https://unix.stackexchange.com/a/234089/108960
+        - 'exec 3<>/dev/tcp/127.0.0.1/3021 && echo -e "GET /healthcheck HTTP/1.1\r\nhost: 127.0.0.1\r\nConnection: close\r\n\r\n" >&3 && grep OK -s -m 1 <&3'
     command: run -c /etc/symbolicator/config.yml
   symbolicator-cleanup:
-    <<: *restart_policy
+    <<: [*restart_policy, *pull_policy]
     image: symbolicator-cleanup-self-hosted-local
     build:
       context: ./cron
@@ -340,99 +518,175 @@ services:
   worker:
     <<: *sentry_defaults
     command: run worker
+    healthcheck:
+      <<: *healthcheck_defaults
+      test:
+        - CMD
+        - sentry
+        - exec
+        - -c
+        - 'from sentry.celery import app; import os; dest="celery@{}".format(os.environ["HOSTNAME"]); print(app.control.ping(destination=[dest], timeout=5)[0][dest]["ok"])'
   events-consumer:
     <<: *sentry_defaults
-    command: run consumer ingest-events --consumer-group ingest-consumer
+    command: run consumer ingest-events --consumer-group ingest-consumer --healthcheck-file-path /tmp/health.txt
+    healthcheck:
+      <<: *file_healthcheck_defaults
   attachments-consumer:
     <<: *sentry_defaults
-    command: run consumer ingest-attachments --consumer-group ingest-consumer
+    command: run consumer ingest-attachments --consumer-group ingest-consumer --healthcheck-file-path /tmp/health.txt
+    healthcheck:
+      <<: *file_healthcheck_defaults
   post-process-forwarder-errors:
     <<: *sentry_defaults
-    command: run consumer --no-strict-offset-reset post-process-forwarder-errors --consumer-group post-process-forwarder --synchronize-commit-log-topic=snuba-commit-log --synchronize-commit-group=snuba-consumers
+    command: run consumer --no-strict-offset-reset post-process-forwarder-errors --consumer-group post-process-forwarder --synchronize-commit-log-topic=snuba-commit-log --synchronize-commit-group=snuba-consumers --healthcheck-file-path /tmp/health.txt
+    healthcheck:
+      <<: *file_healthcheck_defaults
   subscription-consumer-events:
     <<: *sentry_defaults
-    command: run consumer events-subscription-results --consumer-group query-subscription-consumer
+    command: run consumer events-subscription-results --consumer-group query-subscription-consumer --healthcheck-file-path /tmp/health.txt
+    healthcheck:
+      <<: *file_healthcheck_defaults
   ##############################################
   ## Feature Complete Sentry Ingest Consumers ##
   ##############################################
   transactions-consumer:
     <<: *sentry_defaults
-    command: run consumer ingest-transactions --consumer-group ingest-consumer
+    command: run consumer ingest-transactions --consumer-group ingest-consumer --healthcheck-file-path /tmp/health.txt
+    healthcheck:
+      <<: *file_healthcheck_defaults
     profiles:
       - feature-complete
   metrics-consumer:
     <<: *sentry_defaults
-    command: run consumer ingest-metrics --consumer-group metrics-consumer
+    command: run consumer ingest-metrics --consumer-group metrics-consumer --healthcheck-file-path /tmp/health.txt
+    healthcheck:
+      <<: *file_healthcheck_defaults
     profiles:
       - feature-complete
   generic-metrics-consumer:
     <<: *sentry_defaults
-    command: run consumer ingest-generic-metrics --consumer-group generic-metrics-consumer
+    command: run consumer ingest-generic-metrics --consumer-group generic-metrics-consumer --healthcheck-file-path /tmp/health.txt
+    healthcheck:
+      <<: *file_healthcheck_defaults
     profiles:
       - feature-complete
   billing-metrics-consumer:
     <<: *sentry_defaults
-    command: run consumer billing-metrics-consumer --consumer-group billing-metrics-consumer
+    command: run consumer billing-metrics-consumer --consumer-group billing-metrics-consumer --healthcheck-file-path /tmp/health.txt
+    healthcheck:
+      <<: *file_healthcheck_defaults
     profiles:
       - feature-complete
   ingest-replay-recordings:
     <<: *sentry_defaults
-    command: run consumer ingest-replay-recordings --consumer-group ingest-replay-recordings
+    command: run consumer ingest-replay-recordings --consumer-group ingest-replay-recordings --healthcheck-file-path /tmp/health.txt
+    healthcheck:
+      <<: *file_healthcheck_defaults
     profiles:
       - feature-complete
   ingest-occurrences:
     <<: *sentry_defaults
-    command: run consumer ingest-occurrences --consumer-group ingest-occurrences
+    command: run consumer ingest-occurrences --consumer-group ingest-occurrences --healthcheck-file-path /tmp/health.txt
+    healthcheck:
+      <<: *file_healthcheck_defaults
     profiles:
       - feature-complete
   ingest-profiles:
     <<: *sentry_defaults
-    command: run consumer ingest-profiles --consumer-group ingest-profiles
+    command: run consumer ingest-profiles --consumer-group ingest-profiles --healthcheck-file-path /tmp/health.txt
+    healthcheck:
+      <<: *file_healthcheck_defaults
     profiles:
       - feature-complete
   ingest-monitors:
     <<: *sentry_defaults
-    command: run consumer ingest-monitors --consumer-group ingest-monitors
+    command: run consumer ingest-monitors --consumer-group ingest-monitors --healthcheck-file-path /tmp/health.txt
+    healthcheck:
+      <<: *file_healthcheck_defaults
     profiles:
       - feature-complete
   ingest-feedback-events:
     <<: *sentry_defaults
-    command: run consumer ingest-feedback-events --consumer-group ingest-feedback
+    command: run consumer ingest-feedback-events --consumer-group ingest-feedback --healthcheck-file-path /tmp/health.txt
+    healthcheck:
+      <<: *file_healthcheck_defaults
+    profiles:
+      - feature-complete
+  process-spans:
+    <<: *sentry_defaults
+    command: run consumer --no-strict-offset-reset process-spans --consumer-group process-spans --healthcheck-file-path /tmp/health.txt
+    healthcheck:
+      <<: *file_healthcheck_defaults
+    profiles:
+      - feature-complete
+  process-segments:
+    <<: *sentry_defaults
+    command: run consumer --no-strict-offset-reset process-segments --consumer-group process-segments --healthcheck-file-path /tmp/health.txt
+    healthcheck:
+      <<: *file_healthcheck_defaults
     profiles:
       - feature-complete
   monitors-clock-tick:
     <<: *sentry_defaults
-    command: run consumer monitors-clock-tick --consumer-group monitors-clock-tick
+    command: run consumer monitors-clock-tick --consumer-group monitors-clock-tick --healthcheck-file-path /tmp/health.txt
+    healthcheck:
+      <<: *file_healthcheck_defaults
     profiles:
       - feature-complete
   monitors-clock-tasks:
     <<: *sentry_defaults
-    command: run consumer monitors-clock-tasks --consumer-group monitors-clock-tasks
+    command: run consumer monitors-clock-tasks --consumer-group monitors-clock-tasks --healthcheck-file-path /tmp/health.txt
+    healthcheck:
+      <<: *file_healthcheck_defaults
+    profiles:
+      - feature-complete
+  uptime-results:
+    <<: *sentry_defaults
+    command: run consumer uptime-results --consumer-group uptime-results --healthcheck-file-path /tmp/health.txt
+    healthcheck:
+      <<: *file_healthcheck_defaults
     profiles:
       - feature-complete
   post-process-forwarder-transactions:
     <<: *sentry_defaults
-    command: run consumer --no-strict-offset-reset post-process-forwarder-transactions --consumer-group post-process-forwarder --synchronize-commit-log-topic=snuba-transactions-commit-log --synchronize-commit-group transactions_group
+    command: run consumer --no-strict-offset-reset post-process-forwarder-transactions --consumer-group post-process-forwarder --synchronize-commit-log-topic=snuba-transactions-commit-log --synchronize-commit-group transactions_group --healthcheck-file-path /tmp/health.txt
+    healthcheck:
+      <<: *file_healthcheck_defaults
     profiles:
       - feature-complete
   post-process-forwarder-issue-platform:
     <<: *sentry_defaults
-    command: run consumer --no-strict-offset-reset post-process-forwarder-issue-platform --consumer-group post-process-forwarder --synchronize-commit-log-topic=snuba-generic-events-commit-log --synchronize-commit-group generic_events_group
+    command: run consumer --no-strict-offset-reset post-process-forwarder-issue-platform --consumer-group post-process-forwarder --synchronize-commit-log-topic=snuba-generic-events-commit-log --synchronize-commit-group generic_events_group --healthcheck-file-path /tmp/health.txt
+    healthcheck:
+      <<: *file_healthcheck_defaults
     profiles:
       - feature-complete
   subscription-consumer-transactions:
     <<: *sentry_defaults
-    command: run consumer transactions-subscription-results --consumer-group query-subscription-consumer
+    command: run consumer transactions-subscription-results --consumer-group query-subscription-consumer --healthcheck-file-path /tmp/health.txt
+    healthcheck:
+      <<: *file_healthcheck_defaults
+    profiles:
+      - feature-complete
+  subscription-consumer-eap-items:
+    <<: *sentry_defaults
+    command: run consumer subscription-results-eap-items --consumer-group subscription-results-eap-items --healthcheck-file-path /tmp/health.txt
+    healthcheck:
+      <<: *file_healthcheck_defaults
     profiles:
       - feature-complete
   subscription-consumer-metrics:
     <<: *sentry_defaults
-    command: run consumer metrics-subscription-results --consumer-group query-subscription-consumer
+    command: run consumer metrics-subscription-results --consumer-group query-subscription-consumer --healthcheck-file-path /tmp/health.txt
+    healthcheck:
+      <<: *file_healthcheck_defaults
     profiles:
       - feature-complete
   subscription-consumer-generic-metrics:
     <<: *sentry_defaults
-    command: run consumer generic-metrics-subscription-results --consumer-group query-subscription-consumer
+    command: run consumer generic-metrics-subscription-results --consumer-group query-subscription-consumer --healthcheck-file-path /tmp/health.txt
+    healthcheck:
+      <<: *file_healthcheck_defaults
     profiles:
       - feature-complete
   process-spans:
@@ -458,7 +712,7 @@ services:
     <<: *restart_policy
     ports:
       - "$SENTRY_BIND:80/tcp"
-    image: "nginx:1.25.4-alpine"
+    image: "nginx:1.29.1-alpine"
     volumes:
       - type: bind
         read_only: true
@@ -466,9 +720,19 @@ services:
         target: /etc/nginx/nginx.conf
       - sentry-nginx-cache:/var/cache/nginx
       - sentry-nginx-www:/var/www
+    healthcheck:
+      <<: *healthcheck_defaults
+      test:
+        - "CMD"
+        - "/usr/bin/curl"
+        - http://localhost
     depends_on:
-      - web
-      - relay
+      web:
+        <<: *depends_on-healthy
+        restart: true
+      relay:
+        <<: *depends_on-healthy
+        restart: true
   relay:
     <<: *restart_policy
     image: "$RELAY_IMAGE"
@@ -488,23 +752,54 @@ services:
         <<: *depends_on-healthy
       web:
         <<: *depends_on-healthy
+    healthcheck:
+      <<: *healthcheck_defaults
+      test: ["CMD", "/bin/relay", "healthcheck"]
+  taskbroker:
+    <<: *restart_policy
+    image: "$TASKBROKER_IMAGE"
+    environment:
+      TASKBROKER_KAFKA_CLUSTER: "kafka:9092"
+      TASKBROKER_KAFKA_DEADLETTER_CLUSTER: "kafka:9092"
+      TASKBROKER_DB_PATH: "/opt/sqlite/taskbroker-activations.sqlite"
+    volumes:
+      - sentry-taskbroker:/opt/sqlite
+    depends_on:
+      kafka:
+        <<: *depends_on-healthy
+  taskscheduler:
+    <<: *sentry_defaults
+    command: run taskworker-scheduler
+  taskworker:
+    <<: *sentry_defaults
+    command: run taskworker --concurrency=4 --rpc-host=taskbroker:50051 --health-check-file-path=/tmp/health.txt
+    healthcheck:
+      <<: *file_healthcheck_defaults
   vroom:
     <<: *restart_policy
     image: "$VROOM_IMAGE"
     environment:
       SENTRY_KAFKA_BROKERS_PROFILING: "kafka:9092"
       SENTRY_KAFKA_BROKERS_OCCURRENCES: "kafka:9092"
-      SENTRY_BUCKET_PROFILES: file://localhost//var/lib/sentry-profiles
+      SENTRY_BUCKET_PROFILES: file:///var/vroom/sentry-profiles
       SENTRY_SNUBA_HOST: "http://snuba-api:1218"
     volumes:
-      - sentry-vroom:/var/lib/sentry-profiles
+      - sentry-vroom:/var/vroom/sentry-profiles
+    healthcheck:
+      <<: *healthcheck_defaults
+      test:
+        - "CMD"
+        - "/bin/bash"
+        - "-c"
+        # Courtesy of https://unix.stackexchange.com/a/234089/108960
+        - 'exec 3<>/dev/tcp/127.0.0.1/8085 && echo -e "GET /health HTTP/1.1\r\nhost: 127.0.0.1\r\n\r\n" >&3 && grep OK -s -m 1 <&3'
     depends_on:
       kafka:
         <<: *depends_on-healthy
     profiles:
       - feature-complete
   vroom-cleanup:
-    <<: *restart_policy
+    <<: [*restart_policy, *pull_policy]
     image: vroom-cleanup-self-hosted-local
     build:
       context: ./cron
@@ -515,9 +810,31 @@ services:
       # Leaving the value empty to just pass whatever is set
       # on the host system (or in the .env file)
       SENTRY_EVENT_RETENTION_DAYS:
-    command: '"0 0 * * * find /var/lib/sentry-profiles -type f -mtime +$SENTRY_EVENT_RETENTION_DAYS -delete"'
+    command: '"0 0 * * * find /var/vroom/sentry-profiles -type f -mtime +$SENTRY_EVENT_RETENTION_DAYS -delete"'
     volumes:
-      - sentry-vroom:/var/lib/sentry-profiles
+      - sentry-vroom:/var/vroom/sentry-profiles
+    profiles:
+      - feature-complete
+  uptime-checker:
+    <<: *restart_policy
+    image: "$UPTIME_CHECKER_IMAGE"
+    command: run
+    environment:
+      UPTIME_CHECKER_RESULTS_KAFKA_CLUSTER: kafka:9092
+      UPTIME_CHECKER_REDIS_HOST: redis://redis:6379
+      # Set to `true` will allow uptime checks against private IP addresses
+      UPTIME_CHECKER_ALLOW_INTERNAL_IPS: "false"
+      # The number of times to retry failed checks before reporting them as failed
+      UPTIME_CHECKER_FAILURE_RETRIES: "1"
+      # DNS name servers to use when making checks in the http checker.
+      # Separated by commas. Leaving this unset will default to the systems dns
+      # resolver.
+      #UPTIME_CHECKER_HTTP_CHECKER_DNS_NAMESERVERS: "8.8.8.8,8.8.4.4"
+    depends_on:
+      kafka:
+        <<: *depends_on-healthy
+      redis:
+        <<: *depends_on-healthy
     profiles:
       - feature-complete
 
@@ -535,6 +852,8 @@ volumes:
     external: true
   sentry-symbolicator:
     external: true
+  sentry-seaweedfs:
+    external: true
   # This volume stores JS SDK assets and the data inside this volume should
   # be cleaned periodically on upgrades.
   sentry-nginx-www:
@@ -542,6 +861,10 @@ volumes:
   # Not being external will still persist data across restarts.
   # It won't persist if someone does a docker compose down -v.
   sentry-vroom:
+  # This volume stores task data that is inflight
+  # It should persist across restarts. If this volume is
+  # deleted, up to ~2048 tasks will be lost.
+  sentry-taskbroker:
   # These store ephemeral data that needn't persist across restarts.
   # That said, volumes will be persisted across restarts until they are deleted.
   sentry-secrets:

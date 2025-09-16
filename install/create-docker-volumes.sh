@@ -1,10 +1,22 @@
 echo "${_group}Creating volumes for persistent storage ..."
 
-echo "Created $(docker volume create --name=sentry-clickhouse)."
-echo "Created $(docker volume create --name=sentry-data)."
-echo "Created $(docker volume create --name=sentry-kafka)."
-echo "Created $(docker volume create --name=sentry-postgres)."
-echo "Created $(docker volume create --name=sentry-redis)."
-echo "Created $(docker volume create --name=sentry-symbolicator)."
+create_volume() {
+  create_command="$CONTAINER_ENGINE volume create"
+  if [ "$CONTAINER_ENGINE" = "podman" ]; then
+    create_command="$create_command --ignore $1"
+  else
+    create_command="$create_command --name=$1"
+  fi
+
+  $create_command
+}
+
+echo "Created $(create_volume sentry-clickhouse)."
+echo "Created $(create_volume sentry-data)."
+echo "Created $(create_volume sentry-kafka)."
+echo "Created $(create_volume sentry-postgres)."
+echo "Created $(create_volume sentry-redis)."
+echo "Created $(create_volume sentry-symbolicator)."
+echo "Created $(create_volume sentry-seaweedfs)."
 
 echo "${_endgroup}"

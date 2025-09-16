@@ -4,7 +4,7 @@ show_help() {
   cat <<EOF
 Usage: $0 [options]
 
-Install Sentry with \`docker compose\`.
+Install Sentry with \`docker|podman compose\`.
 
 Options:
  -h, --help             Show this message and exit.
@@ -29,6 +29,12 @@ Options:
  --no-report-self-hosted-issues
                         Do not report error and performance data about your
                           self-hosted instance upstream to Sentry.
+ --container-engine-podman
+                        Use podman as the container engine.
+ --apply-automatic-config-updates
+                        Apply automatic config file updates.
+ --no-apply-automatic-config-updates
+                        Do not apply automatic config file updates.
 EOF
 }
 
@@ -39,6 +45,7 @@ depwarn() {
 if [ ! -z "${SKIP_USER_PROMPT:-}" ]; then
   depwarn "SKIP_USER_PROMPT variable" "SKIP_USER_CREATION"
   SKIP_USER_CREATION="${SKIP_USER_PROMPT}"
+  APPLY_AUTOMATIC_CONFIG_UPDATES="${SKIP_USER_PROMPT}"
 fi
 
 SKIP_USER_CREATION="${SKIP_USER_CREATION:-}"
@@ -46,6 +53,8 @@ MINIMIZE_DOWNTIME="${MINIMIZE_DOWNTIME:-}"
 SKIP_COMMIT_CHECK="${SKIP_COMMIT_CHECK:-}"
 REPORT_SELF_HOSTED_ISSUES="${REPORT_SELF_HOSTED_ISSUES:-}"
 SKIP_SSE42_REQUIREMENTS="${SKIP_SSE42_REQUIREMENTS:-}"
+CONTAINER_ENGINE_PODMAN="${CONTAINER_ENGINE_PODMAN:-}"
+APPLY_AUTOMATIC_CONFIG_UPDATES="${APPLY_AUTOMATIC_CONFIG_UPDATES:-}"
 
 while (($#)); do
   case "$1" in
@@ -67,6 +76,9 @@ while (($#)); do
   --report-self-hosted-issues) REPORT_SELF_HOSTED_ISSUES=1 ;;
   --no-report-self-hosted-issues) REPORT_SELF_HOSTED_ISSUES=0 ;;
   --skip-sse42-requirements) SKIP_SSE42_REQUIREMENTS=1 ;;
+  --container-engine-podman) CONTAINER_ENGINE_PODMAN=1 ;;
+  --apply-automatic-config-updates) APPLY_AUTOMATIC_CONFIG_UPDATES=1 ;;
+  --no-apply-automatic-config-updates) APPLY_AUTOMATIC_CONFIG_UPDATES=0 ;;
   --) ;;
   *)
     echo "Unexpected argument: $1. Use --help for usage information."

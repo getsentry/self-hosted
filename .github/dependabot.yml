@@ -6,7 +6,7 @@ updates:
       interval: daily
     open-pull-requests-limit: 0 # only security updates
     reviewers:
-      - "@getsentry/open-source"
+      - "@getsentry/dev-infra"
       - "@getsentry/security"
 
   - package-ecosystem: "github-actions"
@@ -15,5 +15,5 @@ updates:
       # Check for updates to GitHub Actions every week
       interval: "weekly"
     reviewers:
-      - "@getsentry/open-source"
+      - "@getsentry/dev-infra"
       - "@getsentry/security"

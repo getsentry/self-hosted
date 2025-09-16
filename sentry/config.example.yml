@@ -45,9 +45,26 @@ mail.host: 'smtp'
 # System Settings #
 ###################
 
+# This is the main URL prefix where Sentry can be accessed.
+# Sentry will use this to create links to its different parts of the web UI.
+# This is most helpful if you are using an external reverse proxy.
+# system.url-prefix: https://example.sentry.com
+
+# Most of the time, this should NOT be changed. It's used for communication
+# between containers. `web` is the container's name, and `9000` is the
+# default port opened by the Sentry backend (this is NOT the public port).
+#
+# If you want to change the publicly exposed domain or port, you should change
+# `system.url-prefix` above instead, along with `SENTRY_BIND` in `.env` file.
+# Also see https://develop.sentry.dev/self-hosted/#productionalizing.
+system.internal-url-prefix: 'http://web:9000'
+
 # If this file ever becomes compromised, it's important to generate a new key.
 # Changing this value will result in all current sessions being invalidated.
 # A new key can be generated with `$ sentry config generate-secret-key`
+#
+# If you are using SENTRY_SYSTEM_SECRET_KEY that is being set on your `.env` or `.env.custom` file,
+# you should remove this line below as it won't be used anyway.
 system.secret-key: '!!changeme!!'
 
 # The ``redis.clusters`` setting is used, unsurprisingly, to configure Redis
@@ -79,9 +96,6 @@ releasefile.cache-path: '/data/releasefile-cache'
 #   secret_key: 'XXXXXXX'
 #   bucket_name: 's3-bucket-name'
 
-# The URL prefix in which Sentry is accessible
-# system.url-prefix: https://example.sentry.com
-system.internal-url-prefix: 'http://web:9000'
 symbolicator.enabled: true
 symbolicator.options:
   url: "http://symbolicator:3021"
@@ -132,3 +146,12 @@ transaction-events.force-disable-internal-project: true
 # discord.public-key: "<public key>"
 # discord.client-secret: "<client secret>"
 # discord.bot-token: "<bot token>"
+
+###############
+# Google Auth #
+###############
+
+# Refer to https://develop.sentry.dev/self-hosted/sso/#google-auth
+
+# auth-google.client-id: "<client id>"
+# auth-google.client-secret: "<client secret>"

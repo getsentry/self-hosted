@@ -13,6 +13,8 @@ on:
     # We also make this an hour after all others such as Sentry,
     # Snuba, and Relay to make sure their releases finish.
     - cron: "0 18 15 * *"
+permissions:
+  contents: read
 jobs:
   release:
     if: github.repository_owner == 'getsentry'
@@ -21,11 +23,11 @@ jobs:
     steps:
       - name: Get auth token
         id: token
-        uses: actions/create-github-app-token@c1a285145b9d317df6ced56c09f525b5c2b6f755 # v1.11.1
+        uses: actions/create-github-app-token@67018539274d69449ef7c02e8e71183d1719ab42 # v2.1.4
         with:
           app-id: ${{ vars.SENTRY_RELEASE_BOT_CLIENT_ID }}
           private-key: ${{ secrets.SENTRY_RELEASE_BOT_PRIVATE_KEY }}
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           token: ${{ steps.token.outputs.token }}
           fetch-depth: 0
@@ -46,10 +48,10 @@ jobs:
     name: Create release on self-hosted dogfood instance
     needs: release
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0
-      - uses: getsentry/action-release@v1
+      - uses: getsentry/action-release@v3
         env:
           SENTRY_ORG: self-hosted
           SENTRY_PROJECT: installer

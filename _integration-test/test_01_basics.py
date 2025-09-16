@@ -11,6 +11,7 @@ from typing import Callable
 import httpx
 import pytest
 import sentry_sdk
+from sentry_sdk import logger as sentry_logger
 from bs4 import BeautifulSoup
 from cryptography import x509
 from cryptography.hazmat.backends import default_backend
@@ -22,7 +23,7 @@ SENTRY_CONFIG_PY = "sentry/sentry.conf.py"
 SENTRY_TEST_HOST = os.getenv("SENTRY_TEST_HOST", "http://localhost:9000")
 TEST_USER = "test@example.com"
 TEST_PASS = "test123TEST"
-TIMEOUT_SECONDS = 60
+TIMEOUT_SECONDS = 120
 
 
 def poll_for_response(
@@ -123,8 +124,10 @@ def test_login(client_login):
 def test_receive_event(client_login):
     event_id = None
     client, _ = client_login
-    with sentry_sdk.init(dsn=get_sentry_dsn(client)):
-        event_id = sentry_sdk.capture_exception(Exception("a failure"))
+
+    sentry_sdk.init(dsn=get_sentry_dsn(client))
+
+    event_id = sentry_sdk.capture_exception(Exception("a failure"))
     assert event_id is not None
     response = poll_for_response(
         f"{SENTRY_TEST_HOST}/api/0/projects/sentry/internal/events/{event_id}/", client
@@ -177,8 +180,10 @@ def test_custom_certificate_authorities():
         .issuer_name(ca_name)
         .public_key(ca_key.public_key())
         .serial_number(x509.random_serial_number())
-        .not_valid_before(datetime.datetime.utcnow())
-        .not_valid_after(datetime.datetime.utcnow() + datetime.timedelta(days=1))
+        .not_valid_before(datetime.datetime.now(datetime.timezone.utc))
+        .not_valid_after(
+            datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(days=1)
+        )
         .add_extension(x509.BasicConstraints(ca=True, path_length=None), critical=True)
         .add_extension(
             x509.KeyUsage(
@@ -375,31 +380,62 @@ def test_custom_certificate_authorities():
         del os.environ["COMPOSE_FILE"]
 
 
+@pytest.mark.skipif(os.environ.get("COMPOSE_PROFILES") != "feature-complete", reason="Only run if feature-complete")
 def test_receive_transaction_events(client_login):
     client, _ = client_login
-    with sentry_sdk.init(
+    sentry_sdk.init(
         dsn=get_sentry_dsn(client), profiles_sample_rate=1.0, traces_sample_rate=1.0
-    ):
+    )
 
-        def placeholder_fn():
-            sum = 0
-            for i in range(5):
-                sum += i
-                time.sleep(0.25)
+    def placeholder_fn():
+        sum = 0
+        for i in range(5):
+            sum += i
+            time.sleep(0.25)
 
-        with sentry_sdk.start_transaction(op="task", name="Test Transactions"):
-            placeholder_fn()
+    with sentry_sdk.start_transaction(op="task", name="Test Transactions"):
+        placeholder_fn()
+
     poll_for_response(
         f"{SENTRY_TEST_HOST}/api/0/organizations/sentry/events/?dataset=profiles&field=profile.id&project=1&statsPeriod=1h",
         client,
         lambda x: len(json.loads(x)["data"]) > 0,
     )
     poll_for_response(
-        f"{SENTRY_TEST_HOST}/api/0/organizations/sentry/events/?dataset=spansIndexed&field=id&project=1&statsPeriod=1h",
+        f"{SENTRY_TEST_HOST}/api/0/organizations/sentry/events/?dataset=spans&field=id&project=1&statsPeriod=1h",
         client,
         lambda x: len(json.loads(x)["data"]) > 0,
     )
 
+
+@pytest.mark.skipif(os.environ.get("COMPOSE_PROFILES") != "feature-complete", reason="Only run if feature-complete")
+def test_receive_logs_events(client_login):
+    client, _ = client_login
+    sentry_sdk.init(
+        dsn=get_sentry_dsn(client), profiles_sample_rate=1.0, traces_sample_rate=1.0, enable_logs=True,
+    )
+
+    sentry_logger.trace('Starting database connection {database}', database="users")
+    sentry_logger.debug('Cache miss for user {user_id}', user_id=123)
+    sentry_logger.info('Updated global cache')
+    sentry_logger.warning('Rate limit reached for endpoint {endpoint}', endpoint='/api/results/')
+    sentry_logger.error('Failed to process payment. Order: {order_id}. Amount: {amount}', order_id="or_2342", amount=99.99)
+    sentry_logger.fatal('Database {database} connection pool exhausted', database="users")
+    sentry_logger.error(
+        'Payment processing failed',
+        attributes={
+            'payment.provider': 'stripe',
+            'payment.method': 'credit_card',
+            'payment.currency': 'USD',
+            'user.subscription_tier': 'premium'
+        }
+    )
+
+    poll_for_response(
+        f"{SENTRY_TEST_HOST}/api/0/organizations/sentry/events/?dataset=ourlogs&field=sentry.item_id&field=project.id&field=trace&field=severity_number&field=severity&field=timestamp&field=timestamp_precise&field=observed_timestamp&field=message&project=1&statsPeriod=1h",
+        client,
+        lambda x: len(json.loads(x)["data"]) > 0,
+    )
 
 def test_customizations():
     commands = [

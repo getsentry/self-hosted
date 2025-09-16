@@ -1,5 +1,146 @@
 # Changelog
 
+## 25.8.0
+
+### Various fixes & improvements
+
+- feat: Relay healthcheck (#3875) by @aldy505
+- fix: setup swapfile only if runner architecture is X64 or X86 (#3876) by @aldy505
+- Set minimum bash version to 4.4.0 (#3873) by @aminvakil
+- fix: adjust file healthcheck durations (#3874) by @mzglinski
+- feat: healthchecks for sentry components (#3859) by @mzglinski
+- fix(eap): Fix dataset parameter to target spans (#3866) by @phacops
+- build(deps): bump actions/create-github-app-token from 2.0.6 to 2.1.0 (#3865) by @dependabot
+- fix(scripts): use `env` to find `bash` interpreter (#3861) by @Zaczero
+- fix(scripts): every known flags should be shifted before executing the sentry <foo> command (#3831) by @aldy505
+- fix: uptime checker image should be bumped to the tagged release (#3858) by @aldy505
+- fix(enhancement): ensure correct ownership check before setting permissions of profiles (#3855) by @LvckyAPI
+- chore(features): cleanup feature flags grouped by its' category (#3843) by @aldy505
+- fix: add schedulers for generic metrics subscriptions (#3847) by @mzglinski
+- feat: Continue using celery in self-hosted for now (#3845) by @markstory
+- feat(features): add `profiling-view` flag (#3837) by @aldy505
+- Potential fix for code scanning alert no. 12: Workflow does not contain permissions (#3822) by @aldy505
+- docs: clearly state that `system.internal-url-prefix` shouldn't be changed (#3829) by @aldy505
+- feat(install): Adds support for podman(compose) (#3673) by @DuncanConroy
+- fix(action): missing project directory path for failure inspection (#3825) by @aldy505
+- Cleanup unused feature flags (#3820) by @doc-sheet
+- feat: inspect docker compose failure on self-hosted e2e action (#3817) by @aldy505
+
+## 25.7.0
+
+### Various fixes & improvements
+
+- feat: Swap `trace-view-v1` feature flag with `visibility-explore-view` (#3801) by @aldy505
+- fix: set harakiri Django option to 30s (#3792) by @aldy505
+- feat(images):Cutover images to ghcr (#3800) by @hubertdeng123
+- docs: encourage community patches (#3794) by @aldy505
+- feat: run EAP-related containers (#3778) by @aldy505
+- feat(uptime): Enable uptime in self-hosted (#3787) by @evanpurkhiser
+- feat: make `system.secret-key` configurable from environment variables (#3783) by @aldy505
+- ci: run tests on arm64 (#3750) by @aldy505
+
+## 25.6.2
+
+### Various fixes & improvements
+
+- fix: Increase timeout for flakey test (#3781) by @tobias-wilfert
+- chore: provide detailed note for sentry endpoint settings (#3780) by @aldy505
+
+## 25.6.1
+
+### Various fixes & improvements
+
+- fix(taskworker) Remove num-brokers (#3769) by @markstory
+- feat: enable customization sentry DSN endpoint (#3747) by @yildizozgur
+- ref(js-assets): Simplify how we call nginx container (#3761) by @BYK
+- Revert "fix(vroom): Explicitly set PROFILES_DIR for upcoming change" (#3760) by @hubertdeng123
+- fix(vroom): Explicitly set PROFILES_DIR for upcoming change (#3759) by @BYK
+
+## 25.6.0
+
+### Various fixes & improvements
+
+- enable shell linter for more scripts (#3748) by @doc-sheet
+- feat: migrate to arm64-compatible smtp image (#3746) by @ezhevita
+- Introduce patches with external kafka (#3521) by @aldy505
+- add shellcheck action to lint bash scripts (#3710) by @doc-sheet
+- tests: Install version 2.x of Python SDK (#3745) by @sentrivana
+- feat(features): enable continuous profiling (#3742) by @aldy505
+- feat: Add taskbroker + worker + scheduler (#3738) by @markstory
+- fix(profiles): Run the profile chunks consumer (#3739) by @phacops
+- chore: prune removed feature flags on main repository (#3731) by @aldy505
+- remove index workaround (#3730) by @asottile-sentry
+- Make usage of Python SDK future proof (#3714) by @antonpirker
+
+## 25.5.1
+
+### Various fixes & improvements
+
+- Add missing lib script to sentry-admin.sh (#3693) by @djakielski
+- chore: cleanup obsolete feature flags (#3701) by @doc-sheet
+
+## 25.5.0
+
+### Various fixes & improvements
+
+- build(deps): bump actions/create-github-app-token from 2.0.2 to 2.0.6 (#3690) by @dependabot
+- Resolve datetime deprecation warnings (#3686) by @emmanuel-ferdman
+- ref: remove SENTRY_USE_BIG_INTS (always True) (#3687) by @asottile-sentry
+
+## 25.4.0
+
+### Stand-alone Docker Compose Fixes
+
+By: @aminvakil (#3658, #3654)
+
+### Various fixes & improvements
+
+- chore(relay): specify spool.enveloppe.max_backpressure_memory_percent configuration for handling relay's failing healthcheck (#3635) by @aldy505
+- build(deps): bump actions/create-github-app-token from 1.12.0 to 2.0.2 (#3649) by @dependabot
+- build(deps): bump actions/create-github-app-token from 1.11.7 to 1.12.0 (#3639) by @dependabot
+- Minimum requirements for 'errors-only' profile (#3634) by @madest92
+- build(deps): bump actions/create-github-app-token from 1.11.6 to 1.11.7 (#3632) by @dependabot
+- feat(sentry): add dynamic sampling feature to config (#3631) by @aldy505
+- docs(config): add example config for Google Auth (#3623) by @junsung-cho
+- fix: js-sdk directory/file permission should be set correctly (#3616) by @aldy505
+- feat(features): enable session replay canvas (#3619) by @aldy505
+
+## 25.3.0
+
+### Various fixes & improvements
+
+- feat(features): enable trace view (#3617) by @aldy505
+- feat: provide monitoring-related configurations (#3611) by @aldy505
+- Enforce license compliance only on getsentry repository (#3606) by @aminvakil
+- Fix unbound variable error in install script (#3601) by @brettdh
+- Add --short to docker-compose version (#3605) by @aminvakil
+- ref: Less complicated docker compose detection (#3604) by @BYK
+- Use docker-compose if version is gte docker compose (#3595) by @aminvakil
+- build(deps): bump actions/create-github-app-token from 1.11.3 to 1.11.6 (#3598) by @dependabot
+- build(deps): bump getsentry/action-release from 1 to 3 (#3599) by @dependabot
+- Bump docker-compose 2.33.1 (#3597) by @aminvakil
+- refactor: move system.url-prefix under systems settings section (#3588) by @leeoocca
+
+## 25.2.0
+
+### Various fixes & improvements
+
+- build(deps): bump actions/create-github-app-token from 1.11.2 to 1.11.3 (#3569) by @dependabot
+- feat: merge `.env` and `.env.custom` file during installation (#3564) by @aldy505
+- build(deps): bump actions/create-github-app-token from 1.11.1 to 1.11.2 (#3561) by @dependabot
+- feat: Require both inputs to be set on action (#3554) by @BYK
+- ref: Simpler and more accurate cache keys (#3553) by @BYK
+- Hand off open-source to dev-infra (#3549) by @chadwhitacre
+- ci: Remove obsolete `dcr up -w` from import test (#3544) by @BYK
+- fix: github.action_path may not have trailing slash (#3547) by @BYK
+- chore: Remove upgrade test (#3541) by @hubertdeng123
+- fix: Use correct path for get compose action (#3539) by @hubertdeng123
+- fix: Caching of sentry migrations should cover additional folders (#3542) by @hubertdeng123
+- ci: Move self-contained action reference to master branch (#3538) by @BYK
+- breaking: Upgrade min Compose version to 2.23.2 (#3535) by @BYK
+- ci: Even better cache keys and granular caching (#3534) by @BYK
+- test: Reorganize backup/restore tests for speed and reliability (#3537) by @BYK
+
 ## 25.1.0
 
 ### Various fixes & improvements
