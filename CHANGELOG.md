@@ -1,5 +1,33 @@
 # Changelog
 
+## 25.9.0
+
+### Various fixes & improvements
+
+- fix: able to setup nodestore multiple times (#3940) by @aldy505
+- build(deps): bump actions/create-github-app-token from 2.1.1 to 2.1.4 (#3936) by @dependabot
+- docs: provide information for SENTRY_AIR_GAP flag on Django config file (#3935) by @aldy505
+- feat: Use S3 node store with seaweedfs (#3498) by @BYK
+- feat(tasks): Remove taskworker option override and add worker healthcheck (#3933) by @markstory
+- feat: install script to migrate sentry.conf.py config to use pgbouncer (#3898) by @aldy505
+- chore(deps): bump clickhouse to 25.3 (#3878) by @aldy505
+- feat: enable `issue-views` flag (#3922) by @aldy505
+- feat: query against `eap` dataset instead of `metrics` dataset for spans (#3923) by @aldy505
+- build(deps): bump actions/setup-python from 5 to 6 (#3927) by @dependabot
+- Add restart policy to pgbouncer service (#3925) by @frederikspang
+- fix(tests): skip logs event test for errors-only (#3915) by @aldy505
+- Improve nginx depends_on policy (#3914) by @aminvakil
+- test: run errors-only integration tests (#3910) by @aldy505
+- feat: enable Logs feature (#3912) by @aldy505
+- fix: ensuring vroom permission should be skipped on errors-only (#3911) by @aldy505
+- chore(deps): bump patches version (#3879) by @aldy505
+- Revert "increase postgres max_connections above 100 connections (#2740)" (#3899) by @aminvakil
+- Add pgbouncer (#3884) by @frederikspang
+- chore: resolve GHA code scanning alerts (#3889) by @aldy505
+- fix(enhancement): search for permissions on docker container instead of host and combine it in one command for performance enhancement (#3890) by @LvckyAPI
+- build(deps): bump actions/create-github-app-token from 2.1.0 to 2.1.1 (#3885) by @dependabot
+- build(deps): bump actions/checkout from 4 to 5 (#3883) by @dependabot
+
 ## 25.8.0
 
 ### Various fixes & improvements
