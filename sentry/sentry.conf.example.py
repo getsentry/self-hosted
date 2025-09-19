@@ -142,25 +142,6 @@ SENTRY_OPTIONS["redis.clusters"] = {
 }
 
 #########
-# Queue #
-#########
-
-# See https://develop.sentry.dev/services/queue/ for more
-# information on configuring your queue broker and workers. Sentry relies
-# on a Python framework called Celery to manage queues.
-
-rabbitmq_host = None
-if rabbitmq_host:
-    BROKER_URL = "amqp://{username}:{password}@{host}/{vhost}".format(
-        username="guest", password="guest", host=rabbitmq_host, vhost="/"
-    )
-else:
-    BROKER_URL = "redis://:{password}@{host}:{port}/{db}".format(
-        **SENTRY_OPTIONS["redis.clusters"]["default"]["hosts"][0]
-    )
-
-
-#########
 # Cache #
 #########
 
