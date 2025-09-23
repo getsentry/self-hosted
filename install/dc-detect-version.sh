@@ -47,9 +47,9 @@ else
   dc="$dc_base $NO_ANSI"
 fi
 
-proxy_args="--build-arg http_proxy=${http_proxy:-} --build-arg https_proxy=${https_proxy:-} --build-arg no_proxy=${no_proxy:-}"
+proxy_args="--build-arg HTTP_PROXY=${HTTP_PROXY:-} --build-arg HTTPS_PROXY=${HTTPS_PROXY:-} --build-arg NO_PROXY=${NO_PROXY:-} --build-arg http_proxy=${http_proxy:-} --build-arg https_proxy=${https_proxy:-} --build-arg no_proxy=${no_proxy:-}"
 if [[ "$CONTAINER_ENGINE" == "podman" ]]; then
-  proxy_args_dc="--podman-build-args http_proxy=${http_proxy:-},https_proxy=${https_proxy:-},no_proxy=${no_proxy:-}"
+  proxy_args_dc="--podman-build-args HTTP_PROXY=${HTTP_PROXY:-},HTTPS_PROXY=${HTTPS_PROXY:-},NO_PROXY=${NO_PROXY:-},http_proxy=${http_proxy:-},https_proxy=${https_proxy:-},no_proxy=${no_proxy:-}"
   # Disable pod creation as these are one-off commands and creating a pod
   # prints its pod id to stdout which is messing with the output that we
   # rely on various places such as configuration generation
