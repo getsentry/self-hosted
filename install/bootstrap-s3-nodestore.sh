@@ -53,7 +53,7 @@ if [[ $(echo "$bucket_list" | tail -1 | awk '{print $3}') != 's3://nodestore' ]]
 
     if [[ "$APPLY_AUTOMATIC_CONFIG_UPDATES" == 1 || "$apply_config_changes_nodestore" == 1 ]]; then
       nodestore_config=$(sed -n '/SENTRY_NODESTORE/,/[}]/{p}' sentry/sentry.conf.example.py)
-      if [[ $($dc exec postgres psql -qAt -U postgres -c "select exists (select * from nodestore_node limit 1)") = "f" ]]; then
+      if [[ $($dc exec postgres psql -qAt -U postgres -c "select exists (select * from nodestore_node limit 1)") = "t" ]]; then
         nodestore_config=$(echo -e "$nodestore_config" | sed '$s/\}/    "read_through": True,\n    "delete_through": True,\n\}/')
       fi
       echo "$nodestore_config" >>$SENTRY_CONFIG_PY
