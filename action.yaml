@@ -157,6 +157,7 @@ runs:
     - name: Setup swapfile
       shell: bash
       run: |
+        df -h
         sudo swapoff -a
         sudo fallocate -l 16G /swapfile
         sudo chmod 600 /swapfile
