@@ -158,7 +158,6 @@ runs:
       shell: bash
       run: |
         df -h
-        dpkg-query -Wf '${Installed-Size}\t${Package}\n' | sort -n
         sudo swapoff -a
         sudo fallocate -l 16G /swapfile
         sudo chmod 600 /swapfile
