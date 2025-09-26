@@ -80,17 +80,13 @@ runs:
         echo "SENTRY_MIGRATIONS_MD5=$SENTRY_MIGRATIONS_MD5" >> $GITHUB_OUTPUT
         SNUBA_MIGRATIONS_MD5=$(docker run --rm --entrypoint bash $SNUBA_IMAGE -c '{ ls -Rv1rpq snuba/snuba_migrations/**/*.py; grep -Poz "(?s)(?<=class Topic\\(Enum\\):\\n).+?(?=\\n\\n\\n)" snuba/utils/streams/topics.py; }' | md5sum | cut -d ' ' -f 1)
         echo "SNUBA_MIGRATIONS_MD5=$SNUBA_MIGRATIONS_MD5" >> $GITHUB_OUTPUT
-
-    - name: Get current machine's architecture
-      id: arch
-      shell: bash
-      run: |
         echo "ARCH=$(uname -m)" >> $GITHUB_OUTPUT
+
     - name: Restore Sentry Volume Cache
       id: restore_cache_sentry
       uses: BYK/docker-volume-cache-action/restore@be89365902126f508dcae387a32ec3712df6b1cd
       with:
-        key: db-volumes-sentry-v2-${{ steps.arch.outputs.ARCH }}-${{ inputs.compose_profiles }}-${{ steps.cache_key.outputs.SENTRY_MIGRATIONS_MD5 }}
+        key: db-volumes-sentry-v2-${{ steps.cache_key.outputs.ARCH }}-${{ inputs.compose_profiles }}-${{ steps.cache_key.outputs.SENTRY_MIGRATIONS_MD5 }}
         restore-keys: |
           db-volumes-sentry-v1-
         volumes: |
@@ -100,7 +96,7 @@ runs:
       id: restore_cache_snuba
       uses: BYK/docker-volume-cache-action/restore@be89365902126f508dcae387a32ec3712df6b1cd
       with:
-        key: db-volumes-snuba-v2-${{ steps.arch.outputs.ARCH }}-${{ inputs.compose_profiles }}-${{ steps.cache_key.outputs.SNUBA_MIGRATIONS_MD5 }}
+        key: db-volumes-snuba-v2-${{ steps.cache_key.outputs.ARCH }}-${{ inputs.compose_profiles }}-${{ steps.cache_key.outputs.SNUBA_MIGRATIONS_MD5 }}
         restore-keys: |
           db-volumes-snuba-v1-
         volumes: |
@@ -110,11 +106,11 @@ runs:
       id: restore_cache_kafka
       uses: BYK/docker-volume-cache-action/restore@be89365902126f508dcae387a32ec3712df6b1cd
       with:
-        key: db-volumes-kafka-v1-${{ steps.arch.outputs.ARCH }}-${{ inputs.compose_profiles }}-${{ steps.cache_key.outputs.SENTRY_MIGRATIONS_MD5 }}-${{ steps.cache_key.outputs.SNUBA_MIGRATIONS_MD5 }}
+        key: db-volumes-kafka-v1-${{ steps.cache_key.outputs.ARCH }}-${{ inputs.compose_profiles }}-${{ steps.cache_key.outputs.SENTRY_MIGRATIONS_MD5 }}-${{ steps.cache_key.outputs.SNUBA_MIGRATIONS_MD5 }}
         restore-keys: |
-          db-volumes-kafka-v1-${{ steps.arch.outputs.ARCH }}-${{ inputs.compose_profiles }}-${{ steps.cache_key.outputs.SENTRY_MIGRATIONS_MD5 }}-${{ steps.cache_key.outputs.SNUBA_MIGRATIONS_MD5 }}
-          db-volumes-kafka-v1-${{ steps.arch.outputs.ARCH }}-${{ inputs.compose_profiles }}-${{ steps.cache_key.outputs.SENTRY_MIGRATIONS_MD5 }}-
-          db-volumes-kafka-v1-${{ steps.arch.outputs.ARCH }}-${{ inputs.compose_profiles }}
+          db-volumes-kafka-v1-${{ steps.cache_key.outputs.ARCH }}-${{ inputs.compose_profiles }}-${{ steps.cache_key.outputs.SENTRY_MIGRATIONS_MD5 }}-${{ steps.cache_key.outputs.SNUBA_MIGRATIONS_MD5 }}
+          db-volumes-kafka-v1-${{ steps.cache_key.outputs.ARCH }}-${{ inputs.compose_profiles }}-${{ steps.cache_key.outputs.SENTRY_MIGRATIONS_MD5 }}-
+          db-volumes-kafka-v1-${{ steps.cache_key.outputs.ARCH }}-${{ inputs.compose_profiles }}
           db-volumes-kafka-v1-
         volumes: |
           sentry-kafka
