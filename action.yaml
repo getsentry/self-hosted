@@ -158,6 +158,9 @@ runs:
       shell: bash
       run: |
         df -h
+        sudo apt-get purge *jdk -y
+        sudo apt-get autoremove --purge -y
+        df -h
         sudo swapoff -a
         sudo fallocate -l 16G /swapfile
         sudo chmod 600 /swapfile
