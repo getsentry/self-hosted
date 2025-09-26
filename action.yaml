@@ -42,6 +42,12 @@ runs:
           echo "COMPOSE_PROFILES=$COMPOSE_PROFILES" >> ${{ github.action_path }}/.env
         fi
 
+    - name: Cleanup runner image
+      shell: bash
+      run: |
+        ### Inspired by https://github.com/endersonmenezes/free-disk-space ###
+        sudo rm -rf /usr/local/.ghcup
+
     - name: Setup dev environment
       shell: bash
       run: |
