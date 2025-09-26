@@ -45,9 +45,9 @@ runs:
     - name: Cleanup runner image
       shell: bash
       run: |
+        ### Inspired by https://github.com/endersonmenezes/free-disk-space ###
         df -h
-        sudo apt-get purge man-db microsoft* php* *jre* *jdk* -y
-        sudo apt-get autoremove --purge -y
+        sudo rm -rf /usr/local/.ghcup
         df -h
 
     - name: Setup dev environment
