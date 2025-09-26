@@ -274,7 +274,13 @@ services:
     volumes:
       - "sentry-seaweedfs:/data"
     healthcheck:
-      test: ["CMD", "wget", "-q", "-O-", "http://seaweedfs:8080/healthz", "http://seaweedfs:9333/cluster/healthz", "http://seaweedfs:8333/healthz"]
+      test: [
+          "CMD-SHELL",
+          # Manually override any http_proxy envvar that might be set, because
+          # this wget does not support no_proxy. See:
+          # https://github.com/getsentry/self-hosted/issues/1537
+          "http_proxy='' wget -q -O- http://seaweedfs:8080/healthz http://seaweedfs:9333/cluster/healthz http://seaweedfs:8333/healthz || exit 1",
+      ]
       interval: 30s
       timeout: 20s
       retries: 5
