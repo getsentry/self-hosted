@@ -46,9 +46,7 @@ runs:
       shell: bash
       run: |
         ### Inspired by https://github.com/endersonmenezes/free-disk-space ###
-        df -h
         sudo rm -rf /usr/local/.ghcup
-        df -h
 
     - name: Setup dev environment
       shell: bash
