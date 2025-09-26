@@ -107,52 +107,52 @@ runs:
         volumes: |
           sentry-kafka
 
-    - name: Install self-hosted
-      env:
-        # Note that cache keys for Sentry and Snuba have their respective Kafka configs built into them
-        # and the Kafka volume cache is comprises both keys. This way we can omit the Kafka cache hit
-        # in here to still avoid running Sentry or Snuba migrations if only one of their Kafka config has
-        # changed. Heats up your head a bit but if you think about it, it makes sense.
-        SKIP_SENTRY_MIGRATIONS: ${{ steps.restore_cache_sentry.outputs.cache-hit == 'true' && '1' || '' }}
-        SKIP_SNUBA_MIGRATIONS: ${{ steps.restore_cache_snuba.outputs.cache-hit == 'true' && '1' || '' }}
-      shell: bash
-      run: |
-        cd ${{ github.action_path }}
-        # Add some customizations to test that path
-        cat <<EOT >> sentry/enhance-image.sh
-        #!/bin/bash
-        touch /created-by-enhance-image
-        apt-get update
-        apt-get install -y gcc libsasl2-dev python-dev-is-python3 libldap2-dev libssl-dev
-        EOT
-        chmod 755 sentry/enhance-image.sh
-        echo "python-ldap" > sentry/requirements.txt
-
-        ./install.sh --no-report-self-hosted-issues --skip-commit-check
-
-    - name: Save Sentry Volume Cache
-      if: steps.restore_cache_sentry.outputs.cache-hit != 'true'
-      uses: BYK/docker-volume-cache-action/save@be89365902126f508dcae387a32ec3712df6b1cd
-      with:
-        key: ${{ steps.restore_cache_sentry.outputs.cache-primary-key }}
-        volumes: |
-          sentry-postgres
-
-    - name: Save Snuba Volume Cache
-      if: steps.restore_cache_snuba.outputs.cache-hit != 'true'
-      uses: BYK/docker-volume-cache-action/save@be89365902126f508dcae387a32ec3712df6b1cd
-      with:
-        key: ${{ steps.restore_cache_snuba.outputs.cache-primary-key }}
-        volumes: |
-          sentry-clickhouse
-
-    - name: Save Kafka Volume Cache
-      if: steps.restore_cache_kafka.outputs.cache-hit != 'true'
-      uses: BYK/docker-volume-cache-action/save@be89365902126f508dcae387a32ec3712df6b1cd
-      with:
-        key: ${{ steps.restore_cache_kafka.outputs.cache-primary-key }}
-        volumes: |
-          sentry-kafka
+#     - name: Install self-hosted
+#       env:
+#         # Note that cache keys for Sentry and Snuba have their respective Kafka configs built into them
+#         # and the Kafka volume cache is comprises both keys. This way we can omit the Kafka cache hit
+#         # in here to still avoid running Sentry or Snuba migrations if only one of their Kafka config has
+#         # changed. Heats up your head a bit but if you think about it, it makes sense.
+#         SKIP_SENTRY_MIGRATIONS: ${{ steps.restore_cache_sentry.outputs.cache-hit == 'true' && '1' || '' }}
+#         SKIP_SNUBA_MIGRATIONS: ${{ steps.restore_cache_snuba.outputs.cache-hit == 'true' && '1' || '' }}
+#       shell: bash
+#       run: |
+#         cd ${{ github.action_path }}
+#         # Add some customizations to test that path
+#         cat <<EOT >> sentry/enhance-image.sh
+#         #!/bin/bash
+#         touch /created-by-enhance-image
+#         apt-get update
+#         apt-get install -y gcc libsasl2-dev python-dev-is-python3 libldap2-dev libssl-dev
+#         EOT
+#         chmod 755 sentry/enhance-image.sh
+#         echo "python-ldap" > sentry/requirements.txt
+# 
+#         ./install.sh --no-report-self-hosted-issues --skip-commit-check
+# 
+#     - name: Save Sentry Volume Cache
+#       if: steps.restore_cache_sentry.outputs.cache-hit != 'true'
+#       uses: BYK/docker-volume-cache-action/save@be89365902126f508dcae387a32ec3712df6b1cd
+#       with:
+#         key: ${{ steps.restore_cache_sentry.outputs.cache-primary-key }}
+#         volumes: |
+#           sentry-postgres
+# 
+#     - name: Save Snuba Volume Cache
+#       if: steps.restore_cache_snuba.outputs.cache-hit != 'true'
+#       uses: BYK/docker-volume-cache-action/save@be89365902126f508dcae387a32ec3712df6b1cd
+#       with:
+#         key: ${{ steps.restore_cache_snuba.outputs.cache-primary-key }}
+#         volumes: |
+#           sentry-clickhouse
+# 
+#     - name: Save Kafka Volume Cache
+#       if: steps.restore_cache_kafka.outputs.cache-hit != 'true'
+#       uses: BYK/docker-volume-cache-action/save@be89365902126f508dcae387a32ec3712df6b1cd
+#       with:
+#         key: ${{ steps.restore_cache_kafka.outputs.cache-primary-key }}
+#         volumes: |
+#           sentry-kafka
 
     - name: Setup swapfile
       shell: bash
