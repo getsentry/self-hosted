@@ -46,7 +46,7 @@ runs:
       shell: bash
       run: |
         df -h
-        sudo apt-get purge man-db microsoft* php* *jdk -y
+        sudo apt-get purge man-db microsoft* php* *jre* *jdk -y
         sudo apt-get autoremove --purge -y
         df -h
 
