@@ -116,6 +116,11 @@ services:
   redis:
     <<: *restart_policy
     image: "redis:6.2.19-alpine"
+    deploy:
+      resources:
+        reservations:
+	  mem_reservation: 512
+          mem_limit: 8G
     healthcheck:
       <<: *healthcheck_defaults
       test: redis-cli ping | grep PONG
