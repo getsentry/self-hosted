@@ -119,8 +119,9 @@ services:
     deploy:
       resources:
         reservations:
-	  mem_reservation: 512
-          mem_limit: 8G
+          memory: 512m
+        limits:
+          memory: 2560m
     healthcheck:
       <<: *healthcheck_defaults
       test: redis-cli ping | grep PONG
