@@ -488,7 +488,7 @@ services:
         target: /etc/symbolicator
     healthcheck:
       <<: *healthcheck_defaults
-      test: ["CMD", "/bin/symbolicator", "healthcheck", "-c /etc/symbolicator/config.yml"]
+      test: ["CMD", "/bin/symbolicator", "healthcheck", "-c", "/etc/symbolicator/config.yml"]
   symbolicator-cleanup:
     <<: *restart_policy
     image: "$SYMBOLICATOR_IMAGE"
