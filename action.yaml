@@ -186,8 +186,9 @@ runs:
         pytest -x --cov --junitxml=junit.xml _integration-test/
 
     - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v5
       if: inputs.CODECOV_TOKEN
+      continue-on-error: true
+      uses: codecov/codecov-action@v5
       with:
         directory: ${{ github.action_path }}
         token: ${{ inputs.CODECOV_TOKEN }}
@@ -195,6 +196,7 @@ runs:
 
     - name: Upload test results to Codecov
       if: inputs.CODECOV_TOKEN && !cancelled()
+      continue-on-error: true
       uses: codecov/test-results-action@v1
       with:
         directory: ${{ github.action_path }}
