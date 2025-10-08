@@ -246,11 +246,13 @@ services:
     entrypoint: "weed"
     command: >-
         server
+        -dir=/data
         -filer=true
         -filer.port=8888
         -filer.port.grpc=18888
         -filer.defaultReplicaPlacement=000
         -master=true
+        -master.mdir=/data/master
         -master.port=9333
         -master.port.grpc=19333
         -metricsPort=9091
