@@ -19,7 +19,7 @@ fi
 
 remove_volume() {
   remove_command="$CONTAINER_ENGINE volume remove -f"
-  $remove_command
+  $remove_command $1
 }
 
 echo "Removed $(remove_volume sentry-symbolicator)."
