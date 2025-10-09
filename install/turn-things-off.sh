@@ -17,4 +17,11 @@ else
   fi
 fi
 
+remove_volume() {
+  remove_command="$CONTAINER_ENGINE volume remove -f"
+  $remove_command
+}
+
+echo "Removed $(remove_volume sentry-symbolicator)."
+
 echo "${_endgroup}"
