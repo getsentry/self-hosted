@@ -451,13 +451,6 @@ services:
       <<: *file_healthcheck_defaults
     profiles:
       - feature-complete
-  snuba-spans-consumer:
-    <<: *snuba_defaults
-    command: rust-consumer --storage spans --consumer-group snuba-spans-consumers --auto-offset-reset=latest --max-batch-time-ms 1000 --no-strict-offset-reset --health-check-file /tmp/health.txt
-    healthcheck:
-      <<: *file_healthcheck_defaults
-    profiles:
-      - feature-complete
   snuba-eap-items-consumer:
     <<: *snuba_defaults
     command: rust-consumer --storage eap_items --consumer-group eap_items_group --auto-offset-reset=latest --max-batch-time-ms 1000 --no-strict-offset-reset --use-rust-processor --health-check-file /tmp/health.txt
@@ -828,10 +821,11 @@ volumes:
     external: true
   sentry-clickhouse:
     external: true
-  sentry-symbolicator:
-    external: true
   sentry-seaweedfs:
     external: true
+  # The volume stores cached version of debug symbols, source maps etc. Upon
+  # removal symbolicator will re-download them.
+  sentry-symbolicator:
   # This volume stores JS SDK assets and the data inside this volume should
   # be cleaned periodically on upgrades.
   sentry-nginx-www:
