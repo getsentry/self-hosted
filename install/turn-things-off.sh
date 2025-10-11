@@ -17,11 +17,16 @@ else
   fi
 fi
 
+exists_volume() {
+  $CONTAINER_ENGINE volume inspect $1 >&/dev/null
+}
 remove_volume() {
-  remove_command="$CONTAINER_ENGINE volume remove -f"
+  remove_command="$CONTAINER_ENGINE volume remove"
   $remove_command $1
 }
 
-echo "Removed $(remove_volume sentry-symbolicator)."
+if exists_volume sentry-symbolicator; then
+  echo "Removed $(remove_volume sentry-symbolicator)."
+fi
 
 echo "${_endgroup}"
