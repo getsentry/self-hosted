@@ -117,7 +117,7 @@ services:
       test: echo stats | nc 127.0.0.1 11211
   redis:
     <<: *restart_policy
-    image: "redis:6.2.19-alpine"
+    image: "redis:6.2.20-alpine"
     healthcheck:
       <<: *healthcheck_defaults
       test: redis-cli ping | grep PONG
@@ -446,13 +446,6 @@ services:
   snuba-profiling-profile-chunks-consumer:
     <<: *snuba_defaults
     command: rust-consumer --storage profile_chunks --consumer-group snuba-consumers --auto-offset-reset=latest --max-batch-time-ms 1000 --no-strict-offset-reset --health-check-file /tmp/health.txt
-    healthcheck:
-      <<: *file_healthcheck_defaults
-    profiles:
-      - feature-complete
-  snuba-spans-consumer:
-    <<: *snuba_defaults
-    command: rust-consumer --storage spans --consumer-group snuba-spans-consumers --auto-offset-reset=latest --max-batch-time-ms 1000 --no-strict-offset-reset --health-check-file /tmp/health.txt
     healthcheck:
       <<: *file_healthcheck_defaults
     profiles:
@@ -827,10 +820,11 @@ volumes:
     external: true
   sentry-clickhouse:
     external: true
-  sentry-symbolicator:
-    external: true
   sentry-seaweedfs:
     external: true
+  # The volume stores cached version of debug symbols, source maps etc. Upon
+  # removal symbolicator will re-download them.
+  sentry-symbolicator:
   # This volume stores JS SDK assets and the data inside this volume should
   # be cleaned periodically on upgrades.
   sentry-nginx-www:
