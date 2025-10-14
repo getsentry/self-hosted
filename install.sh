@@ -13,6 +13,7 @@ fi
 
 source install/_logging.sh
 source install/_lib.sh
+source install/_lockfile.sh
 
 # Pre-flight. No impact yet.
 source install/parse-cli.sh

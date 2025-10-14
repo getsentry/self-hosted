@@ -25,8 +25,18 @@ remove_volume() {
   $remove_command $1
 }
 
-if exists_volume sentry-symbolicator; then
-  echo "Removed $(remove_volume sentry-symbolicator)."
+if ! exist_in_lockfile "remove-symbolicator-volume-distroless"; then
+  if exists_volume sentry-symbolicator; then
+    echo "Removed $(remove_volume sentry-symbolicator)."
+    add_to_lockfile "remove-symbolicator-volume-distroless"
+  fi
+fi
+
+if ! exist_in_lockfile "move-seaweedfs-tmp-data"; then
+  $dc exec seaweedfs find /tmp -maxdepth 1 -name "*.dat" -exec mv -v {} /data/ \;
+  $dc exec seaweedfs find /tmp -maxdepth 1 -name "*.vif" -exec mv -v {} /data/ \;
+  echo "Moved SeaweedFS tmp data to persistent storage."
+  add_to_lockfile "move-seaweedfs-tmp-data"
 fi
 
 echo "${_endgroup}"

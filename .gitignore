@@ -105,3 +105,6 @@ sentry/test-custom-ca-roots.py
 
 # OSX minutia
 .DS_Store
+
+# Self-hosted Sentry Upgrade Lockfile
+.upgrade.lock
