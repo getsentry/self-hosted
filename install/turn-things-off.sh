@@ -1,5 +1,21 @@
 echo "${_group}Turning things off ..."
 
+# Only execute this when `seaweedfs` container is running
+if ! $dc ps --quiet seaweedfs; then
+  echo "SeaweedFS container is not running, skipping moving tmp data."
+else
+  # Only execute this when we find `*.dat` and/or `*.vif` files in `/tmp`
+  if [ -n "$($dc exec seaweedfs find /tmp -maxdepth 1 \( -name "*.dat" -o -name "*.vif" \))" ]; then
+    echo "Moving SeaweedFS tmp data to persistent storage..."
+
+    $dc exec seaweedfs find /tmp -maxdepth 1 \( -name "*.dat" -o -name "*.vif" \) -exec mv -v {} /data/ \;
+    $dc exec seaweedfs sh -c '[ -d /tmp/m9333 ] && mv -v /tmp/m9333 /data/ || true'
+    $dc exec seaweedfs sh -c '[ -f /tmp/vol_dir.uuid ] && mv -v /tmp/vol_dir.uuid /data/ || true'
+
+    echo "Moved SeaweedFS tmp data to persistent storage."
+  fi
+fi
+
 if [[ -n "$MINIMIZE_DOWNTIME" ]]; then
   # Stop everything but relay and nginx
   $dc rm -fsv $($dc config --services | grep -v -E '^(nginx|relay)$')
