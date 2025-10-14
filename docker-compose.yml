@@ -246,6 +246,7 @@ services:
     entrypoint: "weed"
     command: >-
         server
+        -dir=/data
         -filer=true
         -filer.port=8888
         -filer.port.grpc=18888
