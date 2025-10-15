@@ -8,7 +8,7 @@ if [[ -z "$CONTAINER_ENGINE" ]]; then
   if [[ -f "$script_dir/_detect-container-engine.sh" ]]; then
     source $script_dir/_detect-container-engine.sh
   else
-    echo "Error: Cannot find install/_detect-container-engine.sh. Defaulting to docker."
+    echo "Error: Cannot find _detect-container-engine.sh. Defaulting to docker."
     export CONTAINER_ENGINE="docker"
   fi
 fi
