@@ -1,5 +1,27 @@
 # Changelog
 
+## 25.10.0
+
+### Various fixes & improvements
+
+- fix: geoip standalone script should check on CONTAINER_ENGINE variable first (#3982) by @aldy505
+- fix: missing `-dir` flag for seaweedfs (#3991) by @aldy505
+- Remove symbolicator volume once (#3994) by @aminvakil
+- Remove symbolicator external volume (#3992) by @aminvakil
+- chore(spans): Remove old snuba-spans consumer (#3989) by @jjbayer
+- Bump redis 6.2.20-alpine (#3988) by @aminvakil
+- ref: add `continue-on-error` for codecov action on self-hosted integration tests (#3978) by @aldy505
+- ref: use dedicated `healthcheck` command for symbolicator & remove cron for `symbolicator-cleanup` (#3979) by @aldy505
+- fix(actions): include arch and compose_profiles information on cache keys (#3974) by @aldy505
+- ref: Remove proxy_next_upstream directives (#3973) by @aminvakil
+- fix: Unset the proxy when performing the seaweedfs health check (#3959) by @SteppingHat
+- fix: logic error in s3 install script (#3965) by @kodebach
+- Fix swap allocation in integration test (#3972) by @aminvakil
+- chore(tasks) Remove reference to celery (#3962) by @markstory
+- Respect uppercase proxy variables (#3949) by @aminvakil
+- chore(tasks): Remove the worker and cron containers (#3946) by @markstory
+- fix: install behind a proxy (#3944) by @moroine
+
 ## 25.9.0
 
 ### Various fixes & improvements
