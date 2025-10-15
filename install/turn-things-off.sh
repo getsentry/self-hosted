@@ -1,7 +1,7 @@
 echo "${_group}Turning things off ..."
 
 # Only execute this when `seaweedfs` container is running
-if ! $dc ps --quiet seaweedfs; then
+if [ -z "$($dc ps --quiet seaweedfs)" ]; then
   echo "SeaweedFS container is not running, skipping moving tmp data."
 else
   # Only execute this when we find `*.dat` and/or `*.vif` files in `/tmp`
