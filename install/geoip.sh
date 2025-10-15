@@ -1,5 +1,18 @@
 echo "${_group}Setting up GeoIP integration ..."
 
+# If `$CONTAINER_ENGINE` is not set, we assume that we are running this script independently
+# to update the geoip database as written on the documentation.
+# Therefore we need to `source _detect-container-engine.sh` to detect the container engine.
+script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd -P)
+if [[ -z "$CONTAINER_ENGINE" ]]; then
+  if [[ -f "$script_dir/_detect-container-engine.sh" ]]; then
+    source $script_dir/_detect-container-engine.sh
+  else
+    echo "Error: Cannot find _detect-container-engine.sh. Defaulting to docker."
+    export CONTAINER_ENGINE="docker"
+  fi
+fi
+
 install_geoip() {
   local mmdb=geoip/GeoLite2-City.mmdb
   local conf=geoip/GeoIP.conf
