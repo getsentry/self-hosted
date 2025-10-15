@@ -6,7 +6,7 @@ echo "${_group}Setting up GeoIP integration ..."
 script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd -P)
 if [[ -z "$CONTAINER_ENGINE" ]]; then
   if [[ -f "$script_dir/_detect-container-engine.sh" ]]; then
-    source $script_dir/install/_detect-container-engine.sh
+    source $script_dir/_detect-container-engine.sh
   else
     echo "Error: Cannot find install/_detect-container-engine.sh. Defaulting to docker."
     export CONTAINER_ENGINE="docker"
