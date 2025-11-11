@@ -246,6 +246,7 @@ services:
     entrypoint: "weed"
     command: >-
         server
+        -dir=/data
         -filer=true
         -filer.port=8888
         -filer.port.grpc=18888
@@ -462,13 +463,6 @@ services:
     command: subscriptions-scheduler-executor --dataset events_analytics_platform --entity eap_items --auto-offset-reset=latest --no-strict-offset-reset --consumer-group=snuba-eap-items-subscriptions-consumers --followed-consumer-group=eap_items_group --schedule-ttl=60 --stale-threshold-seconds=900 --health-check-file /tmp/health.txt
     healthcheck:
       <<: *file_healthcheck_defaults
-  snuba-uptime-results-consumer:
-    <<: *snuba_defaults
-    command: rust-consumer --storage uptime_monitor_checks --consumer-group snuba-uptime-results --auto-offset-reset=latest --max-batch-time-ms 750 --no-strict-offset-reset --health-check-file /tmp/health.txt
-    healthcheck:
-      <<: *file_healthcheck_defaults
-    profiles:
-      - feature-complete
   symbolicator:
     <<: *restart_policy
     image: "$SYMBOLICATOR_IMAGE"
