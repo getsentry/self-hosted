@@ -69,6 +69,7 @@ x-sentry-defaults: &sentry_defaults
     SENTRY_EVENT_RETENTION_DAYS:
     SENTRY_MAIL_HOST:
     SENTRY_MAX_EXTERNAL_SOURCEMAP_SIZE:
+    SENTRY_STATSD_ADDR: ${STATSD_ADDR:-}
   volumes:
     - "sentry-data:/data"
     - "./sentry:/etc/sentry"
@@ -96,8 +97,7 @@ x-snuba-defaults: &snuba_defaults
     SENTRY_EVENT_RETENTION_DAYS:
     # If you have statsd server, you can utilize that to monitor self-hosted Snuba containers.
     # To start, state these environment variables below on your `.env.` file and adjust the options as needed.
-    SNUBA_STATSD_HOST: # Example value: "100.100.123.123". Must be an IP address, not domain name
-    SNUBA_STATSD_PORT: # Example value: 8125
+    SNUBA_STATSD_ADDR: "${STATSD_ADDR:-}"
 services:
   smtp:
     <<: *restart_policy
@@ -726,6 +726,7 @@ services:
       TASKBROKER_KAFKA_CLUSTER: "kafka:9092"
       TASKBROKER_KAFKA_DEADLETTER_CLUSTER: "kafka:9092"
       TASKBROKER_DB_PATH: "/opt/sqlite/taskbroker-activations.sqlite"
+      TASKBROKER_STATSD_ADDR: "${STATSD_ADDR:-}"
     volumes:
       - sentry-taskbroker:/opt/sqlite
     depends_on:
@@ -794,6 +795,7 @@ services:
       # Separated by commas. Leaving this unset will default to the systems dns
       # resolver.
       #UPTIME_CHECKER_HTTP_CHECKER_DNS_NAMESERVERS: "8.8.8.8,8.8.4.4"
+      UPTIME_CHECKER_STATSD_ADDR: "${STATSD_ADDR:-}"
     depends_on:
       kafka:
         <<: *depends_on-healthy
