@@ -92,7 +92,7 @@ if env("SENTRY_SYSTEM_SECRET_KEY"):
 # in your `.env` file. To enable only the error monitoring feature, set
 # `COMPOSE_PROFILES` to `errors-only`.
 #
-# See https://develop.sentry.dev/self-hosted/experimental/errors-only/
+# See https://develop.sentry.dev/self-hosted/optional-features/errors-only/
 SENTRY_SELF_HOSTED_ERRORS_ONLY = env("COMPOSE_PROFILES") != "feature-complete"
 
 # When running in an air-gapped environment, set this to True to entirely disable
