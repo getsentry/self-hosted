@@ -466,6 +466,8 @@ services:
   symbolicator:
     <<: *restart_policy
     image: "$SYMBOLICATOR_IMAGE"
+    environment:
+      SYMBOLICATOR_STATSD_ADDR: ${STATSD_ADDR:-}
     command: run -c /etc/symbolicator/config.yml
     volumes:
       - "sentry-symbolicator:/data"
@@ -700,6 +702,8 @@ services:
   relay:
     <<: *restart_policy
     image: "$RELAY_IMAGE"
+    environment:
+      RELAY_STATSD_ADDR: ${STATSD_ADDR:-}
     volumes:
       - type: bind
         read_only: true
@@ -726,7 +730,7 @@ services:
       TASKBROKER_KAFKA_CLUSTER: "kafka:9092"
       TASKBROKER_KAFKA_DEADLETTER_CLUSTER: "kafka:9092"
       TASKBROKER_DB_PATH: "/opt/sqlite/taskbroker-activations.sqlite"
-      TASKBROKER_STATSD_ADDR: "${STATSD_ADDR:-}"
+      TASKBROKER_STATSD_ADDR: ${STATSD_ADDR:-}
     volumes:
       - sentry-taskbroker:/opt/sqlite
     depends_on:
@@ -795,7 +799,7 @@ services:
       # Separated by commas. Leaving this unset will default to the systems dns
       # resolver.
       #UPTIME_CHECKER_HTTP_CHECKER_DNS_NAMESERVERS: "8.8.8.8,8.8.4.4"
-      UPTIME_CHECKER_STATSD_ADDR: "${STATSD_ADDR:-}"
+      UPTIME_CHECKER_STATSD_ADDR: ${STATSD_ADDR:-}
     depends_on:
       kafka:
         <<: *depends_on-healthy
