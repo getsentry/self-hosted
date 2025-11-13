@@ -47,7 +47,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-24.04, ubuntu-24.04-arm]
-        container_engine: ['docker'] # TODO: add 'podman' into the list
+        container_engine: ['docker', 'podman']
         compose_profiles: ['feature-complete', 'errors-only']
     name: ${{ format('integration test{0}{1}{2}', matrix.os == 'ubuntu-24.04-arm' && ' (arm64)' || '', matrix.container_engine == 'podman' && ' (podman)' || '', matrix.compose_profiles == 'errors-only' && ' (errors-only)' || '') }}
     env:
@@ -73,4 +73,5 @@ jobs:
         uses: './'
         with:
           compose_profiles: ${{ matrix.compose_profiles }}
+          container_engine: ${{ matrix.container_engine }}
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
