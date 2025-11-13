@@ -463,7 +463,7 @@ JS_SDK_LOADER_DEFAULT_SDK_URL = "https://browser.sentry-cdn.com/%s/bundle%s.min.
 #
 # To start, uncomment the following line and adjust the options as needed.
 
-SENTRY_STATSD_ADDR = env("STATSD_ADDR")
+SENTRY_STATSD_ADDR = env("SENTRY_STATSD_ADDR")
 if SENTRY_STATSD_ADDR:
     host, _, port = SENTRY_STATSD_ADDR.partition(":")
     port = int(port or 8125)
