@@ -521,10 +521,14 @@ JS_SDK_LOADER_DEFAULT_SDK_URL = "https://browser.sentry-cdn.com/%s/bundle%s.min.
 #
 # To start, uncomment the following line and adjust the options as needed.
 
-# SENTRY_METRICS_BACKEND = 'sentry.metrics.statsd.StatsdMetricsBackend'
-# SENTRY_METRICS_OPTIONS: dict[str, Any] = {
-#     'host': '100.100.123.123', # It is recommended to use IP address instead of domain name
-#     'port': 8125,
-# }
+SENTRY_STATSD_ADDR = env("SENTRY_STATSD_ADDR")
+if SENTRY_STATSD_ADDR:
+    host, _, port = SENTRY_STATSD_ADDR.partition(":")
+    port = int(port or 8125)
+    SENTRY_METRICS_BACKEND = 'sentry.metrics.statsd.StatsdMetricsBackend'
+    SENTRY_METRICS_OPTIONS: dict[str, Any] = {
+        'host': host,
+        'port': port,
+    }
 # SENTRY_METRICS_SAMPLE_RATE = 1.0   # Adjust this to your needs, default is 1.0
 # SENTRY_METRICS_PREFIX = "sentry."  # Adjust this to your needs, default is "sentry."
