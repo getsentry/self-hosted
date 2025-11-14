@@ -69,7 +69,7 @@ x-sentry-defaults: &sentry_defaults
     SENTRY_EVENT_RETENTION_DAYS:
     SENTRY_MAIL_HOST:
     SENTRY_MAX_EXTERNAL_SOURCEMAP_SIZE:
-    SENTRY_STATSD_ADDR: ${STATSD_ADDR:-127.0.0.1:8125}
+    SENTRY_STATSD_ADDR: "${STATSD_ADDR:-}"
   volumes:
     - "sentry-data:/data"
     - "./sentry:/etc/sentry"
@@ -97,7 +97,7 @@ x-snuba-defaults: &snuba_defaults
     SENTRY_EVENT_RETENTION_DAYS:
     # If you have statsd server, you can utilize that to monitor self-hosted Snuba containers.
     # To start, state these environment variables below on your `.env.` file and adjust the options as needed.
-    SNUBA_STATSD_ADDR: "${STATSD_ADDR:-127.0.0.1:8125}"
+    SNUBA_STATSD_ADDR: "${STATSD_ADDR:-}"
 services:
   smtp:
     <<: *restart_policy
