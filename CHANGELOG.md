@@ -1,5 +1,17 @@
 # Changelog
 
+## 25.11.0
+
+### Various fixes & improvements
+
+- feat: statsd configuration through environment variables (#4031) by @aldy505
+- ref: sound SENTRY_DISALLOWED_IPS on the configuration file (#3981) by @aldy505
+- fix: broken link to Errors-Only Mode docs (#4032) by @mariansimecek
+- Fix Clickhouse max_server_memory_usage_to_ram_ratio setting (#4025) by @otoriphoenix
+- Increase default max_suspicious_broken_parts to 100 (#4011) by @stevenobird
+- fix(install): add migrate-pgbouncer.sh to install.sh (#4030) by @kodebach
+- fix: remove snuba uptime results consumer (#4027) by @aldy505
+
 ## 25.10.0
 
 ### Various fixes & improvements
