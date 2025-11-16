@@ -481,6 +481,8 @@ services:
   symbolicator-cleanup:
     <<: *restart_policy
     image: "$SYMBOLICATOR_IMAGE"
+    environment:
+      SYMBOLICATOR_STATSD_ADDR: ${STATSD_ADDR:-127.0.0.1:8125}
     command: "cleanup -c /etc/symbolicator/config.yml --repeat 1h"
     volumes:
       - "sentry-symbolicator:/data"
