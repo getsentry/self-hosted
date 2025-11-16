@@ -68,6 +68,9 @@ jobs:
           pip3 install --user https://github.com/containers/podman-compose/archive/main.tar.gz
           echo "PODMAN_COMPOSE_PROVIDER=podman-compose" >> $GITHUB_ENV
           echo "PODMAN_COMPOSE_WARNING_LOGS=false" >> $GITHUB_ENV
+          
+          # DEBUG: Check ulimits
+          ulimit -a
 
       - name: Use action from local checkout
         uses: './'
