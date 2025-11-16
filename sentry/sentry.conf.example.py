@@ -103,6 +103,64 @@ SENTRY_SELF_HOSTED_ERRORS_ONLY = env("COMPOSE_PROFILES") != "feature-complete"
 # AI model prices from various public APIs.
 SENTRY_AIR_GAP = False
 
+# As of 25.9.0 (September 2025 release), Sentry enforces tighter restrictions
+# of allowed IP addresses for outgoing requests. This is to prevent
+# accidentally leaking sensitive information to third parties.
+#
+# By default, Sentry will not allow requests to private IP addresses.
+# You can override this by configuring the allowed IP addresses here.
+# Below is the default value, which is a list of IP addresses that are
+# considered "private" and "reserved".
+#
+# SENTRY_DISALLOWED_IPS: tuple[str, ...] = (
+#     # https://en.wikipedia.org/wiki/Reserved_IP_addresses#IPv4
+#     "0.0.0.0/8",
+#     "10.0.0.0/8",
+#     "100.64.0.0/10",
+#     "127.0.0.0/8",
+#     "169.254.0.0/16",
+#     "172.16.0.0/12",
+#     "192.0.0.0/29",
+#     "192.0.2.0/24",
+#     "192.88.99.0/24",
+#     "192.168.0.0/16",
+#     "198.18.0.0/15",
+#     "198.51.100.0/24",
+#     "224.0.0.0/4",
+#     "240.0.0.0/4",
+#     "255.255.255.255/32",
+#     # https://en.wikipedia.org/wiki/IPv6#IPv4-mapped_IPv6_addresses
+#     # Subnets match the IPv4 subnets above
+#     "::ffff:0:0/104",
+#     "::ffff:a00:0/104",
+#     "::ffff:6440:0/106",
+#     "::ffff:7f00:0/104",
+#     "::ffff:a9fe:0/112",
+#     "::ffff:ac10:0/108",
+#     "::ffff:c000:0/125",
+#     "::ffff:c000:200/120",
+#     "::ffff:c058:6300/120",
+#     "::ffff:c0a8:0/112",
+#     "::ffff:c612:0/111",
+#     "::ffff:c633:6400/120",
+#     "::ffff:e000:0/100",
+#     "::ffff:f000:0/100",
+#     "::ffff:ffff:ffff/128",
+#     # https://en.wikipedia.org/wiki/Reserved_IP_addresses#IPv6
+#     "::1/128",
+#     "::ffff:0:0/96",
+#     "64:ff9b::/96",
+#     "64:ff9b:1::/48",
+#     "100::/64",
+#     "2001:0000::/32",
+#     "2001:20::/28",
+#     "2001:db8::/32",
+#     "2002::/16",
+#     "fc00::/7",
+#     "fe80::/10",
+#     "ff00::/8",
+# )
+
 ################
 # Node Storage #
 ################
@@ -463,10 +521,14 @@ JS_SDK_LOADER_DEFAULT_SDK_URL = "https://browser.sentry-cdn.com/%s/bundle%s.min.
 #
 # To start, uncomment the following line and adjust the options as needed.
 
-# SENTRY_METRICS_BACKEND = 'sentry.metrics.statsd.StatsdMetricsBackend'
-# SENTRY_METRICS_OPTIONS: dict[str, Any] = {
-#     'host': '100.100.123.123', # It is recommended to use IP address instead of domain name
-#     'port': 8125,
-# }
+SENTRY_STATSD_ADDR = env("SENTRY_STATSD_ADDR")
+if SENTRY_STATSD_ADDR:
+    host, _, port = SENTRY_STATSD_ADDR.partition(":")
+    port = int(port or 8125)
+    SENTRY_METRICS_BACKEND = 'sentry.metrics.statsd.StatsdMetricsBackend'
+    SENTRY_METRICS_OPTIONS: dict[str, Any] = {
+        'host': host,
+        'port': port,
+    }
 # SENTRY_METRICS_SAMPLE_RATE = 1.0   # Adjust this to your needs, default is 1.0
 # SENTRY_METRICS_PREFIX = "sentry."  # Adjust this to your needs, default is "sentry."
