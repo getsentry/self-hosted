@@ -46,13 +46,8 @@ runs:
       shell: bash
       run: |
         ### Inspired by https://github.com/endersonmenezes/free-disk-space ###
-        df -h
         sudo rm -rf /usr/local/.ghcup
-        df -h
-        sudo rm -rf /opt/ghc /opt/cabal
-        df -h
         sudo rm -rf /home/runner/Android /usr/local/lib/android /opt/android /usr/local/android-sdk
-        df -h
         sudo rm -rf /usr/share/dotnet /usr/share/doc/dotnet-*
         df -h
 
