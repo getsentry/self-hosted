@@ -62,7 +62,11 @@ if [[ $(echo "$bucket_list" | tail -1 | awk '{print $3}') != 's3://nodestore' ]]
 
   $dc exec seaweedfs mkdir -p /data/idx/
   $s3cmd --access_key=sentry --secret_key=sentry --no-ssl --region=us-east-1 --host=localhost:8333 --host-bucket='localhost:8333/%(bucket)' mb s3://nodestore
+else
+  echo "Node store already exists, skipping creation..."
+fi
 
+if [[ -z "${APPLY_AUTOMATIC_CONFIG_UPDATES:-}" || "$APPLY_AUTOMATIC_CONFIG_UPDATES" == 1 ]]; then
   # XXX(aldy505): Should we refactor this?
   lifecycle_policy=$(
     cat <<EOF
@@ -79,13 +83,11 @@ if [[ $(echo "$bucket_list" | tail -1 | awk '{print $3}') != 's3://nodestore' ]]
 </LifecycleConfiguration>
 EOF
   )
-  $dc exec seaweedfs sh -c "printf '%s' '$lifecycle_policy' > /tmp/nodestore-lifecycle-policy.xml"
-  $s3cmd --access_key=sentry --secret_key=sentry --no-ssl --region=us-east-1 --host=localhost:8333 --host-bucket='localhost:8333/%(bucket)' setlifecycle /tmp/nodestore-lifecycle-policy.xml s3://nodestore
 
   echo "Making sure the bucket lifecycle policy is all set up correctly..."
+  $dc exec seaweedfs sh -c "printf '%s' '$lifecycle_policy' > /tmp/nodestore-lifecycle-policy.xml"
+  $s3cmd --access_key=sentry --secret_key=sentry --no-ssl --region=us-east-1 --host=localhost:8333 --host-bucket='localhost:8333/%(bucket)' setlifecycle /tmp/nodestore-lifecycle-policy.xml s3://nodestore
   $s3cmd --access_key=sentry --secret_key=sentry --no-ssl --region=us-east-1 --host=localhost:8333 --host-bucket='localhost:8333/%(bucket)' getlifecycle s3://nodestore
-else
-  echo "Node store already exists, skipping..."
 fi
 
 echo "${_endgroup}"
