@@ -22,7 +22,8 @@ fi
 export DOCKER_ARCH=$($CONTAINER_ENGINE info --format "$FORMAT")
 if [[ "$DOCKER_ARCH" = "x86_64" || "$DOCKER_ARCH" = "amd64" ]]; then
   export DOCKER_PLATFORM="linux/amd64"
-elif [[ "$DOCKER_ARCH" = "aarch64" ]]; then
+# NOTE(aldy505): Docker outputs `aarch64`, but Podman outputs `arm64`.
+elif [[ "$DOCKER_ARCH" = "aarch64" || "$DOCKER_ARCH" = "arm64" ]]; then
   export DOCKER_PLATFORM="linux/arm64"
 else
   echo "FAIL: Unsupported docker architecture $DOCKER_ARCH."

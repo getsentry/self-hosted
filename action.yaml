@@ -9,6 +9,9 @@ inputs:
   compose_profiles:
     required: false
     description: "Docker Compose profile to use. Defaults to feature-complete."
+  container_engine:
+    required: false
+    default: docker
   CODECOV_TOKEN:
     required: false
     description: "The Codecov token to upload coverage."
@@ -67,9 +70,11 @@ runs:
         fi
 
     - name: Get Compose
+      if: ${{ inputs.container_engine == 'docker' }}
       uses: getsentry/self-hosted/get-compose-action@master
 
     - name: Compute Docker Volume Cache Keys
+      if: ${{ inputs.container_engine == 'docker' }}
       id: cache_key
       shell: bash
       run: |
@@ -83,6 +88,7 @@ runs:
         echo "ARCH=$(uname -m)" >> $GITHUB_OUTPUT
 
     - name: Restore Sentry Volume Cache
+      if: ${{ inputs.container_engine == 'docker' }}
       id: restore_cache_sentry
       uses: BYK/docker-volume-cache-action/restore@be89365902126f508dcae387a32ec3712df6b1cd
       with:
@@ -93,6 +99,7 @@ runs:
           sentry-postgres
 
     - name: Restore Snuba Volume Cache
+      if: ${{ inputs.container_engine == 'docker' }}
       id: restore_cache_snuba
       uses: BYK/docker-volume-cache-action/restore@be89365902126f508dcae387a32ec3712df6b1cd
       with:
@@ -103,6 +110,7 @@ runs:
           sentry-clickhouse
 
     - name: Restore Kafka Volume Cache
+      if: ${{ inputs.container_engine == 'docker' }}
       id: restore_cache_kafka
       uses: BYK/docker-volume-cache-action/restore@be89365902126f508dcae387a32ec3712df6b1cd
       with:
@@ -121,6 +129,8 @@ runs:
         # changed. Heats up your head a bit but if you think about it, it makes sense.
         SKIP_SENTRY_MIGRATIONS: ${{ steps.restore_cache_sentry.outputs.cache-hit == 'true' && '1' || '' }}
         SKIP_SNUBA_MIGRATIONS: ${{ steps.restore_cache_snuba.outputs.cache-hit == 'true' && '1' || '' }}
+        CONTAINER_ENGINE: ${{ inputs.container_engine }}
+        DEBUG: ${{ env.ACTIONS_STEP_DEBUG == 'true' }}
       shell: bash
       run: |
         cd ${{ github.action_path }}
@@ -128,32 +138,40 @@ runs:
         cat <<EOT >> sentry/enhance-image.sh
         #!/bin/bash
         touch /created-by-enhance-image
+        echo 'debconf debconf/frontend select noninteractive' | debconf-set-selections
         apt-get update
-        apt-get install -y gcc libsasl2-dev python-dev-is-python3 libldap2-dev libssl-dev
+        apt-get install --yes --no-install-recommends gcc libsasl2-dev python-dev-is-python3 libldap2-dev libssl-dev
         EOT
         chmod 755 sentry/enhance-image.sh
         echo "python-ldap" > sentry/requirements.txt
 
         ./install.sh --no-report-self-hosted-issues --skip-commit-check
 
-    - name: Save Sentry Volume Cache
-      if: steps.restore_cache_sentry.outputs.cache-hit != 'true'
+    - name: Save Sentry Docker Volume Cache
+      if: ${{ steps.restore_cache_sentry.outputs.cache-hit != 'true' && inputs.container_engine == 'docker' }}
       uses: BYK/docker-volume-cache-action/save@be89365902126f508dcae387a32ec3712df6b1cd
       with:
         key: ${{ steps.restore_cache_sentry.outputs.cache-primary-key }}
         volumes: |
           sentry-postgres
 
-    - name: Save Snuba Volume Cache
-      if: steps.restore_cache_snuba.outputs.cache-hit != 'true'
+    - name: Save Sentry Podman Volume Cache
+      if: ${{ steps.restore_cache_sentry.outputs.cache-hit != 'true' && inputs.container_engine == 'podman' }}
+      uses: actions/cache/save@5a3ec84eff668545956fd18022155c47e93e2684
+      with:
+        key: ${{ steps.restore_cache_sentry.outputs.cache-primary-key }}-podman
+        path: ${{ runner.temp }}/sentry-postgres.tar
+
+    - name: Save Snuba Docker Volume Cache
+      if: ${{ steps.restore_cache_snuba.outputs.cache-hit != 'true' && inputs.container_engine == 'docker' }}
       uses: BYK/docker-volume-cache-action/save@be89365902126f508dcae387a32ec3712df6b1cd
       with:
         key: ${{ steps.restore_cache_snuba.outputs.cache-primary-key }}
         volumes: |
           sentry-clickhouse
 
-    - name: Save Kafka Volume Cache
-      if: steps.restore_cache_kafka.outputs.cache-hit != 'true'
+    - name: Save Kafka Docker Volume Cache
+      if: ${{ steps.restore_cache_kafka.outputs.cache-hit != 'true' && inputs.container_engine == 'docker' }}
       uses: BYK/docker-volume-cache-action/save@be89365902126f508dcae387a32ec3712df6b1cd
       with:
         key: ${{ steps.restore_cache_kafka.outputs.cache-primary-key }}
@@ -171,10 +189,13 @@ runs:
         sudo swapon --show
         free -h
 
-    - name: Integration Test
-      shell: bash
+    - name: Integration Test with docker
+      if: ${{ inputs.container_engine == 'docker' }}
       env:
+        CONTAINER_ENGINE: ${{ inputs.container_engine }}
+        CONTAINER_ENGINE_PODMAN: ${{ inputs.container_engine == 'podman' && '1' || '0' }}
         COMPOSE_PROFILES: ${{ inputs.compose_profiles }}
+      shell: bash
       run: |
         sudo chown root /usr/bin/rsync && sudo chmod u+s /usr/bin/rsync
         rsync -aW --super --numeric-ids --no-compress --mkpath \
@@ -184,6 +205,21 @@ runs:
           "$RUNNER_TEMP/volumes/"
         cd ${{ github.action_path }}
         pytest -x --cov --junitxml=junit.xml _integration-test/
+
+    - name: Integration Test with podman
+      if: ${{ inputs.container_engine == 'podman' }}
+      env:
+        CONTAINER_ENGINE: ${{ inputs.container_engine }}
+        CONTAINER_ENGINE_PODMAN: ${{ inputs.container_engine == 'podman' && '1' || '0' }}
+        COMPOSE_PROFILES: ${{ inputs.compose_profiles }}
+      shell: bash
+      run: |
+        set -x
+        for volume in sentry-postgres sentry-clickhouse sentry-kafka; do
+          podman volume export -o "${RUNNER_TEMP}/volumes/${volume}.tar" "$volume"
+        done
+        cd ${{ github.action_path }}
+        pytest -s -v -x --cov --junitxml=junit.xml _integration-test/
 
     - name: Upload coverage to Codecov
       if: inputs.CODECOV_TOKEN
