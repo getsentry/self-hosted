@@ -794,7 +794,7 @@ services:
       UPTIME_CHECKER_RESULTS_KAFKA_CLUSTER: kafka:9092
       UPTIME_CHECKER_REDIS_HOST: redis://redis:6379
       # Set to `true` will allow uptime checks against private IP addresses
-      UPTIME_CHECKER_ALLOW_INTERNAL_IPS: "false"
+      UPTIME_CHECKER_ALLOW_INTERNAL_IPS: "$UPTIME_CHECKER_ALLOW_INTERNAL_IPS"
       # The number of times to retry failed checks before reporting them as failed
       UPTIME_CHECKER_FAILURE_RETRIES: "1"
       # DNS name servers to use when making checks in the http checker.
