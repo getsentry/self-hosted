@@ -96,6 +96,10 @@ releasefile.cache-path: '/data/releasefile-cache'
 #   secret_key: 'XXXXXXX'
 #   bucket_name: 's3-bucket-name'
 
+filestore.profiles-backend: 'filesystem'
+filestore.profiles-options:
+  location: '/var/vroom/sentry-profiles'
+
 symbolicator.enabled: true
 symbolicator.options:
   url: "http://symbolicator:3021"

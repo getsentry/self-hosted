@@ -72,6 +72,7 @@ x-sentry-defaults: &sentry_defaults
     SENTRY_STATSD_ADDR: "${STATSD_ADDR:-}"
   volumes:
     - "sentry-data:/data"
+    - sentry-vroom:/var/vroom/sentry-profiles
     - "./sentry:/etc/sentry"
     - "./geoip:/geoip:ro"
     - "./certificates:/usr/local/share/ca-certificates:ro"
