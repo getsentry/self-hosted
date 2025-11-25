@@ -13,6 +13,7 @@ echo "${_group}Bootstrapping seaweedfs (profiles)..."
 
 start_service_and_wait_ready seaweedfs
 $dc exec -e "HTTP_PROXY=${HTTP_PROXY:-}" -e "HTTPS_PROXY=${HTTPS_PROXY:-}" -e "NO_PROXY=${NO_PROXY:-}" -e "http_proxy=${http_proxy:-}" -e "https_proxy=${https_proxy:-}" -e "no_proxy=${no_proxy:-}" seaweedfs apk add --no-cache s3cmd
+s3cmd="$dc exec seaweedfs s3cmd"
 
 bucket_list=$($s3cmd --access_key=sentry --secret_key=sentry --no-ssl --region=us-east-1 --host=localhost:8333 --host-bucket='localhost:8333/%(bucket)' ls)
 
@@ -70,6 +71,7 @@ if [[ $(echo "$bucket_list" | tail -1 | awk '{print $3}') != 's3://profiles' ]];
   $s3cmd --access_key=sentry --secret_key=sentry --no-ssl --region=us-east-1 --host=localhost:8333 --host-bucket='localhost:8333/%(bucket)' mb s3://profiles
 
   # Check if there are files in the sentry-vroom volume
+  start_service_and_wait_ready vroom
   vroom_files_count=$($dc exec vroom sh -c "find /var/vroom/sentry-profiles -type f | wc -l")
   if [[ "$vroom_files_count" -gt 0 ]]; then
     echo "Migrating $vroom_files_count files from 'sentry-vroom' volume to 'profiles' bucket on SeaweedFS..."
