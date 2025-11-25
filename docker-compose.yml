@@ -72,7 +72,7 @@ x-sentry-defaults: &sentry_defaults
     SENTRY_STATSD_ADDR: "${STATSD_ADDR:-}"
   volumes:
     - "sentry-data:/data"
-    - sentry-vroom:/var/vroom/sentry-profiles
+    - "sentry-vroom:/var/vroom/sentry-profiles"
     - "./sentry:/etc/sentry"
     - "./geoip:/geoip:ro"
     - "./certificates:/usr/local/share/ca-certificates:ro"
@@ -753,7 +753,7 @@ services:
     environment:
       SENTRY_KAFKA_BROKERS_PROFILING: "kafka:9092"
       SENTRY_KAFKA_BROKERS_OCCURRENCES: "kafka:9092"
-      SENTRY_BUCKET_PROFILES: file:///var/vroom/sentry-profiles
+      SENTRY_BUCKET_PROFILES: "s3://profiles?region=us-east-1&endpoint=seaweedfs:8333&s3ForcePathStyle=true&disableSSL=true"
       SENTRY_SNUBA_HOST: "http://snuba-api:1218"
     volumes:
       - sentry-vroom:/var/vroom/sentry-profiles
