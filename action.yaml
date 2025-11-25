@@ -189,7 +189,7 @@ runs:
           /var/lib/docker/volumes/sentry-kafka \
           "$RUNNER_TEMP/volumes/"
         cd ${{ github.action_path }}
-        pytest -x --cov --junitxml=junit.xml _integration-test/
+        uv run pytest -x --cov --junitxml=junit.xml _integration-test/
 
     - name: Upload coverage to Codecov
       if: inputs.CODECOV_TOKEN
