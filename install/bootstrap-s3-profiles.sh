@@ -1,7 +1,7 @@
 echo "${_group}Bootstrapping seaweedfs (profiles)..."
 
 # The purpose of this file is to have both `sentry`-based containers and `vroom` use the same bucket for profiling.
-# Currently, we have a `sentry-vroom` volume which stores the profiling data. However, since version 25.10.0,
+# On pre-25.10.0, we have a `sentry-vroom` volume which stores the profiling data however, since this version,
 # the behavior changed, and `vroomrs` now ingests profiles directly. Both services must share the same bucket,
 # but at the time of this writing, it's not possible because the `sentry-vroom` volume has ownership set to `vroom:vroom`.
 # This prevents the `sentry`-based containers from performing read/write operations on that volume.
@@ -23,7 +23,7 @@ if [[ $(echo "$bucket_list" | tail -1 | awk '{print $3}') != 's3://profiles' ]];
   if ! grep -q "filestore.profiles-backend" $SENTRY_CONFIG_YML; then
     if [[ -z "${APPLY_AUTOMATIC_CONFIG_UPDATES:-}" ]]; then
       echo
-      echo "We are migrating the Profiles data directory from the 'sentry-vroom' volume to S3."
+      echo "We are migrating the Profiles data directory from the 'sentry-vroom' volume to SeaweedFS."
       echo "This migration will ensure profiles ingestion works correctly with the new 'vroomrs'"
       echo "and allows both 'sentry' and 'vroom' to transition smoothly."
       echo "To complete this, your sentry/config.yml file needs to be modified."
