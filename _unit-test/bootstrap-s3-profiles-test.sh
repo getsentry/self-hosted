@@ -20,7 +20,7 @@ export APPLY_AUTOMATIC_CONFIG_UPDATES=1
 # Here we're just gonna test to run it multiple times
 # Only to make sure it doesn't break
 for i in $(seq 1 5); do
-  source install/bootstrap-s3-vroom.sh
+  source install/bootstrap-s3-profiles.sh
 done
 
 # Ensure that the files have been migrated to SeaweedFS
