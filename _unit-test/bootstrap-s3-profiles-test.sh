@@ -31,4 +31,8 @@ if [[ "$migrated_files_count" -ne 1000 ]]; then
   exit 1
 fi
 
+# Manual cleanup, otherwise `create-docker-volumes.sh` will fail
+$dc down -v vroom seaweedfs
+docker volume rm sentry-vroom sentry-seaweedfs
+
 report_success
