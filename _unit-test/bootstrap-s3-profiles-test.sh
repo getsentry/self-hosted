@@ -3,6 +3,7 @@
 source _unit-test/_test_setup.sh
 source install/dc-detect-version.sh
 source install/create-docker-volumes.sh
+source install/ensure-files-from-examples.sh
 export COMPOSE_PROFILES="feature-complete"
 $dc pull vroom
 source install/ensure-correct-permissions-profiles-dir.sh
@@ -24,7 +25,7 @@ for i in $(seq 1 5); do
 done
 
 # Ensure that the files have been migrated to SeaweedFS
-migrated_files_count=$($dc run --rm --no-deps seaweedfs sh -c '
+migrated_files_count=$($dc run --rm --no-deps --entrypoint /bin/sh seaweedfs -c '
   apk add --no-cache s3cmd &&
   s3cmd --access_key=sentry --secret_key=sentry --no-ssl --region=us-east-1 --host=localhost:8333 --host-bucket="localhost:8333/%(bucket)" ls s3://profiles/ | wc -l
 ')

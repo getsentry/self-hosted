@@ -79,7 +79,7 @@ if [[ "$COMPOSE_PROFILES" == "feature-complete" ]]; then
       echo "Migrating $vroom_files_count files from 'sentry-vroom' volume to 'profiles' bucket on SeaweedFS..."
 
       # Use a temporary container to copy files from the volume to SeaweedFS
-      $dc run --rm --no-deps -v sentry-vroom:/source -e "HTTP_PROXY=${HTTP_PROXY:-}" -e "HTTPS_PROXY=${HTTPS_PROXY:-}" -e "NO_PROXY=${NO_PROXY:-}" -e "http_proxy=${http_proxy:-}" -e "https_proxy=${https_proxy:-}" -e "no_proxy=${no_proxy:-}" seaweedfs sh -c '
+      $dc run --rm --no-deps -v sentry-vroom:/source -e "HTTP_PROXY=${HTTP_PROXY:-}" -e "HTTPS_PROXY=${HTTPS_PROXY:-}" -e "NO_PROXY=${NO_PROXY:-}" -e "http_proxy=${http_proxy:-}" -e "https_proxy=${https_proxy:-}" -e "no_proxy=${no_proxy:-}" --entrypoint /bin/sh seaweedfs -c '
         apk add --no-cache s3cmd &&
         s3cmd --access_key=sentry --secret_key=sentry --no-ssl --region=us-east-1 --host=localhost:8333 --host-bucket="localhost:8333/%(bucket)" sync /source/ s3://profiles/
       '
