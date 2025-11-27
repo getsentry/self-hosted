@@ -80,10 +80,8 @@ if [[ "$COMPOSE_PROFILES" == "feature-complete" ]]; then
 
       # Use a temporary container to copy files from the volume to SeaweedFS
 
-      $dc exec -e "HTTP_PROXY=${HTTP_PROXY:-}" -e "HTTPS_PROXY=${HTTPS_PROXY:-}" -e "NO_PROXY=${NO_PROXY:-}" -e "http_proxy=${http_proxy:-}" -e "https_proxy=${https_proxy:-}" -e "no_proxy=${no_proxy:-}" vroom sh -c '
-        apt-get update && apt-get install -y --no-install-recommends s3cmd &&
-        s3cmd --access_key=sentry --secret_key=sentry --no-ssl --region=us-east-1 --host=seaweedfs:8333 --host-bucket="seaweedfs:8333/%(bucket)" sync /var/vroom/sentry-profiles/ s3://profiles/
-      '
+      $dc exec -e "HTTP_PROXY=${HTTP_PROXY:-}" -e "HTTPS_PROXY=${HTTPS_PROXY:-}" -e "NO_PROXY=${NO_PROXY:-}" -e "http_proxy=${http_proxy:-}" -e "https_proxy=${https_proxy:-}" -e "no_proxy=${no_proxy:-}" -u root vroom sh -c 'mkdir -p /var/lib/apt/lists/partial && apt-get update && apt-get install -y --no-install-recommends s3cmd'
+      $dc exec vroom sh -c 's3cmd --access_key=sentry --secret_key=sentry --no-ssl --region=us-east-1 --host=seaweedfs:8333 --host-bucket="seaweedfs:8333/%(bucket)" sync /var/vroom/sentry-profiles/ s3://profiles/'
 
       echo "Migration completed."
     else
