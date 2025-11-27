@@ -5,10 +5,10 @@ source install/dc-detect-version.sh
 source install/create-docker-volumes.sh
 
 # Generate some random files on `sentry-vroom` volume for testing
-$dc run --rm --no-deps -v sentry-vroom:/var/vroom/sentry-profiles --entrypoint /bin/bash vroom su - vroom -c '
+$dc run --rm --no-deps -v sentry-vroom:/var/vroom/sentry-profiles --entrypoint /bin/bash vroom -c '
   ls -lah /var/vroom/sentry-profiles/
   for i in $(seq 1 1000); do
-    echo "This is test file $i" > /var/vroom/sentry-profiles/test_file_$i.txt
+    su vroom -c "echo This is test file $i > /var/vroom/sentry-profiles/test_file_$i.txt"
   done
 '
 
