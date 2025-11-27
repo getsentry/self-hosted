@@ -25,7 +25,7 @@ for i in $(seq 1 5); do
 done
 
 # Ensure that the files have been migrated to SeaweedFS
-migrated_files_count=$($dc exec seaweedfs -c '
+migrated_files_count=$($dc exec seaweedfs sh -c '
   apk add --no-cache s3cmd &&
   s3cmd --access_key=sentry --secret_key=sentry --no-ssl --region=us-east-1 --host=seaweedfs:8333 --host-bucket="seaweedfs:8333/%(bucket)" ls s3://profiles/ | wc -l
 ')
