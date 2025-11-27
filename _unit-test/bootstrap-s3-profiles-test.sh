@@ -3,6 +3,7 @@
 source _unit-test/_test_setup.sh
 source install/dc-detect-version.sh
 source install/create-docker-volumes.sh
+export COMPOSE_PROFILES="feature-complete"
 source install/ensure-correct-permissions-profiles-dir.sh
 
 # Generate some random files on `sentry-vroom` volume for testing
