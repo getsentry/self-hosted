@@ -1,7 +1,7 @@
 echo "${_group}Bootstrapping seaweedfs (node store)..."
 
 $dc up --wait seaweedfs postgres
-$dcep seaweedfs apk add --no-cache s3cmd
+$dcx seaweedfs apk add --no-cache s3cmd
 $dc exec seaweedfs mkdir -p /data/idx/
 s3cmd="$dc exec seaweedfs s3cmd"
 
