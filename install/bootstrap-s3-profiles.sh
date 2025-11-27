@@ -114,4 +114,5 @@ EOF
     echo "Making sure the bucket lifecycle policy is all set up correctly..."
     $s3cmd --access_key=sentry --secret_key=sentry --no-ssl --region=us-east-1 --host=localhost:8333 --host-bucket='localhost:8333/%(bucket)' getlifecycle s3://profiles
   fi
+  echo "${_endgroup}"
 fi
