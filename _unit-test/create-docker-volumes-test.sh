@@ -23,6 +23,7 @@ test "$before" == "" || test "$before" == "$expected_volumes"
 source install/create-docker-volumes.sh
 
 after=$(get_volumes)
+echo "$after"
 test "$after" == "$expected_volumes"
 
 report_success
