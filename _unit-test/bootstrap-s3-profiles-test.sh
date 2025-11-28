@@ -33,6 +33,6 @@ fi
 
 # Manual cleanup, otherwise `create-docker-volumes.sh` will fail
 $dc down -v vroom seaweedfs
-docker volume rm sentry-vroom sentry-seaweedfs
+docker volume rm sentry-seaweedfs
 
 report_success
