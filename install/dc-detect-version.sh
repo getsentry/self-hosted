@@ -48,8 +48,7 @@ else
 fi
 
 proxy_args="--build-arg HTTP_PROXY=${HTTP_PROXY:-} --build-arg HTTPS_PROXY=${HTTPS_PROXY:-} --build-arg NO_PROXY=${NO_PROXY:-} --build-arg http_proxy=${http_proxy:-} --build-arg https_proxy=${https_proxy:-} --build-arg no_proxy=${no_proxy:-}"
-# Shortcut for docker compose exec with http proxy environment variables
-dcx="$dc exec -e \"HTTP_PROXY=${HTTP_PROXY:-}\" -e \"HTTPS_PROXY=${HTTPS_PROXY:-}\" -e \"NO_PROXY=${NO_PROXY:-}\" -e \"http_proxy=${http_proxy:-}\" -e \"https_proxy=${https_proxy:-}\" -e \"no_proxy=${no_proxy:-}\""
+exec_proxy_args="-e HTTP_PROXY=${HTTP_PROXY:-} -e HTTPS_PROXY=${HTTPS_PROXY:-} -e NO_PROXY=${NO_PROXY:-} -e http_proxy=${http_proxy:-} -e https_proxy=${https_proxy:-} -e no_proxy=${no_proxy:-}"
 if [[ "$CONTAINER_ENGINE" == "podman" ]]; then
   proxy_args_dc="--podman-build-args HTTP_PROXY=${HTTP_PROXY:-},HTTPS_PROXY=${HTTPS_PROXY:-},NO_PROXY=${NO_PROXY:-},http_proxy=${http_proxy:-},https_proxy=${https_proxy:-},no_proxy=${no_proxy:-}"
   # Disable pod creation as these are one-off commands and creating a pod
@@ -62,6 +61,7 @@ else
 fi
 dcb="$dc build $proxy_args"
 dbuild="$CONTAINER_ENGINE build $proxy_args"
+dcx="$dc exec $exec_proxy_args"
 echo "$dcr"
 # Utility function to handle --wait with docker and podman
 function start_service_and_wait_ready() {
