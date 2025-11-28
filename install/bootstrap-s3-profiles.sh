@@ -14,7 +14,7 @@ if [[ "$COMPOSE_PROFILES" == "feature-complete" ]]; then
   echo "${_group}Bootstrapping seaweedfs (profiles)..."
 
   start_service_and_wait_ready seaweedfs
-  $dc exec -e "HTTP_PROXY=${HTTP_PROXY:-}" -e "HTTPS_PROXY=${HTTPS_PROXY:-}" -e "NO_PROXY=${NO_PROXY:-}" -e "http_proxy=${http_proxy:-}" -e "https_proxy=${https_proxy:-}" -e "no_proxy=${no_proxy:-}" seaweedfs apk add --no-cache s3cmd
+  $dcx seaweedfs apk add --no-cache s3cmd
   s3cmd="$dc exec seaweedfs s3cmd"
 
   bucket_list=$($s3cmd --access_key=sentry --secret_key=sentry --no-ssl --region=us-east-1 --host=localhost:8333 --host-bucket='localhost:8333/%(bucket)' ls)
@@ -80,7 +80,7 @@ if [[ "$COMPOSE_PROFILES" == "feature-complete" ]]; then
 
       # Use a temporary container to copy files from the volume to SeaweedFS
 
-      $dc exec -e "HTTP_PROXY=${HTTP_PROXY:-}" -e "HTTPS_PROXY=${HTTPS_PROXY:-}" -e "NO_PROXY=${NO_PROXY:-}" -e "http_proxy=${http_proxy:-}" -e "https_proxy=${https_proxy:-}" -e "no_proxy=${no_proxy:-}" -u root vroom sh -c 'mkdir -p /var/lib/apt/lists/partial && apt-get update && apt-get install -y --no-install-recommends s3cmd'
+      $dcx -u root vroom sh -c 'mkdir -p /var/lib/apt/lists/partial && apt-get update && apt-get install -y --no-install-recommends s3cmd'
       $dc exec vroom sh -c 's3cmd --access_key=sentry --secret_key=sentry --no-ssl --region=us-east-1 --host=seaweedfs:8333 --host-bucket="seaweedfs:8333/%(bucket)" sync /var/vroom/sentry-profiles/ s3://profiles/'
 
       echo "Migration completed."
