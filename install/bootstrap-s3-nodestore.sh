@@ -1,7 +1,7 @@
 echo "${_group}Bootstrapping seaweedfs (node store)..."
 
 start_service_and_wait_ready seaweedfs postgres
-$dc exec -e "HTTP_PROXY=${HTTP_PROXY:-}" -e "HTTPS_PROXY=${HTTPS_PROXY:-}" -e "NO_PROXY=${NO_PROXY:-}" -e "http_proxy=${http_proxy:-}" -e "https_proxy=${https_proxy:-}" -e "no_proxy=${no_proxy:-}" seaweedfs apk add --no-cache s3cmd
+$dcx seaweedfs apk add --no-cache s3cmd
 $dc exec seaweedfs mkdir -p /data/idx/
 s3cmd="$dc exec seaweedfs s3cmd"
 
