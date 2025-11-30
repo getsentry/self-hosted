@@ -418,7 +418,7 @@ def test_receive_user_feedback_events(client_login):
     env = os.environ.copy()
     env["SENTRY_DSN"] = sentry_dsn
     subprocess.run(
-        ["node", "--import", "instrument.js", "user-feedback.js"],
+        ["node", "--import", "./instrument.js", "./user-feedback.js"],
         check=True,
         shell=False,
         env=env,
