@@ -1,0 +1,19 @@
+[project]
+name = "sentry-self-hosted"
+version = "0.1.0"
+description = "Sentry, feature-complete and packaged up for low-volume deployments and proofs-of-concept."
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = []
+
+[dependency-groups]
+dev = [
+    "beautifulsoup4>=4.7.1",
+    "cryptography>=43.0.3",
+    "httpx>=0.25.2",
+    "pytest>=8.0.0",
+    "pytest-cov>=4.1.0",
+    "pytest-rerunfailures>=11.0",
+    "pytest-sentry>=0.1.11",
+    "sentry-sdk>=2.4.0,<3.0.0",
+]
