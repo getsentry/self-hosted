@@ -53,7 +53,7 @@ export SENTRY_CONFIG_PY=sentry/sentry.conf.py
 export SENTRY_CONFIG_YML=sentry/config.yml
 
 # Increase the default 10 second SIGTERM timeout
-# to ensure celery queues are properly drained
+# to ensure task queues are properly drained
 # between upgrades as task signatures may change across
 # versions
 export STOP_TIMEOUT=60 # seconds

@@ -92,8 +92,99 @@ if env("SENTRY_SYSTEM_SECRET_KEY"):
 # in your `.env` file. To enable only the error monitoring feature, set
 # `COMPOSE_PROFILES` to `errors-only`.
 #
-# See https://develop.sentry.dev/self-hosted/experimental/errors-only/
+# See https://develop.sentry.dev/self-hosted/optional-features/errors-only/
 SENTRY_SELF_HOSTED_ERRORS_ONLY = env("COMPOSE_PROFILES") != "feature-complete"
+
+# When running in an air-gapped environment, set this to True to entirely disable
+# external network calls and features that require Internet connectivity.
+#
+# Setting the value to False while running in an air-gapped environment will
+# cause some containers to raise exceptions. One known example is fetching
+# AI model prices from various public APIs.
+SENTRY_AIR_GAP = False
+
+# As of 25.9.0 (September 2025 release), Sentry enforces tighter restrictions
+# of allowed IP addresses for outgoing requests. This is to prevent
+# accidentally leaking sensitive information to third parties.
+#
+# By default, Sentry will not allow requests to private IP addresses.
+# You can override this by configuring the allowed IP addresses here.
+# Below is the default value, which is a list of IP addresses that are
+# considered "private" and "reserved".
+#
+# SENTRY_DISALLOWED_IPS: tuple[str, ...] = (
+#     # https://en.wikipedia.org/wiki/Reserved_IP_addresses#IPv4
+#     "0.0.0.0/8",
+#     "10.0.0.0/8",
+#     "100.64.0.0/10",
+#     "127.0.0.0/8",
+#     "169.254.0.0/16",
+#     "172.16.0.0/12",
+#     "192.0.0.0/29",
+#     "192.0.2.0/24",
+#     "192.88.99.0/24",
+#     "192.168.0.0/16",
+#     "198.18.0.0/15",
+#     "198.51.100.0/24",
+#     "224.0.0.0/4",
+#     "240.0.0.0/4",
+#     "255.255.255.255/32",
+#     # https://en.wikipedia.org/wiki/IPv6#IPv4-mapped_IPv6_addresses
+#     # Subnets match the IPv4 subnets above
+#     "::ffff:0:0/104",
+#     "::ffff:a00:0/104",
+#     "::ffff:6440:0/106",
+#     "::ffff:7f00:0/104",
+#     "::ffff:a9fe:0/112",
+#     "::ffff:ac10:0/108",
+#     "::ffff:c000:0/125",
+#     "::ffff:c000:200/120",
+#     "::ffff:c058:6300/120",
+#     "::ffff:c0a8:0/112",
+#     "::ffff:c612:0/111",
+#     "::ffff:c633:6400/120",
+#     "::ffff:e000:0/100",
+#     "::ffff:f000:0/100",
+#     "::ffff:ffff:ffff/128",
+#     # https://en.wikipedia.org/wiki/Reserved_IP_addresses#IPv6
+#     "::1/128",
+#     "::ffff:0:0/96",
+#     "64:ff9b::/96",
+#     "64:ff9b:1::/48",
+#     "100::/64",
+#     "2001:0000::/32",
+#     "2001:20::/28",
+#     "2001:db8::/32",
+#     "2002::/16",
+#     "fc00::/7",
+#     "fe80::/10",
+#     "ff00::/8",
+# )
+
+################
+# Node Storage #
+################
+
+# Sentry uses an abstraction layer called "node storage" to store raw events.
+# Previously, it used PostgreSQL as the backend, but this didn't scale for
+# high-throughput environments. Read more about this in the documentation:
+# https://develop.sentry.dev/backend/application-domains/nodestore/
+#
+# Through this setting, you can use the provided blob storage or
+# your own S3-compatible API from your infrastructure.
+# Other backend implementations for node storage developed by the community
+# are available in public GitHub repositories.
+
+SENTRY_NODESTORE = "sentry_nodestore_s3.S3PassthroughDjangoNodeStorage"
+SENTRY_NODESTORE_OPTIONS = {
+    "compression": True,
+    "endpoint_url": "http://seaweedfs:8333",
+    "bucket_path": "nodestore",
+    "bucket_name": "nodestore",
+    "region_name": "us-east-1",
+    "aws_access_key_id": "sentry",
+    "aws_secret_access_key": "sentry",
+}
 
 #########
 # Redis #
@@ -107,25 +198,6 @@ SENTRY_OPTIONS["redis.clusters"] = {
         "hosts": {0: {"host": "redis", "password": "", "port": "6379", "db": "0"}}
     }
 }
-
-#########
-# Queue #
-#########
-
-# See https://develop.sentry.dev/services/queue/ for more
-# information on configuring your queue broker and workers. Sentry relies
-# on a Python framework called Celery to manage queues.
-
-rabbitmq_host = None
-if rabbitmq_host:
-    BROKER_URL = "amqp://{username}:{password}@{host}/{vhost}".format(
-        username="guest", password="guest", host=rabbitmq_host, vhost="/"
-    )
-else:
-    BROKER_URL = "redis://:{password}@{host}:{port}/{db}".format(
-        **SENTRY_OPTIONS["redis.clusters"]["default"]["hosts"][0]
-    )
-
 
 #########
 # Cache #
@@ -293,6 +365,7 @@ SENTRY_FEATURES.update(
         for feature in (
             "organizations:discover",
             "organizations:global-views",
+            "organizations:issue-views",
             "organizations:incidents",
             "organizations:integrations-issue-basic",
             "organizations:integrations-issue-sync",
@@ -316,12 +389,15 @@ SENTRY_FEATURES.update(
         # Performance/Tracing/Spans related flags
         + (
             "organizations:performance-view",
+            "organizations:span-stats",
             "organizations:visibility-explore-view",
+            "organizations:visibility-explore-range-high",
             "organizations:transaction-metrics-extraction",
             "organizations:indexed-spans-extraction",
             "organizations:insights-entry-points",
             "organizations:insights-initial-modules",
             "organizations:insights-addon-modules",
+            "organizations:insights-modules-use-eap",
             "organizations:standalone-span-ingestion",
             "organizations:starfish-mobile-appstart",
             "projects:span-metrics-extraction",
@@ -349,6 +425,13 @@ SENTRY_FEATURES.update(
         + (
             "organizations:uptime",
             "organizations:uptime-create-issues",
+        )
+        # Logs related flags
+        + (
+            "organizations:ourlogs-enabled",
+            "organizations:ourlogs-ingestion",
+            "organizations:ourlogs-stats",
+            "organizations:ourlogs-replay-ui",
         )
     }
 )
@@ -438,16 +521,14 @@ JS_SDK_LOADER_DEFAULT_SDK_URL = "https://browser.sentry-cdn.com/%s/bundle%s.min.
 #
 # To start, uncomment the following line and adjust the options as needed.
 
-# SENTRY_METRICS_BACKEND = 'sentry.metrics.statsd.StatsdMetricsBackend'
-# SENTRY_METRICS_OPTIONS: dict[str, Any] = {
-#     'host': '100.100.123.123', # It is recommended to use IP address instead of domain name
-#     'port': 8125,
-# }
+SENTRY_STATSD_ADDR = env("SENTRY_STATSD_ADDR")
+if SENTRY_STATSD_ADDR:
+    host, _, port = SENTRY_STATSD_ADDR.partition(":")
+    port = int(port or 8125)
+    SENTRY_METRICS_BACKEND = 'sentry.metrics.statsd.StatsdMetricsBackend'
+    SENTRY_METRICS_OPTIONS: dict[str, Any] = {
+        'host': host,
+        'port': port,
+    }
 # SENTRY_METRICS_SAMPLE_RATE = 1.0   # Adjust this to your needs, default is 1.0
 # SENTRY_METRICS_PREFIX = "sentry."  # Adjust this to your needs, default is "sentry."
-
-#########
-# Tasks #
-#########
-# Disable taskworker and continue using celery.
-SENTRY_OPTIONS["taskworker.enabled"] = False

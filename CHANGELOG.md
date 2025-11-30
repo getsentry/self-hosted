@@ -1,5 +1,67 @@
 # Changelog
 
+## 25.11.0
+
+### Various fixes & improvements
+
+- feat: statsd configuration through environment variables (#4031) by @aldy505
+- ref: sound SENTRY_DISALLOWED_IPS on the configuration file (#3981) by @aldy505
+- fix: broken link to Errors-Only Mode docs (#4032) by @mariansimecek
+- Fix Clickhouse max_server_memory_usage_to_ram_ratio setting (#4025) by @otoriphoenix
+- Increase default max_suspicious_broken_parts to 100 (#4011) by @stevenobird
+- fix(install): add migrate-pgbouncer.sh to install.sh (#4030) by @kodebach
+- fix: remove snuba uptime results consumer (#4027) by @aldy505
+
+## 25.10.0
+
+### Various fixes & improvements
+
+- fix: geoip standalone script should check on CONTAINER_ENGINE variable first (#3982) by @aldy505
+- fix: missing `-dir` flag for seaweedfs (#3991) by @aldy505
+- Remove symbolicator volume once (#3994) by @aminvakil
+- Remove symbolicator external volume (#3992) by @aminvakil
+- chore(spans): Remove old snuba-spans consumer (#3989) by @jjbayer
+- Bump redis 6.2.20-alpine (#3988) by @aminvakil
+- ref: add `continue-on-error` for codecov action on self-hosted integration tests (#3978) by @aldy505
+- ref: use dedicated `healthcheck` command for symbolicator & remove cron for `symbolicator-cleanup` (#3979) by @aldy505
+- fix(actions): include arch and compose_profiles information on cache keys (#3974) by @aldy505
+- ref: Remove proxy_next_upstream directives (#3973) by @aminvakil
+- fix: Unset the proxy when performing the seaweedfs health check (#3959) by @SteppingHat
+- fix: logic error in s3 install script (#3965) by @kodebach
+- Fix swap allocation in integration test (#3972) by @aminvakil
+- chore(tasks) Remove reference to celery (#3962) by @markstory
+- Respect uppercase proxy variables (#3949) by @aminvakil
+- chore(tasks): Remove the worker and cron containers (#3946) by @markstory
+- fix: install behind a proxy (#3944) by @moroine
+
+## 25.9.0
+
+### Various fixes & improvements
+
+- fix: able to setup nodestore multiple times (#3940) by @aldy505
+- build(deps): bump actions/create-github-app-token from 2.1.1 to 2.1.4 (#3936) by @dependabot
+- docs: provide information for SENTRY_AIR_GAP flag on Django config file (#3935) by @aldy505
+- feat: Use S3 node store with seaweedfs (#3498) by @BYK
+- feat(tasks): Remove taskworker option override and add worker healthcheck (#3933) by @markstory
+- feat: install script to migrate sentry.conf.py config to use pgbouncer (#3898) by @aldy505
+- chore(deps): bump clickhouse to 25.3 (#3878) by @aldy505
+- feat: enable `issue-views` flag (#3922) by @aldy505
+- feat: query against `eap` dataset instead of `metrics` dataset for spans (#3923) by @aldy505
+- build(deps): bump actions/setup-python from 5 to 6 (#3927) by @dependabot
+- Add restart policy to pgbouncer service (#3925) by @frederikspang
+- fix(tests): skip logs event test for errors-only (#3915) by @aldy505
+- Improve nginx depends_on policy (#3914) by @aminvakil
+- test: run errors-only integration tests (#3910) by @aldy505
+- feat: enable Logs feature (#3912) by @aldy505
+- fix: ensuring vroom permission should be skipped on errors-only (#3911) by @aldy505
+- chore(deps): bump patches version (#3879) by @aldy505
+- Revert "increase postgres max_connections above 100 connections (#2740)" (#3899) by @aminvakil
+- Add pgbouncer (#3884) by @frederikspang
+- chore: resolve GHA code scanning alerts (#3889) by @aldy505
+- fix(enhancement): search for permissions on docker container instead of host and combine it in one command for performance enhancement (#3890) by @LvckyAPI
+- build(deps): bump actions/create-github-app-token from 2.1.0 to 2.1.1 (#3885) by @dependabot
+- build(deps): bump actions/checkout from 4 to 5 (#3883) by @dependabot
+
 ## 25.8.0
 
 ### Various fixes & improvements

@@ -1,6 +1,6 @@
 <yandex>
  <!-- This include is important! It is required for the version of Clickhouse used on ARM to read the environment variable. This must be a one-liner to avoid errors in Clickhouse. -->
-    <max_server_memory_usage_to_ram_ratio><include from_env="MAX_MEMORY_USAGE_RATIO"/></max_server_memory_usage_to_ram_ratio>
+    <max_server_memory_usage_to_ram_ratio from_env="MAX_MEMORY_USAGE_RATIO"/>
     <logger>
         <level>warning</level>
         <console>true</console>
@@ -28,6 +28,6 @@
         <enable_mixed_granularity_parts>1</enable_mixed_granularity_parts>
          <!-- Increase "max_suspicious_broken_parts" in case of errors with Clickhouse like "Suspiciously many broken parts to remove".
               see: https://github.com/getsentry/self-hosted/issues/2832 -->
-        <max_suspicious_broken_parts>10</max_suspicious_broken_parts>
+        <max_suspicious_broken_parts>100</max_suspicious_broken_parts>
     </merge_tree>
 </yandex>
