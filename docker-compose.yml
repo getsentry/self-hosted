@@ -146,6 +146,7 @@ services:
       POSTGRES_HOST_AUTH_METHOD: "trust"
     volumes:
       - "sentry-postgres:/var/lib/postgresql/data"
+    shm_size: 256m
   pgbouncer:
     <<: *restart_policy
     image: "edoburu/pgbouncer:v1.24.1-p1"
