@@ -1,5 +1,24 @@
 # Changelog
 
+## 25.11.1
+
+### Build / dependencies / internal 🔧
+
+- chore: remove some more unused directories by @aldy505 in [#4046](https://github.com/getsentry/self-hosted/pull/4046)
+- build(deps): bump actions/create-github-app-token from 2.1.4 to 2.2.0 by @dependabot in [#4058](https://github.com/getsentry/self-hosted/pull/4058)
+- build(deps): bump actions/checkout from 5 to 6 by @dependabot in [#4059](https://github.com/getsentry/self-hosted/pull/4059)
+- chore: uptime checker is missing on the release issue by @aldy505 in [#4047](https://github.com/getsentry/self-hosted/pull/4047)
+
+### Bug Fixes 🐛
+
+- fix(profiling): Ingest profile file path by @Zylphrex in [#4060](https://github.com/getsentry/self-hosted/pull/4060)
+- fix: ensure seaweedfs lifecycle policy is set correctly by @kodebach in [#4040](https://github.com/getsentry/self-hosted/pull/4040)
+- fix: missing SYMBOLICATOR_STATSD_ADDR environment var for symbolicator-cleanup by @aldy505 in [#4042](https://github.com/getsentry/self-hosted/pull/4042)
+
+### Other
+
+- Add `dcx` shortcut for docker compose exec with HTTP proxy env vars by @copilot-swe-agent in [#4067](https://github.com/getsentry/self-hosted/pull/4067)
+
 ## 25.11.0
 
 ### Various fixes & improvements
