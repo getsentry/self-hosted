@@ -19,7 +19,7 @@ if [[ "$COMPOSE_PROFILES" == "feature-complete" ]]; then
 
   bucket_list=$($s3cmd --access_key=sentry --secret_key=sentry --no-ssl --region=us-east-1 --host=localhost:8333 --host-bucket='localhost:8333/%(bucket)' ls)
 
-  if [[ $(echo "$bucket_list" | tail -1 | awk '{print $3}') != 's3://profiles' ]]; then
+  if echo "$bucket_list" | grep -q "s3://profiles"; then
     apply_config_changes_profiles=0
     # Only touch if no existing profiles config is found
     if ! grep -q "filestore.profiles-backend" $SENTRY_CONFIG_YML; then
