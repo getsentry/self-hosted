@@ -30,4 +30,10 @@ if ! echo "$bucket_list" | grep -q "s3://bucket2"; then
   exit 1
 fi
 
+# Can't find "bucket5", should not exist
+if echo "$bucket_list" | grep -q "s3://bucket5"; then
+  echo "Error: Bucket s3://bucket5 should not exist."
+  exit 1
+fi
+
 report_success
