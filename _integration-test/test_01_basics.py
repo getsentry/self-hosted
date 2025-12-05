@@ -422,7 +422,7 @@ def test_receive_user_feedback_events(client_login):
         check=True,
         shell=False,
         env=env,
-        cwd=f"_integration-test/nodejs",
+        cwd="_integration-test/nodejs",
         stdout=sys.stdout,
         stderr=sys.stderr,
         timeout=60,
