@@ -4,6 +4,7 @@ import os
 import re
 import shutil
 import subprocess
+import sys
 import time
 from functools import lru_cache
 from typing import Callable
@@ -407,6 +408,36 @@ def test_receive_transaction_events(client_login):
         lambda x: len(json.loads(x)["data"]) > 0,
     )
 
+@pytest.mark.skipif(os.environ.get("COMPOSE_PROFILES") != "feature-complete", reason="Only run if feature-complete")
+def test_receive_user_feedback_events(client_login):
+    client, _ = client_login
+    sentry_dsn = get_sentry_dsn(client)
+
+
+    # Execute `node --import instrument.js user-feedback.js` on the `nodejs` directory with the `SENTRY_DSN` env var set
+    env = os.environ.copy()
+    env["SENTRY_DSN"] = sentry_dsn
+    subprocess.run(
+        ["node", "--import", "./instrument.js", "./user-feedback.js"],
+        check=True,
+        shell=False,
+        env=env,
+        cwd="_integration-test/nodejs",
+        stdout=sys.stdout,
+        stderr=sys.stderr,
+        timeout=60,
+    )
+
+    poll_for_response(
+        f"{SENTRY_TEST_HOST}/api/0/organizations/sentry/issues/?query=issue.category%3Afeedback",
+        client,
+        lambda x: len(json.loads(x)) > 0,
+    )
+    poll_for_response(
+        f"{SENTRY_TEST_HOST}/api/0/organizations/sentry/events/?dataset=issuePlatform&field=message&field=title&field=timestamp&project=1&statsPeriod=1h",
+        client,
+        lambda x: len(json.loads(x)["data"]) > 0,
+    )
 
 @pytest.mark.skipif(os.environ.get("COMPOSE_PROFILES") != "feature-complete", reason="Only run if feature-complete")
 def test_receive_logs_events(client_login):
