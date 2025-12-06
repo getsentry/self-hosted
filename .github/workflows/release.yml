@@ -27,13 +27,13 @@ jobs:
         with:
           app-id: ${{ vars.SENTRY_RELEASE_BOT_CLIENT_ID }}
           private-key: ${{ secrets.SENTRY_RELEASE_BOT_PRIVATE_KEY }}
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
         with:
           token: ${{ steps.token.outputs.token }}
           fetch-depth: 0
       - name: Prepare release
         id: prepare-release
-        uses: getsentry/action-prepare-release@v1
+        uses: getsentry/action-prepare-release@3cea80dc3938c0baf5ec4ce752ecb311f8780cdc # v1.6.4
         env:
           GITHUB_TOKEN: ${{ steps.token.outputs.token }}
         with:
@@ -48,10 +48,10 @@ jobs:
     name: Create release on self-hosted dogfood instance
     needs: release
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
         with:
           fetch-depth: 0
-      - uses: getsentry/action-release@v3
+      - uses: getsentry/action-release@128c5058bbbe93c8e02147fe0a9c713f166259a6 # v3.4.0
         env:
           SENTRY_ORG: self-hosted
           SENTRY_PROJECT: installer

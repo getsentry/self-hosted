@@ -51,11 +51,24 @@ runs:
         sudo rm -rf /usr/share/dotnet /usr/share/doc/dotnet-*
         df -h
 
+    - name: Setup uv
+      uses: astral-sh/setup-uv@1e862dfacbd1d6d858c55d9b792c756523627244 # v7.1.4
+      with:
+        working-directory: ${{ github.action_path }}
+        version: "0.9.15"
+        # we just cache the venv-dir directly in action-setup-venv
+        enable-cache: false
+
+    - uses: getsentry/action-setup-venv@0958463ee0e02b9e8aa8f8e031afae1f84b80881 # v3.0.0
+      with:
+        cache-dependency-path: uv.lock
+        install-cmd: uv sync --frozen --active
+
     - name: Setup dev environment
       shell: bash
       run: |
         cd ${{ github.action_path }}
-        pip install -r requirements-dev.txt
+
         echo "PY_COLORS=1" >> "$GITHUB_ENV"
         ### pytest-sentry configuration ###
         if [ "$GITHUB_REPOSITORY" = "getsentry/self-hosted" ]; then
@@ -202,7 +215,7 @@ runs:
     - name: Upload coverage to Codecov
       if: inputs.CODECOV_TOKEN
       continue-on-error: true
-      uses: codecov/codecov-action@v5
+      uses: codecov/codecov-action@5a1091511ad55cbe89839c7260b706298ca349f7 # v5.5.1
       with:
         directory: ${{ github.action_path }}
         token: ${{ inputs.CODECOV_TOKEN }}
@@ -211,7 +224,7 @@ runs:
     - name: Upload test results to Codecov
       if: inputs.CODECOV_TOKEN && !cancelled()
       continue-on-error: true
-      uses: codecov/test-results-action@v1
+      uses: codecov/test-results-action@47f89e9acb64b76debcd5ea40642d25a4adced9f # v1.1.1
       with:
         directory: ${{ github.action_path }}
         token: ${{ inputs.CODECOV_TOKEN }}
