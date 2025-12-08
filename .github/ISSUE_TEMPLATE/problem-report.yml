@@ -49,6 +49,15 @@ body:
           required: true
     validations:
       required: true
+  - type: input
+    id: installation_type
+    attributes:
+      label: Installation Type
+      placeholder: Fresh install / Upgrade from 24.8.0 to 25.5.1
+      description: |
+        Are you filing this issue for a fresh install or an upgrade?
+    validations:
+      required: true
   - type: textarea
     id: repro
     attributes:
