@@ -19,7 +19,22 @@ if [[ $CONTAINER_ENGINE == "podman" ]]; then
   FORMAT="{{.Host.Arch}}"
 fi
 
-export DOCKER_ARCH=$($CONTAINER_ENGINE info --format "$FORMAT")
+DOCKER_ARCH_OUTPUT=$($CONTAINER_ENGINE info --format "$FORMAT" 2>&1)
+DOCKER_INFO_EXIT_CODE=$?
+
+if [[ $DOCKER_INFO_EXIT_CODE -ne 0 ]]; then
+  echo "FAIL: Unable to get $CONTAINER_ENGINE architecture information."
+  echo "$DOCKER_ARCH_OUTPUT"
+  if [[ "$DOCKER_ARCH_OUTPUT" == *"permission denied"* ]]; then
+    echo ""
+    echo "You may need to add your user to the docker group:"
+    echo "  sudo usermod -aG docker \$USER"
+    echo "Then log out and log back in, or run: newgrp docker"
+  fi
+  exit 1
+fi
+
+export DOCKER_ARCH="$DOCKER_ARCH_OUTPUT"
 if [[ "$DOCKER_ARCH" = "x86_64" || "$DOCKER_ARCH" = "amd64" ]]; then
   export DOCKER_PLATFORM="linux/amd64"
 elif [[ "$DOCKER_ARCH" = "aarch64" ]]; then
