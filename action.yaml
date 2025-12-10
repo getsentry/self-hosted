@@ -61,6 +61,7 @@ runs:
 
     - uses: getsentry/action-setup-venv@0958463ee0e02b9e8aa8f8e031afae1f84b80881 # v3.0.0
       with:
+        python-version: "3.12"
         cache-dependency-path: uv.lock
         install-cmd: uv sync --frozen --active
 
