@@ -59,11 +59,12 @@ runs:
         # we just cache the venv-dir directly in action-setup-venv
         enable-cache: false
 
-    - uses: getsentry/action-setup-venv@0958463ee0e02b9e8aa8f8e031afae1f84b80881 # v3.0.0
+    - uses: getsentry/action-setup-venv@6e8aebf461914919d9de6e3082669d6bfecc400c # v3.1.0
       with:
         python-version: "3.12"
         cache-dependency-path: uv.lock
         install-cmd: uv sync --frozen --active
+        working-directory: ${{ github.action_path }}
 
     - name: Setup dev environment
       shell: bash
