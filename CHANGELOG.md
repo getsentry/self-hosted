@@ -1,5 +1,38 @@
 # Changelog
 
+## 25.12.0
+
+### New Features ✨
+
+- feat(release): Manually run post release script by @hubertdeng123 in [#4073](https://github.com/getsentry/self-hosted/pull/4073)
+
+- feat: bump action-setup-venv to use working-directory by @aldy505 in [#4098](https://github.com/getsentry/self-hosted/pull/4098)
+
+### Bug Fixes 🐛
+
+- fix: Provide useful info on permission errors by @BYK in [#4096](https://github.com/getsentry/self-hosted/pull/4096)
+- fix: missing 'SENTRY_SYSTEM_SECRET_KEY' declaration on Docker Compose block by @aldy505 in [#4087](https://github.com/getsentry/self-hosted/pull/4087)
+- fix: grep seaweedfs bucket name instead of using awk by @aldy505 in [#4076](https://github.com/getsentry/self-hosted/pull/4076)
+
+### Build / dependencies / internal 🔧
+
+#### Deps
+
+- build(deps): bump actions/create-github-app-token from 2.2.0 to 2.2.1 by @dependabot in [#4090](https://github.com/getsentry/self-hosted/pull/4090)
+- build(deps): bump actions/setup-node from 4.4.0 to 6.1.0 by @dependabot in [#4091](https://github.com/getsentry/self-hosted/pull/4091)
+- build(deps): bump astral-sh/setup-uv from 7.1.4 to 7.1.5 by @dependabot in [#4093](https://github.com/getsentry/self-hosted/pull/4093)
+
+- chore: guard unit-test.sh from being invoked by users by @aldy505 in [#4085](https://github.com/getsentry/self-hosted/pull/4085)
+- chore: ask installation type on problem report template by @aldy505 in [#4086](https://github.com/getsentry/self-hosted/pull/4086)
+
+### Other
+
+- Revert "Revert "ref: migrate to uv (#4061)"" by @aldy505 in [#4097](https://github.com/getsentry/self-hosted/pull/4097)
+- Revert "ref: migrate to uv (#4061)" by @BYK in [#4094](https://github.com/getsentry/self-hosted/pull/4094)
+- test: integration test for user feedback by @aldy505 in [#3880](https://github.com/getsentry/self-hosted/pull/3880)
+- ref: migrate to uv by @aldy505 in [#4061](https://github.com/getsentry/self-hosted/pull/4061)
+- Add shm_size configuration back to postgres by @max-wittig in [#4072](https://github.com/getsentry/self-hosted/pull/4072)
+
 ## 25.11.1
 
 ### Build / dependencies / internal 🔧
