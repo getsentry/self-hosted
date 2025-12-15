@@ -24,8 +24,15 @@ for i in $(seq 1 5); do
   source install/bootstrap-s3-profiles.sh
 done
 
+s3_cmd="$dc exec seaweedfs s3cmd --access_key=sentry --secret_key=sentry --no-ssl --region=us-east-1 --host=seaweedfs:8333 --host-bucket=seaweedfs:8333/%(bucket)"
+
+if ! $s3_cmd ls | grep -q "s3://profiles"; then
+  echo 'Error: Profiles bucket not found'
+  exit 1
+fi
+
 # Ensure that the files have been migrated to SeaweedFS
-migrated_files_count=$($dc exec seaweedfs s3cmd --access_key=sentry --secret_key=sentry --no-ssl --region=us-east-1 --host=seaweedfs:8333 --host-bucket="seaweedfs:8333/%(bucket)" ls s3://profiles/ | wc -l)
+migrated_files_count=$($s3_cmd ls s3://profiles/ | wc -l)
 if [[ "$migrated_files_count" -ne 1000 ]]; then
   echo "Error: Expected 1000 migrated files, but found $migrated_files_count"
   exit 1
