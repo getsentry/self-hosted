@@ -46,10 +46,14 @@ runs:
       shell: bash
       run: |
         ### Inspired by https://github.com/endersonmenezes/free-disk-space ###
-        sudo rm -rf /usr/local/.ghcup
-        sudo rm -rf /home/runner/Android /usr/local/lib/android /opt/android /usr/local/android-sdk
-        sudo rm -rf /usr/share/dotnet /usr/share/doc/dotnet-*
         df -h
+        time sudo rm -rf /usr/local/.ghcup
+        df -h
+        time sudo rm -rf /home/runner/Android /usr/local/lib/android /opt/android /usr/local/android-sdk
+        df -h
+        time sudo rm -rf /usr/share/dotnet /usr/share/doc/dotnet-*
+        df -h
+        exit 1
 
     - name: Setup uv
       uses: astral-sh/setup-uv@ed21f2f24f8dd64503750218de024bcf64c7250a # v7.1.5
