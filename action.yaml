@@ -59,7 +59,7 @@ runs:
         # we just cache the venv-dir directly in action-setup-venv
         enable-cache: false
 
-    - uses: getsentry/action-setup-venv@6e8aebf461914919d9de6e3082669d6bfecc400c # v3.1.0
+    - uses: getsentry/action-setup-venv@5a80476d175edf56cb205b08bc58986fa99d1725 # v3.2.0
       with:
         python-version: "3.12"
         cache-dependency-path: uv.lock
