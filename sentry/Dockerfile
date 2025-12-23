@@ -1,7 +1,7 @@
 ARG SENTRY_IMAGE
 FROM ${SENTRY_IMAGE}
 
-RUN pip install https://github.com/stayallive/sentry-nodestore-s3/archive/main.zip
+RUN pip install https://github.com/getsentry/sentry-nodestore-s3/archive/main.zip
 
 COPY . /usr/src/sentry
 
