@@ -244,7 +244,7 @@ services:
       retries: 30
   seaweedfs:
     <<: *restart_policy
-    image: "chrislusf/seaweedfs:3.96_large_disk"
+    image: "chrislusf/seaweedfs:3.97_large_disk"
     entrypoint: "weed"
     command: >-
         server
