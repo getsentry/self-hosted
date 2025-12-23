@@ -1,5 +1,11 @@
 # Changelog
 
+## 25.12.1
+
+### Build / dependencies / internal 🔧
+
+- chore(deps): bump seaweedfs version to 3.97 by @kostirez1 in [#4120](https://github.com/getsentry/self-hosted/pull/4120)
+
 ## 25.12.0
 
 ### New Features ✨
