@@ -1,0 +1,13 @@
+{
+  "name": "sentry-self-hosted-integration-test-nodejs",
+  "version": "0.0.0",
+  "description": "Scripts to run for features only available on Nodejs SDK",
+  "author": "Sentry <oss@sentry.io>",
+  "type": "module",
+  "scripts": {
+    "start": "node --import ./instrument.js index.js"
+  },
+  "dependencies": {
+    "@sentry/node": "^10.5.0"
+  }
+}

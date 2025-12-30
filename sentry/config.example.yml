@@ -96,6 +96,18 @@ releasefile.cache-path: '/data/releasefile-cache'
 #   secret_key: 'XXXXXXX'
 #   bucket_name: 's3-bucket-name'
 
+filestore.profiles-backend: 's3'
+filestore.profiles-options:
+  bucket_acl: "private"
+  default_acl: "private"
+  access_key: "sentry"
+  secret_key: "sentry"
+  bucket_name: "profiles"
+  region_name: "us-east-1"
+  endpoint_url: "http://seaweedfs:8333"
+  addressing_style: "path"
+  signature_version: "s3v4"
+
 symbolicator.enabled: true
 symbolicator.options:
   url: "http://symbolicator:3021"

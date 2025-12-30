@@ -32,7 +32,7 @@ jobs:
     name: ${{ matrix.os == 'ubuntu-24.04-arm' && 'unit tests (arm64)' || 'unit tests' }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
 
       - name: Get Compose
         uses: ./get-compose-action
@@ -48,14 +48,15 @@ jobs:
       matrix:
         os: [ubuntu-24.04, ubuntu-24.04-arm]
         container_engine: ['docker'] # TODO: add 'podman' into the list
-    name: ${{ matrix.os == 'ubuntu-24.04-arm' && (matrix.container_engine == 'docker' && 'integration test (arm64)' || 'integration test (arm64 podman)') || (matrix.container_engine == 'docker' && 'integration test' || 'integration test (podman)') }}
+        compose_profiles: ['feature-complete', 'errors-only']
+    name: ${{ format('integration test{0}{1}{2}', matrix.os == 'ubuntu-24.04-arm' && ' (arm64)' || '', matrix.container_engine == 'podman' && ' (podman)' || '', matrix.compose_profiles == 'errors-only' && ' (errors-only)' || '') }}
     env:
       REPORT_SELF_HOSTED_ISSUES: 0
       SELF_HOSTED_TESTING_DSN: ${{ vars.SELF_HOSTED_TESTING_DSN }}
       CONTAINER_ENGINE_PODMAN: ${{ matrix.container_engine == 'podman' && '1' || '0' }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
 
       - name: Install Podman
         if: matrix.container_engine == 'podman'
@@ -71,4 +72,5 @@ jobs:
       - name: Use action from local checkout
         uses: './'
         with:
+          compose_profiles: ${{ matrix.compose_profiles }}
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}

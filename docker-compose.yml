@@ -42,6 +42,8 @@ x-sentry-defaults: &sentry_defaults
       <<: *depends_on-default
     smtp:
       <<: *depends_on-default
+    seaweedfs:
+      <<: *depends_on-default
     snuba-api:
       <<: *depends_on-default
     symbolicator:
@@ -67,6 +69,8 @@ x-sentry-defaults: &sentry_defaults
     SENTRY_EVENT_RETENTION_DAYS:
     SENTRY_MAIL_HOST:
     SENTRY_MAX_EXTERNAL_SOURCEMAP_SIZE:
+    SENTRY_SYSTEM_SECRET_KEY:
+    SENTRY_STATSD_ADDR: "${STATSD_ADDR:-}"
   volumes:
     - "sentry-data:/data"
     - "./sentry:/etc/sentry"
@@ -94,8 +98,7 @@ x-snuba-defaults: &snuba_defaults
     SENTRY_EVENT_RETENTION_DAYS:
     # If you have statsd server, you can utilize that to monitor self-hosted Snuba containers.
     # To start, state these environment variables below on your `.env.` file and adjust the options as needed.
-    SNUBA_STATSD_HOST: # Example value: "100.100.123.123". Must be an IP address, not domain name
-    SNUBA_STATSD_PORT: # Example value: 8125
+    SNUBA_STATSD_ADDR: "${STATSD_ADDR:-}"
 services:
   smtp:
     <<: *restart_policy
@@ -115,7 +118,7 @@ services:
       test: echo stats | nc 127.0.0.1 11211
   redis:
     <<: *restart_policy
-    image: "redis:6.2.19-alpine"
+    image: "redis:6.2.20-alpine"
     deploy:
       resources:
         reservations:
@@ -150,7 +153,9 @@ services:
       POSTGRES_HOST_AUTH_METHOD: "trust"
     volumes:
       - "sentry-postgres:/var/lib/postgresql/data"
+    shm_size: 256m
   pgbouncer:
+    <<: *restart_policy
     image: "edoburu/pgbouncer:v1.24.1-p1"
     healthcheck:
       <<: *healthcheck_defaults
@@ -211,7 +216,7 @@ services:
     build:
       context: ./clickhouse
       args:
-        BASE_IMAGE: "altinity/clickhouse-server:23.8.11.29.altinitystable"
+        BASE_IMAGE: "altinity/clickhouse-server:25.3.6.10034.altinitystable"
     ulimits:
       nofile:
         soft: 262144
@@ -219,10 +224,14 @@ services:
     volumes:
       - "sentry-clickhouse:/var/lib/clickhouse"
       - "sentry-clickhouse-log:/var/log/clickhouse-server"
-      - type: bind
+      - type: "bind"
         read_only: true
-        source: ./clickhouse/config.xml
-        target: /etc/clickhouse-server/config.d/sentry.xml
+        source: "./clickhouse/config.xml"
+        target: "/etc/clickhouse-server/config.d/sentry.xml"
+      - type: "bind"
+        read_only: true
+        source: "./clickhouse/default-password.xml"
+        target: "/etc/clickhouse-server/users.d/default-password.xml"
     environment:
       # This limits Clickhouse's memory to 30% of the host memory
       # If you have high volume and your search return incomplete results
@@ -234,11 +243,57 @@ services:
           # Manually override any http_proxy envvar that might be set, because
           # this wget does not support no_proxy. See:
           # https://github.com/getsentry/self-hosted/issues/1537
-          "http_proxy='' wget -nv -t1 --spider 'http://localhost:8123/' || exit 1",
+          "HTTP_PROXY='' http_proxy='' wget -nv -t1 --spider 'http://localhost:8123/' || exit 1",
         ]
       interval: 10s
       timeout: 10s
       retries: 30
+  seaweedfs:
+    <<: *restart_policy
+    image: "chrislusf/seaweedfs:3.97_large_disk"
+    entrypoint: "weed"
+    command: >-
+        server
+        -dir=/data
+        -filer=true
+        -filer.port=8888
+        -filer.port.grpc=18888
+        -filer.defaultReplicaPlacement=000
+        -master=true
+        -master.port=9333
+        -master.port.grpc=19333
+        -metricsPort=9091
+        -s3=true
+        -s3.port=8333
+        -s3.port.grpc=18333
+        -volume=true
+        -volume.dir.idx=/data/idx
+        -volume.index=leveldbLarge
+        -volume.max=0
+        -volume.preStopSeconds=8
+        -volume.readMode=redirect
+        -volume.port=8080
+        -volume.port.grpc=18080
+        -ip=127.0.0.1
+        -ip.bind=0.0.0.0
+        -webdav=false
+    environment:
+      AWS_ACCESS_KEY_ID: sentry
+      AWS_SECRET_ACCESS_KEY: sentry
+    volumes:
+      - "sentry-seaweedfs:/data"
+    healthcheck:
+      test: [
+          "CMD-SHELL",
+          # Manually override any http_proxy envvar that might be set, because
+          # this wget does not support no_proxy. See:
+          # https://github.com/getsentry/self-hosted/issues/1537
+          "http_proxy='' wget -q -O- http://seaweedfs:8080/healthz http://seaweedfs:9333/cluster/healthz http://seaweedfs:8333/healthz || exit 1",
+      ]
+      interval: 30s
+      timeout: 20s
+      retries: 5
+      start_period: 60s
   snuba-api:
     <<: *snuba_defaults
     healthcheck:
@@ -404,13 +459,6 @@ services:
       <<: *file_healthcheck_defaults
     profiles:
       - feature-complete
-  snuba-spans-consumer:
-    <<: *snuba_defaults
-    command: rust-consumer --storage spans --consumer-group snuba-spans-consumers --auto-offset-reset=latest --max-batch-time-ms 1000 --no-strict-offset-reset --health-check-file /tmp/health.txt
-    healthcheck:
-      <<: *file_healthcheck_defaults
-    profiles:
-      - feature-complete
   snuba-eap-items-consumer:
     <<: *snuba_defaults
     command: rust-consumer --storage eap_items --consumer-group eap_items_group --auto-offset-reset=latest --max-batch-time-ms 1000 --no-strict-offset-reset --use-rust-processor --health-check-file /tmp/health.txt
@@ -423,16 +471,12 @@ services:
     command: subscriptions-scheduler-executor --dataset events_analytics_platform --entity eap_items --auto-offset-reset=latest --no-strict-offset-reset --consumer-group=snuba-eap-items-subscriptions-consumers --followed-consumer-group=eap_items_group --schedule-ttl=60 --stale-threshold-seconds=900 --health-check-file /tmp/health.txt
     healthcheck:
       <<: *file_healthcheck_defaults
-  snuba-uptime-results-consumer:
-    <<: *snuba_defaults
-    command: rust-consumer --storage uptime_monitor_checks --consumer-group snuba-uptime-results --auto-offset-reset=latest --max-batch-time-ms 750 --no-strict-offset-reset --health-check-file /tmp/health.txt
-    healthcheck:
-      <<: *file_healthcheck_defaults
-    profiles:
-      - feature-complete
   symbolicator:
     <<: *restart_policy
     image: "$SYMBOLICATOR_IMAGE"
+    environment:
+      SYMBOLICATOR_STATSD_ADDR: ${STATSD_ADDR:-127.0.0.1:8125}
+    command: run -c /etc/symbolicator/config.yml
     volumes:
       - "sentry-symbolicator:/data"
       - type: bind
@@ -441,23 +485,19 @@ services:
         target: /etc/symbolicator
     healthcheck:
       <<: *healthcheck_defaults
-      test:
-        - "CMD"
-        - "/bin/bash"
-        - "-c"
-        # Courtesy of https://unix.stackexchange.com/a/234089/108960
-        - 'exec 3<>/dev/tcp/127.0.0.1/3021 && echo -e "GET /healthcheck HTTP/1.1\r\nhost: 127.0.0.1\r\nConnection: close\r\n\r\n" >&3 && grep OK -s -m 1 <&3'
-    command: run -c /etc/symbolicator/config.yml
+      test: ["CMD", "/bin/symbolicator", "healthcheck", "-c", "/etc/symbolicator/config.yml"]
   symbolicator-cleanup:
-    <<: [*restart_policy, *pull_policy]
-    image: symbolicator-cleanup-self-hosted-local
-    build:
-      context: ./cron
-      args:
-        BASE_IMAGE: "$SYMBOLICATOR_IMAGE"
-    command: '"55 23 * * * gosu symbolicator symbolicator cleanup"'
+    <<: *restart_policy
+    image: "$SYMBOLICATOR_IMAGE"
+    environment:
+      SYMBOLICATOR_STATSD_ADDR: ${STATSD_ADDR:-127.0.0.1:8125}
+    command: "cleanup -c /etc/symbolicator/config.yml --repeat 1h"
     volumes:
       - "sentry-symbolicator:/data"
+      - type: bind
+        read_only: true
+        source: ./symbolicator
+        target: /etc/symbolicator
   web:
     <<: *sentry_defaults
     ulimits:
@@ -472,20 +512,6 @@ services:
         - "-c"
         # Courtesy of https://unix.stackexchange.com/a/234089/108960
         - 'exec 3<>/dev/tcp/127.0.0.1/9000 && echo -e "GET /_health/ HTTP/1.1\r\nhost: 127.0.0.1\r\n\r\n" >&3 && grep ok -s -m 1 <&3'
-  cron:
-    <<: *sentry_defaults
-    command: run cron
-  worker:
-    <<: *sentry_defaults
-    command: run worker
-    healthcheck:
-      <<: *healthcheck_defaults
-      test:
-        - CMD
-        - sentry
-        - exec
-        - -c
-        - 'from sentry.celery import app; import os; dest="celery@{}".format(os.environ["HOSTNAME"]); print(app.control.ping(destination=[dest], timeout=5)[0][dest]["ok"])'
   events-consumer:
     <<: *sentry_defaults
     command: run consumer ingest-events --consumer-group ingest-consumer --healthcheck-file-path /tmp/health.txt
@@ -677,11 +703,17 @@ services:
         - "/usr/bin/curl"
         - http://localhost
     depends_on:
-      - web
-      - relay
+      web:
+        <<: *depends_on-healthy
+        restart: true
+      relay:
+        <<: *depends_on-healthy
+        restart: true
   relay:
     <<: *restart_policy
     image: "$RELAY_IMAGE"
+    environment:
+      RELAY_STATSD_ADDR: ${STATSD_ADDR:-127.0.0.1:8125}
     volumes:
       - type: bind
         read_only: true
@@ -708,6 +740,7 @@ services:
       TASKBROKER_KAFKA_CLUSTER: "kafka:9092"
       TASKBROKER_KAFKA_DEADLETTER_CLUSTER: "kafka:9092"
       TASKBROKER_DB_PATH: "/opt/sqlite/taskbroker-activations.sqlite"
+      TASKBROKER_STATSD_ADDR: ${STATSD_ADDR:-127.0.0.1:8125}
     volumes:
       - sentry-taskbroker:/opt/sqlite
     depends_on:
@@ -718,14 +751,18 @@ services:
     command: run taskworker-scheduler
   taskworker:
     <<: *sentry_defaults
-    command: run taskworker --concurrency=4 --rpc-host=taskbroker:50051
+    command: run taskworker --concurrency=4 --rpc-host=taskbroker:50051 --health-check-file-path=/tmp/health.txt
+    healthcheck:
+      <<: *file_healthcheck_defaults
   vroom:
     <<: *restart_policy
     image: "$VROOM_IMAGE"
     environment:
       SENTRY_KAFKA_BROKERS_PROFILING: "kafka:9092"
       SENTRY_KAFKA_BROKERS_OCCURRENCES: "kafka:9092"
-      SENTRY_BUCKET_PROFILES: file:///var/vroom/sentry-profiles
+      SENTRY_BUCKET_PROFILES: "s3://profiles?region=us-east-1&endpoint=seaweedfs:8333&s3ForcePathStyle=true&disableSSL=true"
+      AWS_ACCESS_KEY: "sentry"
+      AWS_SECRET_KEY: "sentry"
       SENTRY_SNUBA_HOST: "http://snuba-api:1218"
     volumes:
       - sentry-vroom:/var/vroom/sentry-profiles
@@ -774,6 +811,7 @@ services:
       # Separated by commas. Leaving this unset will default to the systems dns
       # resolver.
       #UPTIME_CHECKER_HTTP_CHECKER_DNS_NAMESERVERS: "8.8.8.8,8.8.4.4"
+      UPTIME_CHECKER_STATSD_ADDR: ${STATSD_ADDR:-127.0.0.1:8125}
     depends_on:
       kafka:
         <<: *depends_on-healthy
@@ -794,8 +832,11 @@ volumes:
     external: true
   sentry-clickhouse:
     external: true
-  sentry-symbolicator:
+  sentry-seaweedfs:
     external: true
+  # The volume stores cached version of debug symbols, source maps etc. Upon
+  # removal symbolicator will re-download them.
+  sentry-symbolicator:
   # This volume stores JS SDK assets and the data inside this volume should
   # be cleaned periodically on upgrades.
   sentry-nginx-www:

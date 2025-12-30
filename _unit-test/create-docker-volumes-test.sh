@@ -14,7 +14,7 @@ sentry-data
 sentry-kafka
 sentry-postgres
 sentry-redis
-sentry-symbolicator"
+sentry-seaweedfs"
 
 before=$(get_volumes)
 

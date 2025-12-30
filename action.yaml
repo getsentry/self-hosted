@@ -6,6 +6,9 @@ inputs:
   image_url:
     required: false
     description: "The URL to the built relay, snuba, sentry image to test against."
+  compose_profiles:
+    required: false
+    description: "Docker Compose profile to use. Defaults to feature-complete."
   CODECOV_TOKEN:
     required: false
     description: "The Codecov token to upload coverage."
@@ -18,6 +21,7 @@ runs:
       env:
         PROJECT_NAME: ${{ inputs.project_name }}
         IMAGE_URL: ${{ inputs.image_url }}
+        COMPOSE_PROFILES: ${{ inputs.compose_profiles }}
       run: |
         if [[ -n "$PROJECT_NAME" && -n "$IMAGE_URL" ]]; then
           image_var=$(echo "${PROJECT_NAME}_IMAGE" | tr '[:lower:]' '[:upper:]')
@@ -30,11 +34,43 @@ runs:
           exit 1
         fi
 
+        # `COMPOSE_PROFILES` may only be `feature-complete` or `errors-only`
+        if [[ "$COMPOSE_PROFILES" != "" && "$COMPOSE_PROFILES" != "feature-complete" && "$COMPOSE_PROFILES" != "errors-only" ]]; then
+          echo "COMPOSE_PROFILES must be either unset, or set to either 'feature-complete' or 'errors-only'."
+          exit 1
+        else
+          echo "COMPOSE_PROFILES=$COMPOSE_PROFILES" >> ${{ github.action_path }}/.env
+        fi
+
+    - name: Cleanup runner image
+      shell: bash
+      run: |
+        ### Inspired by https://github.com/endersonmenezes/free-disk-space ###
+        sudo rm -rf /usr/local/.ghcup
+        sudo rm -rf /home/runner/Android /usr/local/lib/android /opt/android /usr/local/android-sdk
+        sudo rm -rf /usr/share/dotnet /usr/share/doc/dotnet-*
+        df -h
+
+    - name: Setup uv
+      uses: astral-sh/setup-uv@ed21f2f24f8dd64503750218de024bcf64c7250a # v7.1.5
+      with:
+        working-directory: ${{ github.action_path }}
+        version: "0.9.15"
+        # we just cache the venv-dir directly in action-setup-venv
+        enable-cache: false
+
+    - uses: getsentry/action-setup-venv@6e8aebf461914919d9de6e3082669d6bfecc400c # v3.1.0
+      with:
+        python-version: "3.12"
+        cache-dependency-path: uv.lock
+        install-cmd: uv sync --frozen --active
+        working-directory: ${{ github.action_path }}
+
     - name: Setup dev environment
       shell: bash
       run: |
         cd ${{ github.action_path }}
-        pip install -r requirements-dev.txt
+
         echo "PY_COLORS=1" >> "$GITHUB_ENV"
         ### pytest-sentry configuration ###
         if [ "$GITHUB_REPOSITORY" = "getsentry/self-hosted" ]; then
@@ -62,14 +98,15 @@ runs:
         echo "SENTRY_MIGRATIONS_MD5=$SENTRY_MIGRATIONS_MD5" >> $GITHUB_OUTPUT
         SNUBA_MIGRATIONS_MD5=$(docker run --rm --entrypoint bash $SNUBA_IMAGE -c '{ ls -Rv1rpq snuba/snuba_migrations/**/*.py; grep -Poz "(?s)(?<=class Topic\\(Enum\\):\\n).+?(?=\\n\\n\\n)" snuba/utils/streams/topics.py; }' | md5sum | cut -d ' ' -f 1)
         echo "SNUBA_MIGRATIONS_MD5=$SNUBA_MIGRATIONS_MD5" >> $GITHUB_OUTPUT
+        echo "ARCH=$(uname -m)" >> $GITHUB_OUTPUT
 
     - name: Restore Sentry Volume Cache
       id: restore_cache_sentry
       uses: BYK/docker-volume-cache-action/restore@be89365902126f508dcae387a32ec3712df6b1cd
       with:
-        key: db-volumes-sentry-v2-${{ steps.cache_key.outputs.SENTRY_MIGRATIONS_MD5 }}
+        key: db-volumes-sentry-v3-${{ steps.cache_key.outputs.ARCH }}-${{ inputs.compose_profiles }}-${{ steps.cache_key.outputs.SENTRY_MIGRATIONS_MD5 }}
         restore-keys: |
-          db-volumes-sentry-v1-
+          key: db-volumes-sentry-v3-${{ steps.cache_key.outputs.ARCH }}-${{ inputs.compose_profiles }}
         volumes: |
           sentry-postgres
 
@@ -77,9 +114,9 @@ runs:
       id: restore_cache_snuba
       uses: BYK/docker-volume-cache-action/restore@be89365902126f508dcae387a32ec3712df6b1cd
       with:
-        key: db-volumes-snuba-v2-${{ steps.cache_key.outputs.SNUBA_MIGRATIONS_MD5 }}
+        key: db-volumes-snuba-v3-${{ steps.cache_key.outputs.ARCH }}-${{ inputs.compose_profiles }}-${{ steps.cache_key.outputs.SNUBA_MIGRATIONS_MD5 }}
         restore-keys: |
-          db-volumes-snuba-v1-
+          key: db-volumes-snuba-v3-${{ steps.cache_key.outputs.ARCH }}-${{ inputs.compose_profiles }}
         volumes: |
           sentry-clickhouse
 
@@ -87,11 +124,10 @@ runs:
       id: restore_cache_kafka
       uses: BYK/docker-volume-cache-action/restore@be89365902126f508dcae387a32ec3712df6b1cd
       with:
-        key: db-volumes-kafka-v1-${{ steps.cache_key.outputs.SENTRY_MIGRATIONS_MD5 }}-${{ steps.cache_key.outputs.SNUBA_MIGRATIONS_MD5 }}
+        key: db-volumes-kafka-v2-${{ steps.cache_key.outputs.ARCH }}-${{ inputs.compose_profiles }}-${{ steps.cache_key.outputs.SENTRY_MIGRATIONS_MD5 }}-${{ steps.cache_key.outputs.SNUBA_MIGRATIONS_MD5 }}
         restore-keys: |
-          db-volumes-kafka-v1-${{ steps.cache_key.outputs.SENTRY_MIGRATIONS_MD5 }}-${{ steps.cache_key.outputs.SNUBA_MIGRATIONS_MD5 }}
-          db-volumes-kafka-v1-${{ steps.cache_key.outputs.SENTRY_MIGRATIONS_MD5 }}-
-          db-volumes-kafka-v1-
+          db-volumes-kafka-v2-${{ steps.cache_key.outputs.ARCH }}-${{ inputs.compose_profiles }}-${{ steps.cache_key.outputs.SENTRY_MIGRATIONS_MD5 }}
+          db-volumes-kafka-v2-${{ steps.cache_key.outputs.ARCH }}-${{ inputs.compose_profiles }}
         volumes: |
           sentry-kafka
 
@@ -144,8 +180,8 @@ runs:
 
     - name: Setup swapfile
       shell: bash
-      if: runner.arch == 'X64' || runner.arch == 'X86'
       run: |
+        sudo swapoff -a
         sudo fallocate -l 16G /swapfile
         sudo chmod 600 /swapfile
         sudo mkswap /swapfile
@@ -153,8 +189,21 @@ runs:
         sudo swapon --show
         free -h
 
+    - name: Setup Nodejs
+      uses: actions/setup-node@395ad3262231945c25e8478fd5baf05154b1d79f # v6.1.0
+      with:
+        node-version: "22.x"
+
+    - name: Install Nodejs dependencies
+      shell: bash
+      run: |
+        cd ${{ github.action_path }}/_integration-test/nodejs
+        npm ci
+
     - name: Integration Test
       shell: bash
+      env:
+        COMPOSE_PROFILES: ${{ inputs.compose_profiles }}
       run: |
         sudo chown root /usr/bin/rsync && sudo chmod u+s /usr/bin/rsync
         rsync -aW --super --numeric-ids --no-compress --mkpath \
@@ -166,8 +215,9 @@ runs:
         pytest -x --cov --junitxml=junit.xml _integration-test/
 
     - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v5
       if: inputs.CODECOV_TOKEN
+      continue-on-error: true
+      uses: codecov/codecov-action@5a1091511ad55cbe89839c7260b706298ca349f7 # v5.5.1
       with:
         directory: ${{ github.action_path }}
         token: ${{ inputs.CODECOV_TOKEN }}
@@ -175,7 +225,8 @@ runs:
 
     - name: Upload test results to Codecov
       if: inputs.CODECOV_TOKEN && !cancelled()
-      uses: codecov/test-results-action@v1
+      continue-on-error: true
+      uses: codecov/test-results-action@47f89e9acb64b76debcd5ea40642d25a4adced9f # v1.1.1
       with:
         directory: ${{ github.action_path }}
         token: ${{ inputs.CODECOV_TOKEN }}
