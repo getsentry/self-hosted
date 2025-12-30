@@ -124,7 +124,7 @@ services:
         reservations:
           memory: 512m
         limits:
-          memory: 2560m
+          memory: 3072m
     healthcheck:
       <<: *healthcheck_defaults
       test: redis-cli ping | grep PONG
