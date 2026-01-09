@@ -6,59 +6,56 @@ on:
         description: Version to release (optional)
         required: false
       force:
-        description: Force a release even when there are release-blockers (optional)
+        description: Force a release even when there are release-blockers 
+          (optional)
         required: false
   schedule:
     # We want the release to be at 10 or 11am Pacific Time
     # We also make this an hour after all others such as Sentry,
     # Snuba, and Relay to make sure their releases finish.
-    - cron: "0 18 15 * *"
-permissions:
-  contents: read
+  - cron: "0 18 15 * *"
 jobs:
   release:
-    if: github.repository_owner == 'getsentry'
     runs-on: ubuntu-latest
     name: "Release a new version"
-    steps:
-      - name: Get auth token
-        id: token
-        uses: actions/create-github-app-token@29824e69f54612133e76f7eaac726eef6c875baf # v2.2.1
-        with:
-          app-id: ${{ vars.SENTRY_RELEASE_BOT_CLIENT_ID }}
-          private-key: ${{ secrets.SENTRY_RELEASE_BOT_PRIVATE_KEY }}
-      - uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
-        with:
-          token: ${{ steps.token.outputs.token }}
-          fetch-depth: 0
-      - name: Prepare release
-        id: prepare-release
-        uses: getsentry/action-prepare-release@3cea80dc3938c0baf5ec4ce752ecb311f8780cdc # v1.6.4
-        env:
-          GITHUB_TOKEN: ${{ steps.token.outputs.token }}
-        with:
-          version: ${{ github.event.inputs.version }}
-          force: ${{ github.event.inputs.force }}
-          calver: true
     outputs:
       release-version: ${{ env.RELEASE_VERSION }}
+    steps:
+    - name: Get auth token
+      id: token
+      uses: 
+        actions/create-github-app-token@29824e69f54612133e76f7eaac726eef6c875baf       # v2.2.1
+      with:
+        app-id: ${{ vars.SENTRY_RELEASE_BOT_CLIENT_ID }}
+        private-key: ${{ secrets.SENTRY_RELEASE_BOT_PRIVATE_KEY }}
+    - uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3   # v6.0.0
+      with:
+        token: ${{ steps.token.outputs.token }}
+        fetch-depth: 0
+    - id: prepare
+      uses: getsentry/craft@v2
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
+      with:
+        version: ${{ inputs.version }}
+        force: ${{ inputs.force }}
   dogfood-release:
     if: github.repository_owner == 'getsentry'
     runs-on: ubuntu-latest
     name: Create release on self-hosted dogfood instance
     needs: release
     steps:
-      - uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
-        with:
-          fetch-depth: 0
-      - uses: getsentry/action-release@128c5058bbbe93c8e02147fe0a9c713f166259a6 # v3.4.0
-        env:
-          SENTRY_ORG: self-hosted
-          SENTRY_PROJECT: installer
-          SENTRY_URL: https://self-hosted.getsentry.net/
-          SENTRY_AUTH_TOKEN: ${{ secrets.SELF_HOSTED_RELEASE_TOKEN }}
-        with:
-          environment: production
-          version: ${{ needs.release.outputs.release-version }}
-          ignore_empty: true
-          ignore_missing: true
+    - uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3   # v6.0.0
+      with:
+        fetch-depth: 0
+    - uses: getsentry/action-release@128c5058bbbe93c8e02147fe0a9c713f166259a6   # v3.4.0
+      env:
+        SENTRY_ORG: self-hosted
+        SENTRY_PROJECT: installer
+        SENTRY_URL: https://self-hosted.getsentry.net/
+        SENTRY_AUTH_TOKEN: ${{ secrets.SELF_HOSTED_RELEASE_TOKEN }}
+      with:
+        environment: production
+        version: ${{ needs.release.outputs.release-version }}
+        ignore_empty: true
+        ignore_missing: true
