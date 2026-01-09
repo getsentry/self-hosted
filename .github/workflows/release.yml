@@ -39,6 +39,13 @@ jobs:
       with:
         version: ${{ inputs.version }}
         force: ${{ inputs.force }}
+    - id: prepare
+      uses: getsentry/craft@v2
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
+      with:
+        version: ${{ inputs.version }}
+        force: ${{ inputs.force }}
   dogfood-release:
     if: github.repository_owner == 'getsentry'
     runs-on: ubuntu-latest
