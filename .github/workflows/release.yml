@@ -14,6 +14,10 @@ on:
     # We also make this an hour after all others such as Sentry,
     # Snuba, and Relay to make sure their releases finish.
   - cron: "0 18 15 * *"
+permissions:
+  contents: write
+  pull-requests: write
+
 jobs:
   release:
     runs-on: ubuntu-latest
@@ -33,14 +37,14 @@ jobs:
         token: ${{ steps.token.outputs.token }}
         fetch-depth: 0
     - id: prepare
-      uses: getsentry/craft@v2
+      uses: getsentry/craft@39ee616a6a58dc64797feecb145d66770492b66c # v2
       env:
         GITHUB_TOKEN: ${{ github.token }}
       with:
         version: ${{ inputs.version }}
         force: ${{ inputs.force }}
     - id: prepare
-      uses: getsentry/craft@v2
+      uses: getsentry/craft@39ee616a6a58dc64797feecb145d66770492b66c # v2
       env:
         GITHUB_TOKEN: ${{ github.token }}
       with:
