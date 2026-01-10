@@ -3,4 +3,6 @@ changelogPolicy: auto
 artifactProvider:
   name: none
 targets:
-  - name: github
+- name: github
+versioning:
+  policy: calver
