@@ -1,5 +1,19 @@
 # Changelog
 
+## 26.1.0
+
+### New Features ✨
+
+- Switch nodestore-s3 package to getsentry org by @aldy505 in [#4119](https://github.com/getsentry/self-hosted/pull/4119)
+
+### Build / dependencies / internal 🔧
+
+- (deps) Bump astral-sh/setup-uv from 7.1.5 to 7.1.6 by @dependabot in [#4100](https://github.com/getsentry/self-hosted/pull/4100)
+
+### Other
+
+- Include SDK version 10 when using local JS SDK assets by @hsgt-brice in [#4130](https://github.com/getsentry/self-hosted/pull/4130)
+
 ## 25.12.1
 
 ### Build / dependencies / internal 🔧
