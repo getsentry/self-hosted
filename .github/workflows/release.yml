@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: Version to release (optional)
+        description: Version to release (or "auto")
         required: false
       force:
         description: Force a release even when there are release-blockers (optional)
@@ -33,7 +33,7 @@ jobs:
           fetch-depth: 0
       - name: Prepare release
         id: prepare-release
-        uses: getsentry/action-prepare-release@3cea80dc3938c0baf5ec4ce752ecb311f8780cdc # v1.6.4
+        uses: getsentry/craft@c6e2f04939b6ee67030588afbb5af76b127d8203 # v2
         env:
           GITHUB_TOKEN: ${{ steps.token.outputs.token }}
         with:
