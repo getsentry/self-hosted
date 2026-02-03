@@ -52,7 +52,7 @@ runs:
         df -h
 
     - name: Setup uv
-      uses: astral-sh/setup-uv@681c641aba71e4a1c380be3ab5e12ad51f415867 # v7.1.6
+      uses: astral-sh/setup-uv@803947b9bd8e9f986429fa0c5a41c367cd732b41 # v7.2.1
       with:
         working-directory: ${{ github.action_path }}
         version: "0.9.15"
@@ -190,7 +190,7 @@ runs:
         free -h
 
     - name: Setup Nodejs
-      uses: actions/setup-node@395ad3262231945c25e8478fd5baf05154b1d79f # v6.1.0
+      uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # v6.2.0
       with:
         node-version: "22.x"
 
@@ -217,7 +217,7 @@ runs:
     - name: Upload coverage to Codecov
       if: inputs.CODECOV_TOKEN
       continue-on-error: true
-      uses: codecov/codecov-action@5a1091511ad55cbe89839c7260b706298ca349f7 # v5.5.1
+      uses: codecov/codecov-action@671740ac38dd9b0130fbe1cec585b89eea48d3de # v5.5.2
       with:
         directory: ${{ github.action_path }}
         token: ${{ inputs.CODECOV_TOKEN }}
@@ -226,7 +226,7 @@ runs:
     - name: Upload test results to Codecov
       if: inputs.CODECOV_TOKEN && !cancelled()
       continue-on-error: true
-      uses: codecov/test-results-action@47f89e9acb64b76debcd5ea40642d25a4adced9f # v1.1.1
+      uses: codecov/test-results-action@0fa95f0e1eeaafde2c782583b36b28ad0d8c77d3 # v1.2.1
       with:
         directory: ${{ github.action_path }}
         token: ${{ inputs.CODECOV_TOKEN }}
