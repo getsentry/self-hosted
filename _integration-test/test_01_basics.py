@@ -203,7 +203,11 @@ def test_custom_certificate_authorities():
         .add_extension(
             x509.NameConstraints([x509.DNSName("self.test")], None), critical=True
         )
-        .sign(private_key=ca_key, algorithm=hashes.SHA256(), backend=default_backend())
+        .add_extension(
+            x509.SubjectKeyIdentifier.from_public_key(ca_key.public_key()),
+            critical=False,
+        )
+        .sign(private_key=ca_key, algorithm=hashes.SHA256())
     )
 
     ca_key_path = f"{test_nginx_conf_path}/ca.key"
@@ -262,11 +266,23 @@ def test_custom_certificate_authorities():
         )
         .issuer_name(ca_cert.issuer)
         .serial_number(x509.random_serial_number())
-        .not_valid_before(datetime.datetime.utcnow())
-        .not_valid_after(datetime.datetime.utcnow() + datetime.timedelta(days=1))
+        .not_valid_before(datetime.datetime.now(datetime.timezone.utc))
+        .not_valid_after(
+            datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(days=1)
+        )
         .public_key(self_test_req.public_key())
         .add_extension(
             x509.SubjectAlternativeName([x509.DNSName("self.test")]), critical=False
+        )
+        .add_extension(
+            x509.SubjectKeyIdentifier.from_public_key(self_test_req.public_key()),
+            critical=False,
+        )
+        .add_extension(
+            x509.AuthorityKeyIdentifier.from_issuer_subject_key_identifier(
+                ca_cert.extensions.get_extension_for_class(x509.SubjectKeyIdentifier).value
+            ),
+            critical=False,
         )
         .sign(private_key=ca_key, algorithm=hashes.SHA256())
     )
@@ -305,11 +321,17 @@ def test_custom_certificate_authorities():
             )
         )
         .serial_number(x509.random_serial_number())
-        .not_valid_before(datetime.datetime.utcnow())
-        .not_valid_after(datetime.datetime.utcnow() + datetime.timedelta(days=1))
+        .not_valid_before(datetime.datetime.now(datetime.timezone.utc))
+        .not_valid_after(
+            datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(days=1)
+        )
         .public_key(fake_test_key.public_key())
         .add_extension(
             x509.SubjectAlternativeName([x509.DNSName("fake.test")]), critical=False
+        )
+        .add_extension(
+            x509.SubjectKeyIdentifier.from_public_key(fake_test_key.public_key()),
+            critical=False,
         )
         .sign(private_key=fake_test_key, algorithm=hashes.SHA256())
     )
