@@ -107,7 +107,11 @@ services:
       - "sentry-smtp:/var/spool/exim4"
       - "sentry-smtp-log:/var/log/exim4"
     environment:
-      - MAILNAME=${SENTRY_MAIL_HOST:-}
+      MAILNAME: ${SENTRY_MAIL_HOST:-}
+      # Refer to https://develop.sentry.dev/self-hosted/configuration/email/#as-aws-ses-relay
+      SES_USER:
+      SES_PASSWORD:
+      SES_REGION:
   memcached:
     <<: *restart_policy
     image: "memcached:1.6.26-alpine"
