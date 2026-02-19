@@ -84,9 +84,6 @@ runs:
           fi
         fi
 
-    - name: Get Compose
-      uses: getsentry/self-hosted/get-compose-action@master
-
     - name: Compute Docker Volume Cache Keys
       id: cache_key
       shell: bash
