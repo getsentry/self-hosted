@@ -1,5 +1,7 @@
 minVersion: 2.21.6
 changelogPolicy: auto
+preReleaseCommand: "scripts/bump-version.sh"
+postReleaseCommand: "scripts/post-release.sh"
 artifactProvider:
   name: none
 targets:
