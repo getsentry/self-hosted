@@ -75,7 +75,11 @@ jobs:
   upgrade-test:
     if: github.repository_owner == 'getsentry'
     runs-on: ubuntu-24.04
-    name: Upgrade Test
+    strategy:
+      fail-fast: false
+      matrix:
+        compose_profiles: ['feature-complete', 'errors-only']
+    name: ${{ format('upgrade test{0}', matrix.compose_profiles == 'errors-only' && ' (errors-only)' || '') }}
     env:
       REPORT_SELF_HOSTED_ISSUES: 0
       SELF_HOSTED_TESTING_DSN: ${{ vars.SELF_HOSTED_TESTING_DSN }}
@@ -93,7 +97,7 @@ jobs:
       - name: Install latest release and run tests
         uses: './'
         with:
-          compose_profiles: "feature-complete"
+          compose_profiles: ${{ matrix.compose_profiles }}
           project_name: |
             sentry
             snuba
@@ -115,5 +119,21 @@ jobs:
       - name: Re-run installation with nightly images and run tests
         uses: './'
         with:
-          compose_profiles: "feature-complete"
+          compose_profiles: ${{ matrix.compose_profiles }}
+          project_name: |
+            sentry
+            snuba
+            relay
+            symbolicator
+            taskbroker
+            vroom
+            uptime_checker
+          image_url: |
+            ghcr.io/getsentry/sentry:nightly
+            ghcr.io/getsentry/snuba:nightly
+            ghcr.io/getsentry/relay:nightly
+            ghcr.io/getsentry/symbolicator:nightly
+            ghcr.io/getsentry/taskbroker:nightly
+            ghcr.io/getsentry/vroom:nightly
+            ghcr.io/getsentry/uptime-checker:nightly
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
