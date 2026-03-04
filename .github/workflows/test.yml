@@ -71,3 +71,47 @@ jobs:
         with:
           compose_profiles: ${{ matrix.compose_profiles }}
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
+  upgrade-test:
+    if: github.repository_owner == 'getsentry'
+    runs-on: ubuntu-24.04
+    name: Upgrade Test
+    env:
+      REPORT_SELF_HOSTED_ISSUES: 0
+      SELF_HOSTED_TESTING_DSN: ${{ vars.SELF_HOSTED_TESTING_DSN }}
+    timeout-minutes: 90
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Get latest release tag
+        id: latest_release
+        run: echo "tag=$(gh release list --json name,isLatest --jq '.[] | select(.isLatest)|.name')" >> "$GITHUB_OUTPUT"
+
+      - name: Install latest release and run tests
+        uses: './'
+        with:
+          compose_profiles: "feature-complete"
+          project_name: |
+            sentry
+            snuba
+            relay
+            symbolicator
+            taskbroker
+            vroom
+            uptime_checker
+          image_url: |
+            ghcr.io/getsentry/sentry:${{ steps.latest_release.outputs.tag }}
+            ghcr.io/getsentry/snuba:${{ steps.latest_release.outputs.tag }}
+            ghcr.io/getsentry/relay:${{ steps.latest_release.outputs.tag }}
+            ghcr.io/getsentry/symbolicator:${{ steps.latest_release.outputs.tag }}
+            ghcr.io/getsentry/taskbroker:${{ steps.latest_release.outputs.tag }}
+            ghcr.io/getsentry/vroom:${{ steps.latest_release.outputs.tag }}
+            ghcr.io/getsentry/uptime-checker:${{ steps.latest_release.outputs.tag }}
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
+      - name: Re-run installation with nightly images and run tests
+        uses: './'
+        with:
+          compose_profiles: "feature-complete"
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}

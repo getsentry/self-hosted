@@ -1,4 +1,5 @@
 name: "Sentry self-hosted end-to-end tests"
+description: "Run the end-to-end tests for Sentry self-hosted using GitHub Actions."
 inputs:
   project_name:
     required: false
@@ -24,8 +25,20 @@ runs:
         COMPOSE_PROFILES: ${{ inputs.compose_profiles }}
       run: |
         if [[ -n "$PROJECT_NAME" && -n "$IMAGE_URL" ]]; then
-          image_var=$(echo "${PROJECT_NAME}_IMAGE" | tr '[:lower:]' '[:upper:]')
-          echo "${image_var}=$IMAGE_URL" >> ${{ github.action_path }}/.env
+          readarray -t project_names <<<"$PROJECT_NAME"
+          readarray -t image_urls <<<"$IMAGE_URL"
+          if [ "${#project_names[@]}" -ne "${#image_urls[@]}" ]; then
+            echo "The number of project names and image URLs must match."
+            echo "project_name: $PROJECT_NAME, image_url: $IMAGE_URL"
+            exit 1
+          fi
+
+          for i in "${!project_names[@]}"; do
+            project="${project_names[$i]}"
+            image="${image_urls[$i]}"
+            image_var=$(echo "${project}_IMAGE" | tr '[:lower:]' '[:upper:]')
+            echo "${image_var}=${image}" >> ${{ github.action_path }}/.env
+          done
         elif [[ -z "$PROJECT_NAME" && -z "$IMAGE_URL" ]]; then
           echo "No project name and image URL set. Skipping image configuration."
         else
