@@ -55,6 +55,8 @@ runs:
           echo "COMPOSE_PROFILES=$COMPOSE_PROFILES" >> ${{ github.action_path }}/.env
         fi
 
+        echo ${{ github.action_path }}/.env
+
     - name: Cleanup runner image
       shell: bash
       run: |
