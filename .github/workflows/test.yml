@@ -87,6 +87,8 @@ jobs:
       - name: Get latest release tag
         id: latest_release
         run: echo "tag=$(gh release list --json name,isLatest --jq '.[] | select(.isLatest)|.name')" >> "$GITHUB_OUTPUT"
+        env:
+            GH_TOKEN: ${{ github.token }}
 
       - name: Install latest release and run tests
         uses: './'
