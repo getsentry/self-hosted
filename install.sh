@@ -28,13 +28,13 @@ source install/check-minimum-requirements.sh
 # Upgrading clickhouse needs to come first before turning things off, since we need the old clickhouse image
 # in order to determine whether or not the clickhouse version needs to be upgraded.
 source install/upgrade-clickhouse.sh
+source install/update-docker-images.sh
 source install/turn-things-off.sh
 source install/create-docker-volumes.sh
 source install/ensure-files-from-examples.sh
 source install/check-memcached-backend.sh
 source install/ensure-relay-credentials.sh
 source install/generate-secret-key.sh
-source install/update-docker-images.sh
 source install/build-docker-images.sh
 source install/bootstrap-s3-nodestore.sh
 source install/bootstrap-snuba.sh
