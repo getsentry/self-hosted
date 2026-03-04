@@ -98,7 +98,7 @@ jobs:
         uses: './'
         with:
           compose_profiles: ${{ matrix.compose_profiles }}
-          project_name: |
+          project_name: |-
             sentry
             snuba
             relay
@@ -106,7 +106,7 @@ jobs:
             taskbroker
             vroom
             uptime_checker
-          image_url: |
+          image_url: |-
             ghcr.io/getsentry/sentry:${{ steps.latest_release.outputs.tag }}
             ghcr.io/getsentry/snuba:${{ steps.latest_release.outputs.tag }}
             ghcr.io/getsentry/relay:${{ steps.latest_release.outputs.tag }}
@@ -120,7 +120,7 @@ jobs:
         uses: './'
         with:
           compose_profiles: ${{ matrix.compose_profiles }}
-          project_name: |
+          project_name: |-
             sentry
             snuba
             relay
@@ -128,7 +128,7 @@ jobs:
             taskbroker
             vroom
             uptime_checker
-          image_url: |
+          image_url: |-
             ghcr.io/getsentry/sentry:nightly
             ghcr.io/getsentry/snuba:nightly
             ghcr.io/getsentry/relay:nightly
