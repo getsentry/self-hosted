@@ -119,6 +119,7 @@ jobs:
       - name: Re-run installation with nightly images and run tests
         uses: './'
         with:
+          no_restore_volume_cache: true
           compose_profiles: ${{ matrix.compose_profiles }}
           project_name: |-
             sentry

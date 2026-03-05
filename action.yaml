@@ -10,6 +10,9 @@ inputs:
   compose_profiles:
     required: false
     description: "Docker Compose profile to use. Defaults to feature-complete."
+  no_restore_volume_cache:
+    required: false
+    description: "Whether to restore Docker volumes cache after the test run. Defaults to false."
   CODECOV_TOKEN:
     required: false
     description: "The Codecov token to upload coverage."
@@ -113,6 +116,7 @@ runs:
         echo "ARCH=$(uname -m)" >> $GITHUB_OUTPUT
 
     - name: Restore Sentry Volume Cache
+      if: ${{ inputs.no_restore_volume_cache != 'true' }}
       id: restore_cache_sentry
       uses: BYK/docker-volume-cache-action/restore@be89365902126f508dcae387a32ec3712df6b1cd
       with:
@@ -123,6 +127,7 @@ runs:
           sentry-postgres
 
     - name: Restore Snuba Volume Cache
+      if: ${{ inputs.no_restore_volume_cache != 'true' }}
       id: restore_cache_snuba
       uses: BYK/docker-volume-cache-action/restore@be89365902126f508dcae387a32ec3712df6b1cd
       with:
@@ -133,6 +138,7 @@ runs:
           sentry-clickhouse
 
     - name: Restore Kafka Volume Cache
+      if: ${{ inputs.no_restore_volume_cache != 'true' }}
       id: restore_cache_kafka
       uses: BYK/docker-volume-cache-action/restore@be89365902126f508dcae387a32ec3712df6b1cd
       with:
@@ -167,7 +173,7 @@ runs:
         ./install.sh --no-report-self-hosted-issues --skip-commit-check
 
     - name: Save Sentry Volume Cache
-      if: steps.restore_cache_sentry.outputs.cache-hit != 'true'
+      if: steps.restore_cache_sentry.outputs.cache-hit != 'true' && inputs.no_restore_volume_cache != 'true'
       uses: BYK/docker-volume-cache-action/save@be89365902126f508dcae387a32ec3712df6b1cd
       with:
         key: ${{ steps.restore_cache_sentry.outputs.cache-primary-key }}
@@ -175,7 +181,7 @@ runs:
           sentry-postgres
 
     - name: Save Snuba Volume Cache
-      if: steps.restore_cache_snuba.outputs.cache-hit != 'true'
+      if: steps.restore_cache_snuba.outputs.cache-hit != 'true' && inputs.no_restore_volume_cache != 'true'
       uses: BYK/docker-volume-cache-action/save@be89365902126f508dcae387a32ec3712df6b1cd
       with:
         key: ${{ steps.restore_cache_snuba.outputs.cache-primary-key }}
@@ -183,7 +189,7 @@ runs:
           sentry-clickhouse
 
     - name: Save Kafka Volume Cache
-      if: steps.restore_cache_kafka.outputs.cache-hit != 'true'
+      if: steps.restore_cache_kafka.outputs.cache-hit != 'true' && inputs.no_restore_volume_cache != 'true'
       uses: BYK/docker-volume-cache-action/save@be89365902126f508dcae387a32ec3712df6b1cd
       with:
         key: ${{ steps.restore_cache_kafka.outputs.cache-primary-key }}
