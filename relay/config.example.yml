@@ -24,6 +24,15 @@ processing:
 #     path: "/tmp/relay-spool-envelopes"
 #     max_backpressure_memory_percent: 1.0
 
+http:
+  # At times where `relay` container can't resolve `web` container for
+  # authentication for project configurations, you can set `dns_cache`
+  # below to `false` to disable DNS caching in `relay`. However, for
+  # better performance, it's recommended to keep it enabled if possible.
+  #
+  # The default value is `true`.
+  dns_cache: false
+
 # If you have statsd server, you can utilize that to monitor self-hosted Relay.
 # To start, uncomment the following `metrics` section and adjust the options as needed.
 #
