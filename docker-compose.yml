@@ -85,8 +85,8 @@ x-snuba-defaults: &snuba_defaults
       <<: *depends_on-healthy
     redis:
       <<: *depends_on-healthy
-  image: "$SNUBA_IMAGE"
-  build: 
+  image: "snuba-self-hosted-local"
+  build:
     dockerfile: ./local-image/Dockerfile
     context: .
     args:
