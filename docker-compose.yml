@@ -819,6 +819,10 @@ volumes:
   # This volume stores JS SDK assets and the data inside this volume should
   # be cleaned periodically on upgrades.
   sentry-nginx-www:
+  # This volume stores profiles and should be persisted.
+  # Not being external will still persist data across restarts.
+  # It won't persist if someone does a docker compose down -v.
+  sentry-vroom:
   # This volume stores task data that is inflight
   # It should persist across restarts. If this volume is
   # deleted, up to ~2048 tasks will be lost.
