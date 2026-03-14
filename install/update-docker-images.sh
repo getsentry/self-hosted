@@ -16,5 +16,11 @@ fi
 
 # We may not have the set image on the repo (local images) so allow fails
 $CONTAINER_ENGINE pull ${SENTRY_IMAGE} || true
+$CONTAINER_ENGINE pull ${SNUBA_IMAGE} || true
+$CONTAINER_ENGINE pull ${SYMBOLICATOR_IMAGE} || true
+$CONTAINER_ENGINE pull ${RELAY_IMAGE} || true
+$CONTAINER_ENGINE pull ${TASKBROKER_IMAGE} || true
+$CONTAINER_ENGINE pull ${VROOM_IMAGE} || true
+$CONTAINER_ENGINE pull ${UPTIME_CHECKER_IMAGE} || true
 
 echo "${_endgroup}"
