@@ -6,7 +6,7 @@ RUN apt-get update \
  && rm -rf /var/lib/apt/lists/*
 
 # Put your custom certs here as *.crt (PEM). You can keep your repo folder name.
-COPY ./certificates/*.crt /usr/local/share/ca-certificates/
+COPY ./certificates/* /usr/local/share/ca-certificates/
 
 RUN update-ca-certificates
 
