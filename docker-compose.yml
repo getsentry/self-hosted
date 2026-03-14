@@ -77,7 +77,7 @@ x-sentry-defaults: &sentry_defaults
     - "./geoip:/geoip:ro"
     - "./certificates:/usr/local/share/ca-certificates:ro"
 x-snuba-defaults: &snuba_defaults
-  <<: *restart_policy
+  <<: [*restart_policy, *pull_policy]
   depends_on:
     clickhouse:
       <<: *depends_on-healthy
@@ -86,6 +86,11 @@ x-snuba-defaults: &snuba_defaults
     redis:
       <<: *depends_on-healthy
   image: "$SNUBA_IMAGE"
+  build: 
+    dockerfile: ./local-image/Dockerfile
+    context: .
+    args:
+      BASE_IMAGE: "${SNUBA_IMAGE}"
   environment:
     SNUBA_SETTINGS: self_hosted
     CLICKHOUSE_HOST: clickhouse
@@ -470,8 +475,12 @@ services:
     healthcheck:
       <<: *file_healthcheck_defaults
   symbolicator:
-    <<: *restart_policy
-    image: "$SYMBOLICATOR_IMAGE"
+    <<: [*restart_policy, *pull_policy]
+    image: "symbolicator-self-hosted-local"
+    build:
+      context: ./local-image
+      args:
+        BASE_IMAGE: "${SYMBOLICATOR_IMAGE}"
     environment:
       SYMBOLICATOR_STATSD_ADDR: ${STATSD_ADDR:-127.0.0.1:8125}
     command: run -c /etc/symbolicator/config.yml
@@ -708,8 +717,12 @@ services:
         <<: *depends_on-healthy
         restart: true
   relay:
-    <<: *restart_policy
-    image: "$RELAY_IMAGE"
+    <<: [*restart_policy, *pull_policy]
+    image: "relay-self-hosted-local"
+    build:
+      context: ./local-image
+      args:
+        BASE_IMAGE: "${RELAY_IMAGE}"
     environment:
       RELAY_STATSD_ADDR: ${STATSD_ADDR:-127.0.0.1:8125}
     volumes:
@@ -732,8 +745,12 @@ services:
       <<: *healthcheck_defaults
       test: ["CMD", "/bin/relay", "healthcheck"]
   taskbroker:
-    <<: *restart_policy
-    image: "$TASKBROKER_IMAGE"
+    <<: [*restart_policy, *pull_policy]
+    image: "taskbroker-self-hosted-local"
+    build:
+      context: ./local-image
+      args:
+        BASE_IMAGE: "${TASKBROKER_IMAGE}"
     environment:
       TASKBROKER_KAFKA_CLUSTER: "kafka:9092"
       TASKBROKER_KAFKA_DEADLETTER_CLUSTER: "kafka:9092"
@@ -753,8 +770,12 @@ services:
     healthcheck:
       <<: *file_healthcheck_defaults
   vroom:
-    <<: *restart_policy
-    image: "$VROOM_IMAGE"
+    <<: [*restart_policy, *pull_policy]
+    image: "vroom-self-hosted-local"
+    build:
+      context: ./local-image
+      args:
+        BASE_IMAGE: "${VROOM_IMAGE}"
     environment:
       SENTRY_KAFKA_BROKERS_PROFILING: "kafka:9092"
       SENTRY_KAFKA_BROKERS_OCCURRENCES: "kafka:9092"
@@ -795,8 +816,12 @@ services:
     profiles:
       - feature-complete
   uptime-checker:
-    <<: *restart_policy
-    image: "$UPTIME_CHECKER_IMAGE"
+    <<: [*restart_policy, *pull_policy]
+    image: "uptime-checker-self-hosted-local"
+    build:
+      context: ./local-image
+      args:
+        BASE_IMAGE: "${UPTIME_CHECKER_IMAGE}"
     command: run
     environment:
       UPTIME_CHECKER_RESULTS_KAFKA_CLUSTER: kafka:9092
