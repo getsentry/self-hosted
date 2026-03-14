@@ -762,8 +762,6 @@ services:
       AWS_ACCESS_KEY: "sentry"
       AWS_SECRET_KEY: "sentry"
       SENTRY_SNUBA_HOST: "http://snuba-api:1218"
-    volumes:
-      - sentry-vroom:/var/vroom/sentry-profiles
     healthcheck:
       <<: *healthcheck_defaults
       test:
@@ -775,23 +773,6 @@ services:
     depends_on:
       kafka:
         <<: *depends_on-healthy
-    profiles:
-      - feature-complete
-  vroom-cleanup:
-    <<: [*restart_policy, *pull_policy]
-    image: vroom-cleanup-self-hosted-local
-    build:
-      context: ./cron
-      args:
-        BASE_IMAGE: "$VROOM_IMAGE"
-    entrypoint: "/entrypoint.sh"
-    environment:
-      # Leaving the value empty to just pass whatever is set
-      # on the host system (or in the .env file)
-      SENTRY_EVENT_RETENTION_DAYS:
-    command: '"0 0 * * * find /var/vroom/sentry-profiles -type f -mtime +$SENTRY_EVENT_RETENTION_DAYS -delete"'
-    volumes:
-      - sentry-vroom:/var/vroom/sentry-profiles
     profiles:
       - feature-complete
   uptime-checker:
@@ -838,10 +819,6 @@ volumes:
   # This volume stores JS SDK assets and the data inside this volume should
   # be cleaned periodically on upgrades.
   sentry-nginx-www:
-  # This volume stores profiles and should be persisted.
-  # Not being external will still persist data across restarts.
-  # It won't persist if someone does a docker compose down -v.
-  sentry-vroom:
   # This volume stores task data that is inflight
   # It should persist across restarts. If this volume is
   # deleted, up to ~2048 tasks will be lost.
