@@ -1,4 +1,4 @@
-# Self-Hosted Sentry 26.2.1
+# Self-Hosted Sentry 26.3.0
 
 [Sentry](https://sentry.io/), feature-complete and packaged up for low-volume deployments and proofs-of-concept.
 
