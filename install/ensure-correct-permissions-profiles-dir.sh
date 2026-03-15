@@ -7,7 +7,7 @@ if [[ "$COMPOSE_PROFILES" == "feature-complete" ]]; then
   echo "${_group}Ensuring correct permissions on profiles directory ..."
 
   # Check if `/var/vroom/sentry-profiles` directory exists. If it doesn't, skip this.
-  if [ ! $dcr --no-deps --entrypoint /bin/bash --user root vroom -c "test -d /var/vroom/sentry-profiles" 2>/dev/null ]; then
+  if [ ! $dcr --no-deps --entrypoint /bin/bash --user root vroom -c "test -d /var/vroom/sentry-profiles" ] 2>/dev/null; then
     echo "/var/vroom/sentry-profiles directory does not exist. Skipping permissions check."
     echo "${_endgroup}"
   else
