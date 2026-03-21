@@ -1,5 +1,27 @@
 # Changelog
 
+## 26.3.1
+
+- No documented changes.
+
+## 26.3.0
+
+### New Features ✨
+
+- Reorder pull images by @aldy505 in [#4202](https://github.com/getsentry/self-hosted/pull/4202)
+
+### Bug Fixes 🐛
+
+- Manual image tags rollback to nightly by @aldy505 in [#4204](https://github.com/getsentry/self-hosted/pull/4204)
+
+### Internal Changes 🔧
+
+#### Deps
+
+- Bump actions/setup-node from 6.2.0 to 6.3.0 by @dependabot in [#4206](https://github.com/getsentry/self-hosted/pull/4206)
+- Bump getsentry/craft from 2.21.7 to 2.23.2 by @dependabot in [#4207](https://github.com/getsentry/self-hosted/pull/4207)
+- Bump minimatch from 9.0.5 to 9.0.7 in /_integration-test/nodejs by @dependabot in [#4189](https://github.com/getsentry/self-hosted/pull/4189)
+
 ## 26.2.1
 
 ### Bug Fixes 🐛
