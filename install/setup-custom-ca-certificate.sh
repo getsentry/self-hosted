@@ -3,7 +3,14 @@
 
 if [[ "${SETUP_CUSTOM_CA_CERTIFICATE:-}" == "1" ]]; then
 
+  custom_ca_debug() {
+    if [[ -n "${DEBUG:-}" ]]; then
+      echo "DEBUG(custom-ca): $*"
+    fi
+  }
+
   echo "${_group}Setting up custom CA certificates"
+  custom_ca_debug "Feature flag SETUP_CUSTOM_CA_CERTIFICATE=1"
 
   # Verify that openssl is available — it is required to validate certificates and
   # regenerate the OpenSSL hash-directory symlinks after overlaying custom certs.
@@ -20,6 +27,8 @@ if [[ "${SETUP_CUSTOM_CA_CERTIFICATE:-}" == "1" ]]; then
 
   CERT_DIR="./certificates"
   GENERATED_DIR="${CERT_DIR}/.generated"
+  custom_ca_debug "Using certificate source directory: ${CERT_DIR}"
+  custom_ca_debug "Using generated output directory: ${GENERATED_DIR}"
 
   # Collect and validate all user-provided .crt files at the top level of
   # ./certificates/ (maxdepth 1 so we never read our own .generated output).
@@ -31,6 +40,8 @@ if [[ "${SETUP_CUSTOM_CA_CERTIFICATE:-}" == "1" ]]; then
     fi
     custom_certs+=("$cert_file")
   done < <(find "$CERT_DIR" -maxdepth 1 -name "*.crt" -print0 | sort -z)
+
+  custom_ca_debug "Detected ${#custom_certs[@]} custom certificate file(s)"
 
   if [[ "${#custom_certs[@]}" -eq 0 ]]; then
     echo "No .crt files found in ${CERT_DIR}/ — nothing to do."
@@ -58,9 +69,12 @@ if [[ "${SETUP_CUSTOM_CA_CERTIFICATE:-}" == "1" ]]; then
       "${UPTIME_CHECKER_IMAGE:-}"
     )
 
+    custom_ca_debug "Target services: ${image_nicknames[*]}"
+
     for i in "${!image_nicknames[@]}"; do
       nickname="${image_nicknames[$i]}"
       image="${image_names[$i]}"
+      custom_ca_debug "Preparing service '${nickname}' with image '${image:-<unset>}'"
 
       if [[ -z "$image" ]]; then
         echo "WARNING: No image configured for '${nickname}' — skipping."
@@ -76,10 +90,12 @@ if [[ "${SETUP_CUSTOM_CA_CERTIFICATE:-}" == "1" ]]; then
       # This preserves the exact public CA baseline that the upstream image ships with.
       tmp_container=""
       if tmp_container=$($CONTAINER_ENGINE create "$image" 2>/dev/null); then
+        custom_ca_debug "Created temporary container ${tmp_container} for ${nickname}"
         if ! $CONTAINER_ENGINE cp "${tmp_container}:/etc/ssl/certs/." "$cert_out_dir/" 2>/dev/null; then
           echo "  No /etc/ssl/certs found in image — using empty baseline."
         fi
         $CONTAINER_ENGINE rm "$tmp_container" >/dev/null 2>&1 || true
+        custom_ca_debug "Removed temporary container ${tmp_container}"
       else
         echo "  WARNING: Could not create a container from '${image}'. Is the image pulled?"
         echo "  Using empty baseline for ${nickname}."
@@ -101,6 +117,7 @@ if [[ "${SETUP_CUSTOM_CA_CERTIFICATE:-}" == "1" ]]; then
       # Regenerate OpenSSL directory hash symlinks so SSL_CERT_DIR-based lookups work
       # (e.g. Go's crypto/tls, OpenSSL direct directory scan).
       openssl rehash "$cert_out_dir" 2>/dev/null || true
+      custom_ca_debug "Rehashed trust directory: ${cert_out_dir}"
     done
 
     echo ""
