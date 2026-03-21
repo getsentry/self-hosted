@@ -99,8 +99,8 @@ for i in "${!image_nicknames[@]}"; do
     cert_basename=$(basename "$cert_file" .crt)
     cp "$cert_file" "${cert_out_dir}/${cert_basename}.crt"
     # cat + echo guarantees a trailing newline between PEM blocks in the bundle.
-    cat "$cert_file" >> "${cert_out_dir}/ca-certificates.crt"
-    echo >> "${cert_out_dir}/ca-certificates.crt"
+    cat "$cert_file" >>"${cert_out_dir}/ca-certificates.crt"
+    echo >>"${cert_out_dir}/ca-certificates.crt"
   done
 
   # Regenerate OpenSSL directory hash symlinks so SSL_CERT_DIR-based lookups work

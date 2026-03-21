@@ -34,7 +34,7 @@ echo "Test certificate generated."
 # -----------------------------------------------------------------------
 # Test 3: Invalid .crt file → script exits non-zero (subshell to isolate).
 # -----------------------------------------------------------------------
-echo "not a certificate" > "${CERT_DIR}/bad.crt"
+echo "not a certificate" >"${CERT_DIR}/bad.crt"
 (
   export SETUP_CUSTOM_CA_CERTIFICATE=1
   source install/setup-custom-ca-certificate.sh
