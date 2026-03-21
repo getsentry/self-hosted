@@ -35,11 +35,13 @@ echo "Test certificate generated."
 # Test 3: Invalid .crt file → script exits non-zero (subshell to isolate).
 # -----------------------------------------------------------------------
 echo "not a certificate" >"${CERT_DIR}/bad.crt"
-(
+if (
   export SETUP_CUSTOM_CA_CERTIFICATE=1
   source install/setup-custom-ca-certificate.sh
-) 2>/dev/null
-test $? -ne 0
+) 2>/dev/null; then
+  echo "Expected setup-custom-ca-certificate.sh to fail for invalid certificate input"
+  exit 1
+fi
 rm "${CERT_DIR}/bad.crt"
 echo "Pass: invalid certificate causes a non-zero exit"
 
