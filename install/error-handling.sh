@@ -193,7 +193,7 @@ cleanup() {
       for ((i = $(($stack_depth - 1)), j = 1; i > 0; i--, j++)); do
         local indent="$(yes a | head -$j | tr -d '\n')"
         local src=${BASH_SOURCE[$i]}
-        local lineno=${BASH_LINENO[$i - 1]}
+        local lineno=${BASH_LINENO[$i-1]}
         local funcname=${FUNCNAME[$i]}
         JSON=$(
           $jq -n -c --arg filename "$src" \
