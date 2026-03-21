@@ -5,7 +5,8 @@ source install/dc-detect-version.sh
 source install/create-docker-volumes.sh
 source install/ensure-files-from-examples.sh
 export COMPOSE_PROFILES="feature-complete"
-$dc pull vroom
+# `docker compose pull vroom` can be skipped when pull_policy is set to `never`.
+$CONTAINER_ENGINE pull "${VROOM_IMAGE}"
 source install/ensure-correct-permissions-profiles-dir.sh
 
 # Generate some random files on `sentry-vroom` volume for testing
