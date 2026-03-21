@@ -52,14 +52,14 @@ runs:
         df -h
 
     - name: Setup uv
-      uses: astral-sh/setup-uv@e06108dd0aef18192324c70427afc47652e63a82 # v7.5.0
+      uses: astral-sh/setup-uv@37802adc94f370d6bfd71619e3f0bf239e1f3b78 # v7.6.0
       with:
         working-directory: ${{ github.action_path }}
         version: "0.9.15"
         # we just cache the venv-dir directly in action-setup-venv
         enable-cache: false
 
-    - uses: getsentry/action-setup-venv@6e8aebf461914919d9de6e3082669d6bfecc400c # v3.1.0
+    - uses: getsentry/action-setup-venv@5a80476d175edf56cb205b08bc58986fa99d1725 # v3.2.0
       with:
         python-version: "3.12"
         cache-dependency-path: uv.lock
@@ -214,7 +214,7 @@ runs:
     - name: Upload coverage to Codecov
       if: inputs.CODECOV_TOKEN
       continue-on-error: true
-      uses: codecov/codecov-action@671740ac38dd9b0130fbe1cec585b89eea48d3de # v5.5.2
+      uses: codecov/codecov-action@1af58845a975a7985b0beb0cbe6fbbb71a41dbad # v5.5.3
       with:
         directory: ${{ github.action_path }}
         token: ${{ inputs.CODECOV_TOKEN }}
