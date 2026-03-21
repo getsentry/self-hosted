@@ -85,12 +85,7 @@ x-snuba-defaults: &snuba_defaults
       <<: *depends_on-healthy
     redis:
       <<: *depends_on-healthy
-  image: "snuba-self-hosted-local"
-  build:
-    dockerfile: ./local-image/Dockerfile
-    context: .
-    args:
-      BASE_IMAGE: "${SNUBA_IMAGE}"
+  image: "$SNUBA_IMAGE"
   environment:
     SNUBA_SETTINGS: self_hosted
     CLICKHOUSE_HOST: clickhouse
@@ -476,11 +471,7 @@ services:
       <<: *file_healthcheck_defaults
   symbolicator:
     <<: [*restart_policy, *pull_policy]
-    image: "symbolicator-self-hosted-local"
-    build:
-      context: ./local-image
-      args:
-        BASE_IMAGE: "${SYMBOLICATOR_IMAGE}"
+    image: "$SYMBOLICATOR_IMAGE"
     environment:
       SYMBOLICATOR_STATSD_ADDR: ${STATSD_ADDR:-127.0.0.1:8125}
     command: run -c /etc/symbolicator/config.yml
@@ -718,11 +709,7 @@ services:
         restart: true
   relay:
     <<: [*restart_policy, *pull_policy]
-    image: "relay-self-hosted-local"
-    build:
-      context: ./local-image
-      args:
-        BASE_IMAGE: "${RELAY_IMAGE}"
+    image: "$RELAY_IMAGE"
     environment:
       RELAY_STATSD_ADDR: ${STATSD_ADDR:-127.0.0.1:8125}
     volumes:
@@ -746,11 +733,7 @@ services:
       test: ["CMD", "/bin/relay", "healthcheck"]
   taskbroker:
     <<: [*restart_policy, *pull_policy]
-    image: "taskbroker-self-hosted-local"
-    build:
-      context: ./local-image
-      args:
-        BASE_IMAGE: "${TASKBROKER_IMAGE}"
+    image: "$TASKBROKER_IMAGE"
     environment:
       TASKBROKER_KAFKA_CLUSTER: "kafka:9092"
       TASKBROKER_KAFKA_DEADLETTER_CLUSTER: "kafka:9092"
@@ -771,11 +754,7 @@ services:
       <<: *file_healthcheck_defaults
   vroom:
     <<: [*restart_policy, *pull_policy]
-    image: "vroom-self-hosted-local"
-    build:
-      context: ./local-image
-      args:
-        BASE_IMAGE: "${VROOM_IMAGE}"
+    image: "$VROOM_IMAGE"
     environment:
       SENTRY_KAFKA_BROKERS_PROFILING: "kafka:9092"
       SENTRY_KAFKA_BROKERS_OCCURRENCES: "kafka:9092"
@@ -800,11 +779,7 @@ services:
       - feature-complete
   uptime-checker:
     <<: [*restart_policy, *pull_policy]
-    image: "uptime-checker-self-hosted-local"
-    build:
-      context: ./local-image
-      args:
-        BASE_IMAGE: "${UPTIME_CHECKER_IMAGE}"
+    image: "$UPTIME_CHECKER_IMAGE"
     command: run
     environment:
       UPTIME_CHECKER_RESULTS_KAFKA_CLUSTER: kafka:9092

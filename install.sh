@@ -45,4 +45,5 @@ source install/set-up-and-migrate-database.sh
 source install/migrate-pgbouncer.sh
 source install/geoip.sh
 source install/setup-js-sdk-assets.sh
+source install/setup-custom-ca-certificate.sh
 source install/wrap-up.sh
