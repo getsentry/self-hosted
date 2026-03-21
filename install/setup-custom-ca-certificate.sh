@@ -1,16 +1,10 @@
 # This will only run if the SETUP_CUSTOM_CA_CERTIFICATE environment variable is set to 1.
 # Think of this as some kind of a feature flag.
 
-_exit_or_return() {
-  local code="${1:-0}"
-  if [[ "${BASH_SOURCE[0]}" != "$0" ]]; then
-    return "$code"
-  fi
-  exit "$code"
-}
+setup_custom_ca_certificate_main() {
 
 if [[ "${SETUP_CUSTOM_CA_CERTIFICATE:-}" != "1" ]]; then
-  _exit_or_return 0
+  return 0
 fi
 
 echo "${_group}Setting up custom CA certificates"
@@ -25,7 +19,7 @@ if ! command -v openssl &>/dev/null; then
   echo "!! SETUP_CUSTOM_CA_CERTIFICATE=1 requires openssl to validate and process   !!" >&2
   echo "!! your certificates. Please install openssl and re-run ./install.sh.       !!" >&2
   echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" >&2
-  _exit_or_return 1
+  return 1
 fi
 
 CERT_DIR="./certificates"
@@ -37,7 +31,7 @@ custom_certs=()
 while IFS= read -r -d '' cert_file; do
   if ! openssl x509 -in "$cert_file" -noout 2>/dev/null; then
     echo "ERROR: '${cert_file}' is not a valid PEM-encoded X.509 certificate." >&2
-    _exit_or_return 1
+    return 1
   fi
   custom_certs+=("$cert_file")
 done < <(find "$CERT_DIR" -maxdepth 1 -name "*.crt" -print0 | sort -z)
@@ -45,7 +39,7 @@ done < <(find "$CERT_DIR" -maxdepth 1 -name "*.crt" -print0 | sort -z)
 if [[ "${#custom_certs[@]}" -eq 0 ]]; then
   echo "No .crt files found in ${CERT_DIR}/ — nothing to do."
   echo "${_endgroup}"
-  _exit_or_return 0
+  return 0
 fi
 
 echo "Found ${#custom_certs[@]} custom certificate(s):"
@@ -248,3 +242,15 @@ YAML
 echo "========================================================================"
 echo ""
 echo "${_endgroup}"
+
+return 0
+}
+
+setup_custom_ca_certificate_main
+setup_custom_ca_certificate_status=$?
+
+if [[ "${BASH_SOURCE[0]}" != "$0" ]]; then
+  return "$setup_custom_ca_certificate_status"
+fi
+
+exit "$setup_custom_ca_certificate_status"
