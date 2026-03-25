@@ -77,7 +77,7 @@ x-sentry-defaults: &sentry_defaults
     - "./geoip:/geoip:ro"
     - "./certificates:/usr/local/share/ca-certificates:ro"
 x-snuba-defaults: &snuba_defaults
-  <<: *restart_policy
+  <<: [*restart_policy, *pull_policy]
   depends_on:
     clickhouse:
       <<: *depends_on-healthy
@@ -470,7 +470,7 @@ services:
     healthcheck:
       <<: *file_healthcheck_defaults
   symbolicator:
-    <<: *restart_policy
+    <<: [*restart_policy, *pull_policy]
     image: "$SYMBOLICATOR_IMAGE"
     environment:
       SYMBOLICATOR_STATSD_ADDR: ${STATSD_ADDR:-127.0.0.1:8125}
@@ -708,7 +708,7 @@ services:
         <<: *depends_on-healthy
         restart: true
   relay:
-    <<: *restart_policy
+    <<: [*restart_policy, *pull_policy]
     image: "$RELAY_IMAGE"
     environment:
       RELAY_STATSD_ADDR: ${STATSD_ADDR:-127.0.0.1:8125}
@@ -732,7 +732,7 @@ services:
       <<: *healthcheck_defaults
       test: ["CMD", "/bin/relay", "healthcheck"]
   taskbroker:
-    <<: *restart_policy
+    <<: [*restart_policy, *pull_policy]
     image: "$TASKBROKER_IMAGE"
     environment:
       TASKBROKER_KAFKA_CLUSTER: "kafka:9092"
@@ -753,7 +753,7 @@ services:
     healthcheck:
       <<: *file_healthcheck_defaults
   vroom:
-    <<: *restart_policy
+    <<: [*restart_policy, *pull_policy]
     image: "$VROOM_IMAGE"
     environment:
       SENTRY_KAFKA_BROKERS_PROFILING: "kafka:9092"
@@ -778,7 +778,7 @@ services:
     profiles:
       - feature-complete
   uptime-checker:
-    <<: *restart_policy
+    <<: [*restart_policy, *pull_policy]
     image: "$UPTIME_CHECKER_IMAGE"
     command: run
     environment:
