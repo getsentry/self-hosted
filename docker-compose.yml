@@ -140,7 +140,7 @@ services:
   postgres:
     <<: *restart_policy
     # Using the same postgres version as Sentry dev for consistency purposes
-    image: "postgres:14.19-bookworm"
+    image: "postgres:14.22-bookworm"
     healthcheck:
       <<: *healthcheck_defaults
       # Using default user "postgres" from sentry/sentry.conf.example.py or value of POSTGRES_USER if provided
