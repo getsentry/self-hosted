@@ -248,7 +248,7 @@ services:
       retries: 30
   seaweedfs:
     <<: *restart_policy
-    image: "chrislusf/seaweedfs:4.09_large_disk"
+    image: "chrislusf/seaweedfs:4.17_large_disk"
     entrypoint: "weed"
     command: >-
         server
@@ -292,6 +292,22 @@ services:
       timeout: 20s
       retries: 5
       start_period: 60s
+  seaweedfs-admin:
+    <<: *restart_policy
+    image: "chrislusf/seaweedfs:4.17_large_disk"
+    entrypoint: "weed"
+    command: >-
+      admin
+      -port=23646
+      -master=seaweedfs:9333
+  seaweedfs-worker:
+    <<: *restart_policy
+    image: "chrislusf/seaweedfs:4.17_large_disk"
+    entrypoint: "weed"
+    command: >-
+      worker
+      -admin=seaweedfs-admin:23646
+      -jobType=all
   snuba-api:
     <<: *snuba_defaults
     healthcheck:
