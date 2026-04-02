@@ -272,7 +272,6 @@ services:
         -volume.readMode=redirect
         -volume.port=8080
         -volume.port.grpc=18080
-        -ip=127.0.0.1
         -ip.bind=0.0.0.0
         -webdav=false
     environment:
@@ -300,6 +299,9 @@ services:
       admin
       -port=23646
       -master=seaweedfs:9333
+    depends_on:
+      seaweedfs:
+        <<: *depends_on-healthy
   seaweedfs-worker:
     <<: *restart_policy
     image: "chrislusf/seaweedfs:4.17_large_disk"
@@ -308,6 +310,9 @@ services:
       worker
       -admin=seaweedfs-admin:23646
       -jobType=all
+    depends_on:
+      seaweedfs-admin:
+        <<: *depends_on-default
   snuba-api:
     <<: *snuba_defaults
     healthcheck:
