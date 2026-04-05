@@ -102,7 +102,7 @@ runs:
 
     - name: Restore Sentry Volume Cache
       id: restore_cache_sentry
-      uses: BYK/docker-volume-cache-action/restore@be89365902126f508dcae387a32ec3712df6b1cd
+      uses: BYK/docker-volume-cache-action/restore@0efa5cf5178c9906cb46ed8d1a357df8fd6b1a06
       with:
         key: db-volumes-sentry-v3-${{ steps.cache_key.outputs.ARCH }}-${{ inputs.compose_profiles }}-${{ steps.cache_key.outputs.SENTRY_MIGRATIONS_MD5 }}
         restore-keys: |
@@ -112,7 +112,7 @@ runs:
 
     - name: Restore Snuba Volume Cache
       id: restore_cache_snuba
-      uses: BYK/docker-volume-cache-action/restore@be89365902126f508dcae387a32ec3712df6b1cd
+      uses: BYK/docker-volume-cache-action/restore@0efa5cf5178c9906cb46ed8d1a357df8fd6b1a06
       with:
         key: db-volumes-snuba-v3-${{ steps.cache_key.outputs.ARCH }}-${{ inputs.compose_profiles }}-${{ steps.cache_key.outputs.SNUBA_MIGRATIONS_MD5 }}
         restore-keys: |
@@ -122,7 +122,7 @@ runs:
 
     - name: Restore Kafka Volume Cache
       id: restore_cache_kafka
-      uses: BYK/docker-volume-cache-action/restore@be89365902126f508dcae387a32ec3712df6b1cd
+      uses: BYK/docker-volume-cache-action/restore@0efa5cf5178c9906cb46ed8d1a357df8fd6b1a06
       with:
         key: db-volumes-kafka-v2-${{ steps.cache_key.outputs.ARCH }}-${{ inputs.compose_profiles }}-${{ steps.cache_key.outputs.SENTRY_MIGRATIONS_MD5 }}-${{ steps.cache_key.outputs.SNUBA_MIGRATIONS_MD5 }}
         restore-keys: |
@@ -156,7 +156,7 @@ runs:
 
     - name: Save Sentry Volume Cache
       if: steps.restore_cache_sentry.outputs.cache-hit != 'true'
-      uses: BYK/docker-volume-cache-action/save@be89365902126f508dcae387a32ec3712df6b1cd
+      uses: BYK/docker-volume-cache-action/save@0efa5cf5178c9906cb46ed8d1a357df8fd6b1a06
       with:
         key: ${{ steps.restore_cache_sentry.outputs.cache-primary-key }}
         volumes: |
@@ -164,7 +164,7 @@ runs:
 
     - name: Save Snuba Volume Cache
       if: steps.restore_cache_snuba.outputs.cache-hit != 'true'
-      uses: BYK/docker-volume-cache-action/save@be89365902126f508dcae387a32ec3712df6b1cd
+      uses: BYK/docker-volume-cache-action/save@0efa5cf5178c9906cb46ed8d1a357df8fd6b1a06
       with:
         key: ${{ steps.restore_cache_snuba.outputs.cache-primary-key }}
         volumes: |
@@ -172,7 +172,7 @@ runs:
 
     - name: Save Kafka Volume Cache
       if: steps.restore_cache_kafka.outputs.cache-hit != 'true'
-      uses: BYK/docker-volume-cache-action/save@be89365902126f508dcae387a32ec3712df6b1cd
+      uses: BYK/docker-volume-cache-action/save@0efa5cf5178c9906cb46ed8d1a357df8fd6b1a06
       with:
         key: ${{ steps.restore_cache_kafka.outputs.cache-primary-key }}
         volumes: |
