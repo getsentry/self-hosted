@@ -773,6 +773,27 @@ services:
     command: run taskworker --concurrency=$SENTRY_TASKWORKER_CONCURRENCY --rpc-host=taskbroker:50051 --health-check-file-path=/tmp/health.txt
     healthcheck:
       <<: *file_healthcheck_defaults
+  launchpad-taskworker:
+    <<: [*restart_policy, *pull_policy]
+    image: "$LAUNCHPAD_IMAGE"
+    command: worker --verbose
+    environment:
+      LAUNCHPAD_WORKER_RPC_HOST: "taskbroker:50051"
+      LAUNCHPAD_WORKER_CONCURRENCY: "${LAUNCHPAD_TASKWORKER_CONCURRENCY:-4}"
+      LAUNCHPAD_WORKER_HEALTH_CHECK_FILE_PATH: "/tmp/health.txt"
+      KAFKA_BOOTSTRAP_SERVERS: "kafka:9092"
+      SENTRY_BASE_URL: "http://web:9000"
+      LAUNCHPAD_RPC_SHARED_SECRET: ""
+      LAUNCHPAD_ENV: "self-hosted"
+    healthcheck:
+      <<: *file_healthcheck_defaults
+    depends_on:
+      kafka:
+        <<: *depends_on-healthy
+      taskbroker:
+        <<: *depends_on-default
+      web:
+        <<: *depends_on-healthy
   vroom:
     <<: [*restart_policy, *pull_policy]
     image: "$VROOM_IMAGE"
