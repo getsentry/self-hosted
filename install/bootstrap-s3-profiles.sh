@@ -22,7 +22,7 @@ if [[ "$COMPOSE_PROFILES" == "feature-complete" ]]; then
   if ! echo "$bucket_list" | grep -q "s3://profiles"; then
     apply_config_changes_profiles=0
     # Only touch if no existing profiles config is found
-    if ! grep -q "filestore.profiles-backend" $SENTRY_CONFIG_YML; then
+    if [[ -f "$SENTRY_CONFIG_YML" ]] && ! grep -q "filestore.profiles-backend" "$SENTRY_CONFIG_YML"; then
       if [[ -z "${APPLY_AUTOMATIC_CONFIG_UPDATES:-}" ]]; then
         echo
         echo "We are migrating the Profiles data directory from the 'sentry-vroom' volume to SeaweedFS."
@@ -66,7 +66,7 @@ if [[ "$COMPOSE_PROFILES" == "feature-complete" ]]; then
 
       if [[ "$APPLY_AUTOMATIC_CONFIG_UPDATES" == 1 || "$apply_config_changes_profiles" == 1 ]]; then
         profiles_config=$(sed -n '/filestore.profiles-backend/,/s3v4"/{p}' sentry/config.example.yml)
-        echo "$profiles_config" >>$SENTRY_CONFIG_YML
+        echo "$profiles_config" >>"$SENTRY_CONFIG_YML"
       fi
     fi
 
