@@ -84,6 +84,7 @@ if [[ "$COMPOSE_PROFILES" == "feature-complete" ]]; then
       $dc exec vroom sh -c 's3cmd --access_key=sentry --secret_key=sentry --no-ssl --region=us-east-1 --host=seaweedfs:8333 --host-bucket="seaweedfs:8333/%(bucket)" sync /var/vroom/sentry-profiles/ s3://profiles/'
 
       echo "Migration completed."
+      $dc exec vroom sh -c 'rm -rf /var/vroom/sentry-profiles/*'
     else
       echo "No files found in 'sentry-vroom' volume. Skipping files migration."
     fi

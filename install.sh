@@ -29,6 +29,8 @@ source install/check-minimum-requirements.sh
 # in order to determine whether or not the clickhouse version needs to be upgraded.
 source install/upgrade-clickhouse.sh
 source install/update-docker-images.sh
+source install/ensure-correct-permissions-profiles-dir.sh
+source install/bootstrap-s3-profiles.sh
 source install/turn-things-off.sh
 source install/create-docker-volumes.sh
 source install/ensure-files-from-examples.sh
@@ -39,8 +41,6 @@ source install/build-docker-images.sh
 source install/bootstrap-s3-nodestore.sh
 source install/bootstrap-snuba.sh
 source install/upgrade-postgres.sh
-source install/ensure-correct-permissions-profiles-dir.sh
-source install/bootstrap-s3-profiles.sh
 source install/set-up-and-migrate-database.sh
 source install/migrate-pgbouncer.sh
 source install/geoip.sh
