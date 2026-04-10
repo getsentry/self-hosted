@@ -70,6 +70,7 @@ x-sentry-defaults: &sentry_defaults
     SENTRY_MAIL_HOST:
     SENTRY_MAX_EXTERNAL_SOURCEMAP_SIZE:
     SENTRY_SYSTEM_SECRET_KEY:
+    LAUNCHPAD_RPC_SHARED_SECRET:
     SENTRY_STATSD_ADDR: "${STATSD_ADDR:-}"
   volumes:
     - "sentry-data:/data"
@@ -776,14 +777,14 @@ services:
   launchpad-taskworker:
     <<: [*restart_policy, *pull_policy]
     image: "$LAUNCHPAD_IMAGE"
-    command: worker --verbose
+    command: "worker --verbose"
     environment:
       LAUNCHPAD_WORKER_RPC_HOST: "taskbroker:50051"
       LAUNCHPAD_WORKER_CONCURRENCY: "${LAUNCHPAD_TASKWORKER_CONCURRENCY:-4}"
       LAUNCHPAD_WORKER_HEALTH_CHECK_FILE_PATH: "/tmp/health.txt"
       KAFKA_BOOTSTRAP_SERVERS: "kafka:9092"
       SENTRY_BASE_URL: "http://web:9000"
-      LAUNCHPAD_RPC_SHARED_SECRET: ""
+      LAUNCHPAD_RPC_SHARED_SECRET:
       LAUNCHPAD_ENV: "self-hosted"
     healthcheck:
       <<: *file_healthcheck_defaults
