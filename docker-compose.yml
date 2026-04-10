@@ -795,6 +795,8 @@ services:
         <<: *depends_on-default
       web:
         <<: *depends_on-healthy
+    profiles:
+      - feature-complete
   vroom:
     <<: [*restart_policy, *pull_policy]
     image: "$VROOM_IMAGE"
