@@ -55,6 +55,16 @@ def get_sentry_dsn(client: httpx.Client) -> str:
     sentry_dsn = json.loads(response.text)[0]["dsn"]["public"]
     return sentry_dsn
 
+@lru_cache
+def get_organization_token(client: httpx.Client, name: str) -> str:
+    response = client.post(
+        f"{SENTRY_TEST_HOST}/api/0/organizations/pans/org-auth-tokens/",
+        follow_redirects=True,
+        data={"name": name},
+        headers={"Referer": f"{SENTRY_TEST_HOST}/settings/pans/auth-tokens/new-token/"},
+    )
+    token = json.loads(response.text)["token"]
+    return token
 
 @pytest.fixture()
 def client_login():
@@ -75,7 +85,6 @@ def client_login():
     )
     assert login_response.status_code == 200
     yield (client, login_response)
-
 
 def test_initial_redirect():
     initial_auth_redirect = httpx.get(SENTRY_TEST_HOST, follow_redirects=True)
@@ -488,6 +497,31 @@ def test_receive_logs_events(client_login):
         f"{SENTRY_TEST_HOST}/api/0/organizations/sentry/events/?dataset=ourlogs&field=sentry.item_id&field=project.id&field=trace&field=severity_number&field=severity&field=timestamp&field=timestamp_precise&field=observed_timestamp&field=message&project=1&statsPeriod=1h",
         client,
         lambda x: len(json.loads(x)["data"]) > 0,
+    )
+
+@pytest.mark.skipif(os.environ.get("COMPOSE_PROFILES") != "feature-complete", reason="Only run if feature-complete")
+def test_upload_mobile_builds(client_login):
+    client, _ = client_login
+    sentry_dsn = get_sentry_dsn(client)
+
+    organization_auth_token = get_organization_token(client, "preprod")
+    env = os.environ.copy()
+    env["SENTRY_DSN"] = sentry_dsn
+    subprocess.run(
+        ["sentry-cli", "--log-level", "DEBUG", "--url", SENTRY_TEST_HOST, "--auth-token", organization_auth_token, "build", "upload", "hn.aab", "--org", "sentry", "--project", "internal"],
+        check=True,
+        shell=False,
+        env=env,
+        cwd="_integration-test/emerge-tools",
+        stdout=sys.stdout,
+        stderr=sys.stderr,
+        timeout=60,
+    )
+
+    poll_for_response(
+        f"{SENTRY_TEST_HOST}/api/0/organizations/sentry/builds/?display=size&per_page=25&project=-1&query=%21size_state%3Anot_ran&statsPeriod=24h&tab=mobile-builds",
+        client,
+        lambda x: len(json.loads(x)) > 0,
     )
 
 def test_customizations():
