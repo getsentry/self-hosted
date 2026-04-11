@@ -58,10 +58,10 @@ def get_sentry_dsn(client: httpx.Client) -> str:
 @lru_cache
 def get_organization_token(client: httpx.Client, name: str) -> str:
     response = client.post(
-        f"{SENTRY_TEST_HOST}/api/0/organizations/pans/org-auth-tokens/",
+        f"{SENTRY_TEST_HOST}/api/0/organizations/sentry/org-auth-tokens/",
         follow_redirects=True,
         data={"name": name},
-        headers={"Referer": f"{SENTRY_TEST_HOST}/settings/pans/auth-tokens/new-token/"},
+        headers={"Referer": f"{SENTRY_TEST_HOST}/settings/sentry/auth-tokens/new-token/"},
     )
     token = json.loads(response.text)["token"]
     return token
