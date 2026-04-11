@@ -770,7 +770,7 @@ services:
     command: run taskworker-scheduler
   taskworker:
     <<: *sentry_defaults
-    command: run taskworker --concurrency=$SENTRY_TASKWORKER_CONCURRENCY --rpc-host=taskbroker:50051 --health-check-file-path=/tmp/health.txt
+    command: run taskworker --concurrency=$SENTRY_TASKWORKER_CONCURRENCY --rpc-host=taskbroker:50051 --health-check-file-path=/tmp/health.txt --max-child-task-count=10000
     healthcheck:
       <<: *file_healthcheck_defaults
   vroom:
