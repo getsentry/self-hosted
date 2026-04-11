@@ -63,6 +63,7 @@ def get_organization_token(client: httpx.Client, name: str) -> str:
         data={"name": name},
         headers={"Referer": f"{SENTRY_TEST_HOST}/settings/sentry/auth-tokens/new-token/"},
     )
+    print(response.text)
     token = json.loads(response.text)["token"]
     return token
 
