@@ -1,5 +1,43 @@
 # Changelog
 
+## 26.4.0
+
+### New Features ✨
+
+- (ci) Cancel in-progress PR workflows on new commit push by @joshuarli in [#4283](https://github.com/getsentry/self-hosted/pull/4283)
+- Add max-child-task-count to taskworker container by @markstory in [#4279](https://github.com/getsentry/self-hosted/pull/4279)
+- Run SeaweedFS admin and worker instance by @aldy505 in [#4259](https://github.com/getsentry/self-hosted/pull/4259)
+- Support custom CA certificates for all containers by @aldy505 in [#4216](https://github.com/getsentry/self-hosted/pull/4216)
+- Remove 'vroom-cleanup' container by @aldy505 in [#4217](https://github.com/getsentry/self-hosted/pull/4217)
+
+### Bug Fixes 🐛
+
+- (install) Gracefully handle missing containers in minimize-downtime by @shameemkpofficial-git in [#4246](https://github.com/getsentry/self-hosted/pull/4246)
+- Disable a few more new clickhouse tables by @alkanna in [#4269](https://github.com/getsentry/self-hosted/pull/4269)
+- Explicit post release command for craft by @aldy505 in [#4273](https://github.com/getsentry/self-hosted/pull/4273)
+- Use default buildx builder to resolve local images during build by @maiqigh in [#4250](https://github.com/getsentry/self-hosted/pull/4250)
+
+### Internal Changes 🔧
+
+#### Deps
+
+- Bump brace-expansion from 5.0.3 to 5.0.5 in /_integration-test/nodejs by @dependabot in [#4247](https://github.com/getsentry/self-hosted/pull/4247)
+- Bump j178/prek-action from 2.0.0 to 2.0.1 by @dependabot in [#4264](https://github.com/getsentry/self-hosted/pull/4264)
+- Bump BYK/docker-volume-cache-action from be89365902126f508dcae387a32ec3712df6b1cd to 0efa5cf5178c9906cb46ed8d1a357df8fd6b1a06 by @dependabot in [#4253](https://github.com/getsentry/self-hosted/pull/4253)
+- Bump astral-sh/setup-uv from 7.6.0 to 8.0.0 by @dependabot in [#4254](https://github.com/getsentry/self-hosted/pull/4254)
+- Bump getsentry/craft from 2.23.2 to 2.24.1 by @dependabot in [#4221](https://github.com/getsentry/self-hosted/pull/4221)
+- Bump astral-sh/setup-uv from 7.2.1 to 7.5.0 by @dependabot in [#4220](https://github.com/getsentry/self-hosted/pull/4220)
+
+#### Other
+
+- (config) Remove graduated standalone span ingestion flag by @Dav1dde in [#4274](https://github.com/getsentry/self-hosted/pull/4274)
+- Restore unpinned actions by @aldy505 in [#4243](https://github.com/getsentry/self-hosted/pull/4243)
+- Swap pre-commit with prek by @aldy505 in [#4235](https://github.com/getsentry/self-hosted/pull/4235)
+
+### Other
+
+- Bump postgres 14.22-bookworm by @aminvakil in [#4249](https://github.com/getsentry/self-hosted/pull/4249)
+
 ## 26.3.1
 
 - No documented changes.
