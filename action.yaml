@@ -176,7 +176,7 @@ runs:
         ./install.sh --no-report-self-hosted-issues --skip-commit-check
 
     - name: Save Sentry Volume Cache
-      if: steps.restore_cache_snuba.outputs.cache-hit != 'true' && inputs.no_restore_volume_cache != 'true'
+      if: steps.restore_cache_sentry.outputs.cache-hit != 'true' && inputs.no_restore_volume_cache != 'true'
       uses: BYK/docker-volume-cache-action/save@0efa5cf5178c9906cb46ed8d1a357df8fd6b1a06
       with:
         key: ${{ steps.restore_cache_sentry.outputs.cache-primary-key }}
@@ -192,7 +192,7 @@ runs:
           sentry-clickhouse
 
     - name: Save Kafka Volume Cache
-      if: steps.restore_cache_snuba.outputs.cache-hit != 'true' && inputs.no_restore_volume_cache != 'true'
+      if: steps.restore_cache_kafka.outputs.cache-hit != 'true' && inputs.no_restore_volume_cache != 'true'
       uses: BYK/docker-volume-cache-action/save@0efa5cf5178c9906cb46ed8d1a357df8fd6b1a06
       with:
         key: ${{ steps.restore_cache_kafka.outputs.cache-primary-key }}
