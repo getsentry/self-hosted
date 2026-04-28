@@ -727,7 +727,7 @@ services:
         <<: *depends_on-healthy
         restart: true
       relay:
-        <<: *depends_on-healthy
+        <<: *depends_on-default
         restart: true
   relay:
     <<: [*restart_policy, *pull_policy]
@@ -750,9 +750,6 @@ services:
         <<: *depends_on-healthy
       web:
         <<: *depends_on-healthy
-    healthcheck:
-      <<: *healthcheck_defaults
-      test: ["CMD", "/bin/relay", "healthcheck"]
   taskbroker:
     <<: [*restart_policy, *pull_policy]
     image: "$TASKBROKER_IMAGE"
@@ -771,7 +768,7 @@ services:
     command: run taskworker-scheduler
   taskworker:
     <<: *sentry_defaults
-    command: run taskworker --concurrency=$SENTRY_TASKWORKER_CONCURRENCY --rpc-host=taskbroker:50051 --health-check-file-path=/tmp/health.txt
+    command: run taskworker --concurrency=$SENTRY_TASKWORKER_CONCURRENCY --rpc-host=taskbroker:50051 --health-check-file-path=/tmp/health.txt --max-child-task-count=10000
     healthcheck:
       <<: *file_healthcheck_defaults
   launchpad-taskworker:
