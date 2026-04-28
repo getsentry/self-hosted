@@ -56,14 +56,16 @@ def get_sentry_dsn(client: httpx.Client) -> str:
     return sentry_dsn
 
 @lru_cache
-def get_organization_token(client: httpx.Client, name: str) -> str:
+def get_organization_token(client: httpx.Client, csrf_token: str, name: str) -> str:
     response = client.post(
         f"{SENTRY_TEST_HOST}/api/0/organizations/sentry/org-auth-tokens/",
         follow_redirects=True,
         data={"name": name},
-        headers={"Referer": f"{SENTRY_TEST_HOST}/settings/sentry/auth-tokens/new-token/"},
+        headers={
+          "Referer": f"{SENTRY_TEST_HOST}/settings/sentry/auth-tokens/new-token/",
+          "X-CSRFToken": csrf_token,
+        },
     )
-    print(response.text)
     token = json.loads(response.text)["token"]
     return token
 
@@ -502,10 +504,10 @@ def test_receive_logs_events(client_login):
 
 @pytest.mark.skipif(os.environ.get("COMPOSE_PROFILES") != "feature-complete", reason="Only run if feature-complete")
 def test_upload_mobile_builds(client_login):
-    client, _ = client_login
+    client, login_response = client_login
     sentry_dsn = get_sentry_dsn(client)
 
-    organization_auth_token = get_organization_token(client, "preprod")
+    organization_auth_token = get_organization_token(client, login_response.cookies["sc"], "preprod")
     env = os.environ.copy()
     env["SENTRY_DSN"] = sentry_dsn
     subprocess.run(
