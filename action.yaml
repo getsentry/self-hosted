@@ -267,6 +267,3 @@ runs:
         echo "::group::Inspect failure - docker stats"
         docker stats --no-stream
         echo "::endgroup::"
-        echo "::group::Inspect failure - disk i/o stats"
-        iostat -x 1
-        echo "::endgroup::"
