@@ -22,6 +22,11 @@ x-file-healthcheck: &file_healthcheck_defaults
   timeout: "$HEALTHCHECK_FILE_TIMEOUT"
   retries: $HEALTHCHECK_FILE_RETRIES
   start_period: "$HEALTHCHECK_FILE_START_PERIOD"
+x-force-no-proxy: &force_no_proxy
+  HTTP_PROXY: ""
+  HTTPS_PROXY: ""
+  http_proxy: ""
+  https_proxy: ""
 x-sentry-defaults: &sentry_defaults
   <<: [*restart_policy, *pull_policy]
   image: sentry-self-hosted-local
@@ -275,6 +280,7 @@ services:
         -ip.bind=0.0.0.0
         -webdav=false
     environment:
+      <<: *force_no_proxy
       AWS_ACCESS_KEY_ID: sentry
       AWS_SECRET_ACCESS_KEY: sentry
     volumes:
@@ -299,6 +305,8 @@ services:
       admin
       -port=23646
       -master=seaweedfs:9333
+    environment:
+      <<: *force_no_proxy
     depends_on:
       seaweedfs:
         <<: *depends_on-healthy
@@ -310,6 +318,8 @@ services:
       worker
       -admin=seaweedfs-admin:23646
       -jobType=all
+    environment:
+      <<: *force_no_proxy
     depends_on:
       seaweedfs-admin:
         <<: *depends_on-default
