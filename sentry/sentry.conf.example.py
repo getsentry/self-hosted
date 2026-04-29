@@ -433,6 +433,18 @@ SENTRY_FEATURES.update(
             "organizations:ourlogs-stats",
             "organizations:ourlogs-replay-ui",
         )
+        # Metrics related flags
+        + (
+            "organizations:tracemetrics-enabled",
+            "organizations:tracemetrics-alerts",
+            "organizations:tracemetrics-ingestion",
+            "organizations:tracemetrics-equations-in-alerts",
+            "organizations:tracemetrics-equations-in-explore",
+            "organizations:tracemetrics-multi-metric-selection-in-dashboards",
+            "organizations:tracemetrics-units-ui",
+            "organizations:tracemetrics-stats-bytes-ui",
+            "organizations:tracemetrics-pii-scrubbing-ui",
+        )
     }
 )
 

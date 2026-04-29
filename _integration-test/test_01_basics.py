@@ -462,6 +462,44 @@ def test_receive_user_feedback_events(client_login):
     )
 
 @pytest.mark.skipif(os.environ.get("COMPOSE_PROFILES") != "feature-complete", reason="Only run if feature-complete")
+def test_receive_metrics_events(client_login):
+    client, _ = client_login
+    sentry_sdk.init(
+        dsn=get_sentry_dsn(client), profiles_sample_rate=1.0, traces_sample_rate=1.0
+    )
+
+    sentry_sdk.metrics.count(
+        "button_click",
+        5,
+        attributes={
+            "browser": "Firefox",
+            "app_version": "1.0.0"
+        },
+    )
+    sentry_sdk.metrics.distribution(
+        "page_load",
+        15.0,
+        unit="millisecond",
+        attributes={
+            "page": "/home"
+        },
+    )
+    sentry_sdk.metrics.gauge(
+        "page_load",
+        15.0,
+        unit="millisecond",
+        attributes={
+            "page": "/home"
+        },
+    )
+
+    poll_for_response(
+        f"{SENTRY_TEST_HOST}/api/0/organizations/sentry/events/?dataset=tracemetrics&field=metric.name&field=metric.type&field=count%28metric.name%29&field=max%28timestamp_precise%29&field=metric.unit&referrer=api.explore.metric-options&statsPeriod=1h",
+        client,
+        lambda x: len(json.loads(x)["data"]) > 0,
+    )
+
+@pytest.mark.skipif(os.environ.get("COMPOSE_PROFILES") != "feature-complete", reason="Only run if feature-complete")
 def test_receive_logs_events(client_login):
     client, _ = client_login
     sentry_sdk.init(
