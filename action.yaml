@@ -264,3 +264,6 @@ runs:
         echo "::group::Inspect failure - docker compose logs"
         docker compose logs
         echo "::endgroup::"
+        echo "::group::Inspect failure - docker stats"
+        docker stats --no-stream
+        echo "::endgroup::"
