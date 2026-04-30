@@ -215,11 +215,25 @@ runs:
       with:
         node-version: "22.x"
 
+    - name: Setup Sentry CLI
+      shell: bash
+      run: curl -sL https://sentry.io/get-cli/ | SENTRY_CLI_VERSION="3.3.5" bash
+
     - name: Install Nodejs dependencies
       shell: bash
       run: |
         cd ${{ github.action_path }}/_integration-test/nodejs
         npm ci
+
+    - name: Setup required Emerge Tools files
+      if: inputs.compose_profiles == 'feature-complete'
+      shell: bash
+      run: |
+        set -euo pipefail
+        cd ${{ github.action_path }}
+        mkdir -p _integration-test/emerge-tools
+        cd _integration-test/emerge-tools
+        curl -LO https://github.com/getsentry/launchpad/raw/893ad23dcfd81d70edbb26ea217d9d18e2ba81da/tests/_fixtures/android/hn.aab
 
     - name: Integration Test
       shell: bash
