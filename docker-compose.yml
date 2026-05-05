@@ -196,8 +196,8 @@ services:
       KAFKA_TOOLS_LOG4J_LOGLEVEL: "WARN"
     ulimits:
       nofile:
-        soft: 4096
-        hard: 4096
+        soft: 100000
+        hard: 100000
     volumes:
       - "sentry-kafka:/var/lib/kafka/data"
       - "sentry-kafka-log:/var/lib/kafka/log"
