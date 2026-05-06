@@ -1,5 +1,34 @@
 # Changelog
 
+## 26.4.2
+
+### New Features ✨
+
+- Allow upgrade tests by @aldy505 in [#4288](https://github.com/getsentry/self-hosted/pull/4288)
+
+### Bug Fixes 🐛
+
+- Force disable HTTP(S) proxy for seaweedfs services by @DragoonAethis in [#4311](https://github.com/getsentry/self-hosted/pull/4311)
+
+### Internal Changes 🔧
+
+#### Deps
+
+- Bump j178/prek-action from 2.0.1 to 2.0.2 by @dependabot in [#4289](https://github.com/getsentry/self-hosted/pull/4289)
+- Bump actions/setup-node from 6.3.0 to 6.4.0 by @dependabot in [#4291](https://github.com/getsentry/self-hosted/pull/4291)
+- Bump actions/create-github-app-token from 3.0.0 to 3.1.1 by @dependabot in [#4280](https://github.com/getsentry/self-hosted/pull/4280)
+- Bump pygments from 2.19.2 to 2.20.0 by @dependabot in [#4256](https://github.com/getsentry/self-hosted/pull/4256)
+
+#### Deps Dev
+
+- Bump pytest from 9.0.1 to 9.0.3 by @dependabot in [#4284](https://github.com/getsentry/self-hosted/pull/4284)
+- Bump cryptography from 46.0.5 to 46.0.7 by @dependabot in [#4275](https://github.com/getsentry/self-hosted/pull/4275)
+
+#### Other
+
+- (relay) Remove healthcheck from docker compose by @Dav1dde in [#4304](https://github.com/getsentry/self-hosted/pull/4304)
+- (template) Remove task for updating relocation release tests by @kenzoengineer in [#4297](https://github.com/getsentry/self-hosted/pull/4297)
+
 ## 26.4.1
 
 - No documented changes.
