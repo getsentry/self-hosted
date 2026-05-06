@@ -433,10 +433,6 @@ SENTRY_FEATURES.update(
             "organizations:ourlogs-stats",
             "organizations:ourlogs-replay-ui",
         )
-        # Emerge Tools (Size Analysis, Build Distribution, etc) related flags
-        + (
-            "organizations:preprod-frontend-routes",
-        )
     }
 )
 
