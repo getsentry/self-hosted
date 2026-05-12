@@ -22,6 +22,11 @@ x-file-healthcheck: &file_healthcheck_defaults
   timeout: "$HEALTHCHECK_FILE_TIMEOUT"
   retries: $HEALTHCHECK_FILE_RETRIES
   start_period: "$HEALTHCHECK_FILE_START_PERIOD"
+x-force-no-proxy: &force_no_proxy
+  HTTP_PROXY: ""
+  HTTPS_PROXY: ""
+  http_proxy: ""
+  https_proxy: ""
 x-sentry-defaults: &sentry_defaults
   <<: [*restart_policy, *pull_policy]
   image: sentry-self-hosted-local
@@ -70,6 +75,7 @@ x-sentry-defaults: &sentry_defaults
     SENTRY_MAIL_HOST:
     SENTRY_MAX_EXTERNAL_SOURCEMAP_SIZE:
     SENTRY_SYSTEM_SECRET_KEY:
+    LAUNCHPAD_RPC_SHARED_SECRET:
     SENTRY_STATSD_ADDR: "${STATSD_ADDR:-}"
   volumes:
     - "sentry-data:/data"
@@ -275,6 +281,7 @@ services:
         -ip.bind=0.0.0.0
         -webdav=false
     environment:
+      <<: *force_no_proxy
       AWS_ACCESS_KEY_ID: sentry
       AWS_SECRET_ACCESS_KEY: sentry
     volumes:
@@ -299,6 +306,8 @@ services:
       admin
       -port=23646
       -master=seaweedfs:9333
+    environment:
+      <<: *force_no_proxy
     depends_on:
       seaweedfs:
         <<: *depends_on-healthy
@@ -310,6 +319,8 @@ services:
       worker
       -admin=seaweedfs-admin:23646
       -jobType=all
+    environment:
+      <<: *force_no_proxy
     depends_on:
       seaweedfs-admin:
         <<: *depends_on-default
@@ -726,7 +737,7 @@ services:
         <<: *depends_on-healthy
         restart: true
       relay:
-        <<: *depends_on-healthy
+        <<: *depends_on-default
         restart: true
   relay:
     <<: [*restart_policy, *pull_policy]
@@ -749,9 +760,6 @@ services:
         <<: *depends_on-healthy
       web:
         <<: *depends_on-healthy
-    healthcheck:
-      <<: *healthcheck_defaults
-      test: ["CMD", "/bin/relay", "healthcheck"]
   taskbroker:
     <<: [*restart_policy, *pull_policy]
     image: "$TASKBROKER_IMAGE"
@@ -773,6 +781,29 @@ services:
     command: run taskworker --concurrency=$SENTRY_TASKWORKER_CONCURRENCY --rpc-host=taskbroker:50051 --health-check-file-path=/tmp/health.txt --max-child-task-count=10000
     healthcheck:
       <<: *file_healthcheck_defaults
+  launchpad-taskworker:
+    <<: [*restart_policy, *pull_policy]
+    image: "$LAUNCHPAD_IMAGE"
+    command: "worker --verbose"
+    environment:
+      LAUNCHPAD_WORKER_RPC_HOST: "taskbroker:50051"
+      LAUNCHPAD_WORKER_CONCURRENCY: "${LAUNCHPAD_TASKWORKER_CONCURRENCY:-4}"
+      LAUNCHPAD_WORKER_HEALTH_CHECK_FILE_PATH: "/tmp/health.txt"
+      KAFKA_BOOTSTRAP_SERVERS: "kafka:9092"
+      SENTRY_BASE_URL: "http://web:9000"
+      LAUNCHPAD_RPC_SHARED_SECRET:
+      LAUNCHPAD_ENV: "self-hosted"
+    healthcheck:
+      <<: *file_healthcheck_defaults
+    depends_on:
+      kafka:
+        <<: *depends_on-healthy
+      taskbroker:
+        <<: *depends_on-default
+      web:
+        <<: *depends_on-healthy
+    profiles:
+      - feature-complete
   vroom:
     <<: [*restart_policy, *pull_policy]
     image: "$VROOM_IMAGE"
