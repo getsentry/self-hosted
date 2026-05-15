@@ -59,7 +59,7 @@ if [[ "${SETUP_CUSTOM_CA_CERTIFICATE:-}" == "1" ]]; then
 
     # Pairs of service nickname and the env var that holds the image reference.
     # All of these are loaded from .env (via install/_lib.sh) before this script runs.
-    image_nicknames=(relay symbolicator snuba vroom taskbroker uptime-checker)
+    image_nicknames=(relay symbolicator snuba vroom taskbroker uptime-checker launchpad)
     image_names=(
       "${RELAY_IMAGE:-}"
       "${SYMBOLICATOR_IMAGE:-}"
@@ -67,6 +67,7 @@ if [[ "${SETUP_CUSTOM_CA_CERTIFICATE:-}" == "1" ]]; then
       "${VROOM_IMAGE:-}"
       "${TASKBROKER_IMAGE:-}"
       "${UPTIME_CHECKER_IMAGE:-}"
+      "${LAUNCHPAD_IMAGE:-}"
     )
 
     custom_ca_debug "Target services: ${image_nicknames[*]}"
@@ -182,6 +183,14 @@ x-custom-ca-uptime-checker: &ca_uptime_checker
       source: ./certificates/.generated/uptime-checker/etc/ssl/certs
       target: /etc/ssl/certs
 
+x-custom-ca-launchpad: &ca_launchpad
+  volumes:
+    - type: bind
+      read_only: true
+      source: ./certificates/.generated/launchpad/etc/ssl/certs
+      target: /etc/ssl/certs
+
+
 services:
   relay:
     <<: *ca_relay
@@ -247,6 +256,8 @@ services:
     <<: *ca_taskbroker
   uptime-checker:
     <<: *ca_uptime_checker
+  launchpad-taskworker:
+    <<: *ca_launchpad
 YAML
   fi
 
