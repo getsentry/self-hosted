@@ -86,7 +86,20 @@ EOF
 
   echo "Making sure the bucket lifecycle policy is all set up correctly..."
   $dc exec seaweedfs sh -c "printf '%s' '$lifecycle_policy' > /tmp/nodestore-lifecycle-policy.xml"
-  $s3cmd --access_key=sentry --secret_key=sentry --no-ssl --region=us-east-1 --host=localhost:8333 --host-bucket='localhost:8333/%(bucket)' setlifecycle /tmp/nodestore-lifecycle-policy.xml s3://nodestore
+  setlifecycle_cmd="$s3cmd --access_key=sentry --secret_key=sentry --no-ssl --region=us-east-1 --host=localhost:8333 --host-bucket='localhost:8333/%(bucket)' setlifecycle /tmp/nodestore-lifecycle-policy.xml s3://nodestore"
+  if ! timeout 60s sh -c "$setlifecycle_cmd"; then
+    echo
+    echo
+    echo "====== WARNING ======"
+    echo
+    echo "Applying the lifecycle policy for the 'nodestore' bucket took too long or failed."
+    echo "This policy is important to ensure that old nodestore data is automatically deleted after $SENTRY_EVENT_RETENTION_DAYS days, which helps manage storage usage."
+    echo "Please run this command manually as soon as possible to set the lifecycle policy for the 'nodestore' bucket:"
+    echo
+    echo "  $setlifecycle_cmd"
+    echo
+    sleep 5
+  fi
   timeout 30s $s3cmd --access_key=sentry --secret_key=sentry --no-ssl --region=us-east-1 --host=localhost:8333 --host-bucket='localhost:8333/%(bucket)' getlifecycle s3://nodestore >/dev/null 2>&1 || true
 fi
 
