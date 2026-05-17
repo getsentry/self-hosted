@@ -121,6 +121,9 @@ EOF
       echo "This policy is important to ensure that old profiles are automatically deleted after $SENTRY_EVENT_RETENTION_DAYS days, which helps manage storage usage."
       echo "Please run this command manually as soon as possible to set the lifecycle policy for the 'profiles' bucket:"
       echo
+      echo "  $dc up --wait seaweedfs"
+      echo "  $dc exec seaweedfs apk add --no-cache s3cmd"
+      echo "  $dc exec seaweedfs sh -c \"printf '%s' '$lifecycle_policy' > /tmp/profiles-lifecycle-policy.xml\""
       echo "  $setlifecycle_cmd"
       echo
       sleep 5
