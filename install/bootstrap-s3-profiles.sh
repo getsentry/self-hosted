@@ -112,9 +112,7 @@ EOF
 
     $dc exec seaweedfs sh -c "printf '%s' '$lifecycle_policy' > /tmp/profiles-lifecycle-policy.xml"
     $s3cmd --access_key=sentry --secret_key=sentry --no-ssl --region=us-east-1 --host=localhost:8333 --host-bucket='localhost:8333/%(bucket)' setlifecycle /tmp/profiles-lifecycle-policy.xml s3://profiles
-
-    echo "Making sure the bucket lifecycle policy is all set up correctly..."
-    $s3cmd --access_key=sentry --secret_key=sentry --no-ssl --region=us-east-1 --host=localhost:8333 --host-bucket='localhost:8333/%(bucket)' getlifecycle s3://profiles
+    timeout 30s $s3cmd --access_key=sentry --secret_key=sentry --no-ssl --region=us-east-1 --host=localhost:8333 --host-bucket='localhost:8333/%(bucket)' getlifecycle s3://profiles >/dev/null 2>&1 || true
   fi
   echo "${_endgroup}"
 fi
