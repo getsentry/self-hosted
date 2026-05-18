@@ -123,7 +123,9 @@ EOF
       echo
       echo "  $dc up --wait seaweedfs"
       echo "  $dc exec seaweedfs apk add --no-cache s3cmd"
-      echo "  $dc exec seaweedfs sh -c \"printf '%s' '$lifecycle_policy' > /tmp/profiles-lifecycle-policy.xml\""
+      echo "  $dc exec -T seaweedfs sh -c 'cat > /tmp/profiles-lifecycle-policy.xml' <<'EOF'"
+      echo "$lifecycle_policy"
+      echo "EOF"
       echo "  $setlifecycle_cmd"
       echo
       sleep 5
