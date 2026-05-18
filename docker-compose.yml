@@ -852,7 +852,13 @@ services:
         <<: *depends_on-healthy
     profiles:
       - feature-complete
-
+  chartcuterie:
+    <<: [*restart_policy, *pull_policy]
+    image: "$CHARTCUTERIE_IMAGE"
+    environment:
+      CHARTCUTERIE_CONFIG: "http://web:9000/_chartcuterie-config.js"
+    profiles:
+      - chartcuterie
 volumes:
   # These store application data that should persist across restarts.
   sentry-data:
