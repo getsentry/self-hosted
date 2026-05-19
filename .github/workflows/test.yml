@@ -45,8 +45,8 @@ jobs:
       matrix:
         os: [ubuntu-24.04, ubuntu-24.04-arm]
         container_engine: ['docker'] # TODO: add 'podman' into the list
-        compose_profiles: ['feature-complete', 'errors-only']
-    name: ${{ format('integration test{0}{1}{2}', matrix.os == 'ubuntu-24.04-arm' && ' (arm64)' || '', matrix.container_engine == 'podman' && ' (podman)' || '', matrix.compose_profiles == 'errors-only' && ' (errors-only)' || '') }}
+        compose_profiles: ['feature-complete', 'errors-only', 'errors-only,chartcuterie']
+    name: ${{ format('integration test{0}{1}{2}', matrix.os == 'ubuntu-24.04-arm' && ' (arm64)' || '', matrix.container_engine == 'podman' && ' (podman)' || '', matrix.compose_profiles == 'feature-complete' && '' || format(' ({0})', matrix.compose_profiles) ) }}
     env:
       REPORT_SELF_HOSTED_ISSUES: 0
       SELF_HOSTED_TESTING_DSN: ${{ vars.SELF_HOSTED_TESTING_DSN }}
