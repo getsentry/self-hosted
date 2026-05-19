@@ -53,13 +53,8 @@ runs:
           exit 1
         fi
 
-        # `COMPOSE_PROFILES` may only be `feature-complete` or `errors-only`
-        if [[ "$COMPOSE_PROFILES" != "" && "$COMPOSE_PROFILES" != "feature-complete" && "$COMPOSE_PROFILES" != "errors-only" ]]; then
-          echo "COMPOSE_PROFILES must be either unset, or set to either 'feature-complete' or 'errors-only'."
-          exit 1
-        else
-          echo "COMPOSE_PROFILES=$COMPOSE_PROFILES" >> ${{ github.action_path }}/.env
-        fi
+        # Compose profiles can be anything at this point
+        echo "COMPOSE_PROFILES=$COMPOSE_PROFILES" >> ${{ github.action_path }}/.env
 
     - name: Cleanup runner image
       shell: bash
