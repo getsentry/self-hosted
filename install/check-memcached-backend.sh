@@ -54,10 +54,23 @@ elif grep -q "\.PyMemcacheCache" "$SENTRY_CONFIG_PY"; then
   if [[ "$APPLY_AUTOMATIC_CONFIG_UPDATES" == 1 || "$apply_config_changes_memcache" == 1 ]]; then
     echo "Migrating $SENTRY_CONFIG_PY to use ReconnectingMemcache"
     sed -i 's|django\.core\.cache\.backends\.memcached\.PyMemcacheCache|sentry.cache.backends.reconnectingmemcache.ReconnectingMemcache|g' "$SENTRY_CONFIG_PY"
-    # Add reconnect_age to OPTIONS if not already present
+
     if ! grep -q "reconnect_age" "$SENTRY_CONFIG_PY"; then
       sed -i 's/"ignore_exc": True}/"ignore_exc": True, "reconnect_age": 300}/g' "$SENTRY_CONFIG_PY"
     fi
+
+    if ! grep -q "reconnect_age" "$SENTRY_CONFIG_PY"; then
+      cat <<'EOF' >>"$SENTRY_CONFIG_PY"
+
+# Added by self-hosted install to keep ReconnectingMemcache aligned with
+# the bundled Sentry image configuration.
+if "CACHES" in globals() and "default" in CACHES:
+    if CACHES["default"].get("OPTIONS") is None:
+        CACHES["default"]["OPTIONS"] = {}
+    CACHES["default"]["OPTIONS"].setdefault("reconnect_age", 300)
+EOF
+    fi
+
     echo "Migrated $SENTRY_CONFIG_PY to use ReconnectingMemcache"
   fi
 elif grep -q "\.MemcachedCache" "$SENTRY_CONFIG_PY"; then
