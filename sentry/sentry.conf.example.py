@@ -530,8 +530,6 @@ JS_SDK_LOADER_DEFAULT_SDK_URL = "https://browser.sentry-cdn.com/%s/bundle%s.min.
 # By default, Sentry uses dummy statsd monitoring backend that is a no-op.
 # If you have a statsd server, you can utilize that to monitor self-hosted
 # Sentry for "sentry"-related containers.
-#
-# To start, uncomment the following line and adjust the options as needed.
 
 SENTRY_STATSD_ADDR = env("SENTRY_STATSD_ADDR")
 if SENTRY_STATSD_ADDR:
