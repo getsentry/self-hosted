@@ -20,7 +20,13 @@ elif grep -q "\.PyMemcacheCache" "$SENTRY_CONFIG_PY"; then
 
     yn=""
     until [ ! -z "$yn" ]; do
-      read -p "y or n? " yn
+      if ! read -p "y or n? " yn; then
+        echo
+        echo "Unable to read a response, so install cannot continue safely."
+        echo "Update sentry.conf.py manually or rerun with --apply-automatic-config-updates."
+        echo "See: https://github.com/getsentry/self-hosted/issues/4301"
+        exit 1
+      fi
       case $yn in
       y | yes | 1)
         export apply_config_changes_memcache=1
@@ -32,6 +38,7 @@ elif grep -q "\.PyMemcacheCache" "$SENTRY_CONFIG_PY"; then
         echo
         echo -n "Alright, you will need to update your sentry.conf.py file manually."
         echo " See: https://github.com/getsentry/self-hosted/issues/4301"
+        exit 1
         ;;
       *) yn="" ;;
       esac
@@ -72,6 +79,11 @@ EOF
     fi
 
     echo "Migrated $SENTRY_CONFIG_PY to use ReconnectingMemcache"
+  else
+    echo "PyMemcacheCache found in $SENTRY_CONFIG_PY, install cannot continue until you switch to ReconnectingMemcache."
+    echo "See:"
+    echo "  https://github.com/getsentry/self-hosted/issues/4301"
+    exit 1
   fi
 elif grep -q "\.MemcachedCache" "$SENTRY_CONFIG_PY"; then
   echo "MemcachedCache found in $SENTRY_CONFIG_PY, you should switch to ReconnectingMemcache."

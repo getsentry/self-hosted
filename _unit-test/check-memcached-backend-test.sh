@@ -96,10 +96,35 @@ assert_not_contains "$SENTRY_CONFIG_PY" "$PYMEMCACHE_BACKEND"
 
 echo "Test 4 (PyMemcacheCache with automatic updates disabled)"
 write_stock_pymemcache_config
-APPLY_AUTOMATIC_CONFIG_UPDATES=0 source install/check-memcached-backend.sh
+if (APPLY_AUTOMATIC_CONFIG_UPDATES=0 source install/check-memcached-backend.sh); then
+  echo "Expected check-memcached-backend.sh to fail when PyMemcacheCache is not migrated"
+  exit 1
+fi
 assert_contains "$SENTRY_CONFIG_PY" "$PYMEMCACHE_BACKEND"
 
-echo "Test 5 (legacy MemcachedCache config)"
+echo "Test 5 (PyMemcacheCache with automatic updates declined)"
+write_stock_pymemcache_config
+if (
+  unset APPLY_AUTOMATIC_CONFIG_UPDATES
+  printf 'n\n' | source install/check-memcached-backend.sh
+); then
+  echo "Expected check-memcached-backend.sh to fail when PyMemcacheCache migration is declined"
+  exit 1
+fi
+assert_contains "$SENTRY_CONFIG_PY" "$PYMEMCACHE_BACKEND"
+
+echo "Test 6 (PyMemcacheCache with prompt input unavailable)"
+write_stock_pymemcache_config
+if (
+  unset APPLY_AUTOMATIC_CONFIG_UPDATES
+  source install/check-memcached-backend.sh </dev/null
+); then
+  echo "Expected check-memcached-backend.sh to fail when prompt input is unavailable"
+  exit 1
+fi
+assert_contains "$SENTRY_CONFIG_PY" "$PYMEMCACHE_BACKEND"
+
+echo "Test 7 (legacy MemcachedCache config)"
 write_memcached_config
 if (APPLY_AUTOMATIC_CONFIG_UPDATES=1 source install/check-memcached-backend.sh); then
   echo "Expected check-memcached-backend.sh to fail on legacy MemcachedCache"
