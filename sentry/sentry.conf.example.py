@@ -208,10 +208,10 @@ SENTRY_OPTIONS["redis.clusters"] = {
 
 CACHES = {
     "default": {
-        "BACKEND": "django.core.cache.backends.memcached.PyMemcacheCache",
+        "BACKEND": "sentry.cache.backends.reconnectingmemcache.ReconnectingMemcache",
         "LOCATION": ["memcached:11211"],
         "TIMEOUT": 3600,
-        "OPTIONS": {"ignore_exc": True},
+        "OPTIONS": {"ignore_exc": True, "reconnect_age": 300},
     }
 }
 
