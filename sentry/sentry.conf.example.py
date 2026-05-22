@@ -208,10 +208,10 @@ SENTRY_OPTIONS["redis.clusters"] = {
 
 CACHES = {
     "default": {
-        "BACKEND": "django.core.cache.backends.memcached.PyMemcacheCache",
+        "BACKEND": "sentry.cache.backends.reconnectingmemcache.ReconnectingMemcache",
         "LOCATION": ["memcached:11211"],
         "TIMEOUT": 3600,
-        "OPTIONS": {"ignore_exc": True},
+        "OPTIONS": {"ignore_exc": True, "reconnect_age": 300},
     }
 }
 
@@ -443,6 +443,18 @@ SENTRY_FEATURES.update(
             "organizations:ourlogs-stats",
             "organizations:ourlogs-replay-ui",
         )
+        # Metrics related flags
+        + (
+            "organizations:tracemetrics-enabled",
+            "organizations:tracemetrics-alerts",
+            "organizations:tracemetrics-ingestion",
+            "organizations:tracemetrics-equations-in-alerts",
+            "organizations:tracemetrics-equations-in-explore",
+            "organizations:tracemetrics-multi-metric-selection-in-dashboards",
+            "organizations:tracemetrics-units-ui",
+            "organizations:tracemetrics-stats-bytes-ui",
+            "organizations:tracemetrics-pii-scrubbing-ui",
+        )
     }
 )
 
@@ -528,8 +540,6 @@ JS_SDK_LOADER_DEFAULT_SDK_URL = "https://browser.sentry-cdn.com/%s/bundle%s.min.
 # By default, Sentry uses dummy statsd monitoring backend that is a no-op.
 # If you have a statsd server, you can utilize that to monitor self-hosted
 # Sentry for "sentry"-related containers.
-#
-# To start, uncomment the following line and adjust the options as needed.
 
 SENTRY_STATSD_ADDR = env("SENTRY_STATSD_ADDR")
 if SENTRY_STATSD_ADDR:

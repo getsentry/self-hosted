@@ -15,5 +15,5 @@ dev = [
     "pytest-cov>=4.1.0",
     "pytest-rerunfailures>=11.0",
     "pytest-sentry>=0.1.11",
-    "sentry-sdk>=2.4.0,<3.0.0",
+    "sentry-sdk==2.58.0",
 ]

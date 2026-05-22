@@ -1,5 +1,24 @@
 # Changelog
 
+## 26.5.0
+
+### New Features ✨
+
+- Enable Metrics by @aldy505 in [#4312](https://github.com/getsentry/self-hosted/pull/4312)
+- Add launchpad taskworker container by @NicoHinderling in [#4267](https://github.com/getsentry/self-hosted/pull/4267)
+
+### Bug Fixes 🐛
+
+- (workflows) Prevent shell injection in fast-revert workflow by @fix-it-felix-sentry in [#4309](https://github.com/getsentry/self-hosted/pull/4309)
+
+### Internal Changes 🔧
+
+- (deps) Bump astral-sh/setup-uv from 8.0.0 to 8.1.0 by @dependabot in [#4290](https://github.com/getsentry/self-hosted/pull/4290)
+
+### Other
+
+- Bump nginx 1.31.0-alpine by @aminvakil in [#4329](https://github.com/getsentry/self-hosted/pull/4329)
+
 ## 26.4.2
 
 ### New Features ✨
