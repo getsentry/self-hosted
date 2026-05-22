@@ -254,7 +254,7 @@ services:
       retries: 30
   seaweedfs:
     <<: *restart_policy
-    image: "chrislusf/seaweedfs:4.17_large_disk"
+    image: "chrislusf/seaweedfs:4.25_large_disk@sha256:784484bcf4bf20dc862c533344c7681bbbf97df17e80ade97579049aa6772086"
     entrypoint: "weed"
     command: >-
         server
@@ -300,7 +300,7 @@ services:
       start_period: 60s
   seaweedfs-admin:
     <<: *restart_policy
-    image: "chrislusf/seaweedfs:4.17_large_disk"
+    image: "chrislusf/seaweedfs:4.25_large_disk@sha256:784484bcf4bf20dc862c533344c7681bbbf97df17e80ade97579049aa6772086"
     entrypoint: "weed"
     command: >-
       admin
@@ -313,7 +313,7 @@ services:
         <<: *depends_on-healthy
   seaweedfs-worker:
     <<: *restart_policy
-    image: "chrislusf/seaweedfs:4.17_large_disk"
+    image: "chrislusf/seaweedfs:4.25_large_disk@sha256:784484bcf4bf20dc862c533344c7681bbbf97df17e80ade97579049aa6772086"
     entrypoint: "weed"
     command: >-
       worker
