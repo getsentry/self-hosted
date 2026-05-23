@@ -221,17 +221,7 @@ SENTRY_CACHE = "sentry.cache.redis.RedisCache"
 DEFAULT_KAFKA_OPTIONS = {
     "bootstrap.servers": "kafka:9092",
     "message.max.bytes": 50000000,
-    "socket.timeout.ms": 10_000,        # Timeout for individual socket operations (send/recv)
-    "request.timeout.ms": 60_000,       # Max time to wait for a broker response before failing
-    "retries": 5,                       # Number of retries for transient/retriable request failures
-    "retry.backoff.ms": 1000,           # Wait time between retry attempts
-    "reconnect.backoff.ms": 1000,       # Initial wait before reconnecting after a lost connection
-    "reconnect.backoff.max.ms": 10_000, # Upper bound for exponential backoff on reconnect attempts
-    # Session & heartbeat — must satisfy:
-    # heartbeat.interval.ms < session.timeout.ms < max.poll.interval.ms
-    "heartbeat.interval.ms": 20_000,    # How often the consumer sends a heartbeat — must be 1/3 of session.timeout.ms
-    "session.timeout.ms": 60_000,       # Grace period before broker evicts an unresponsive consumer (default: 45s)
-    "max.poll.interval.ms": 600_000,    # Max allowed time between poll() calls before the consumer is considered dead
+    "socket.timeout.ms": 1000,
 }
 
 SENTRY_EVENTSTREAM = "sentry.eventstream.kafka.KafkaEventStream"
