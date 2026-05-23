@@ -77,6 +77,7 @@ x-sentry-defaults: &sentry_defaults
     SENTRY_SYSTEM_SECRET_KEY:
     LAUNCHPAD_RPC_SHARED_SECRET:
     SENTRY_STATSD_ADDR: "${STATSD_ADDR:-}"
+    SENTRY_KAFKA_MAX_POLL_INTERVAL_MS:
   volumes:
     - "sentry-data:/data"
     - "./sentry:/etc/sentry"
@@ -105,6 +106,7 @@ x-snuba-defaults: &snuba_defaults
     # If you have statsd server, you can utilize that to monitor self-hosted Snuba containers.
     # To start, state these environment variables below on your `.env.` file and adjust the options as needed.
     SNUBA_STATSD_ADDR: "${STATSD_ADDR:-}"
+    SENTRY_KAFKA_MAX_POLL_INTERVAL_MS:
 services:
   smtp:
     <<: *restart_policy
@@ -363,7 +365,7 @@ services:
     command: replacer --storage errors --auto-offset-reset=latest --no-strict-offset-reset
   snuba-subscription-consumer-events:
     <<: *snuba_defaults
-    command: subscriptions-scheduler-executor --dataset events --entity events --auto-offset-reset=latest --no-strict-offset-reset --consumer-group=snuba-events-subscriptions-consumers --followed-consumer-group=snuba-consumers --schedule-ttl=60 --stale-threshold-seconds=900 --health-check-file /tmp/health.txt --max-poll-interval-ms ${SENTRY_KAFKA_MAX_POLL_INTERVAL_MS:-300000}
+    command: subscriptions-scheduler-executor --dataset events --entity events --auto-offset-reset=latest --no-strict-offset-reset --consumer-group=snuba-events-subscriptions-consumers --followed-consumer-group=snuba-consumers --schedule-ttl=60 --stale-threshold-seconds=900 --health-check-file /tmp/health.txt
     healthcheck:
       <<: *file_healthcheck_defaults
   #############################################
@@ -400,42 +402,42 @@ services:
       - feature-complete
   snuba-subscription-consumer-transactions:
     <<: *snuba_defaults
-    command: subscriptions-scheduler-executor --dataset transactions --entity transactions --auto-offset-reset=latest --no-strict-offset-reset --consumer-group=snuba-transactions-subscriptions-consumers --followed-consumer-group=transactions_group --schedule-ttl=60 --stale-threshold-seconds=900 --health-check-file /tmp/health.txt --max-poll-interval-ms ${SENTRY_KAFKA_MAX_POLL_INTERVAL_MS:-300000}
+    command: subscriptions-scheduler-executor --dataset transactions --entity transactions --auto-offset-reset=latest --no-strict-offset-reset --consumer-group=snuba-transactions-subscriptions-consumers --followed-consumer-group=transactions_group --schedule-ttl=60 --stale-threshold-seconds=900 --health-check-file /tmp/health.txt
     healthcheck:
       <<: *file_healthcheck_defaults
     profiles:
       - feature-complete
   snuba-subscription-consumer-metrics:
     <<: *snuba_defaults
-    command: subscriptions-scheduler-executor --dataset metrics --entity metrics_sets --entity metrics_counters --auto-offset-reset=latest --no-strict-offset-reset --consumer-group=snuba-metrics-subscriptions-consumers --followed-consumer-group=snuba-metrics-consumers --schedule-ttl=60 --stale-threshold-seconds=900 --health-check-file /tmp/health.txt --max-poll-interval-ms ${SENTRY_KAFKA_MAX_POLL_INTERVAL_MS:-300000}
+    command: subscriptions-scheduler-executor --dataset metrics --entity metrics_sets --entity metrics_counters --auto-offset-reset=latest --no-strict-offset-reset --consumer-group=snuba-metrics-subscriptions-consumers --followed-consumer-group=snuba-metrics-consumers --schedule-ttl=60 --stale-threshold-seconds=900 --health-check-file /tmp/health.txt
     healthcheck:
       <<: *file_healthcheck_defaults
     profiles:
       - feature-complete
   snuba-subscription-consumer-generic-metrics-distributions:
     <<: *snuba_defaults
-    command: subscriptions-scheduler-executor --dataset generic_metrics --entity=generic_metrics_distributions   --auto-offset-reset=latest --no-strict-offset-reset --consumer-group=snuba-generic-metrics-distributions-subscriptions-schedulers --followed-consumer-group=snuba-gen-metrics-distributions-consumers --schedule-ttl=60 --stale-threshold-seconds=900 --health-check-file /tmp/health.txt --max-poll-interval-ms ${SENTRY_KAFKA_MAX_POLL_INTERVAL_MS:-300000}
+    command: subscriptions-scheduler-executor --dataset generic_metrics --entity=generic_metrics_distributions   --auto-offset-reset=latest --no-strict-offset-reset --consumer-group=snuba-generic-metrics-distributions-subscriptions-schedulers --followed-consumer-group=snuba-gen-metrics-distributions-consumers --schedule-ttl=60 --stale-threshold-seconds=900 --health-check-file /tmp/health.txt
     healthcheck:
       <<: *file_healthcheck_defaults
     profiles:
       - feature-complete
   snuba-subscription-consumer-generic-metrics-sets:
     <<: *snuba_defaults
-    command: subscriptions-scheduler-executor --dataset generic_metrics --entity=generic_metrics_sets --auto-offset-reset=latest --no-strict-offset-reset --consumer-group=snuba-generic-metrics-sets-subscriptions-schedulers --followed-consumer-group=snuba-gen-metrics-sets-consumers --schedule-ttl=60 --stale-threshold-seconds=900 --health-check-file /tmp/health.txt --max-poll-interval-ms ${SENTRY_KAFKA_MAX_POLL_INTERVAL_MS:-300000}
+    command: subscriptions-scheduler-executor --dataset generic_metrics --entity=generic_metrics_sets --auto-offset-reset=latest --no-strict-offset-reset --consumer-group=snuba-generic-metrics-sets-subscriptions-schedulers --followed-consumer-group=snuba-gen-metrics-sets-consumers --schedule-ttl=60 --stale-threshold-seconds=900 --health-check-file /tmp/health.txt
     healthcheck:
       <<: *file_healthcheck_defaults
     profiles:
       - feature-complete
   snuba-subscription-consumer-generic-metrics-counters:
     <<: *snuba_defaults
-    command: subscriptions-scheduler-executor --dataset generic_metrics --entity=generic_metrics_counters --auto-offset-reset=latest --no-strict-offset-reset --consumer-group=snuba-generic-metrics-counters-subscriptions-schedulers --followed-consumer-group=snuba-gen-metrics-counters-consumers --schedule-ttl=60 --stale-threshold-seconds=900 --health-check-file /tmp/health.txt --max-poll-interval-ms ${SENTRY_KAFKA_MAX_POLL_INTERVAL_MS:-300000}
+    command: subscriptions-scheduler-executor --dataset generic_metrics --entity=generic_metrics_counters --auto-offset-reset=latest --no-strict-offset-reset --consumer-group=snuba-generic-metrics-counters-subscriptions-schedulers --followed-consumer-group=snuba-gen-metrics-counters-consumers --schedule-ttl=60 --stale-threshold-seconds=900 --health-check-file /tmp/health.txt
     healthcheck:
       <<: *file_healthcheck_defaults
     profiles:
       - feature-complete
   snuba-subscription-consumer-generic-metrics-gauges:
     <<: *snuba_defaults
-    command: subscriptions-scheduler-executor --dataset generic_metrics --entity=generic_metrics_gauges --auto-offset-reset=latest --no-strict-offset-reset --consumer-group=snuba-generic-metrics-gauges-subscriptions-schedulers --followed-consumer-group=snuba-gen-metrics-gauges-consumers --schedule-ttl=60 --stale-threshold-seconds=900 --health-check-file /tmp/health.txt --max-poll-interval-ms ${SENTRY_KAFKA_MAX_POLL_INTERVAL_MS:-300000}
+    command: subscriptions-scheduler-executor --dataset generic_metrics --entity=generic_metrics_gauges --auto-offset-reset=latest --no-strict-offset-reset --consumer-group=snuba-generic-metrics-gauges-subscriptions-schedulers --followed-consumer-group=snuba-gen-metrics-gauges-consumers --schedule-ttl=60 --stale-threshold-seconds=900 --health-check-file /tmp/health.txt
     healthcheck:
       <<: *file_healthcheck_defaults
     profiles:
@@ -498,7 +500,7 @@ services:
       - feature-complete
   snuba-subscription-consumer-eap-items:
     <<: *snuba_defaults
-    command: subscriptions-scheduler-executor --dataset events_analytics_platform --entity eap_items --auto-offset-reset=latest --no-strict-offset-reset --consumer-group=snuba-eap-items-subscriptions-consumers --followed-consumer-group=eap_items_group --schedule-ttl=60 --stale-threshold-seconds=900 --health-check-file /tmp/health.txt --max-poll-interval-ms ${SENTRY_KAFKA_MAX_POLL_INTERVAL_MS:-300000}
+    command: subscriptions-scheduler-executor --dataset events_analytics_platform --entity eap_items --auto-offset-reset=latest --no-strict-offset-reset --consumer-group=snuba-eap-items-subscriptions-consumers --followed-consumer-group=eap_items_group --schedule-ttl=60 --stale-threshold-seconds=900 --health-check-file /tmp/health.txt
     healthcheck:
       <<: *file_healthcheck_defaults
   symbolicator:
