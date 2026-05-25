@@ -19,9 +19,11 @@ send_envelope() {
 export -f send_envelope
 echo "Testing initial send_event"
 export log_file=test_log.txt
+expected_filename='sentry-envelope-f73e4da437c42a1d28b86a81ebcff35d'
+rm -f "/tmp/$expected_filename"
 echo "Test Logs" >"$log_file"
 echo "Error Msg" >>"$log_file"
-breadcrumbs=$(generate_breadcrumb_json | sed '$d' | $jq -s -c)
+breadcrumbs=$(collect_breadcrumbs)
 SEND_EVENT_RESPONSE=$(
   send_event \
     "'foo' exited with status 1" \
@@ -31,7 +33,6 @@ SEND_EVENT_RESPONSE=$(
     "$breadcrumbs"
 )
 rm "$log_file"
-expected_filename='sentry-envelope-f73e4da437c42a1d28b86a81ebcff35d'
 test "$SEND_EVENT_RESPONSE" == "Test Sending $expected_filename"
 ENVELOPE_CONTENTS=$(cat "/tmp/$expected_filename")
 test "$ENVELOPE_CONTENTS" == "$(cat _unit-test/snapshots/$expected_filename)"
@@ -61,7 +62,7 @@ export dc=':'
 echo "Test Logs" >"$log_file"
 CLEANUP_RESPONSE=$(cleanup ERROR) # the linenumber of this line must match just below
 rm "$log_file"
-test "$CLEANUP_RESPONSE" == 'Error in _unit-test/error-handling-test.sh:62.
+test "$CLEANUP_RESPONSE" == 'Error in _unit-test/error-handling-test.sh:63.
 '\''local cmd="${BASH_COMMAND}"'\'' exited with status 0
 
 Cleaning up...'
@@ -75,10 +76,23 @@ export MINIMIZE_DOWNTIME=1
 echo "Test Logs" >"$log_file"
 CLEANUP_RESPONSE=$(cleanup ERROR) # the linenumber of this line must match just below
 rm "$log_file"
-test "$CLEANUP_RESPONSE" == 'Error in _unit-test/error-handling-test.sh:76.
+test "$CLEANUP_RESPONSE" == 'Error in _unit-test/error-handling-test.sh:77.
 '\''local cmd="${BASH_COMMAND}"'\'' exited with status 0
 
 *NOT* cleaning up, to clean your environment run "docker compose stop".'
+echo "Pass."
+
+##########################
+
+echo "Testing breadcrumb truncation limit"
+export SENTRY_MAX_BREADCRUMB_LINES=2
+echo "first" >"$log_file"
+echo "second" >>"$log_file"
+echo "Error Msg" >>"$log_file"
+CAPPED_BREADCRUMBS=$(collect_breadcrumbs)
+rm "$log_file"
+unset SENTRY_MAX_BREADCRUMB_LINES
+test "$CAPPED_BREADCRUMBS" == '[{"message":"second","category":"log","level":"info"}]'
 echo "Pass."
 
 ##########################
