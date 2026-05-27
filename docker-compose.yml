@@ -17,7 +17,7 @@ x-healthcheck-defaults: &healthcheck_defaults
   retries: $HEALTHCHECK_RETRIES
   start_period: "$HEALTHCHECK_START_PERIOD"
 x-file-healthcheck: &file_healthcheck_defaults
-  test: ["CMD-SHELL", "rm /tmp/health.txt"]
+  test: ["CMD", "python3", "/usr/src/snuba/healthcheck/consumer.py"]
   interval: "$HEALTHCHECK_FILE_INTERVAL"
   timeout: "$HEALTHCHECK_FILE_TIMEOUT"
   retries: $HEALTHCHECK_FILE_RETRIES
@@ -92,6 +92,8 @@ x-snuba-defaults: &snuba_defaults
     redis:
       <<: *depends_on-healthy
   image: "$SNUBA_IMAGE"
+  volumes:
+    - "./snuba/healthcheck:/usr/src/snuba/healthcheck:ro"
   environment:
     SNUBA_SETTINGS: self_hosted
     CLICKHOUSE_HOST: clickhouse
@@ -328,12 +330,7 @@ services:
     <<: *snuba_defaults
     healthcheck:
       <<: *healthcheck_defaults
-      test:
-        - "CMD"
-        - "/bin/bash"
-        - "-c"
-        # Courtesy of https://unix.stackexchange.com/a/234089/108960
-        - 'exec 3<>/dev/tcp/127.0.0.1/1218 && echo -e "GET /health HTTP/1.1\r\nhost: 127.0.0.1\r\n\r\n" >&3 && grep ok -s -m 1 <&3'
+      test: ["CMD", "python3", "/usr/src/snuba/healthcheck/api.py"]
   # Kafka consumer responsible for feeding events into Clickhouse
   snuba-errors-consumer:
     <<: *snuba_defaults
