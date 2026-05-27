@@ -17,7 +17,10 @@ x-healthcheck-defaults: &healthcheck_defaults
   retries: $HEALTHCHECK_RETRIES
   start_period: "$HEALTHCHECK_START_PERIOD"
 x-file-healthcheck: &file_healthcheck_defaults
-  test: ["CMD", "python3", "/usr/src/snuba/healthcheck/consumer.py"]
+  # Inline python so this anchor works across snuba, sentry, taskworker,
+  # and launchpad images. python3 is on PATH in all of them; a dedicated
+  # script would need to be mounted into every image base separately.
+  test: ["CMD", "python3", "-c", "import os; os.remove('/tmp/health.txt')"]
   interval: "$HEALTHCHECK_FILE_INTERVAL"
   timeout: "$HEALTHCHECK_FILE_TIMEOUT"
   retries: $HEALTHCHECK_FILE_RETRIES
@@ -92,8 +95,6 @@ x-snuba-defaults: &snuba_defaults
     redis:
       <<: *depends_on-healthy
   image: "$SNUBA_IMAGE"
-  volumes:
-    - "./snuba/healthcheck:/usr/src/snuba/healthcheck:ro"
   environment:
     SNUBA_SETTINGS: self_hosted
     CLICKHOUSE_HOST: clickhouse
@@ -328,9 +329,11 @@ services:
         <<: *depends_on-default
   snuba-api:
     <<: *snuba_defaults
+    volumes:
+      - "./snuba/api_healthcheck.py:/usr/src/snuba/api_healthcheck.py:ro"
     healthcheck:
       <<: *healthcheck_defaults
-      test: ["CMD", "python3", "/usr/src/snuba/healthcheck/api.py"]
+      test: ["CMD", "python3", "/usr/src/snuba/api_healthcheck.py"]
   # Kafka consumer responsible for feeding events into Clickhouse
   snuba-errors-consumer:
     <<: *snuba_defaults
