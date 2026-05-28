@@ -1,5 +1,16 @@
 # Changelog
 
+## 26.5.1
+
+### Bug Fixes 🐛
+
+- (config) Migrate PyMemcacheCache to ReconnectingMemcache by @sentry-junior in [#4338](https://github.com/getsentry/self-hosted/pull/4338)
+
+### Other
+
+- Clean up statsd monitoring configuration comments by @bobvandevijver in [#4334](https://github.com/getsentry/self-hosted/pull/4334)
+- Bump postgres 14.23-bookworm by @aminvakil in [#4330](https://github.com/getsentry/self-hosted/pull/4330)
+
 ## 26.5.0
 
 ### New Features ✨
