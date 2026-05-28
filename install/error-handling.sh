@@ -19,6 +19,8 @@ generate_breadcrumb_json() {
   $jq -R -c '{"message": ., "category": "log", "level": "info"}'
 }
 
+# Create the breadcrumb payload now before stacktrace is printed
+# https://develop.sentry.dev/sdk/event-payloads/breadcrumbs/
 collect_breadcrumbs() {
   local line_limit="${SENTRY_MAX_BREADCRUMB_LINES:-$DEFAULT_BREADCRUMB_LINE_LIMIT}"
   if ! [[ "$line_limit" =~ ^[1-9][0-9]*$ ]]; then
@@ -187,9 +189,6 @@ cleanup() {
     set +o xtrace
     # Save the error message that comes from the last line of the log file
     error_msg=$(tail -n 1 "$log_file")
-    # Create the breadcrumb payload now before stacktrace is printed
-    # https://develop.sentry.dev/sdk/event-payloads/breadcrumbs/
-    # Use sed to remove the last line, that is reported through the error message
     breadcrumbs=$(collect_breadcrumbs)
     printf -v err '%s' "Error in ${BASH_SOURCE[1]}:${BASH_LINENO[0]}."
     printf -v cmd_exit '%s' "'$cmd' exited with status $retcode"
