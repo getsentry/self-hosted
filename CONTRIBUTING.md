@@ -17,7 +17,7 @@ Here's a list of where to route problems:
 
 ## What to contribute
 
-Hi! I'm Reinaldy (aldy505). I view self-hosted Sentry not just as something we maintain, but as a community we develop together. Contributing to self-hosted means more than code contributions; there are many ways to help!
+Hi! We view self-hosted Sentry not just as something we maintain, but as a community we develop together. Contributing to self-hosted means more than code contributions; there are many ways to help!
 
 1. Answer user issues, bug reports, and requests via GitHub issues. It's easier to monitor them on the [Self-Hosted Sentry Projects pane](https://github.com/orgs/getsentry/projects/109/views/2), which filters out issues with the "Waiting For: Product Owner" label. When someone with at least "Triage" access replies to the issue, the label will be removed. This helps prevent issues from being forgotten. Some issues may still take longer to reply to because they require regaining context or a deeper investigation.
 2. Answer user issues on the Discord channel. This is usually the place to go if someone has a problem that prevents their self-hosted Sentry from running, since it's real-time messaging.
@@ -56,7 +56,7 @@ Treat those generated files as install outputs first and manual edits second. If
 There are two kinds of tests:
 
 1. Unit tests: run specific bash scripts and ensure they're working as intended. Test files are under the `_unit-test/` directory, and assertions are made using Bash.
-2. Integration tests: run the entire self-hosted stack (using specific `COMPOSE_PROFILES`) by running `./install.sh` and `docker compose up -d`, then execute scenarios for logging in and verifying that events are ingested and queried correctly. Test files are under `_integration-test/`, and assertions are written in Python using the `pytest` testing framework.
+2. Integration tests: run the entire self-hosted stack (using specific `COMPOSE_PROFILES`) by running `./install.sh` and `docker compose up --wait`, then execute scenarios for logging in and verifying that events are ingested and queried correctly. Test files are under `_integration-test/`, and assertions are written in Python using the `pytest` testing framework.
 
 Specifically for integration tests, dependencies are managed through `uv`. To set up the environment and install testing dependencies, run:
 
