@@ -18,9 +18,21 @@ x-healthcheck-defaults: &healthcheck_defaults
   start_period: "$HEALTHCHECK_START_PERIOD"
 x-file-healthcheck: &file_healthcheck_defaults
   # Inline python so this anchor works across snuba, sentry, taskworker,
-  # and launchpad images. python3 is on PATH in all of them; a dedicated
-  # script would need to be mounted into every image base separately.
-  test: ["CMD", "python3", "-c", "import os; os.remove('/tmp/health.txt')"]
+  # and launchpad images (python3 is on PATH in all of them; a mounted
+  # script would have to be wired into every image base separately).
+  # The try/except keeps the missing-file case to a single readable line
+  # in `docker inspect` output instead of a multi-line traceback.
+  test:
+    - "CMD"
+    - "python3"
+    - "-c"
+    - |
+      import os, sys
+      try:
+          os.remove('/tmp/health.txt')
+      except FileNotFoundError:
+          print('consumer heartbeat file missing: /tmp/health.txt', file=sys.stderr)
+          sys.exit(1)
   interval: "$HEALTHCHECK_FILE_INTERVAL"
   timeout: "$HEALTHCHECK_FILE_TIMEOUT"
   retries: $HEALTHCHECK_FILE_RETRIES
