@@ -38,12 +38,11 @@ To get started, install these tools:
 3. the `uv` package manager. Refer to [their installation documentation](https://docs.astral.sh/uv/getting-started/installation/).
 4. `prek` for Git pre-commit hooks. Refer to [their installation documentation](https://prek.j178.dev/installation/).
 
-The install flow is driven by `./install.sh`, which performs version checks, copies example config files, generates missing secrets, builds any local images, and prepares the database. When the install completes, the expected next step is `docker compose up --wait`.
+The install flow is driven by `./install.sh`, which performs version checks, copies example config files, generates missing secrets, builds any local images, and prepares the database. When the install completes, the expected next step is `docker compose up -d --wait`.
 
 Generated and managed config files live in the repo working tree:
 
 - `.env` is the default environment file.
-- `.env.custom` is loaded automatically when present and should be your normal place for local overrides.
 - `sentry/sentry.conf.py` is created from `sentry/sentry.conf.example.py`.
 - `sentry/config.yml` is created from `sentry/config.example.yml`.
 - `relay/config.yml` is created from `relay/config.example.yml`.
