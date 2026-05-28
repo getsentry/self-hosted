@@ -33,7 +33,18 @@ def main() -> int:
         print(f"snuba api returned HTTP {exc.code} from {URL}", file=sys.stderr)
         return 1
     except urllib.error.URLError as exc:
+        # urlopen() wraps connection-phase failures (refused, DNS, etc.) here.
         print(f"snuba api unreachable at {URL}: {exc.reason}", file=sys.stderr)
+        return 1
+    except TimeoutError:
+        # A timeout firing during .read() (after urlopen returns) bubbles up
+        # as a bare TimeoutError from the underlying socket — not wrapped in
+        # URLError. Catch it explicitly so the message stays one-line.
+        print(f"snuba api timed out reading {URL} after {TIMEOUT}s", file=sys.stderr)
+        return 1
+    except OSError as exc:
+        # ConnectionResetError, etc. — anything else from the socket layer.
+        print(f"snuba api error against {URL}: {exc}", file=sys.stderr)
         return 1
 
     if "ok" not in body:
