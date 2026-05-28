@@ -217,7 +217,7 @@ runs:
 
     - name: Setup Sentry CLI
       shell: bash
-      run: curl -sL https://sentry.io/get-cli/ | SENTRY_CLI_VERSION="3.4.1" bash
+      run: curl -sL https://sentry.io/get-cli/ | SENTRY_CLI_VERSION="3.4.3" bash
 
     - name: Install Nodejs dependencies
       shell: bash
