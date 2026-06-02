@@ -8,6 +8,7 @@ $dbuild -t sentry-self-hosted-jq-local --platform="$DOCKER_PLATFORM" jq
 
 jq="$CONTAINER_ENGINE run --rm -i sentry-self-hosted-jq-local"
 sentry_cli="$CONTAINER_ENGINE run --rm -v /tmp:/work -e SENTRY_DSN=$SENTRY_DSN getsentry/sentry-cli"
+DEFAULT_BREADCRUMB_LINE_LIMIT=200
 
 send_envelope() {
   # Send envelope
@@ -15,7 +16,17 @@ send_envelope() {
 }
 
 generate_breadcrumb_json() {
-  cat $log_file | $jq -R -c 'split("\n") | {"message": (.[0]//""), "category": "log", "level": "info"}'
+  $jq -R -c '{"message": ., "category": "log", "level": "info"}'
+}
+
+# Create the breadcrumb payload now before stacktrace is printed
+# https://develop.sentry.dev/sdk/event-payloads/breadcrumbs/
+collect_breadcrumbs() {
+  local line_limit="${SENTRY_MAX_BREADCRUMB_LINES:-$DEFAULT_BREADCRUMB_LINE_LIMIT}"
+  if ! [[ "$line_limit" =~ ^[1-9][0-9]*$ ]]; then
+    line_limit=$DEFAULT_BREADCRUMB_LINE_LIMIT
+  fi
+  tail -n "$line_limit" "$log_file" | sed '$d' | generate_breadcrumb_json | $jq -s -c '.'
 }
 
 send_event() {
@@ -73,11 +84,10 @@ send_event() {
   # spam in the system). It was also futzy to figure out how to get the
   # traceback in there properly. Meh.
   event_body=$(
-    $jq -n -c --arg level error \
-      --argjson exception "{\"values\":[$exception]}" \
-      --argjson breadcrumbs "{\"values\": $breadcrumbs}" \
-      --argjson fingerprint "[\"$fingerprint_value\"]" \
-      '$ARGS.named'
+    printf '%s\n%s\n' "$exception" "$breadcrumbs" |
+      $jq -s -c --arg level error \
+        --arg fingerprint "$fingerprint_value" \
+        '{"level": $level, "exception": {"values": [.[0]]}, "breadcrumbs": {"values": .[1]}, "fingerprint": [$fingerprint]}'
   )
   echo "$event_body" >>$envelope_file_path
   # Add attachment to the event
@@ -179,10 +189,7 @@ cleanup() {
     set +o xtrace
     # Save the error message that comes from the last line of the log file
     error_msg=$(tail -n 1 "$log_file")
-    # Create the breadcrumb payload now before stacktrace is printed
-    # https://develop.sentry.dev/sdk/event-payloads/breadcrumbs/
-    # Use sed to remove the last line, that is reported through the error message
-    breadcrumbs=$(generate_breadcrumb_json | sed '$d' | $jq -s -c)
+    breadcrumbs=$(collect_breadcrumbs)
     printf -v err '%s' "Error in ${BASH_SOURCE[1]}:${BASH_LINENO[0]}."
     printf -v cmd_exit '%s' "'$cmd' exited with status $retcode"
     printf '%s\n%s\n' "$err" "$cmd_exit"
