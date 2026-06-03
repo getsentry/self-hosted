@@ -1,5 +1,24 @@
 # Changelog
 
+## 26.5.2
+
+### New Features ✨
+
+- (snuba) Healthcheck adjustments preparing for distroless by @oioki in [#4352](https://github.com/getsentry/self-hosted/pull/4352)
+
+### Bug Fixes 🐛
+
+- Prevent argument too long error on self-hosted error reports due to breadcrumbs too long by @aldy505 in [#4348](https://github.com/getsentry/self-hosted/pull/4348)
+
+### Documentation 📚
+
+- Contributing guideline by @aldy505 in [#4347](https://github.com/getsentry/self-hosted/pull/4347)
+
+### Internal Changes 🔧
+
+- (deps) Bump j178/prek-action from 2.0.2 to 2.0.4 by @dependabot in [#4337](https://github.com/getsentry/self-hosted/pull/4337)
+- (sentry-cli) Upgrade to 3.4.3 by @szokeasaurusrex in [#4354](https://github.com/getsentry/self-hosted/pull/4354)
+
 ## 26.5.1
 
 ### Bug Fixes 🐛
