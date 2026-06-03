@@ -776,8 +776,16 @@ services:
     <<: [*restart_policy, *pull_policy]
     image: "$TASKBROKER_IMAGE"
     environment:
-      TASKBROKER_KAFKA_CLUSTER: "kafka:9092"
-      TASKBROKER_KAFKA_DEADLETTER_CLUSTER: "kafka:9092"
+      # Multi-topic/cluster config via env vars: nested keys use "__", and
+      # figment lowercases each segment, so topic/cluster names can only use
+      # underscores (not hyphens) when set this way.
+      TASKBROKER_KAFKA_CLUSTERS__DEFAULT__ADDRESS: "kafka:9092"
+      TASKBROKER_KAFKA_TOPICS__TASKWORKER__CLUSTER: "default"
+      TASKBROKER_KAFKA_TOPICS__TASKWORKER__CONSUMER_GROUP: "taskworker"
+      TASKBROKER_KAFKA_DEADLETTER_TOPIC: "taskworker_dlq"
+      TASKBROKER_KAFKA_TOPICS__TASKWORKER_DLQ__CLUSTER: "default"
+      TASKBROKER_KAFKA_TOPICS__TASKWORKER_DLQ__CONSUMER_GROUP: "taskworker"
+      TASKBROKER_KAFKA_TOPICS__TASKWORKER_DLQ__PRODUCE_ONLY: "true"
       TASKBROKER_DB_PATH: "/opt/sqlite/taskbroker-activations.sqlite"
       TASKBROKER_STATSD_ADDR: ${STATSD_ADDR:-127.0.0.1:8125}
     volumes:
