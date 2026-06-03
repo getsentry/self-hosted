@@ -776,12 +776,20 @@ services:
     <<: [*restart_policy, *pull_policy]
     image: "$TASKBROKER_IMAGE"
     environment:
-      TASKBROKER_KAFKA_CLUSTER: "kafka:9092"
-      TASKBROKER_KAFKA_DEADLETTER_CLUSTER: "kafka:9092"
+      # The cluster address (and, in the external-kafka variant, its auth) is
+      # supplied via env vars. Topics live in the mounted config file
+      # (./taskbroker/config.yml) so they can use hyphenated names — env-var
+      # config keys can't contain hyphens.
+      TASKBROKER_KAFKA_CLUSTERS__DEFAULT__ADDRESS: "kafka:9092"
       TASKBROKER_DB_PATH: "/opt/sqlite/taskbroker-activations.sqlite"
       TASKBROKER_STATSD_ADDR: ${STATSD_ADDR:-127.0.0.1:8125}
+    command: /opt/taskbroker -c /etc/taskbroker/config.yml
     volumes:
       - sentry-taskbroker:/opt/sqlite
+      - type: bind
+        read_only: true
+        source: ./taskbroker
+        target: /etc/taskbroker
     depends_on:
       kafka:
         <<: *depends_on-healthy
