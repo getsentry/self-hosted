@@ -1,5 +1,5 @@
---- docker-compose.yml
-+++ docker-compose.external-kafka.yml
+--- docker-compose.yml	2026-03-15 21:35:31.736074540 +0700
++++ docker-compose.external-kafka.yml	2026-03-15 21:40:44.675091837 +0700
 @@ -54,8 +54,6 @@
    depends_on:
      redis:
