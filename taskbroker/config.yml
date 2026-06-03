@@ -1,0 +1,16 @@
+# Taskbroker Kafka topology.
+#
+# Topics are declared here (rather than via TASKBROKER_KAFKA_TOPICS__* env vars)
+# so they can use hyphenated names — env-var config keys can't contain hyphens.
+# The cluster address and auth are supplied via TASKBROKER_KAFKA_CLUSTERS__*
+# env vars in docker-compose.yml (the external-kafka patch overrides them).
+kafka_deadletter_topic: taskworker-dlq
+
+kafka_topics:
+  taskworker:
+    cluster: default
+    consumer_group: taskworker
+  taskworker-dlq:
+    cluster: default
+    consumer_group: taskworker
+    produce_only: true
