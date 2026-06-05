@@ -256,30 +256,17 @@ services:
       retries: 30
   seaweedfs:
     <<: *restart_policy
-    image: "chrislusf/seaweedfs:4.17_large_disk"
+    image: "chrislusf/seaweedfs:4.29_large_disk@sha256:e5ca7cc6b61cf5d89a5f85821e0cf115a9765e2d1f27223cbb7722c7837c024e"
     entrypoint: "weed"
     command: >-
-        server
+        mini
         -dir=/data
-        -filer=true
-        -filer.port=8888
-        -filer.port.grpc=18888
         -filer.defaultReplicaPlacement=000
-        -master=true
-        -master.port=9333
-        -master.port.grpc=19333
         -metricsPort=9091
-        -s3=true
-        -s3.port=8333
-        -s3.port.grpc=18333
-        -volume=true
         -volume.dir.idx=/data/idx
         -volume.index=leveldbLarge
-        -volume.max=0
         -volume.preStopSeconds=8
         -volume.readMode=redirect
-        -volume.port=8080
-        -volume.port.grpc=18080
         -ip.bind=0.0.0.0
         -webdav=false
     environment:
@@ -294,38 +281,12 @@ services:
           # Manually override any http_proxy envvar that might be set, because
           # this wget does not support no_proxy. See:
           # https://github.com/getsentry/self-hosted/issues/1537
-          "http_proxy='' wget -q -O- http://seaweedfs:8080/healthz http://seaweedfs:9333/cluster/healthz http://seaweedfs:8333/healthz || exit 1",
+          "http_proxy='' wget -q -O- http://seaweedfs:9340/healthz http://seaweedfs:9333/cluster/healthz http://seaweedfs:8333/healthz || exit 1",
       ]
       interval: 30s
       timeout: 20s
       retries: 5
       start_period: 60s
-  seaweedfs-admin:
-    <<: *restart_policy
-    image: "chrislusf/seaweedfs:4.17_large_disk"
-    entrypoint: "weed"
-    command: >-
-      admin
-      -port=23646
-      -master=seaweedfs:9333
-    environment:
-      <<: *force_no_proxy
-    depends_on:
-      seaweedfs:
-        <<: *depends_on-healthy
-  seaweedfs-worker:
-    <<: *restart_policy
-    image: "chrislusf/seaweedfs:4.17_large_disk"
-    entrypoint: "weed"
-    command: >-
-      worker
-      -admin=seaweedfs-admin:23646
-      -jobType=all
-    environment:
-      <<: *force_no_proxy
-    depends_on:
-      seaweedfs-admin:
-        <<: *depends_on-default
   snuba-api:
     <<: *snuba_defaults
     healthcheck:
