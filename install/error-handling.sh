@@ -118,7 +118,7 @@ send_event() {
   # spam in the system). It was also futzy to figure out how to get the
   # traceback in there properly. Meh.
   event_body=$(
-    printf '%s\n%s\n' "$exception" "$breadcrumbs" "$tags" |
+    printf '%s\n%s\n%s\n' "$exception" "$breadcrumbs" "$tags" |
       $jq -s -c --arg level error \
         --arg fingerprint "$fingerprint_value" \
         '{"level": $level, "exception": {"values": [.[0]]}, "breadcrumbs": {"values": .[1]}, "fingerprint": [$fingerprint], "tags": .[2]}'
