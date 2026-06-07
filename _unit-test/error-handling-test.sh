@@ -38,7 +38,7 @@ ENVELOPE_CONTENTS=$(cat "/tmp/$expected_filename")
 # Only make sure the content are parsable JSON. The exact content is not tested,
 # it'll have different values on the "tags" field based on either we're running
 # on the release branch or not.
-jq -e . "/tmp/$expected_filename"
+jq -s -e . "/tmp/$expected_filename"
 echo "Pass."
 
 ##########################
