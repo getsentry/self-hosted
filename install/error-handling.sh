@@ -62,11 +62,11 @@ send_event() {
 
   # Next we construct the meat of the event payload, which we build up
   # inside out using jq
-  # See https://develop.sentry.dev/sdk/event-payloads/
+  # See https://develop.sentry.dev/sdk/foundations/envelopes/event-payloads/
   # for details about the event payload
 
   # Then we need the exception payload
-  # https://develop.sentry.dev/sdk/event-payloads/exception/
+  # https://develop.sentry.dev/sdk/telemetry/errors/#wire-format
   # but first we need to make the stacktrace which goes in the exception payload
   frames=$(echo "$traceback_json" | $jq -s -c)
   stacktrace=$($jq -n -c --argjson frames "$frames" '$ARGS.named')
@@ -74,6 +74,40 @@ send_event() {
     $jq -n -c --arg "type" Error \
       --arg value "$error_msg" \
       --argjson stacktrace "$stacktrace" \
+      '$ARGS.named'
+  )
+
+  # We want to track some data about the state of the system leading up
+  # to the error: Docker version, OS name/version, Docker image tags.
+  # We should track these using Sentry tags, therefore it'll be searchable.
+  # The format is a simple key-value JSON pairs.
+
+  # If `lsb_release` is available, we can get a more user-friendly OS name and version.
+  # If not, we'll just use the kernel name and version from `uname`.
+  if [[ -x "$(command -v lsb_release)" ]]; then
+    os_name=$(lsb_release -si)
+    os_version=$(lsb_release -sr)
+  else
+    os_name=$(uname -s)
+    os_version=$(uname -r)
+  fi
+  tags=$(
+    $jq -n -c --arg docker_version "$DOCKER_VERSION" \
+      --arg compose_version "$COMPOSE_VERSION" \
+      --arg os_name "$os_name" \
+      --arg os_version "$os_version" \
+      --arg container_engine "$CONTAINER_ENGINE" \
+      --arg compose_profiles "$COMPOSE_PROFILES" \
+      --arg sentry_image "$SENTRY_IMAGE" \
+      --arg snuba_image "$SNUBA_IMAGE" \
+      --arg relay_image "$RELAY_IMAGE" \
+      --arg symbolicator_image "$SYMBOLICATOR_IMAGE" \
+      --arg taskbroker_image "$TASKBROKER_IMAGE" \
+      --arg vroom_image "$VROOM_IMAGE" \
+      --arg uptime_checker_image "$UPTIME_CHECKER_IMAGE" \
+      --arg launchpad_image "$LAUNCHPAD_IMAGE" \
+      --arg setup_js_sdk_assets "${SETUP_JS_SDK_ASSETS:-0}" \
+      --arg setup_custom_ca_certificate "${SETUP_CUSTOM_CA_CERTIFICATE:-0}" \
       '$ARGS.named'
   )
 
@@ -87,7 +121,8 @@ send_event() {
     printf '%s\n%s\n' "$exception" "$breadcrumbs" |
       $jq -s -c --arg level error \
         --arg fingerprint "$fingerprint_value" \
-        '{"level": $level, "exception": {"values": [.[0]]}, "breadcrumbs": {"values": .[1]}, "fingerprint": [$fingerprint]}'
+        --args --argjson tags "$tags" \
+        '{"level": $level, "exception": {"values": [.[0]]}, "breadcrumbs": {"values": .[1]}, "fingerprint": [$fingerprint], "tags": $ARGS.named}'
   )
   echo "$event_body" >>$envelope_file_path
   # Add attachment to the event
