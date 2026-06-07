@@ -92,22 +92,22 @@ send_event() {
     os_version=$(uname -r)
   fi
   tags=$(
-    $jq -n -c --arg docker_version "${DOCKER_VERSION:-}" \
-      --arg compose_version "${COMPOSE_VERSION:-}" \
-      --arg os_name "$os_name" \
-      --arg os_version "$os_version" \
-      --arg container_engine "${CONTAINER_ENGINE:-}" \
-      --arg compose_profiles "${COMPOSE_PROFILES:-}" \
-      --arg sentry_image "${SENTRY_IMAGE:-}" \
-      --arg snuba_image "${SNUBA_IMAGE:-}" \
-      --arg relay_image "${RELAY_IMAGE:-}" \
-      --arg symbolicator_image "${SYMBOLICATOR_IMAGE:-}" \
-      --arg taskbroker_image "${TASKBROKER_IMAGE:-}" \
-      --arg vroom_image "${VROOM_IMAGE:-}" \
-      --arg uptime_checker_image "${UPTIME_CHECKER_IMAGE:-}" \
-      --arg launchpad_image "${LAUNCHPAD_IMAGE:-}" \
-      --arg setup_js_sdk_assets "${SETUP_JS_SDK_ASSETS:-0}" \
-      --arg setup_custom_ca_certificate "${SETUP_CUSTOM_CA_CERTIFICATE:-0}" \
+    $jq -n -c --arg 'docker.version' "${DOCKER_VERSION:-}" \
+      --arg 'compose.version' "${COMPOSE_VERSION:-}" \
+      --arg 'os.name' "$os_name" \
+      --arg 'os.version' "$os_version" \
+      --arg 'container_engine' "${CONTAINER_ENGINE:-}" \
+      --arg 'compose.profiles' "${COMPOSE_PROFILES:-}" \
+      --arg 'image_tag.sentry' "${SENTRY_IMAGE:-}" \
+      --arg 'image_tag.snuba' "${SNUBA_IMAGE:-}" \
+      --arg 'image_tag.relay' "${RELAY_IMAGE:-}" \
+      --arg 'image_tag.symbolicator' "${SYMBOLICATOR_IMAGE:-}" \
+      --arg 'image_tag.taskbroker' "${TASKBROKER_IMAGE:-}" \
+      --arg 'image_tag.vroom' "${VROOM_IMAGE:-}" \
+      --arg 'image_tag.uptime_checker' "${UPTIME_CHECKER_IMAGE:-}" \
+      --arg 'image_tag.launchpad' "${LAUNCHPAD_IMAGE:-}" \
+      --arg 'flags.setup_js_sdk_assets' "${SETUP_JS_SDK_ASSETS:-0}" \
+      --arg 'flags.setup_custom_ca_certificate' "${SETUP_CUSTOM_CA_CERTIFICATE:-0}" \
       '$ARGS.named'
   )
 

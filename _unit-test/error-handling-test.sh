@@ -34,11 +34,9 @@ SEND_EVENT_RESPONSE=$(
 )
 rm "$log_file"
 test "$SEND_EVENT_RESPONSE" == "Test Sending $expected_filename"
-# Only make sure the content are parsable JSON. The exact content is not tested,
-# it'll have different values on the "tags" field based on either we're running
-# on the release branch or not.
-cat "/tmp/$expected_filename"
-jq --slurp . "/tmp/$expected_filename"
+sed -i 's/"tags":{[^}]*}/"tags":{}/g' "/tmp/$expected_filename"
+ENVELOPE_CONTENTS=$(cat "/tmp/$expected_filename")
+test "$ENVELOPE_CONTENTS" == "$(cat _unit-test/snapshots/$expected_filename)"
 echo "Pass."
 
 ##########################
