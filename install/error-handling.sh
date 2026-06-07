@@ -92,20 +92,20 @@ send_event() {
     os_version=$(uname -r)
   fi
   tags=$(
-    $jq -n -c --arg docker_version "$DOCKER_VERSION" \
-      --arg compose_version "$COMPOSE_VERSION" \
+    $jq -n -c --arg docker_version "${DOCKER_VERSION:-}" \
+      --arg compose_version "${COMPOSE_VERSION:-}" \
       --arg os_name "$os_name" \
       --arg os_version "$os_version" \
-      --arg container_engine "$CONTAINER_ENGINE" \
-      --arg compose_profiles "$COMPOSE_PROFILES" \
-      --arg sentry_image "$SENTRY_IMAGE" \
-      --arg snuba_image "$SNUBA_IMAGE" \
-      --arg relay_image "$RELAY_IMAGE" \
-      --arg symbolicator_image "$SYMBOLICATOR_IMAGE" \
-      --arg taskbroker_image "$TASKBROKER_IMAGE" \
-      --arg vroom_image "$VROOM_IMAGE" \
-      --arg uptime_checker_image "$UPTIME_CHECKER_IMAGE" \
-      --arg launchpad_image "$LAUNCHPAD_IMAGE" \
+      --arg container_engine "${CONTAINER_ENGINE:-}" \
+      --arg compose_profiles "${COMPOSE_PROFILES:-}" \
+      --arg sentry_image "${SENTRY_IMAGE:-}" \
+      --arg snuba_image "${SNUBA_IMAGE:-}" \
+      --arg relay_image "${RELAY_IMAGE:-}" \
+      --arg symbolicator_image "${SYMBOLICATOR_IMAGE:-}" \
+      --arg taskbroker_image "${TASKBROKER_IMAGE:-}" \
+      --arg vroom_image "${VROOM_IMAGE:-}" \
+      --arg uptime_checker_image "${UPTIME_CHECKER_IMAGE:-}" \
+      --arg launchpad_image "${LAUNCHPAD_IMAGE:-}" \
       --arg setup_js_sdk_assets "${SETUP_JS_SDK_ASSETS:-0}" \
       --arg setup_custom_ca_certificate "${SETUP_CUSTOM_CA_CERTIFICATE:-0}" \
       '$ARGS.named'
@@ -118,11 +118,10 @@ send_event() {
   # spam in the system). It was also futzy to figure out how to get the
   # traceback in there properly. Meh.
   event_body=$(
-    printf '%s\n%s\n' "$exception" "$breadcrumbs" |
+    printf '%s\n%s\n' "$exception" "$breadcrumbs" "$tags" |
       $jq -s -c --arg level error \
         --arg fingerprint "$fingerprint_value" \
-        --args --argjson tags "$tags" \
-        '{"level": $level, "exception": {"values": [.[0]]}, "breadcrumbs": {"values": .[1]}, "fingerprint": [$fingerprint], "tags": $ARGS.named}'
+        '{"level": $level, "exception": {"values": [.[0]]}, "breadcrumbs": {"values": .[1]}, "fingerprint": [$fingerprint], "tags": .[2]}'
   )
   echo "$event_body" >>$envelope_file_path
   # Add attachment to the event
