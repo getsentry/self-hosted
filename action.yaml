@@ -175,19 +175,6 @@ runs:
 
         ./install.sh --no-report-self-hosted-issues --skip-commit-check
 
-        cat <<'EOT' >> sentry/sentry.conf.py
-        from sentry.ratelimits.redis import RedisRateLimiter
-
-        _original_is_limited = RedisRateLimiter.is_limited
-
-        def _self_hosted_integration_is_limited(self, key, limit, project=None, window=None):
-            if key.startswith("auth:login:username:"):
-                return False
-            return _original_is_limited(self, key, limit, project=project, window=window)
-
-        RedisRateLimiter.is_limited = _self_hosted_integration_is_limited
-        EOT
-
     - name: Save Sentry Volume Cache
       if: steps.restore_cache_sentry.outputs.cache-hit != 'true' && inputs.no_restore_volume_cache != 'true'
       uses: BYK/docker-volume-cache-action/save@0efa5cf5178c9906cb46ed8d1a357df8fd6b1a06
