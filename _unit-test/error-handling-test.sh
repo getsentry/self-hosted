@@ -37,6 +37,7 @@ test "$SEND_EVENT_RESPONSE" == "Test Sending $expected_filename"
 # Only make sure the content are parsable JSON. The exact content is not tested,
 # it'll have different values on the "tags" field based on either we're running
 # on the release branch or not.
+cat "/tmp/$expected_filename"
 jq --slurp . "/tmp/$expected_filename"
 echo "Pass."
 
