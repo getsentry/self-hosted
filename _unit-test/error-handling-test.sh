@@ -35,6 +35,8 @@ SEND_EVENT_RESPONSE=$(
 rm "$log_file"
 test "$SEND_EVENT_RESPONSE" == "Test Sending $expected_filename"
 ENVELOPE_CONTENTS=$(cat "/tmp/$expected_filename")
+echo "Peeking what's inside the envelope..."
+cat "$ENVELOPE_CONTENTS"
 test "$ENVELOPE_CONTENTS" == "$(cat _unit-test/snapshots/$expected_filename)"
 echo "Pass."
 
