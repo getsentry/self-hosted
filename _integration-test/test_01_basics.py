@@ -69,8 +69,8 @@ def get_organization_token(client: httpx.Client, csrf_token: str, name: str) -> 
     token = json.loads(response.text)["token"]
     return token
 
-@pytest.fixture()
-def client_login():
+@pytest.fixture(scope="session")
+def authenticated_session():
     client = httpx.Client()
     response = client.get(SENTRY_TEST_HOST, follow_redirects=True)
     parser = BeautifulSoup(response.text, "html.parser")
@@ -87,7 +87,23 @@ def client_login():
         headers={"Referer": f"{SENTRY_TEST_HOST}/auth/login/sentry/"},
     )
     assert login_response.status_code == 200
+    parser = BeautifulSoup(login_response.text, "html.parser")
+    script_tag = parser.find(
+        "script", string=lambda x: x and "window.__initialData" in x
+    )
+    assert script_tag is not None
+    json_data = json.loads(script_tag.text.split("=", 1)[1].strip().rstrip(";"))
+    assert json_data["isAuthenticated"] is True
+    yield (httpx.Cookies(client.cookies), login_response)
+    client.close()
+
+
+@pytest.fixture()
+def client_login(authenticated_session):
+    cookies, login_response = authenticated_session
+    client = httpx.Client(cookies=httpx.Cookies(cookies))
     yield (client, login_response)
+    client.close()
 
 def test_initial_redirect():
     initial_auth_redirect = httpx.get(SENTRY_TEST_HOST, follow_redirects=True)
