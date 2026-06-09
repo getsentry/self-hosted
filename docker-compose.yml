@@ -17,7 +17,22 @@ x-healthcheck-defaults: &healthcheck_defaults
   retries: $HEALTHCHECK_RETRIES
   start_period: "$HEALTHCHECK_START_PERIOD"
 x-file-healthcheck: &file_healthcheck_defaults
-  test: ["CMD-SHELL", "rm /tmp/health.txt"]
+  # Inline python so this anchor works across snuba, sentry, taskworker,
+  # and launchpad images (python3 is on PATH in all of them; a mounted
+  # script would have to be wired into every image base separately).
+  # The try/except keeps the missing-file case to a single readable line
+  # in `docker inspect` output instead of a multi-line traceback.
+  test:
+    - "CMD"
+    - "python3"
+    - "-c"
+    - |
+      import os, sys
+      try:
+          os.remove('/tmp/health.txt')
+      except FileNotFoundError:
+          print('consumer heartbeat file missing: /tmp/health.txt', file=sys.stderr)
+          sys.exit(1)
   interval: "$HEALTHCHECK_FILE_INTERVAL"
   timeout: "$HEALTHCHECK_FILE_TIMEOUT"
   retries: $HEALTHCHECK_FILE_RETRIES
@@ -146,7 +161,7 @@ services:
   postgres:
     <<: *restart_policy
     # Using the same postgres version as Sentry dev for consistency purposes
-    image: "postgres:14.22-bookworm"
+    image: "postgres:14.23-bookworm"
     healthcheck:
       <<: *healthcheck_defaults
       # Using default user "postgres" from sentry/sentry.conf.example.py or value of POSTGRES_USER if provided
@@ -326,14 +341,11 @@ services:
         <<: *depends_on-default
   snuba-api:
     <<: *snuba_defaults
+    volumes:
+      - "./snuba/api_healthcheck.py:/usr/src/snuba/api_healthcheck.py:ro"
     healthcheck:
       <<: *healthcheck_defaults
-      test:
-        - "CMD"
-        - "/bin/bash"
-        - "-c"
-        # Courtesy of https://unix.stackexchange.com/a/234089/108960
-        - 'exec 3<>/dev/tcp/127.0.0.1/1218 && echo -e "GET /health HTTP/1.1\r\nhost: 127.0.0.1\r\n\r\n" >&3 && grep ok -s -m 1 <&3'
+      test: ["CMD", "python3", "/usr/src/snuba/api_healthcheck.py"]
   # Kafka consumer responsible for feeding events into Clickhouse
   snuba-errors-consumer:
     <<: *snuba_defaults
@@ -764,12 +776,20 @@ services:
     <<: [*restart_policy, *pull_policy]
     image: "$TASKBROKER_IMAGE"
     environment:
-      TASKBROKER_KAFKA_CLUSTER: "kafka:9092"
-      TASKBROKER_KAFKA_DEADLETTER_CLUSTER: "kafka:9092"
+      # The cluster address (and, in the external-kafka variant, its auth) is
+      # supplied via env vars. Topics live in the mounted config file
+      # (./taskbroker/config.yml) so they can use hyphenated names — env-var
+      # config keys can't contain hyphens.
+      TASKBROKER_KAFKA_CLUSTERS__DEFAULT__ADDRESS: "kafka:9092"
       TASKBROKER_DB_PATH: "/opt/sqlite/taskbroker-activations.sqlite"
       TASKBROKER_STATSD_ADDR: ${STATSD_ADDR:-127.0.0.1:8125}
+    command: /opt/taskbroker -c /etc/taskbroker/config.yml
     volumes:
       - sentry-taskbroker:/opt/sqlite
+      - type: bind
+        read_only: true
+        source: ./taskbroker
+        target: /etc/taskbroker
     depends_on:
       kafka:
         <<: *depends_on-healthy

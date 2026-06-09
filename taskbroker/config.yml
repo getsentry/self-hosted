@@ -1,0 +1,11 @@
+# See https://github.com/getsentry/taskbroker/pull/667 for the config format.
+kafka_deadletter_topic: taskworker-dlq
+
+kafka_topics:
+  taskworker:
+    cluster: default
+    consumer_group: taskworker
+  taskworker-dlq:
+    cluster: default
+    consumer_group: taskworker
+    produce_only: true
