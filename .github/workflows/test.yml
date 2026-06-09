@@ -10,7 +10,9 @@ on:
       - "release/**"
   pull_request:
   schedule:
-    - cron: "0 0,12 * * *"
+    # Timezone is UTC by default
+    - cron: "0 0,6,12,18 * * 1-5" # weekdays
+    - cron: "0 0,12 * * 6,0" # weekends
 
 concurrency:
   group: ${{ github.ref_name || github.sha }}
