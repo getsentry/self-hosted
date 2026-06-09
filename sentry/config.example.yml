@@ -7,6 +7,11 @@
 # Mail Server #
 ###############
 
+# We strongly recommend configuring an email backend. Without one, users can't
+# verify their primary email or add secondary/backup emails. Email verification
+# protects accounts from unauthorized access — if you skip this, there's no way
+# to confirm a user owns the email address on their account.
+
 # mail.backend: 'smtp'  # Use dummy if you want to disable email entirely
 mail.host: 'smtp'
 # mail.port: 25

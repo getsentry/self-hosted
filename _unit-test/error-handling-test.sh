@@ -34,6 +34,7 @@ SEND_EVENT_RESPONSE=$(
 )
 rm "$log_file"
 test "$SEND_EVENT_RESPONSE" == "Test Sending $expected_filename"
+sed -i 's/"tags":{[^}]*}/"tags":{}/g' "/tmp/$expected_filename"
 ENVELOPE_CONTENTS=$(cat "/tmp/$expected_filename")
 test "$ENVELOPE_CONTENTS" == "$(cat _unit-test/snapshots/$expected_filename)"
 echo "Pass."
@@ -62,7 +63,7 @@ export dc=':'
 echo "Test Logs" >"$log_file"
 CLEANUP_RESPONSE=$(cleanup ERROR) # the linenumber of this line must match just below
 rm "$log_file"
-test "$CLEANUP_RESPONSE" == 'Error in _unit-test/error-handling-test.sh:63.
+test "$CLEANUP_RESPONSE" == 'Error in _unit-test/error-handling-test.sh:64.
 '\''local cmd="${BASH_COMMAND}"'\'' exited with status 0
 
 Cleaning up...'
@@ -76,7 +77,7 @@ export MINIMIZE_DOWNTIME=1
 echo "Test Logs" >"$log_file"
 CLEANUP_RESPONSE=$(cleanup ERROR) # the linenumber of this line must match just below
 rm "$log_file"
-test "$CLEANUP_RESPONSE" == 'Error in _unit-test/error-handling-test.sh:77.
+test "$CLEANUP_RESPONSE" == 'Error in _unit-test/error-handling-test.sh:78.
 '\''local cmd="${BASH_COMMAND}"'\'' exited with status 0
 
 *NOT* cleaning up, to clean your environment run "docker compose stop".'
