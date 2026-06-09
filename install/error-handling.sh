@@ -62,11 +62,11 @@ send_event() {
 
   # Next we construct the meat of the event payload, which we build up
   # inside out using jq
-  # See https://develop.sentry.dev/sdk/event-payloads/
+  # See https://develop.sentry.dev/sdk/foundations/envelopes/event-payloads/
   # for details about the event payload
 
   # Then we need the exception payload
-  # https://develop.sentry.dev/sdk/event-payloads/exception/
+  # https://develop.sentry.dev/sdk/telemetry/errors/#wire-format
   # but first we need to make the stacktrace which goes in the exception payload
   frames=$(echo "$traceback_json" | $jq -s -c)
   stacktrace=$($jq -n -c --argjson frames "$frames" '$ARGS.named')
@@ -77,6 +77,40 @@ send_event() {
       '$ARGS.named'
   )
 
+  # We want to track some data about the state of the system leading up
+  # to the error: Docker version, OS name/version, Docker image tags.
+  # We should track these using Sentry tags, therefore it'll be searchable.
+  # The format is a simple key-value JSON pairs.
+
+  # If `lsb_release` is available, we can get a more user-friendly OS name and version.
+  # If not, we'll just use the kernel name and version from `uname`.
+  if [[ -x "$(command -v lsb_release)" ]]; then
+    os_name=$(lsb_release -si)
+    os_version=$(lsb_release -sr)
+  else
+    os_name=$(uname -s)
+    os_version=$(uname -r)
+  fi
+  tags=$(
+    $jq -n -c --arg 'docker.version' "${DOCKER_VERSION:-}" \
+      --arg 'compose.version' "${COMPOSE_VERSION:-}" \
+      --arg 'os.name' "$os_name" \
+      --arg 'os.version' "$os_version" \
+      --arg 'container_engine' "${CONTAINER_ENGINE:-}" \
+      --arg 'compose.profiles' "${COMPOSE_PROFILES:-}" \
+      --arg 'image_tag.sentry' "${SENTRY_IMAGE:-}" \
+      --arg 'image_tag.snuba' "${SNUBA_IMAGE:-}" \
+      --arg 'image_tag.relay' "${RELAY_IMAGE:-}" \
+      --arg 'image_tag.symbolicator' "${SYMBOLICATOR_IMAGE:-}" \
+      --arg 'image_tag.taskbroker' "${TASKBROKER_IMAGE:-}" \
+      --arg 'image_tag.vroom' "${VROOM_IMAGE:-}" \
+      --arg 'image_tag.uptime_checker' "${UPTIME_CHECKER_IMAGE:-}" \
+      --arg 'image_tag.launchpad' "${LAUNCHPAD_IMAGE:-}" \
+      --arg 'flags.setup_js_sdk_assets' "${SETUP_JS_SDK_ASSETS:-0}" \
+      --arg 'flags.setup_custom_ca_certificate' "${SETUP_CUSTOM_CA_CERTIFICATE:-0}" \
+      '$ARGS.named'
+  )
+
   # It'd be a bit cleaner in the Sentry UI if we passed the inputs to
   # fingerprint_value hash rather than the hash itself (I believe the ultimate
   # hash ends up simply being a hash of our hash), but we want the hash locally
@@ -84,10 +118,10 @@ send_event() {
   # spam in the system). It was also futzy to figure out how to get the
   # traceback in there properly. Meh.
   event_body=$(
-    printf '%s\n%s\n' "$exception" "$breadcrumbs" |
+    printf '%s\n%s\n%s\n' "$exception" "$breadcrumbs" "$tags" |
       $jq -s -c --arg level error \
         --arg fingerprint "$fingerprint_value" \
-        '{"level": $level, "exception": {"values": [.[0]]}, "breadcrumbs": {"values": .[1]}, "fingerprint": [$fingerprint]}'
+        '{"level": $level, "exception": {"values": [.[0]]}, "breadcrumbs": {"values": .[1]}, "fingerprint": [$fingerprint], "tags": .[2]}'
   )
   echo "$event_body" >>$envelope_file_path
   # Add attachment to the event
