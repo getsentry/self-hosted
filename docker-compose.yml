@@ -374,7 +374,7 @@ services:
       <<: *file_healthcheck_defaults
   snuba-replacer:
     <<: *snuba_defaults
-    command: replacer --storage errors --auto-offset-reset=latest --no-strict-offset-reset --max-poll-interval-ms ${SENTRY_KAFKA_MAX_POLL_INTERVAL_MS:-300000}
+    command: replacer --storage errors --auto-offset-reset=latest --no-strict-offset-reset --health-check-file /tmp/health.txt --max-poll-interval-ms ${SENTRY_KAFKA_MAX_POLL_INTERVAL_MS:-300000}
     healthcheck:
       <<: *file_healthcheck_defaults
   snuba-subscription-consumer-events:
