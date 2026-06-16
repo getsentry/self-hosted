@@ -1,5 +1,41 @@
 # Changelog
 
+## 26.6.0
+
+### New Features ✨
+
+- (ci) Run tests every 6 hours on the weekdays by @aldy505 in [#4374](https://github.com/getsentry/self-hosted/pull/4374)
+- (error-handling) Collect extra tags to distinguish OS and Docker Image version by @aldy505 in [#4366](https://github.com/getsentry/self-hosted/pull/4366)
+- Set --max-poll-interval-ms flags to Sentry/Snuba consumers by @aldy505 in [#4376](https://github.com/getsentry/self-hosted/pull/4376)
+
+### Documentation 📚
+
+- (auth) Add email backend recommendation to config example by @nora-shap in [#4362](https://github.com/getsentry/self-hosted/pull/4362)
+
+### Internal Changes 🔧
+
+#### Ci
+
+- Declare 'timeout-minutes' on tests by @aldy505 in [#4375](https://github.com/getsentry/self-hosted/pull/4375)
+- Disable Linux arm64 integration tests for the time being by @aldy505 in [#4367](https://github.com/getsentry/self-hosted/pull/4367)
+
+#### Deps
+
+- Bump actions/checkout from 6.0.2 to 6.0.3 by @dependabot in [#4372](https://github.com/getsentry/self-hosted/pull/4372)
+- Bump codecov/codecov-action from 5.5.3 to 7.0.0 by @dependabot in [#4370](https://github.com/getsentry/self-hosted/pull/4370)
+- Bump astral-sh/setup-uv from 8.1.0 to 8.2.0 by @dependabot in [#4371](https://github.com/getsentry/self-hosted/pull/4371)
+- Bump actions/create-github-app-token from 3.1.1 to 3.2.0 by @dependabot in [#4336](https://github.com/getsentry/self-hosted/pull/4336)
+
+#### Other
+
+- (taskbroker) Migrate to new kafka_clusters/kafka_topics config format by @untitaker in [#4363](https://github.com/getsentry/self-hosted/pull/4363)
+
+### Other
+
+- Increase proxy_read_timeout to 90s by @aminvakil in [#4368](https://github.com/getsentry/self-hosted/pull/4368)
+- Reuse integration test login sessions by @aminvakil in [#4369](https://github.com/getsentry/self-hosted/pull/4369)
+- Adjust ClickHouse configuration to disable query_views_log by @LordSimal in [#4365](https://github.com/getsentry/self-hosted/pull/4365)
+
 ## 26.5.2
 
 ### New Features ✨
