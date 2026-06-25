@@ -177,7 +177,7 @@ services:
     shm_size: 256m
   pgbouncer:
     <<: *restart_policy
-    image: "edoburu/pgbouncer:v1.24.1-p1"
+    image: "edoburu/pgbouncer:v1.25.2-p0"
     healthcheck:
       <<: *healthcheck_defaults
       # Using default user "postgres" from sentry/sentry.conf.example.py or value of POSTGRES_USER if provided
