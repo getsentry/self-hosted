@@ -623,13 +623,6 @@ services:
       <<: *file_healthcheck_defaults
     profiles:
       - feature-complete
-  ingest-profiles:
-    <<: *sentry_defaults
-    command: run consumer ingest-profiles --consumer-group ingest-profiles --healthcheck-file-path /tmp/health.txt --max-poll-interval-ms ${SENTRY_KAFKA_MAX_POLL_INTERVAL_MS:-300000}
-    healthcheck:
-      <<: *file_healthcheck_defaults
-    profiles:
-      - feature-complete
   ingest-monitors:
     <<: *sentry_defaults
     command: run consumer ingest-monitors --consumer-group ingest-monitors --healthcheck-file-path /tmp/health.txt --max-poll-interval-ms ${SENTRY_KAFKA_MAX_POLL_INTERVAL_MS:-300000}
