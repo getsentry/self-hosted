@@ -64,9 +64,7 @@ runs:
         # To enable easier debugging process
         # See https://github.com/getsentry/sentry/pull/118444
         echo "SENTRY_TRACE_STARTUP=1" >> ${{ github.action_path }}/.env
-        if [ "$GITHUB_REPOSITORY" = "getsentry/self-hosted" ]; then
-          echo "SENTRY_DSN=$SELF_HOSTED_INTEGRATION_DSN" >> $GITHUB_ENV
-        fi
+        echo "SENTRY_DSN=$SELF_HOSTED_INTEGRATION_DSN" >> $GITHUB_ENV
 
     - name: Cleanup runner image
       shell: bash
