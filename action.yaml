@@ -16,6 +16,9 @@ inputs:
   skip_backup_restore_test:
     required: false
     description: "Whether to skip backup and restore test. Defaults to false."
+  sentry_dsn:
+    required: false
+    description: "The DSN to use for the integration tests."
   CODECOV_TOKEN:
     required: false
     description: "The Codecov token to upload coverage."
@@ -29,6 +32,7 @@ runs:
         PROJECT_NAME: ${{ inputs.project_name }}
         IMAGE_URL: ${{ inputs.image_url }}
         COMPOSE_PROFILES: ${{ inputs.compose_profiles }}
+        SELF_HOSTED_INTEGRATION_DSN: ${{ inputs.sentry_dsn }}
       run: |
         if [[ -n "$PROJECT_NAME" && -n "$IMAGE_URL" ]]; then
           readarray -t project_names <<<"$PROJECT_NAME"
