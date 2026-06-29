@@ -552,6 +552,7 @@ services:
         hard: 4096
     healthcheck:
       <<: *healthcheck_defaults
+      start_period: 5m
       test:
         - "CMD"
         - "/bin/bash"
