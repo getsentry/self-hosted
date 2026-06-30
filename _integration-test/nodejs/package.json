@@ -8,6 +8,6 @@
     "start": "node --import ./instrument.js index.js"
   },
   "dependencies": {
-    "@sentry/node": "^10.5.0"
+    "@sentry/node": "^10.58.0"
   }
 }
