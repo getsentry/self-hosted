@@ -1,5 +1,6 @@
 # See https://github.com/getsentry/taskbroker/pull/667 for the config format.
 kafka_deadletter_topic: taskworker-dlq
+kafka_retry_topic: taskworker
 
 kafka_topics:
   taskworker:
@@ -9,3 +10,11 @@ kafka_topics:
     cluster: default
     consumer_group: taskworker
     produce_only: true
+  profiles:
+    cluster: default
+    consumer_group: ingest-profiles-consumers-0
+    raw:
+      namespace: ingest.profiling.passthrough
+      application: sentry
+      taskname: sentry.profiles.task.process_profile_from_kafka
+      processing_deadline_duration: 60
