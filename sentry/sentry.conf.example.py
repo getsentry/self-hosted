@@ -93,7 +93,7 @@ if env("SENTRY_SYSTEM_SECRET_KEY"):
 # `COMPOSE_PROFILES` to `errors-only`.
 #
 # See https://develop.sentry.dev/self-hosted/optional-features/errors-only/
-SENTRY_SELF_HOSTED_ERRORS_ONLY = env("COMPOSE_PROFILES") != "feature-complete"
+SENTRY_SELF_HOSTED_ERRORS_ONLY = "errors-only" in env("COMPOSE_PROFILES")
 
 # When running in an air-gapped environment, set this to True to entirely disable
 # external network calls and features that require Internet connectivity.
@@ -447,6 +447,27 @@ SENTRY_FEATURES.update(
         )
     }
 )
+
+################
+# Chartcuterie #
+################
+
+# Chartcuterie is a service that generates charts outside browser environment.
+# It is used pretty much to create charts for metric alerts for Slack integration.
+# At the time of writing, there are no other use case that depends on Chartcuterie.
+#
+# To enable it, add `chartcuterie` to `COMPOSE_PROFILES` in your `.env` file.
+# An example would be:
+# ```env
+# COMPOSE_PROFILES=feature-complete,chartcuterie
+# ```
+
+if "chartcuterie" in env("COMPOSE_PROFILES"):
+    SENTRY_FEATURES["organizations:metric-alert-chartcuterie"] = True
+    SENTRY_OPTIONS["chart-rendering.enabled"] = True
+    SENTRY_OPTIONS["chart-rendering.chartcuterie"] = {
+        "url": "http://chartcuterie:9090"
+    }
 
 #######################
 # MaxMind Integration #
