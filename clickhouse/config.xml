@@ -7,6 +7,7 @@
     </logger>
     <query_thread_log remove="remove"/>
     <query_log remove="remove"/>
+    <query_views_log remove="remove"/>
     <text_log remove="remove"/>
     <trace_log remove="remove"/>
     <metric_log remove="remove"/>
@@ -15,6 +16,10 @@
     <!-- Update: Required for newer versions of Clickhouse -->
     <session_log remove="remove"/>
     <part_log remove="remove"/>
+    <query_views_log remove="remove"/>
+    <processors_profile_log remove="remove"/>
+    <error_log remove="remove"/>
+    <latency_log remove="remove"/>
 
     <allow_nullable_key>1</allow_nullable_key>
 

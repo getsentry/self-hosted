@@ -19,10 +19,10 @@ jobs:
     if: |
       github.event_name == 'workflow_dispatch' || github.event.label.name == 'Trigger: Revert'
     steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
         with:
           token: ${{ secrets.BUMP_SENTRY_TOKEN }}
-      - uses: getsentry/action-fast-revert@35b4b6c1f8f91b5911159568b3b15e531b5b8174 # v2.0.1
+      - uses: getsentry/action-fast-revert@v2
         with:
           pr: ${{ github.event.number || github.event.inputs.pr }}
           co_authored_by: ${{ github.event.inputs.co_authored_by || format('{0} <{1}+{0}@users.noreply.github.com>', github.event.sender.login, github.event.sender.id) }}
@@ -30,11 +30,17 @@ jobs:
           committer_email: bot@sentry.io
           token: ${{ secrets.BUMP_SENTRY_TOKEN }}
       - name: comment on failure
+        env:
+          GITHUB_TOKEN: ${{ secrets.BUMP_SENTRY_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_RUN_ID: ${{ github.run_id }}
+          REPOSITORY_ID: ${{ github.event.repository.id }}
+          PR_NUMBER: ${{ github.event.number || github.event.inputs.pr }}
         run: |
           curl \
               --silent \
               -X POST \
-              -H 'Authorization: token ${{ secrets.BUMP_SENTRY_TOKEN }}' \
-              -d'{"body": "revert failed (conflict? already reverted?) -- [check the logs](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})"}' \
-              https://api.github.com/repositories/${{ github.event.repository.id }}/issues/${{ github.event.number || github.event.inputs.pr }}/comments
+              -H "Authorization: token $GITHUB_TOKEN" \
+              -d"{\"body\": \"revert failed (conflict? already reverted?) -- [check the logs](https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID)\"}" \
+              "https://api.github.com/repositories/$REPOSITORY_ID/issues/$PR_NUMBER/comments"
         if: failure()

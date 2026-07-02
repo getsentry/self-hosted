@@ -1,4 +1,5 @@
 name: "Sentry self-hosted end-to-end tests"
+description: "Runs end-to-end tests against a self-hosted instance built from the current branch. You can optionally specify a custom image to test against as well."
 inputs:
   project_name:
     required: false
@@ -9,6 +10,12 @@ inputs:
   compose_profiles:
     required: false
     description: "Docker Compose profile to use. Defaults to feature-complete."
+  no_restore_volume_cache:
+    required: false
+    description: "Whether to restore Docker volumes cache after the test run. Defaults to false."
+  skip_backup_restore_test:
+    required: false
+    description: "Whether to skip backup and restore test. Defaults to false."
   CODECOV_TOKEN:
     required: false
     description: "The Codecov token to upload coverage."
@@ -24,8 +31,20 @@ runs:
         COMPOSE_PROFILES: ${{ inputs.compose_profiles }}
       run: |
         if [[ -n "$PROJECT_NAME" && -n "$IMAGE_URL" ]]; then
-          image_var=$(echo "${PROJECT_NAME}_IMAGE" | tr '[:lower:]' '[:upper:]')
-          echo "${image_var}=$IMAGE_URL" >> ${{ github.action_path }}/.env
+          readarray -t project_names <<<"$PROJECT_NAME"
+          readarray -t image_urls <<<"$IMAGE_URL"
+          if [ "${#project_names[@]}" -ne "${#image_urls[@]}" ]; then
+            echo "The number of project names and image URLs must match."
+            echo "project_name: $PROJECT_NAME, image_url: $IMAGE_URL"
+            exit 1
+          fi
+
+          for i in "${!project_names[@]}"; do
+            project="${project_names[$i]}"
+            image="${image_urls[$i]}"
+            image_var=$(echo "${project}_IMAGE" | tr '[:lower:]' '[:upper:]')
+            echo "${image_var}=${image}" >> ${{ github.action_path }}/.env
+          done
         elif [[ -z "$PROJECT_NAME" && -z "$IMAGE_URL" ]]; then
           echo "No project name and image URL set. Skipping image configuration."
         else
@@ -52,13 +71,15 @@ runs:
         df -h
 
     - name: Setup uv
-      uses: astral-sh/setup-uv@803947b9bd8e9f986429fa0c5a41c367cd732b41 # v7.2.1
+      uses: astral-sh/setup-uv@fac544c07dec837d0ccb6301d7b5580bf5edae39 # v8.2.0
       with:
         working-directory: ${{ github.action_path }}
         version: "0.9.15"
         # we just cache the venv-dir directly in action-setup-venv
         enable-cache: false
 
+    # NOTE(aldy505): Specifically pinned to 3.1.0
+    # See https://github.com/getsentry/action-setup-venv/issues/28
     - uses: getsentry/action-setup-venv@6e8aebf461914919d9de6e3082669d6bfecc400c # v3.1.0
       with:
         python-version: "3.12"
@@ -93,13 +114,14 @@ runs:
         # for that long `ls` command
         SENTRY_MIGRATIONS_MD5=$(docker run --rm --entrypoint bash $SENTRY_IMAGE -c '{ cat migrations_lockfile.txt; grep -Poz "(?s)(?<=class Topic\\(Enum\\):\\n).+?(?=\\n\\n\\n)" src/sentry/conf/types/kafka_definition.py; }' | md5sum | cut -d ' ' -f 1)
         echo "SENTRY_MIGRATIONS_MD5=$SENTRY_MIGRATIONS_MD5" >> $GITHUB_OUTPUT
-        SNUBA_MIGRATIONS_MD5=$(docker run --rm --entrypoint bash $SNUBA_IMAGE -c '{ ls -Rv1rpq snuba/snuba_migrations/**/*.py; grep -Poz "(?s)(?<=class Topic\\(Enum\\):\\n).+?(?=\\n\\n\\n)" snuba/utils/streams/topics.py; }' | md5sum | cut -d ' ' -f 1)
+        SNUBA_MIGRATIONS_MD5=$(docker run --rm -i --entrypoint python3 $SNUBA_IMAGE - < ${{ github.action_path }}/scripts/snuba_migrations_hash.py)
         echo "SNUBA_MIGRATIONS_MD5=$SNUBA_MIGRATIONS_MD5" >> $GITHUB_OUTPUT
         echo "ARCH=$(uname -m)" >> $GITHUB_OUTPUT
 
     - name: Restore Sentry Volume Cache
+      if: ${{ inputs.no_restore_volume_cache != 'true' }}
       id: restore_cache_sentry
-      uses: BYK/docker-volume-cache-action/restore@be89365902126f508dcae387a32ec3712df6b1cd
+      uses: BYK/docker-volume-cache-action/restore@0efa5cf5178c9906cb46ed8d1a357df8fd6b1a06
       with:
         key: db-volumes-sentry-v3-${{ steps.cache_key.outputs.ARCH }}-${{ inputs.compose_profiles }}-${{ steps.cache_key.outputs.SENTRY_MIGRATIONS_MD5 }}
         restore-keys: |
@@ -108,8 +130,9 @@ runs:
           sentry-postgres
 
     - name: Restore Snuba Volume Cache
+      if: ${{ inputs.no_restore_volume_cache != 'true' }}
       id: restore_cache_snuba
-      uses: BYK/docker-volume-cache-action/restore@be89365902126f508dcae387a32ec3712df6b1cd
+      uses: BYK/docker-volume-cache-action/restore@0efa5cf5178c9906cb46ed8d1a357df8fd6b1a06
       with:
         key: db-volumes-snuba-v3-${{ steps.cache_key.outputs.ARCH }}-${{ inputs.compose_profiles }}-${{ steps.cache_key.outputs.SNUBA_MIGRATIONS_MD5 }}
         restore-keys: |
@@ -118,8 +141,9 @@ runs:
           sentry-clickhouse
 
     - name: Restore Kafka Volume Cache
+      if: ${{ inputs.no_restore_volume_cache != 'true' }}
       id: restore_cache_kafka
-      uses: BYK/docker-volume-cache-action/restore@be89365902126f508dcae387a32ec3712df6b1cd
+      uses: BYK/docker-volume-cache-action/restore@0efa5cf5178c9906cb46ed8d1a357df8fd6b1a06
       with:
         key: db-volumes-kafka-v2-${{ steps.cache_key.outputs.ARCH }}-${{ inputs.compose_profiles }}-${{ steps.cache_key.outputs.SENTRY_MIGRATIONS_MD5 }}-${{ steps.cache_key.outputs.SNUBA_MIGRATIONS_MD5 }}
         restore-keys: |
@@ -152,24 +176,24 @@ runs:
         ./install.sh --no-report-self-hosted-issues --skip-commit-check
 
     - name: Save Sentry Volume Cache
-      if: steps.restore_cache_sentry.outputs.cache-hit != 'true'
-      uses: BYK/docker-volume-cache-action/save@be89365902126f508dcae387a32ec3712df6b1cd
+      if: steps.restore_cache_sentry.outputs.cache-hit != 'true' && inputs.no_restore_volume_cache != 'true'
+      uses: BYK/docker-volume-cache-action/save@0efa5cf5178c9906cb46ed8d1a357df8fd6b1a06
       with:
         key: ${{ steps.restore_cache_sentry.outputs.cache-primary-key }}
         volumes: |
           sentry-postgres
 
     - name: Save Snuba Volume Cache
-      if: steps.restore_cache_snuba.outputs.cache-hit != 'true'
-      uses: BYK/docker-volume-cache-action/save@be89365902126f508dcae387a32ec3712df6b1cd
+      if: steps.restore_cache_snuba.outputs.cache-hit != 'true' && inputs.no_restore_volume_cache != 'true'
+      uses: BYK/docker-volume-cache-action/save@0efa5cf5178c9906cb46ed8d1a357df8fd6b1a06
       with:
         key: ${{ steps.restore_cache_snuba.outputs.cache-primary-key }}
         volumes: |
           sentry-clickhouse
 
     - name: Save Kafka Volume Cache
-      if: steps.restore_cache_kafka.outputs.cache-hit != 'true'
-      uses: BYK/docker-volume-cache-action/save@be89365902126f508dcae387a32ec3712df6b1cd
+      if: steps.restore_cache_kafka.outputs.cache-hit != 'true' && inputs.no_restore_volume_cache != 'true'
+      uses: BYK/docker-volume-cache-action/save@0efa5cf5178c9906cb46ed8d1a357df8fd6b1a06
       with:
         key: ${{ steps.restore_cache_kafka.outputs.cache-primary-key }}
         volumes: |
@@ -187,9 +211,13 @@ runs:
         free -h
 
     - name: Setup Nodejs
-      uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
+      uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
       with:
         node-version: "22.x"
+
+    - name: Setup Sentry CLI
+      shell: bash
+      run: curl -sL https://sentry.io/get-cli/ | SENTRY_CLI_VERSION="3.4.3" bash
 
     - name: Install Nodejs dependencies
       shell: bash
@@ -197,10 +225,21 @@ runs:
         cd ${{ github.action_path }}/_integration-test/nodejs
         npm ci
 
+    - name: Setup required Emerge Tools files
+      if: inputs.compose_profiles == 'feature-complete'
+      shell: bash
+      run: |
+        set -euo pipefail
+        cd ${{ github.action_path }}
+        mkdir -p _integration-test/emerge-tools
+        cd _integration-test/emerge-tools
+        curl -LO https://github.com/getsentry/launchpad/raw/893ad23dcfd81d70edbb26ea217d9d18e2ba81da/tests/_fixtures/android/hn.aab
+
     - name: Integration Test
       shell: bash
       env:
         COMPOSE_PROFILES: ${{ inputs.compose_profiles }}
+        SKIP_BACKUP_RESTORE_TEST: ${{ inputs.skip_backup_restore_test }}
       run: |
         sudo chown root /usr/bin/rsync && sudo chmod u+s /usr/bin/rsync
         rsync -aW --super --numeric-ids --no-compress --mkpath \
@@ -214,7 +253,7 @@ runs:
     - name: Upload coverage to Codecov
       if: inputs.CODECOV_TOKEN
       continue-on-error: true
-      uses: codecov/codecov-action@671740ac38dd9b0130fbe1cec585b89eea48d3de # v5.5.2
+      uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
       with:
         directory: ${{ github.action_path }}
         token: ${{ inputs.CODECOV_TOKEN }}
