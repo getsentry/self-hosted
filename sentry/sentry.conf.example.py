@@ -379,6 +379,8 @@ SENTRY_FEATURES.update(
             "organizations:mep-rollout-flag",
             "organizations:dashboards-rh-widget",
             "organizations:dynamic-sampling",
+            "organizations:workflow-engine-ui",
+            "organizations:workflow-engine-rule-serializers",
             "projects:custom-inbound-filters",
             "projects:data-forwarding",
             "projects:discard-groups",
