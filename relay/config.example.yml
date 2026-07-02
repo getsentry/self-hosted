@@ -31,7 +31,7 @@ http:
   # better performance, it's recommended to keep it enabled if possible.
   #
   # The default value is `true`.
-  dns_cache: false
+  # dns_cache: false
 
 # If you have statsd server, you can utilize that to monitor self-hosted Relay.
 # To start, uncomment the following `metrics` section and adjust the options as needed.
