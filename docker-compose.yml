@@ -535,11 +535,6 @@ services:
     command: run consumer --no-strict-offset-reset post-process-forwarder-errors --consumer-group post-process-forwarder --synchronize-commit-log-topic=snuba-commit-log --synchronize-commit-group=snuba-consumers --healthcheck-file-path /tmp/health.txt --max-poll-interval-ms ${SENTRY_KAFKA_MAX_POLL_INTERVAL_MS:-300000}
     healthcheck:
       <<: *file_healthcheck_defaults
-  subscription-consumer-events:
-    <<: *sentry_defaults
-    command: run consumer events-subscription-results --consumer-group query-subscription-consumer --healthcheck-file-path /tmp/health.txt --max-poll-interval-ms ${SENTRY_KAFKA_MAX_POLL_INTERVAL_MS:-300000}
-    healthcheck:
-      <<: *file_healthcheck_defaults
   ##############################################
   ## Feature Complete Sentry Ingest Consumers ##
   ##############################################
@@ -644,34 +639,6 @@ services:
   post-process-forwarder-issue-platform:
     <<: *sentry_defaults
     command: run consumer --no-strict-offset-reset post-process-forwarder-issue-platform --consumer-group post-process-forwarder --synchronize-commit-log-topic=snuba-generic-events-commit-log --synchronize-commit-group generic_events_group --healthcheck-file-path /tmp/health.txt --max-poll-interval-ms ${SENTRY_KAFKA_MAX_POLL_INTERVAL_MS:-300000}
-    healthcheck:
-      <<: *file_healthcheck_defaults
-    profiles:
-      - feature-complete
-  subscription-consumer-transactions:
-    <<: *sentry_defaults
-    command: run consumer transactions-subscription-results --consumer-group query-subscription-consumer --healthcheck-file-path /tmp/health.txt --max-poll-interval-ms ${SENTRY_KAFKA_MAX_POLL_INTERVAL_MS:-300000}
-    healthcheck:
-      <<: *file_healthcheck_defaults
-    profiles:
-      - feature-complete
-  subscription-consumer-eap-items:
-    <<: *sentry_defaults
-    command: run consumer subscription-results-eap-items --consumer-group subscription-results-eap-items --healthcheck-file-path /tmp/health.txt --max-poll-interval-ms ${SENTRY_KAFKA_MAX_POLL_INTERVAL_MS:-300000}
-    healthcheck:
-      <<: *file_healthcheck_defaults
-    profiles:
-      - feature-complete
-  subscription-consumer-metrics:
-    <<: *sentry_defaults
-    command: run consumer metrics-subscription-results --consumer-group query-subscription-consumer --healthcheck-file-path /tmp/health.txt --max-poll-interval-ms ${SENTRY_KAFKA_MAX_POLL_INTERVAL_MS:-300000}
-    healthcheck:
-      <<: *file_healthcheck_defaults
-    profiles:
-      - feature-complete
-  subscription-consumer-generic-metrics:
-    <<: *sentry_defaults
-    command: run consumer generic-metrics-subscription-results --consumer-group query-subscription-consumer --healthcheck-file-path /tmp/health.txt --max-poll-interval-ms ${SENTRY_KAFKA_MAX_POLL_INTERVAL_MS:-300000}
     healthcheck:
       <<: *file_healthcheck_defaults
     profiles:
