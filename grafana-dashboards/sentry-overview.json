@@ -15,7 +15,7 @@
       }
     ]
   },
-  "description": "Sentry self-hosted monitoring dashboard for VictoriaMetrics. Visualizes notable metric keys from https://develop.sentry.dev/self-hosted/production-enhancements/monitoring/",
+  "description": "Single-pane health summary for Sentry self-hosted. Pulls one signal from each subsystem so you know where to drill down.",
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 1,
@@ -24,240 +24,39 @@
     {
       "title": "Sentry Monitoring Docs",
       "type": "link",
-      "url": "https://develop.sentry.dev/self-hosted/production-enhancements/monitoring/#notable-metric-keys"
+      "url": "https://develop.sentry.dev/self-hosted/production-enhancements/monitoring/"
     }
   ],
   "panels": [
     {
-      "collapsed": false,
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "options": {
+        "code": {
+          "language": "plaintext",
+          "showLineNumbers": false,
+          "showMiniMap": false
+        },
+        "content": "This dashboard answers: **Is my Sentry healthy?** Each row summarizes one subsystem. If a number looks wrong, open the matching subsystem dashboard.",
+        "mode": "markdown"
+      },
+      "pluginVersion": "11.0.0",
+      "targets": [],
+      "title": "",
+      "type": "text",
       "gridPos": {
-        "h": 1,
+        "h": 2,
         "w": 24,
         "x": 0,
         "y": 0
       },
-      "id": 100,
-      "panels": [],
-      "title": "API Request Volume",
-      "type": "row"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "${datasource}"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisBorderShow": false,
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "requests / sec",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "barWidthFactor": 0.6,
-            "drawStyle": "line",
-            "fillOpacity": 10,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "insertNulls": false,
-            "lineInterpolation": "linear",
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "never",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "normal"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "min": 0,
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              }
-            ]
-          },
-          "unit": "reqps"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 0,
-        "y": 1
-      },
-      "id": 1,
-      "options": {
-        "legend": {
-          "calcs": [
-            "mean",
-            "max"
-          ],
-          "displayMode": "table",
-          "placement": "right",
-          "showLegend": true
-        },
-        "tooltip": {
-          "hideZeros": false,
-          "maxHeight": 600,
-          "mode": "multi",
-          "sort": "desc"
-        }
-      },
-      "pluginVersion": "11.0.0",
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${datasource}"
-          },
-          "expr": "sum by(url_name, method) (rate(stats.counters.sentry.view.response.count{host=~\"$host\"}[$__rate_interval]))",
-          "interval": "",
-          "legendFormat": "{{method}} {{url_name}}",
-          "refId": "A"
-        }
-      ],
-      "title": "API Request Rate by Endpoint",
-      "type": "timeseries"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "${datasource}"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisBorderShow": false,
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "duration",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "barWidthFactor": 0.6,
-            "drawStyle": "line",
-            "fillOpacity": 10,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "insertNulls": false,
-            "lineInterpolation": "linear",
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "never",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "min": 0,
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              }
-            ]
-          },
-          "unit": "s"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 12,
-        "y": 9
-      },
-      "id": 2,
-      "options": {
-        "legend": {
-          "calcs": [
-            "mean",
-            "max"
-          ],
-          "displayMode": "table",
-          "placement": "right",
-          "showLegend": true
-        },
-        "tooltip": {
-          "hideZeros": false,
-          "maxHeight": 600,
-          "mode": "multi",
-          "sort": "desc"
-        }
-      },
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${datasource}"
-          },
-          "expr": "sum by(url_name, method) (stats.timers.sentry.view.duration.median{host=~\"$host\"})",
-          "hide": false,
-          "interval": "",
-          "legendFormat": "p50 {{method}} {{url_name}}",
-          "refId": "A"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${datasource}"
-          },
-          "expr": "sum by(url_name, method) (stats.timers.sentry.view.duration.upper_90{host=~\"$host\"})",
-          "hide": false,
-          "interval": "",
-          "legendFormat": "p90 {{method}} {{url_name}}",
-          "refId": "B"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${datasource}"
-          },
-          "expr": "sum by(url_name, method) (stats.timers.sentry.view.duration.upper{host=~\"$host\"})",
-          "hide": false,
-          "interval": "",
-          "legendFormat": "max {{method}} {{url_name}}",
-          "refId": "C"
-        }
-      ],
-      "title": "API Request Duration by Endpoint",
-      "type": "timeseries"
+      "id": 1
     },
     {
       "collapsed": false,
@@ -265,338 +64,11 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 17
+        "y": 2
       },
-      "id": 101,
+      "id": 1000,
       "panels": [],
-      "title": "Task Throughput",
-      "type": "row"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "${datasource}"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisBorderShow": false,
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "tasks / sec",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "barWidthFactor": 0.6,
-            "drawStyle": "line",
-            "fillOpacity": 10,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "insertNulls": false,
-            "lineInterpolation": "linear",
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "never",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "normal"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "min": 0,
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              }
-            ]
-          },
-          "unit": "tps"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 0,
-        "y": 18
-      },
-      "id": 3,
-      "options": {
-        "legend": {
-          "calcs": [
-            "mean",
-            "max"
-          ],
-          "displayMode": "table",
-          "placement": "right",
-          "showLegend": true
-        },
-        "tooltip": {
-          "hideZeros": false,
-          "maxHeight": 600,
-          "mode": "multi",
-          "sort": "desc"
-        }
-      },
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${datasource}"
-          },
-          "expr": "sum by(taskname) (rate(stats.counters.sentry.taskworker.registry.send_task.scheduled.count{host=~\"$host\"}[$__rate_interval]))",
-          "interval": "",
-          "legendFormat": "scheduled: {{taskname}}",
-          "refId": "A"
-        }
-      ],
-      "title": "Tasks Scheduled Rate",
-      "type": "timeseries"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "${datasource}"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisBorderShow": false,
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "tasks / sec",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "barWidthFactor": 0.6,
-            "drawStyle": "line",
-            "fillOpacity": 10,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "insertNulls": false,
-            "lineInterpolation": "linear",
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "never",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "normal"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "min": 0,
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              }
-            ]
-          },
-          "unit": "tps"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 12,
-        "y": 26
-      },
-      "id": 4,
-      "options": {
-        "legend": {
-          "calcs": [
-            "mean",
-            "max"
-          ],
-          "displayMode": "table",
-          "placement": "right",
-          "showLegend": true
-        },
-        "tooltip": {
-          "hideZeros": false,
-          "maxHeight": 600,
-          "mode": "multi",
-          "sort": "desc"
-        }
-      },
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${datasource}"
-          },
-          "expr": "sum by(taskname) (rate(stats.counters.sentry.taskworker.worker.execute_task.count{host=~\"$host\"}[$__rate_interval]))",
-          "interval": "",
-          "legendFormat": "executed: {{taskname}}",
-          "refId": "A"
-        }
-      ],
-      "title": "Tasks Executed Rate",
-      "type": "timeseries"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "${datasource}"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisBorderShow": false,
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "duration",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "barWidthFactor": 0.6,
-            "drawStyle": "line",
-            "fillOpacity": 10,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "insertNulls": false,
-            "lineInterpolation": "linear",
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "never",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "min": 0,
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              }
-            ]
-          },
-          "unit": "s"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 24,
-        "x": 0,
-        "y": 34
-      },
-      "id": 5,
-      "options": {
-        "legend": {
-          "calcs": [
-            "mean",
-            "max"
-          ],
-          "displayMode": "table",
-          "placement": "right",
-          "showLegend": true
-        },
-        "tooltip": {
-          "hideZeros": false,
-          "maxHeight": 600,
-          "mode": "multi",
-          "sort": "desc"
-        }
-      },
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${datasource}"
-          },
-          "expr": "sum by(taskname) (stats.timers.sentry.taskworker.worker.execution_duration.median{host=~\"$host\"})",
-          "hide": false,
-          "interval": "",
-          "legendFormat": "p50 {{taskname}}",
-          "refId": "A"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${datasource}"
-          },
-          "expr": "sum by(taskname) (stats.timers.sentry.taskworker.worker.execution_duration.upper.90{host=~\"$host\"})",
-          "hide": false,
-          "interval": "",
-          "legendFormat": "p90 {{taskname}}",
-          "refId": "B"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${datasource}"
-          },
-          "expr": "sum by(taskname) (stats.timers.sentry.taskworker.worker.execution_duration.upper{host=~\"$host\"})",
-          "hide": false,
-          "interval": "",
-          "legendFormat": "max {{taskname}}",
-          "refId": "C"
-        }
-      ],
-      "title": "Task Execution Duration by Task",
-      "type": "timeseries"
-    },
-    {
-      "collapsed": false,
-      "gridPos": {
-        "h": 1,
-        "w": 24,
-        "x": 0,
-        "y": 42
-      },
-      "id": 102,
-      "panels": [],
-      "title": "Error Processing",
+      "title": "Ingestion: Is Sentry receiving events?",
       "type": "row"
     },
     {
@@ -623,13 +95,6 @@
         },
         "overrides": []
       },
-      "gridPos": {
-        "h": 4,
-        "w": 8,
-        "x": 0,
-        "y": 43
-      },
-      "id": 6,
       "options": {
         "colorMode": "value",
         "graphMode": "area",
@@ -655,13 +120,18 @@
             "uid": "${datasource}"
           },
           "expr": "sum(rate(stats.counters.sentry.relay.event.accepted.count{host=~\"$host\"}[$__rate_interval]))",
-          "interval": "",
-          "legendFormat": "Events accepted / sec",
           "refId": "A"
         }
       ],
-      "title": "Events Accepted Rate",
-      "type": "stat"
+      "title": "Events Accepted / sec",
+      "type": "stat",
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 0,
+        "y": 3
+      },
+      "id": 2
     },
     {
       "datasource": {
@@ -678,7 +148,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
+                "color": "red",
                 "value": null
               }
             ]
@@ -687,13 +157,68 @@
         },
         "overrides": []
       },
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.0.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "sum(rate(stats.counters.sentry.relay.event.rejected.count{host=~\"$host\"}[$__rate_interval]))",
+          "refId": "A"
+        }
+      ],
+      "title": "Events Rejected / sec",
+      "type": "stat",
       "gridPos": {
         "h": 4,
-        "w": 8,
-        "x": 8,
-        "y": 47
+        "w": 6,
+        "x": 6,
+        "y": 3
       },
-      "id": 7,
+      "id": 3
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "orange",
+                "value": null
+              }
+            ]
+          },
+          "unit": "events/s"
+        },
+        "overrides": []
+      },
       "options": {
         "colorMode": "value",
         "graphMode": "area",
@@ -719,13 +244,18 @@
             "uid": "${datasource}"
           },
           "expr": "sum(rate(stats.counters.sentry.relay.event.error.processed.count{host=~\"$host\"}[$__rate_interval]))",
-          "interval": "",
-          "legendFormat": "Relay error events processed / sec",
           "refId": "A"
         }
       ],
-      "title": "Relay Error Events Processed Rate",
-      "type": "stat"
+      "title": "Error Events / sec",
+      "type": "stat",
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 12,
+        "y": 3
+      },
+      "id": 4
     },
     {
       "datasource": {
@@ -735,41 +265,28 @@
       "fieldConfig": {
         "defaults": {
           "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            }
+            "mode": "thresholds"
           },
           "mappings": [],
-          "unit": "events/s"
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
+          },
+          "unit": "reqps"
         },
         "overrides": []
       },
-      "gridPos": {
-        "h": 8,
-        "w": 8,
-        "x": 16,
-        "y": 51
-      },
-      "id": 8,
       "options": {
-        "displayLabels": [
-          "name"
-        ],
-        "legend": {
-          "displayMode": "table",
-          "placement": "right",
-          "showLegend": true,
-          "values": [
-            "value",
-            "percent"
-          ]
-        },
-        "pieType": "donut",
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
         "reduceOptions": {
           "calcs": [
             "lastNotNull"
@@ -777,27 +294,30 @@
           "fields": "",
           "values": false
         },
-        "tooltip": {
-          "hideZeros": false,
-          "maxHeight": 600,
-          "mode": "multi",
-          "sort": "desc"
-        }
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
       },
+      "pluginVersion": "11.0.0",
       "targets": [
         {
           "datasource": {
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "sum by(item_type) (rate(stats.counters.sentry.relay.event.items.count{host=~\"$host\"}[$__rate_interval]))",
-          "interval": "",
-          "legendFormat": "{{item_type}}",
+          "expr": "sum(rate(stats.counters.sentry.relay.server.http.accepted.count{host=~\"$host\"}[$__rate_interval]))",
           "refId": "A"
         }
       ],
-      "title": "Event Items by Type",
-      "type": "piechart"
+      "title": "Relay HTTP Accepted / sec",
+      "type": "stat",
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 18,
+        "y": 3
+      },
+      "id": 5
     },
     {
       "datasource": {
@@ -836,14 +356,13 @@
             "spanNulls": false,
             "stacking": {
               "group": "A",
-              "mode": "normal"
+              "mode": "none"
             },
             "thresholdsStyle": {
               "mode": "off"
             }
           },
           "mappings": [],
-          "min": 0,
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -853,17 +372,11 @@
               }
             ]
           },
-          "unit": "events/s"
+          "unit": "events/s",
+          "min": 0
         },
         "overrides": []
       },
-      "gridPos": {
-        "h": 4,
-        "w": 16,
-        "x": 0,
-        "y": 59
-      },
-      "id": 9,
       "options": {
         "legend": {
           "calcs": [
@@ -881,20 +394,306 @@
           "sort": "desc"
         }
       },
+      "pluginVersion": "11.0.0",
       "targets": [
         {
           "datasource": {
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "sum by(item_type) (rate(stats.counters.sentry.relay.event.items.count{host=~\"$host\"}[$__rate_interval]))",
-          "interval": "",
-          "legendFormat": "{{item_type}}",
+          "expr": "sum(rate(stats.counters.sentry.relay.event.accepted.count{host=~\"$host\"}[$__rate_interval]))",
+          "refId": "A",
+          "legendFormat": "accepted"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "sum(rate(stats.counters.sentry.relay.event.rejected.count{host=~\"$host\"}[$__rate_interval]))",
+          "refId": "A",
+          "legendFormat": "rejected"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "sum(rate(stats.counters.sentry.relay.event.error.processed.count{host=~\"$host\"}[$__rate_interval]))",
+          "refId": "A",
+          "legendFormat": "error processed"
+        }
+      ],
+      "title": "Event Intake",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 6,
+        "w": 24,
+        "x": 0,
+        "y": 7
+      },
+      "id": 6
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 13
+      },
+      "id": 1001,
+      "panels": [],
+      "title": "UI & API: Can users reach Sentry?",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
+          },
+          "unit": "reqps"
+        },
+        "overrides": []
+      },
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.0.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "sum(rate(stats.counters.sentry.view.response.count{host=~\"$host\"}[$__rate_interval]))",
           "refId": "A"
         }
       ],
-      "title": "Relay Event Items Rate by Type",
-      "type": "timeseries"
+      "title": "API Requests / sec",
+      "type": "stat",
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 0,
+        "y": 14
+      },
+      "id": 7
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "yellow",
+                "value": null
+              }
+            ]
+          },
+          "unit": "reqps"
+        },
+        "overrides": []
+      },
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.0.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "sum(rate(stats.counters.sentry.login.attempt.count{host=~\"$host\"}[$__rate_interval]))",
+          "refId": "A"
+        }
+      ],
+      "title": "Login Attempts / sec",
+      "type": "stat",
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 6,
+        "y": 14
+      },
+      "id": 8
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "purple",
+                "value": null
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.0.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "sum(stats.gauges.snuba.clickhouse.native.connections{host=~\"$host\"})",
+          "refId": "A"
+        }
+      ],
+      "title": "ClickHouse Connections",
+      "type": "stat",
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 12,
+        "y": 14
+      },
+      "id": 9
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "tps"
+        },
+        "overrides": []
+      },
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.0.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "sum(rate(stats.counters.sentry.taskworker.worker.execute_task.count{host=~\"$host\"}[$__rate_interval]))",
+          "refId": "A"
+        }
+      ],
+      "title": "Tasks Executed / sec",
+      "type": "stat",
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 18,
+        "y": 14
+      },
+      "id": 10
     },
     {
       "datasource": {
@@ -940,7 +739,6 @@
             }
           },
           "mappings": [],
-          "min": 0,
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -950,17 +748,11 @@
               }
             ]
           },
-          "unit": "s"
+          "unit": "s",
+          "min": 0
         },
         "overrides": []
       },
-      "gridPos": {
-        "h": 8,
-        "w": 24,
-        "x": 0,
-        "y": 63
-      },
-      "id": 10,
       "options": {
         "legend": {
           "calcs": [
@@ -978,43 +770,142 @@
           "sort": "desc"
         }
       },
+      "pluginVersion": "11.0.0",
       "targets": [
         {
           "datasource": {
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "sum by(stage) (stats.timers.sentry.events.since_received.median{host=~\"$host\"})",
-          "hide": false,
-          "interval": "",
-          "legendFormat": "p50 {{stage}}",
-          "refId": "A"
+          "expr": "sum (stats.timers.sentry.view.duration.median{host=~\"$host\"})",
+          "refId": "A",
+          "legendFormat": "p50"
         },
         {
           "datasource": {
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "sum by(stage) (stats.timers.sentry.events.since_received.upper.90{host=~\"$host\"})",
-          "hide": false,
-          "interval": "",
-          "legendFormat": "p90 {{stage}}",
-          "refId": "B"
+          "expr": "sum (stats.timers.sentry.view.duration.upper_90{host=~\"$host\"})",
+          "refId": "A",
+          "legendFormat": "p90"
         },
         {
           "datasource": {
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "sum by(stage) (stats.timers.sentry.events.since_received.upper{host=~\"$host\"})",
-          "hide": false,
-          "interval": "",
-          "legendFormat": "max {{stage}}",
-          "refId": "C"
+          "expr": "sum (stats.timers.sentry.view.duration.upper{host=~\"$host\"})",
+          "refId": "A",
+          "legendFormat": "max"
         }
       ],
-      "title": "Event Pipeline Latency by Stage",
-      "type": "timeseries"
+      "title": "API Request Latency",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 18
+      },
+      "id": 11
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "queries / sec",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "ops",
+          "min": 0
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "calcs": [
+            "mean",
+            "max"
+          ],
+          "displayMode": "table",
+          "placement": "right",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "maxHeight": 600,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "11.0.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "sum(rate(stats.counters.snuba.api.execute.count{host=~\"$host\"}[$__rate_interval]))",
+          "refId": "A",
+          "legendFormat": "queries / sec"
+        }
+      ],
+      "title": "Snuba API Queries",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 18
+      },
+      "id": 12
     },
     {
       "collapsed": false,
@@ -1022,11 +913,11 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 71
+        "y": 26
       },
-      "id": 103,
+      "id": 1002,
       "panels": [],
-      "title": "Snuba Queries",
+      "title": "Event Processing: Is the pipeline flowing?",
       "type": "row"
     },
     {
@@ -1049,17 +940,10 @@
               }
             ]
           },
-          "unit": "short"
+          "unit": "events/s"
         },
         "overrides": []
       },
-      "gridPos": {
-        "h": 4,
-        "w": 6,
-        "x": 0,
-        "y": 72
-      },
-      "id": 104,
       "options": {
         "colorMode": "value",
         "graphMode": "area",
@@ -1084,14 +968,81 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "sum(stats.gauges.snuba.clickhouse.native.connections{host=~\"$host\"})",
-          "interval": "",
-          "legendFormat": "connections",
+          "expr": "sum(rate(stats.counters.sentry.events.symbolicator.response.count{host=~\"$host\"}[$__rate_interval]))",
           "refId": "A"
         }
       ],
-      "title": "ClickHouse Connections",
-      "type": "stat"
+      "title": "Symbolicator Responses / sec",
+      "type": "stat",
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 0,
+        "y": 27
+      },
+      "id": 13
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "yellow",
+                "value": null
+              }
+            ]
+          },
+          "unit": "events/s"
+        },
+        "overrides": []
+      },
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.0.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "sum(rate(stats.counters.sentry.events.to-symbolicate.count{host=~\"$host\"}[$__rate_interval]))",
+          "refId": "A"
+        }
+      ],
+      "title": "Events to Symbolicate / sec",
+      "type": "stat",
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 6,
+        "y": 27
+      },
+      "id": 14
     },
     {
       "datasource": {
@@ -1117,13 +1068,6 @@
         },
         "overrides": []
       },
-      "gridPos": {
-        "h": 4,
-        "w": 6,
-        "x": 6,
-        "y": 76
-      },
-      "id": 105,
       "options": {
         "colorMode": "value",
         "graphMode": "area",
@@ -1148,14 +1092,333 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "sum(rate(stats.counters.snuba.subscriptions.scheduler_executor.arroyo.consumer.run.count.count{host=~\"$host\"}[$__rate_interval]))",
-          "interval": "",
-          "legendFormat": "run loops / sec",
+          "expr": "sum(rate(stats.counters.snuba.consumer.insertions.batch_write_msgs.count{host=~\"$host\"}[$__rate_interval]))",
           "refId": "A"
         }
       ],
-      "title": "Subscription Executor Queries",
-      "type": "stat"
+      "title": "Snuba Inserts / sec",
+      "type": "stat",
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 12,
+        "y": 27
+      },
+      "id": 15
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              }
+            ]
+          },
+          "unit": "ops"
+        },
+        "overrides": []
+      },
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.0.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "sum(rate(stats.counters.sentry.consumer.arroyo.consumer.invalid_message.count.count{host=~\"$host\"}[$__rate_interval]))",
+          "refId": "A"
+        }
+      ],
+      "title": "Consumer Invalid Messages / sec",
+      "type": "stat",
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 18,
+        "y": 27
+      },
+      "id": 16
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "duration",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "s",
+          "min": 0
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "calcs": [
+            "mean",
+            "max"
+          ],
+          "displayMode": "table",
+          "placement": "right",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "maxHeight": 600,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "11.0.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "sum by(stage) (stats.timers.sentry.events.since_received.median{host=~\"$host\"})",
+          "refId": "A",
+          "legendFormat": "p50 {{stage}}"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "sum by(stage) (stats.timers.sentry.events.since_received.upper_90{host=~\"$host\"})",
+          "refId": "A",
+          "legendFormat": "p90 {{stage}}"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "sum by(stage) (stats.timers.sentry.events.since_received.upper{host=~\"$host\"})",
+          "refId": "A",
+          "legendFormat": "max {{stage}}"
+        }
+      ],
+      "title": "Event Pipeline Latency by Stage",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 31
+      },
+      "id": 17
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 39
+      },
+      "id": 1003,
+      "panels": [],
+      "title": "Tasks Manager: Are tasks keeping up?",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
+          },
+          "unit": "tps"
+        },
+        "overrides": []
+      },
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.0.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "sum(rate(stats.counters.sentry.taskworker.registry.send_task.scheduled.count{host=~\"$host\"}[$__rate_interval]))",
+          "refId": "A"
+        }
+      ],
+      "title": "Tasks Scheduled / sec",
+      "type": "stat",
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 0,
+        "y": 40
+      },
+      "id": 18
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "tps"
+        },
+        "overrides": []
+      },
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.0.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "sum(rate(stats.counters.sentry.taskworker.worker.execute_task.count{host=~\"$host\"}[$__rate_interval]))",
+          "refId": "A"
+        }
+      ],
+      "title": "Tasks Executed / sec",
+      "type": "stat",
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 6,
+        "y": 40
+      },
+      "id": 19
     },
     {
       "datasource": {
@@ -1181,13 +1444,6 @@
         },
         "overrides": []
       },
-      "gridPos": {
-        "h": 4,
-        "w": 6,
-        "x": 12,
-        "y": 80
-      },
-      "id": 106,
       "options": {
         "colorMode": "value",
         "graphMode": "area",
@@ -1212,14 +1468,19 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "sum(stats.gauges.snuba.subscriptions.scheduler_executor.schedule.size{host=~\"$host\"})",
-          "interval": "",
-          "legendFormat": "scheduled subscriptions",
+          "expr": "sum(stats.gauges.taskbroker.upkeep.current_pending_tasks{host=~\"$host\"})",
           "refId": "A"
         }
       ],
-      "title": "Subscription Schedule Size",
-      "type": "stat"
+      "title": "Broker Pending Tasks",
+      "type": "stat",
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 12,
+        "y": 40
+      },
+      "id": 20
     },
     {
       "datasource": {
@@ -1236,22 +1497,15 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "orange",
+                "color": "red",
                 "value": null
               }
             ]
           },
-          "unit": "short"
+          "unit": "tps"
         },
         "overrides": []
       },
-      "gridPos": {
-        "h": 4,
-        "w": 6,
-        "x": 18,
-        "y": 84
-      },
-      "id": 107,
       "options": {
         "colorMode": "value",
         "graphMode": "area",
@@ -1276,14 +1530,19 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "sum(stats.gauges.snuba.subscriptions.scheduler_executor.calculated_max_concurrent_queries{host=~\"$host\"})",
-          "interval": "",
-          "legendFormat": "max concurrent",
+          "expr": "sum(rate(stats.counters.sentry.taskworker.worker.processing_deadline_exceeded.count{host=~\"$host\"}[$__rate_interval]))",
           "refId": "A"
         }
       ],
-      "title": "Max Concurrent Queries",
-      "type": "stat"
+      "title": "Processing Deadline Exceeded / sec",
+      "type": "stat",
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 18,
+        "y": 40
+      },
+      "id": 21
     },
     {
       "datasource": {
@@ -1299,7 +1558,7 @@
             "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
-            "axisLabel": "events / sec",
+            "axisLabel": "tasks / sec",
             "axisPlacement": "auto",
             "barAlignment": 0,
             "barWidthFactor": 0.6,
@@ -1329,7 +1588,6 @@
             }
           },
           "mappings": [],
-          "min": 0,
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -1339,60 +1597,58 @@
               }
             ]
           },
-          "unit": "ops"
+          "unit": "tps",
+          "min": 0
         },
         "overrides": []
       },
+      "options": {
+        "legend": {
+          "calcs": [
+            "mean",
+            "max"
+          ],
+          "displayMode": "table",
+          "placement": "right",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "maxHeight": 600,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "11.0.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "sum(rate(stats.counters.sentry.taskworker.registry.send_task.scheduled.count{host=~\"$host\"}[$__rate_interval]))",
+          "refId": "A",
+          "legendFormat": "scheduled"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "sum(rate(stats.counters.sentry.taskworker.worker.execute_task.count{host=~\"$host\"}[$__rate_interval]))",
+          "refId": "A",
+          "legendFormat": "executed"
+        }
+      ],
+      "title": "Task Scheduled vs Executed",
+      "type": "timeseries",
       "gridPos": {
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 88
+        "y": 44
       },
-      "id": 108,
-      "options": {
-        "legend": {
-          "calcs": [
-            "mean",
-            "max"
-          ],
-          "displayMode": "table",
-          "placement": "right",
-          "showLegend": true
-        },
-        "tooltip": {
-          "hideZeros": false,
-          "maxHeight": 600,
-          "mode": "multi",
-          "sort": "desc"
-        }
-      },
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${datasource}"
-          },
-          "expr": "sum(rate(stats.counters.snuba.subscriptions.scheduler_executor.arroyo.consumer.run.count.count{host=~\"$host\"}[$__rate_interval]))",
-          "hide": false,
-          "interval": "",
-          "legendFormat": "consumer run loops",
-          "refId": "A"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${datasource}"
-          },
-          "expr": "sum(rate(stats.counters.snuba.subscriptions.scheduler_executor.arroyo.processing.strategies.healthcheck.touch.count{host=~\"$host\"}[$__rate_interval]))",
-          "hide": false,
-          "interval": "",
-          "legendFormat": "healthcheck touches",
-          "refId": "B"
-        }
-      ],
-      "title": "Snuba Subscription Throughput",
-      "type": "timeseries"
+      "id": 22
     },
     {
       "datasource": {
@@ -1408,7 +1664,7 @@
             "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
-            "axisLabel": "messages",
+            "axisLabel": "duration",
             "axisPlacement": "auto",
             "barAlignment": 0,
             "barWidthFactor": 0.6,
@@ -1438,7 +1694,6 @@
             }
           },
           "mappings": [],
-          "min": 0,
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -1448,17 +1703,11 @@
               }
             ]
           },
-          "unit": "short"
+          "unit": "s",
+          "min": 0
         },
         "overrides": []
       },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 12,
-        "y": 96
-      },
-      "id": 109,
       "options": {
         "legend": {
           "calcs": [
@@ -1476,32 +1725,45 @@
           "sort": "desc"
         }
       },
+      "pluginVersion": "11.0.0",
       "targets": [
         {
           "datasource": {
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "sum(stats.gauges.snuba.subscriptions.scheduler_executor.tick_buffer.queue_size{host=~\"$host\"})",
-          "hide": false,
-          "interval": "",
-          "legendFormat": "tick buffer queue",
-          "refId": "A"
+          "expr": "sum (stats.timers.sentry.taskworker.worker.execution_duration.median{host=~\"$host\"})",
+          "refId": "A",
+          "legendFormat": "p50"
         },
         {
           "datasource": {
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "sum(stats.gauges.snuba.subscriptions.scheduler_executor.arroyo.consumer.librdkafka.total_queue_size{host=~\"$host\"})",
-          "hide": false,
-          "interval": "",
-          "legendFormat": "kafka queue",
-          "refId": "B"
+          "expr": "sum (stats.timers.sentry.taskworker.worker.execution_duration.upper_90{host=~\"$host\"})",
+          "refId": "A",
+          "legendFormat": "p90"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "sum (stats.timers.sentry.taskworker.worker.execution_duration.upper{host=~\"$host\"})",
+          "refId": "A",
+          "legendFormat": "max"
         }
       ],
-      "title": "Snuba Subscription Queue Size",
-      "type": "timeseries"
+      "title": "Task Execution Duration",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 44
+      },
+      "id": 23
     },
     {
       "collapsed": false,
@@ -1509,11 +1771,11 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 104
+        "y": 52
       },
-      "id": 110,
+      "id": 1004,
       "panels": [],
-      "title": "Emails",
+      "title": "Background Workflows: Are notifications and rules firing?",
       "type": "row"
     },
     {
@@ -1540,13 +1802,6 @@
         },
         "overrides": []
       },
-      "gridPos": {
-        "h": 4,
-        "w": 6,
-        "x": 0,
-        "y": 105
-      },
-      "id": 111,
       "options": {
         "colorMode": "value",
         "graphMode": "area",
@@ -1572,13 +1827,18 @@
             "uid": "${datasource}"
           },
           "expr": "sum(rate(stats.counters.sentry.email.sent.count{host=~\"$host\"}[$__rate_interval]))",
-          "interval": "",
-          "legendFormat": "sent / sec",
           "refId": "A"
         }
       ],
       "title": "Emails Sent / sec",
-      "type": "stat"
+      "type": "stat",
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 0,
+        "y": 53
+      },
+      "id": 24
     },
     {
       "datasource": {
@@ -1604,13 +1864,6 @@
         },
         "overrides": []
       },
-      "gridPos": {
-        "h": 4,
-        "w": 6,
-        "x": 6,
-        "y": 109
-      },
-      "id": 112,
       "options": {
         "colorMode": "value",
         "graphMode": "area",
@@ -1636,13 +1889,142 @@
             "uid": "${datasource}"
           },
           "expr": "sum(rate(stats.counters.sentry.email.queued.count{host=~\"$host\"}[$__rate_interval]))",
-          "interval": "",
-          "legendFormat": "queued / sec",
           "refId": "A"
         }
       ],
       "title": "Emails Queued / sec",
-      "type": "stat"
+      "type": "stat",
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 6,
+        "y": 53
+      },
+      "id": 25
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "purple",
+                "value": null
+              }
+            ]
+          },
+          "unit": "ops"
+        },
+        "overrides": []
+      },
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.0.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "sum(rate(stats.counters.sentry.workflow_engine.process_workflows.count{host=~\"$host\"}[$__rate_interval]))",
+          "refId": "A"
+        }
+      ],
+      "title": "Workflows Processed / sec",
+      "type": "stat",
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 12,
+        "y": 53
+      },
+      "id": 26
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "ops"
+        },
+        "overrides": []
+      },
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.0.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "sum(rate(stats.counters.sentry.workflow_engine.activity_handler.complete.count{host=~\"$host\"}[$__rate_interval]))",
+          "refId": "A"
+        }
+      ],
+      "title": "Activities Completed / sec",
+      "type": "stat",
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 18,
+        "y": 53
+      },
+      "id": 27
     },
     {
       "datasource": {
@@ -1688,7 +2070,6 @@
             }
           },
           "mappings": [],
-          "min": 0,
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -1698,17 +2079,11 @@
               }
             ]
           },
-          "unit": "mps"
+          "unit": "mps",
+          "min": 0
         },
         "overrides": []
       },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 12,
-        "y": 113
-      },
-      "id": 113,
       "options": {
         "legend": {
           "calcs": [
@@ -1726,6 +2101,7 @@
           "sort": "desc"
         }
       },
+      "pluginVersion": "11.0.0",
       "targets": [
         {
           "datasource": {
@@ -1733,10 +2109,8 @@
             "uid": "${datasource}"
           },
           "expr": "sum(rate(stats.counters.sentry.email.sent.count{host=~\"$host\"}[$__rate_interval]))",
-          "hide": false,
-          "interval": "",
-          "legendFormat": "sent",
-          "refId": "A"
+          "refId": "A",
+          "legendFormat": "sent"
         },
         {
           "datasource": {
@@ -1744,269 +2118,19 @@
             "uid": "${datasource}"
           },
           "expr": "sum(rate(stats.counters.sentry.email.queued.count{host=~\"$host\"}[$__rate_interval]))",
-          "hide": false,
-          "interval": "",
-          "legendFormat": "queued",
-          "refId": "B"
+          "refId": "A",
+          "legendFormat": "queued"
         }
       ],
       "title": "Email Throughput",
-      "type": "timeseries"
-    },
-    {
-      "collapsed": false,
-      "gridPos": {
-        "h": 1,
-        "w": 24,
-        "x": 0,
-        "y": 121
-      },
-      "id": 114,
-      "panels": [],
-      "title": "Webhooks",
-      "type": "row"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "${datasource}"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisBorderShow": false,
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "webhooks / sec",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "barWidthFactor": 0.6,
-            "drawStyle": "line",
-            "fillOpacity": 10,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "insertNulls": false,
-            "lineInterpolation": "linear",
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "never",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "min": 0,
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              }
-            ]
-          },
-          "unit": "ops"
-        },
-        "overrides": []
-      },
+      "type": "timeseries",
       "gridPos": {
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 122
+        "y": 57
       },
-      "id": 115,
-      "options": {
-        "legend": {
-          "calcs": [
-            "mean",
-            "max"
-          ],
-          "displayMode": "table",
-          "placement": "right",
-          "showLegend": true
-        },
-        "tooltip": {
-          "hideZeros": false,
-          "maxHeight": 600,
-          "mode": "multi",
-          "sort": "desc"
-        }
-      },
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${datasource}"
-          },
-          "expr": "sum(rate(stats.counters.sentry.sentry_app.send_webhook.started.count{host=~\"$host\"}[$__rate_interval]))",
-          "hide": false,
-          "interval": "",
-          "legendFormat": "started",
-          "refId": "A"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${datasource}"
-          },
-          "expr": "sum(rate(stats.counters.sentry.sentry_app.send_webhook.success.count{host=~\"$host\"}[$__rate_interval]))",
-          "hide": false,
-          "interval": "",
-          "legendFormat": "success",
-          "refId": "B"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${datasource}"
-          },
-          "expr": "sum(rate(stats.counters.sentry.sentry_app.prepare_webhook.started.count{host=~\"$host\"}[$__rate_interval]))",
-          "hide": false,
-          "interval": "",
-          "legendFormat": "prepare started",
-          "refId": "C"
-        }
-      ],
-      "title": "Sentry App Webhook Rate",
-      "type": "timeseries"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "${datasource}"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisBorderShow": false,
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "webhooks / sec",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "barWidthFactor": 0.6,
-            "drawStyle": "line",
-            "fillOpacity": 10,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "insertNulls": false,
-            "lineInterpolation": "linear",
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "never",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "min": 0,
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              }
-            ]
-          },
-          "unit": "ops"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 12,
-        "y": 130
-      },
-      "id": 116,
-      "options": {
-        "legend": {
-          "calcs": [
-            "mean",
-            "max"
-          ],
-          "displayMode": "table",
-          "placement": "right",
-          "showLegend": true
-        },
-        "tooltip": {
-          "hideZeros": false,
-          "maxHeight": 600,
-          "mode": "multi",
-          "sort": "desc"
-        }
-      },
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${datasource}"
-          },
-          "expr": "sum(rate(stats.counters.sentry.integrations.webhook.started.count{host=~\"$host\"}[$__rate_interval]))",
-          "hide": false,
-          "interval": "",
-          "legendFormat": "started",
-          "refId": "A"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${datasource}"
-          },
-          "expr": "sum(rate(stats.counters.sentry.integrations.webhook.success.count{host=~\"$host\"}[$__rate_interval]))",
-          "hide": false,
-          "interval": "",
-          "legendFormat": "success",
-          "refId": "B"
-        }
-      ],
-      "title": "Integration Webhook Rate",
-      "type": "timeseries"
-    },
-    {
-      "collapsed": false,
-      "gridPos": {
-        "h": 1,
-        "w": 24,
-        "x": 0,
-        "y": 138
-      },
-      "id": 117,
-      "panels": [],
-      "title": "Workflow Engine",
-      "type": "row"
+      "id": 28
     },
     {
       "datasource": {
@@ -2052,7 +2176,6 @@
             }
           },
           "mappings": [],
-          "min": 0,
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -2062,17 +2185,11 @@
               }
             ]
           },
-          "unit": "ops"
+          "unit": "ops",
+          "min": 0
         },
         "overrides": []
       },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 0,
-        "y": 139
-      },
-      "id": 118,
       "options": {
         "legend": {
           "calcs": [
@@ -2090,6 +2207,7 @@
           "sort": "desc"
         }
       },
+      "pluginVersion": "11.0.0",
       "targets": [
         {
           "datasource": {
@@ -2097,10 +2215,8 @@
             "uid": "${datasource}"
           },
           "expr": "sum(rate(stats.counters.sentry.workflow_engine.process_workflows.count{host=~\"$host\"}[$__rate_interval]))",
-          "hide": false,
-          "interval": "",
-          "legendFormat": "process workflows",
-          "refId": "A"
+          "refId": "A",
+          "legendFormat": "process workflows"
         },
         {
           "datasource": {
@@ -2108,10 +2224,8 @@
             "uid": "${datasource}"
           },
           "expr": "sum(rate(stats.counters.sentry.workflow_engine.data_condition.evaluation.count{host=~\"$host\"}[$__rate_interval]))",
-          "hide": false,
-          "interval": "",
-          "legendFormat": "condition evaluations",
-          "refId": "B"
+          "refId": "A",
+          "legendFormat": "condition evaluations"
         },
         {
           "datasource": {
@@ -2119,14 +2233,32 @@
             "uid": "${datasource}"
           },
           "expr": "sum(rate(stats.counters.sentry.workflow_engine.activity_handler.complete.count{host=~\"$host\"}[$__rate_interval]))",
-          "hide": false,
-          "interval": "",
-          "legendFormat": "activities completed",
-          "refId": "C"
+          "refId": "A",
+          "legendFormat": "activities completed"
         }
       ],
       "title": "Workflow Engine Throughput",
-      "type": "timeseries"
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 57
+      },
+      "id": 29
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 65
+      },
+      "id": 1005,
+      "panels": [],
+      "title": "Foundational Storage: Is storage healthy?",
+      "type": "row"
     },
     {
       "datasource": {
@@ -2136,43 +2268,71 @@
       "fieldConfig": {
         "defaults": {
           "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisBorderShow": false,
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "events / sec",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "barWidthFactor": 0.6,
-            "drawStyle": "line",
-            "fillOpacity": 10,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "insertNulls": false,
-            "lineInterpolation": "linear",
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "never",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
+            "mode": "thresholds"
           },
           "mappings": [],
-          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
+          },
+          "unit": "ops"
+        },
+        "overrides": []
+      },
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.0.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "sum(rate(stats.counters.sentry.nodestore.get.count{host=~\"$host\"}[$__rate_interval]))",
+          "refId": "A"
+        }
+      ],
+      "title": "Nodestore Get / sec",
+      "type": "stat",
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 0,
+        "y": 66
+      },
+      "id": 30
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -2186,69 +2346,167 @@
         },
         "overrides": []
       },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 12,
-        "y": 147
-      },
-      "id": 119,
       "options": {
-        "legend": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
           "calcs": [
-            "mean",
-            "max"
+            "lastNotNull"
           ],
-          "displayMode": "table",
-          "placement": "right",
-          "showLegend": true
+          "fields": "",
+          "values": false
         },
-        "tooltip": {
-          "hideZeros": false,
-          "maxHeight": 600,
-          "mode": "multi",
-          "sort": "desc"
-        }
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
       },
+      "pluginVersion": "11.0.0",
       "targets": [
         {
           "datasource": {
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "sum(rate(stats.counters.sentry.workflow_engine.workflow_engine.cache.processing_workflow.hit.count{host=~\"$host\"}[$__rate_interval]))",
-          "hide": false,
-          "interval": "",
-          "legendFormat": "hit",
+          "expr": "sum(rate(stats.timers.sentry.filestore.read.count{host=~\"$host\"}[$__rate_interval]))",
           "refId": "A"
+        }
+      ],
+      "title": "Filestore Read / sec",
+      "type": "stat",
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 6,
+        "y": 66
+      },
+      "id": 31
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "ops"
         },
+        "overrides": []
+      },
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.0.0",
+      "targets": [
         {
           "datasource": {
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "sum(rate(stats.counters.sentry.workflow_engine.workflow_engine.cache.processing_workflow.miss.count{host=~\"$host\"}[$__rate_interval]))",
-          "hide": false,
-          "interval": "",
-          "legendFormat": "miss",
-          "refId": "B"
+          "expr": "sum(rate(stats.timers.sentry.filestore.save.count{host=~\"$host\"}[$__rate_interval]))",
+          "refId": "A"
         }
       ],
-      "title": "Workflow Engine Cache Hit/Miss",
-      "type": "timeseries"
+      "title": "Filestore Save / sec",
+      "type": "stat",
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 12,
+        "y": 66
+      },
+      "id": 32
     },
     {
-      "collapsed": false,
-      "gridPos": {
-        "h": 1,
-        "w": 24,
-        "x": 0,
-        "y": 155
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
       },
-      "id": 120,
-      "panels": [],
-      "title": "Nodestore",
-      "type": "row"
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              }
+            ]
+          },
+          "unit": "ops"
+        },
+        "overrides": []
+      },
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.0.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "sum(rate(stats.counters.sentry.cache.memcache.reconnect.count{host=~\"$host\"}[$__rate_interval]))",
+          "refId": "A"
+        }
+      ],
+      "title": "Memcache Reconnects / sec",
+      "type": "stat",
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 18,
+        "y": 66
+      },
+      "id": 33
     },
     {
       "datasource": {
@@ -2294,7 +2552,6 @@
             }
           },
           "mappings": [],
-          "min": 0,
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -2304,17 +2561,11 @@
               }
             ]
           },
-          "unit": "ops"
+          "unit": "ops",
+          "min": 0
         },
         "overrides": []
       },
-      "gridPos": {
-        "h": 8,
-        "w": 24,
-        "x": 0,
-        "y": 156
-      },
-      "id": 121,
       "options": {
         "legend": {
           "calcs": [
@@ -2332,6 +2583,7 @@
           "sort": "desc"
         }
       },
+      "pluginVersion": "11.0.0",
       "targets": [
         {
           "datasource": {
@@ -2339,10 +2591,8 @@
             "uid": "${datasource}"
           },
           "expr": "sum(rate(stats.counters.sentry.nodestore.get.count{host=~\"$host\"}[$__rate_interval]))",
-          "hide": false,
-          "interval": "",
-          "legendFormat": "get",
-          "refId": "A"
+          "refId": "A",
+          "legendFormat": "get"
         },
         {
           "datasource": {
@@ -2350,14 +2600,528 @@
             "uid": "${datasource}"
           },
           "expr": "sum(rate(stats.counters.sentry.nodestore.get_multi.count{host=~\"$host\"}[$__rate_interval]))",
-          "hide": false,
-          "interval": "",
-          "legendFormat": "get_multi",
-          "refId": "B"
+          "refId": "A",
+          "legendFormat": "get_multi"
         }
       ],
       "title": "Nodestore Operations",
-      "type": "timeseries"
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 70
+      },
+      "id": 34
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "connections",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "short",
+          "min": 0
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "calcs": [
+            "mean",
+            "max"
+          ],
+          "displayMode": "table",
+          "placement": "right",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "maxHeight": 600,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "11.0.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "sum(stats.gauges.sentry.relay.redis.pool.connections{host=~\"$host\"})",
+          "refId": "A",
+          "legendFormat": "connections"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "sum(stats.gauges.sentry.relay.redis.pool.idle_connections{host=~\"$host\"})",
+          "refId": "A",
+          "legendFormat": "idle"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "sum(stats.gauges.sentry.relay.redis.pool.max_connections{host=~\"$host\"})",
+          "refId": "A",
+          "legendFormat": "max"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "sum(stats.gauges.sentry.relay.redis.pool.waiting_for_connection{host=~\"$host\"})",
+          "refId": "A",
+          "legendFormat": "waiting"
+        }
+      ],
+      "title": "Redis Pool Health (Relay)",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 70
+      },
+      "id": 35
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 78
+      },
+      "id": 1006,
+      "panels": [],
+      "title": "Failures: Where should I look first?",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              }
+            ]
+          },
+          "unit": "events/s"
+        },
+        "overrides": []
+      },
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.0.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "sum(rate(stats.counters.sentry.relay.event.rejected.count{host=~\"$host\"}[$__rate_interval]))",
+          "refId": "A"
+        }
+      ],
+      "title": "Rejected Events / sec",
+      "type": "stat",
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 0,
+        "y": 79
+      },
+      "id": 36
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              }
+            ]
+          },
+          "unit": "ops"
+        },
+        "overrides": []
+      },
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.0.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "sum(rate(stats.counters.sentry.taskworker.client.rpc_error.count{host=~\"$host\"}[$__rate_interval]))",
+          "refId": "A"
+        }
+      ],
+      "title": "Task RPC Errors / sec",
+      "type": "stat",
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 4,
+        "y": 79
+      },
+      "id": 37
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              }
+            ]
+          },
+          "unit": "ops"
+        },
+        "overrides": []
+      },
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.0.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "sum(rate(stats.counters.sentry.taskworker.worker.processing_deadline_exceeded.count{host=~\"$host\"}[$__rate_interval]))",
+          "refId": "A"
+        }
+      ],
+      "title": "Processing Deadline Exceeded / sec",
+      "type": "stat",
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 8,
+        "y": 79
+      },
+      "id": 38
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              }
+            ]
+          },
+          "unit": "ops"
+        },
+        "overrides": []
+      },
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.0.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "sum(rate(stats.counters.sentry.consumer.arroyo.consumer.invalid_message.count.count{host=~\"$host\"}[$__rate_interval]))",
+          "refId": "A"
+        }
+      ],
+      "title": "Consumer Invalid Messages / sec",
+      "type": "stat",
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 12,
+        "y": 79
+      },
+      "id": 39
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              }
+            ]
+          },
+          "unit": "ops"
+        },
+        "overrides": []
+      },
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.0.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "sum(rate(stats.counters.snuba.consumer.rust_consumer.clickhouse_insert_error.count{host=~\"$host\"}[$__rate_interval]))",
+          "refId": "A"
+        }
+      ],
+      "title": "Snuba CH Insert Errors / sec",
+      "type": "stat",
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 16,
+        "y": 79
+      },
+      "id": 40
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              }
+            ]
+          },
+          "unit": "ops"
+        },
+        "overrides": []
+      },
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.0.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "sum(rate(stats.counters.sentry.cache.memcache.reconnect.count{host=~\"$host\"}[$__rate_interval]))",
+          "refId": "A"
+        }
+      ],
+      "title": "Memcache Reconnects / sec",
+      "type": "stat",
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 20,
+        "y": 79
+      },
+      "id": 41
     }
   ],
   "refresh": "30s",
@@ -2365,7 +3129,7 @@
   "tags": [
     "sentry",
     "self-hosted",
-    "monitoring"
+    "overview"
   ],
   "templating": {
     "list": [
@@ -2427,8 +3191,8 @@
   },
   "timepicker": {},
   "timezone": "browser",
-  "title": "Sentry Self-Hosted Monitoring",
-  "uid": "sentry-self-hosted-monitoring",
+  "title": "Self-Hosted Sentry: Overview",
+  "uid": "sentry-self-hosted-overview",
   "version": 1,
   "weekStart": ""
 }
