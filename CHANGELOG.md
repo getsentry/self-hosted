@@ -428,7 +428,7 @@ By: @aminvakil (#3658, #3654)
 
 ### Various fixes & improvements
 
-- chore(relay): specify spool.enveloppe.max_backpressure_memory_percent configuration for handling relay's failing healthcheck (#3635) by @aldy505
+- chore(relay): specify spool.envelope.max_backpressure_memory_percent configuration for handling relay's failing healthcheck (#3635) by @aldy505
 - build(deps): bump actions/create-github-app-token from 1.12.0 to 2.0.2 (#3649) by @dependabot
 - build(deps): bump actions/create-github-app-token from 1.11.7 to 1.12.0 (#3639) by @dependabot
 - Minimum requirements for 'errors-only' profile (#3634) by @madest92
