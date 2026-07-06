@@ -381,7 +381,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum(rate(stats.counters.sentry.relay.event.rejected.count{host=~\"$host\"}[$__rate_interval]))",
-          "refId": "A",
+          "refId": "B",
           "legendFormat": "rejected"
         },
         {
@@ -390,7 +390,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum(rate(stats.counters.sentry.relay.event.error.processed.count{host=~\"$host\"}[$__rate_interval]))",
-          "refId": "A",
+          "refId": "C",
           "legendFormat": "error processed"
         }
       ],
@@ -829,7 +829,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum(rate(stats.counters.sentry.relay.responses.status_codes.count{host=~\"$host\"}[$__rate_interval]))",
-          "refId": "A",
+          "refId": "B",
           "legendFormat": "responses"
         }
       ],
@@ -1323,7 +1323,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum (stats.timers.sentry.relay.config.get_project_config.duration.upper_90{host=~\"$host\"})",
-          "refId": "A",
+          "refId": "B",
           "legendFormat": "p90"
         },
         {
@@ -1332,7 +1332,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum (stats.timers.sentry.relay.config.get_project_config.duration.upper{host=~\"$host\"})",
-          "refId": "A",
+          "refId": "C",
           "legendFormat": "max"
         }
       ],
@@ -1438,7 +1438,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum(stats.counters.sentry.relay.project_configs.post_v3.pending.count{host=~\"$host\"})",
-          "refId": "A",
+          "refId": "B",
           "legendFormat": "pending"
         }
       ],
@@ -1557,7 +1557,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum(rate(stats.counters.sentry.relay.producer.produce_status.error.count{host=~\"$host\"}[$__rate_interval]))",
-          "refId": "A",
+          "refId": "B",
           "legendFormat": "error"
         }
       ],
@@ -1663,7 +1663,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum(stats.gauges.sentry.consumer.arroyo.producer.librdkafka.p99_outbuf_latency{host=~\"$host\"})",
-          "refId": "A",
+          "refId": "B",
           "legendFormat": "outbuf latency"
         },
         {
@@ -1672,7 +1672,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum(stats.gauges.sentry.consumer.arroyo.producer.librdkafka.p99_rtt{host=~\"$host\"})",
-          "refId": "A",
+          "refId": "C",
           "legendFormat": "rtt"
         }
       ],
@@ -2039,7 +2039,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum(rate(stats.counters.sentry.consumer.arroyo.processing.strategies.healthcheck.touch.count{host=~\"$host\"}[$__rate_interval]))",
-          "refId": "A",
+          "refId": "B",
           "legendFormat": "healthcheck touches"
         }
       ],
@@ -2145,7 +2145,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum (stats.timers.sentry.consumer.arroyo.consumer.processing.time.upper_90{host=~\"$host\"})",
-          "refId": "A",
+          "refId": "B",
           "legendFormat": "processing p90"
         },
         {
@@ -2154,7 +2154,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum (stats.timers.sentry.consumer.arroyo.consumer.backpressure.time.median{host=~\"$host\"})",
-          "refId": "A",
+          "refId": "C",
           "legendFormat": "backpressure p50"
         },
         {
@@ -2163,7 +2163,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum (stats.timers.sentry.consumer.arroyo.consumer.backpressure.time.upper_90{host=~\"$host\"})",
-          "refId": "A",
+          "refId": "D",
           "legendFormat": "backpressure p90"
         }
       ],
@@ -2530,7 +2530,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum(rate(stats.counters.sentry.spans.buffer.empty_segments.count{host=~\"$host\"}[$__rate_interval]))",
-          "refId": "A",
+          "refId": "B",
           "legendFormat": "empty segments"
         },
         {
@@ -2539,7 +2539,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum(rate(stats.counters.sentry.spans.buffer.flusher_unhealthy.count{host=~\"$host\"}[$__rate_interval]))",
-          "refId": "A",
+          "refId": "C",
           "legendFormat": "flusher unhealthy"
         }
       ],
@@ -2645,7 +2645,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum (stats.timers.sentry.spans.buffer.process_spans.upper_90{host=~\"$host\"})",
-          "refId": "A",
+          "refId": "B",
           "legendFormat": "process_spans p90"
         },
         {
@@ -2654,7 +2654,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum (stats.timers.sentry.spans.buffer.process_batch.median{host=~\"$host\"})",
-          "refId": "A",
+          "refId": "C",
           "legendFormat": "process_batch p50"
         },
         {
@@ -2663,7 +2663,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum (stats.timers.sentry.spans.buffer.process_batch.upper_90{host=~\"$host\"})",
-          "refId": "A",
+          "refId": "D",
           "legendFormat": "process_batch p90"
         }
       ],

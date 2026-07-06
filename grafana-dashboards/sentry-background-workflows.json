@@ -381,7 +381,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum(rate(stats.counters.sentry.workflow_engine.process_workflows.triggered_workflows.count{host=~\"$host\"}[$__rate_interval]))",
-          "refId": "A",
+          "refId": "B",
           "legendFormat": "triggered workflows"
         },
         {
@@ -390,7 +390,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum(rate(stats.counters.sentry.workflow_engine.process_workflows.workflows_evaluated.count{host=~\"$host\"}[$__rate_interval]))",
-          "refId": "A",
+          "refId": "C",
           "legendFormat": "workflows evaluated"
         },
         {
@@ -399,7 +399,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum(rate(stats.counters.sentry.workflow_engine.activity_handler.complete.count{host=~\"$host\"}[$__rate_interval]))",
-          "refId": "A",
+          "refId": "D",
           "legendFormat": "activities completed"
         }
       ],
@@ -505,7 +505,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum (stats.timers.sentry.workflow_engine.data_condition.evaluation_duration.upper_90{host=~\"$host\"})",
-          "refId": "A",
+          "refId": "B",
           "legendFormat": "p90"
         },
         {
@@ -514,7 +514,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum (stats.timers.sentry.workflow_engine.invoke_workflow_activity_handlers.duration.median{host=~\"$host\"})",
-          "refId": "A",
+          "refId": "C",
           "legendFormat": "invoke handlers p50"
         },
         {
@@ -523,7 +523,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum (stats.timers.sentry.workflow_engine.invoke_workflow_activity_handlers.duration.upper_90{host=~\"$host\"})",
-          "refId": "A",
+          "refId": "D",
           "legendFormat": "invoke handlers p90"
         }
       ],
@@ -629,7 +629,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum(rate(stats.counters.sentry.workflow_engine.workflow_engine.cache.processing_workflow.miss.count{host=~\"$host\"}[$__rate_interval]))",
-          "refId": "A",
+          "refId": "B",
           "legendFormat": "miss"
         }
       ],
@@ -872,7 +872,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum(rate(stats.counters.sentry.email.queued.count{host=~\"$host\"}[$__rate_interval]))",
-          "refId": "A",
+          "refId": "B",
           "legendFormat": "queued"
         }
       ],
@@ -991,7 +991,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum(rate(stats.counters.sentry.sentry_app.send_webhook.success.count{host=~\"$host\"}[$__rate_interval]))",
-          "refId": "A",
+          "refId": "B",
           "legendFormat": "send success"
         },
         {
@@ -1000,7 +1000,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum(rate(stats.counters.sentry.sentry_app.prepare_webhook.started.count{host=~\"$host\"}[$__rate_interval]))",
-          "refId": "A",
+          "refId": "C",
           "legendFormat": "prepare started"
         },
         {
@@ -1009,7 +1009,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum(rate(stats.counters.sentry.sentry_app.prepare_webhook.success.count{host=~\"$host\"}[$__rate_interval]))",
-          "refId": "A",
+          "refId": "D",
           "legendFormat": "prepare success"
         }
       ],
@@ -1115,7 +1115,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum(rate(stats.counters.sentry.integrations.http_response.count{host=~\"$host\"}[$__rate_interval]))",
-          "refId": "A",
+          "refId": "B",
           "legendFormat": "http response"
         },
         {
@@ -1124,7 +1124,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum(rate(stats.counters.sentry.integrations.slo.started.count{host=~\"$host\"}[$__rate_interval]))",
-          "refId": "A",
+          "refId": "C",
           "legendFormat": "slo started"
         },
         {
@@ -1133,7 +1133,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum(rate(stats.counters.sentry.integrations.slo.failure.count{host=~\"$host\"}[$__rate_interval]))",
-          "refId": "A",
+          "refId": "D",
           "legendFormat": "slo failure"
         },
         {
@@ -1142,7 +1142,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum(rate(stats.counters.sentry.integrations.slo.success.count{host=~\"$host\"}[$__rate_interval]))",
-          "refId": "A",
+          "refId": "E",
           "legendFormat": "slo success"
         }
       ],
@@ -1539,7 +1539,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum(rate(stats.counters.sentry.weekly_report.prepare_organization_report.started.count{host=~\"$host\"}[$__rate_interval]))",
-          "refId": "A",
+          "refId": "B",
           "legendFormat": "prepare started"
         },
         {
@@ -1548,7 +1548,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum(rate(stats.counters.sentry.weekly_report.prepare_organization_report.success.count{host=~\"$host\"}[$__rate_interval]))",
-          "refId": "A",
+          "refId": "C",
           "legendFormat": "prepare success"
         },
         {
@@ -1557,7 +1557,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum(rate(stats.counters.sentry.weekly_report.send_email.started.count{host=~\"$host\"}[$__rate_interval]))",
-          "refId": "A",
+          "refId": "D",
           "legendFormat": "send started"
         },
         {
@@ -1566,7 +1566,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum(rate(stats.counters.sentry.weekly_report.send_email.success.count{host=~\"$host\"}[$__rate_interval]))",
-          "refId": "A",
+          "refId": "E",
           "legendFormat": "send success"
         }
       ],
@@ -1672,7 +1672,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum (stats.timers.sentry.weekly_report.create_context.duration.upper_90{host=~\"$host\"})",
-          "refId": "A",
+          "refId": "B",
           "legendFormat": "p90"
         },
         {
@@ -1681,7 +1681,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum (stats.timers.sentry.weekly_report.deliver_reports.duration.median{host=~\"$host\"})",
-          "refId": "A",
+          "refId": "C",
           "legendFormat": "deliver p50"
         },
         {
@@ -1690,7 +1690,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum (stats.timers.sentry.weekly_report.deliver_reports.duration.upper_90{host=~\"$host\"})",
-          "refId": "A",
+          "refId": "D",
           "legendFormat": "deliver p90"
         }
       ],
@@ -1933,7 +1933,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum(rate(stats.counters.sentry.monitors.checkin.handle_processing_error.count{host=~\"$host\"}[$__rate_interval]))",
-          "refId": "A",
+          "refId": "B",
           "legendFormat": "processing errors"
         },
         {
@@ -1942,7 +1942,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum(rate(stats.counters.sentry.monitors.tasks.clock_tick.tick_decision.count{host=~\"$host\"}[$__rate_interval]))",
-          "refId": "A",
+          "refId": "C",
           "legendFormat": "clock tick decisions"
         }
       ],

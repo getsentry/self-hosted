@@ -478,7 +478,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum by(url_name,method) (stats.timers.sentry.view.duration.upper_90{host=~\"$host\"})",
-          "refId": "A",
+          "refId": "B",
           "legendFormat": "p90 {{method}} {{url_name}}"
         },
         {
@@ -487,7 +487,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum by(url_name,method) (stats.timers.sentry.view.duration.upper{host=~\"$host\"})",
-          "refId": "A",
+          "refId": "C",
           "legendFormat": "max {{method}} {{url_name}}"
         }
       ],
@@ -813,7 +813,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum(rate(stats.counters.sentry.middleware.ratelimit.process_response.count{host=~\"$host\"}[$__rate_interval]))",
-          "refId": "A",
+          "refId": "B",
           "legendFormat": "process_response"
         }
       ],
@@ -919,7 +919,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum (stats.timers.sentry.middleware.ratelimit.process_view.upper_90{host=~\"$host\"})",
-          "refId": "A",
+          "refId": "B",
           "legendFormat": "process_view p90"
         },
         {
@@ -928,7 +928,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum (stats.timers.sentry.middleware.ratelimit.process_response.median{host=~\"$host\"})",
-          "refId": "A",
+          "refId": "C",
           "legendFormat": "process_response p50"
         },
         {
@@ -937,7 +937,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum (stats.timers.sentry.middleware.ratelimit.process_response.upper_90{host=~\"$host\"})",
-          "refId": "A",
+          "refId": "D",
           "legendFormat": "process_response p90"
         }
       ],
@@ -1304,7 +1304,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum(rate(stats.counters.snuba.db_query.cache_miss.count{host=~\"$host\"}[$__rate_interval]))",
-          "refId": "A",
+          "refId": "B",
           "legendFormat": "misses"
         },
         {
@@ -1313,7 +1313,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum(rate(stats.counters.snuba.db_query.cache_hit_simple.count{host=~\"$host\"}[$__rate_interval]))",
-          "refId": "A",
+          "refId": "C",
           "legendFormat": "hits simple"
         }
       ],
@@ -1419,7 +1419,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum (stats.timers.sentry.snuba.client.snql_query.upper_90{host=~\"$host\"})",
-          "refId": "A",
+          "refId": "B",
           "legendFormat": "snql_query p90"
         },
         {
@@ -1428,7 +1428,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum (stats.timers.sentry.snuba.client.process_result.median{host=~\"$host\"})",
-          "refId": "A",
+          "refId": "C",
           "legendFormat": "process_result p50"
         },
         {
@@ -1437,7 +1437,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum (stats.timers.sentry.snuba.client.process_result.upper_90{host=~\"$host\"})",
-          "refId": "A",
+          "refId": "D",
           "legendFormat": "process_result p90"
         }
       ],
@@ -1556,7 +1556,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum(rate(stats.counters.sentry.sentry_metrics.indexer.memcache.count{host=~\"$host\"}[$__rate_interval]))",
-          "refId": "A",
+          "refId": "B",
           "legendFormat": "metrics indexer memcache"
         },
         {
@@ -1565,7 +1565,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum(rate(stats.counters.sentry.cache.memcache.reconnect.count{host=~\"$host\"}[$__rate_interval]))",
-          "refId": "A",
+          "refId": "C",
           "legendFormat": "memcache reconnect"
         },
         {
@@ -1574,7 +1574,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum(rate(stats.counters.sentry.dynamic_sampling.boost_low_volume_transactions.query.count{host=~\"$host\"}[$__rate_interval]))",
-          "refId": "A",
+          "refId": "D",
           "legendFormat": "dynamic sampling queries"
         }
       ],
@@ -1680,7 +1680,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum(stats.gauges.sentry.relay.redis.pool.idle_connections{host=~\"$host\"})",
-          "refId": "A",
+          "refId": "B",
           "legendFormat": "idle"
         },
         {
@@ -1689,7 +1689,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum(stats.gauges.sentry.relay.redis.pool.max_connections{host=~\"$host\"})",
-          "refId": "A",
+          "refId": "C",
           "legendFormat": "max"
         },
         {
@@ -1698,7 +1698,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum(stats.gauges.sentry.relay.redis.pool.waiting_for_connection{host=~\"$host\"})",
-          "refId": "A",
+          "refId": "D",
           "legendFormat": "waiting"
         }
       ],

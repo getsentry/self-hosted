@@ -381,7 +381,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum(rate(stats.counters.sentry.taskworker.registry.send_task.success.count{host=~\"$host\"}[$__rate_interval]))",
-          "refId": "A",
+          "refId": "B",
           "legendFormat": "send success"
         },
         {
@@ -390,7 +390,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum(rate(stats.counters.sentry.taskworker.worker.execute_task.count{host=~\"$host\"}[$__rate_interval]))",
-          "refId": "A",
+          "refId": "C",
           "legendFormat": "executed"
         }
       ],
@@ -496,7 +496,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum by(taskname) (stats.timers.sentry.taskworker.worker.execution_duration.upper_90{host=~\"$host\"})",
-          "refId": "A",
+          "refId": "B",
           "legendFormat": "p90 {{taskname}}"
         },
         {
@@ -505,7 +505,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum by(taskname) (stats.timers.sentry.taskworker.worker.execution_duration.upper{host=~\"$host\"})",
-          "refId": "A",
+          "refId": "C",
           "legendFormat": "max {{taskname}}"
         }
       ],
@@ -872,7 +872,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum(rate(stats.counters.sentry.taskworker.worker.processing_deadline_exceeded.count{host=~\"$host\"}[$__rate_interval]))",
-          "refId": "A",
+          "refId": "B",
           "legendFormat": "deadline exceeded"
         },
         {
@@ -881,7 +881,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum(rate(stats.counters.sentry.taskworker.worker.child_task_queue_empty.count{host=~\"$host\"}[$__rate_interval]))",
-          "refId": "A",
+          "refId": "C",
           "legendFormat": "child queue empty"
         },
         {
@@ -890,7 +890,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum(rate(stats.counters.sentry.taskworker.worker.max_task_count_reached.count{host=~\"$host\"}[$__rate_interval]))",
-          "refId": "A",
+          "refId": "D",
           "legendFormat": "max task count"
         },
         {
@@ -899,7 +899,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum(rate(stats.counters.sentry.taskworker.worker.add_tasks.child_tasks_full.count{host=~\"$host\"}[$__rate_interval]))",
-          "refId": "A",
+          "refId": "E",
           "legendFormat": "child tasks full"
         }
       ],
@@ -1266,7 +1266,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum(stats.gauges.taskbroker.upkeep.current_processing_tasks{host=~\"$host\"})",
-          "refId": "A",
+          "refId": "B",
           "legendFormat": "processing"
         },
         {
@@ -1275,7 +1275,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum(stats.gauges.taskbroker.upkeep.current_claimed_tasks{host=~\"$host\"})",
-          "refId": "A",
+          "refId": "C",
           "legendFormat": "claimed"
         },
         {
@@ -1284,7 +1284,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum(stats.gauges.taskbroker.upkeep.current_delayed_tasks{host=~\"$host\"})",
-          "refId": "A",
+          "refId": "D",
           "legendFormat": "delayed"
         }
       ],
@@ -1500,7 +1500,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum(stats.gauges.taskbroker.sqlite.db.cache_miss_total{host=~\"$host\"})",
-          "refId": "A",
+          "refId": "B",
           "legendFormat": "cache misses"
         },
         {
@@ -1509,7 +1509,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum(stats.gauges.taskbroker.sqlite.db.cache_spill_total{host=~\"$host\"})",
-          "refId": "A",
+          "refId": "C",
           "legendFormat": "cache spills"
         }
       ],
@@ -1615,7 +1615,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum(stats.gauges.taskbroker.upkeep.wal_file_size.bytes{host=~\"$host\"})",
-          "refId": "A",
+          "refId": "B",
           "legendFormat": "wal file size"
         },
         {
@@ -1624,7 +1624,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum(stats.gauges.taskbroker.sqlite.db.cache_used_bytes{host=~\"$host\"})",
-          "refId": "A",
+          "refId": "C",
           "legendFormat": "cache used"
         }
       ],
@@ -1805,7 +1805,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum (stats.timers.sentry.taskworker.get_task.rpc.upper_90{host=~\"$host\"})",
-          "refId": "A",
+          "refId": "B",
           "legendFormat": "get_task p90"
         },
         {
@@ -1814,7 +1814,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum (stats.timers.sentry.taskworker.update_task.rpc.median{host=~\"$host\"})",
-          "refId": "A",
+          "refId": "C",
           "legendFormat": "update_task p50"
         },
         {
@@ -1823,7 +1823,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum (stats.timers.sentry.taskworker.update_task.rpc.upper_90{host=~\"$host\"})",
-          "refId": "A",
+          "refId": "D",
           "legendFormat": "update_task p90"
         }
       ],
@@ -1929,7 +1929,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum (stats.timers.taskbroker.grpc_server.get_task.duration.upper_90{host=~\"$host\"})",
-          "refId": "A",
+          "refId": "B",
           "legendFormat": "get_task p90"
         },
         {
@@ -1938,7 +1938,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum (stats.timers.taskbroker.grpc_server.set_status.duration.median{host=~\"$host\"})",
-          "refId": "A",
+          "refId": "C",
           "legendFormat": "set_status p50"
         },
         {
@@ -1947,7 +1947,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum (stats.timers.taskbroker.grpc_server.set_status.duration.upper_90{host=~\"$host\"})",
-          "refId": "A",
+          "refId": "D",
           "legendFormat": "set_status p90"
         },
         {
@@ -1956,7 +1956,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum (stats.timers.taskbroker.grpc_server.fetch_next.duration.median{host=~\"$host\"})",
-          "refId": "A",
+          "refId": "E",
           "legendFormat": "fetch_next p50"
         },
         {
@@ -1965,7 +1965,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum (stats.timers.taskbroker.grpc_server.fetch_next.duration.upper_90{host=~\"$host\"})",
-          "refId": "A",
+          "refId": "F",
           "legendFormat": "fetch_next p90"
         }
       ],

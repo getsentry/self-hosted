@@ -411,7 +411,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum(rate(stats.counters.sentry.relay.event.rejected.count{host=~\"$host\"}[$__rate_interval]))",
-          "refId": "A",
+          "refId": "B",
           "legendFormat": "rejected"
         },
         {
@@ -420,7 +420,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum(rate(stats.counters.sentry.relay.event.error.processed.count{host=~\"$host\"}[$__rate_interval]))",
-          "refId": "A",
+          "refId": "C",
           "legendFormat": "error processed"
         }
       ],
@@ -787,7 +787,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum (stats.timers.sentry.view.duration.upper_90{host=~\"$host\"})",
-          "refId": "A",
+          "refId": "B",
           "legendFormat": "p90"
         },
         {
@@ -796,7 +796,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum (stats.timers.sentry.view.duration.upper{host=~\"$host\"})",
-          "refId": "A",
+          "refId": "C",
           "legendFormat": "max"
         }
       ],
@@ -1260,7 +1260,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum by(stage) (stats.timers.sentry.events.since_received.upper_90{host=~\"$host\"})",
-          "refId": "A",
+          "refId": "B",
           "legendFormat": "p90 {{stage}}"
         },
         {
@@ -1269,7 +1269,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum by(stage) (stats.timers.sentry.events.since_received.upper{host=~\"$host\"})",
-          "refId": "A",
+          "refId": "C",
           "legendFormat": "max {{stage}}"
         }
       ],
@@ -1636,7 +1636,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum(rate(stats.counters.sentry.taskworker.worker.execute_task.count{host=~\"$host\"}[$__rate_interval]))",
-          "refId": "A",
+          "refId": "B",
           "legendFormat": "executed"
         }
       ],
@@ -1742,7 +1742,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum (stats.timers.sentry.taskworker.worker.execution_duration.upper_90{host=~\"$host\"})",
-          "refId": "A",
+          "refId": "B",
           "legendFormat": "p90"
         },
         {
@@ -1751,7 +1751,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum (stats.timers.sentry.taskworker.worker.execution_duration.upper{host=~\"$host\"})",
-          "refId": "A",
+          "refId": "C",
           "legendFormat": "max"
         }
       ],
@@ -2118,7 +2118,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum(rate(stats.counters.sentry.email.queued.count{host=~\"$host\"}[$__rate_interval]))",
-          "refId": "A",
+          "refId": "B",
           "legendFormat": "queued"
         }
       ],
@@ -2224,7 +2224,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum(rate(stats.counters.sentry.workflow_engine.data_condition.evaluation.count{host=~\"$host\"}[$__rate_interval]))",
-          "refId": "A",
+          "refId": "B",
           "legendFormat": "condition evaluations"
         },
         {
@@ -2233,7 +2233,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum(rate(stats.counters.sentry.workflow_engine.activity_handler.complete.count{host=~\"$host\"}[$__rate_interval]))",
-          "refId": "A",
+          "refId": "C",
           "legendFormat": "activities completed"
         }
       ],
@@ -2600,7 +2600,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum(rate(stats.counters.sentry.nodestore.get_multi.count{host=~\"$host\"}[$__rate_interval]))",
-          "refId": "A",
+          "refId": "B",
           "legendFormat": "get_multi"
         }
       ],
@@ -2706,7 +2706,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum(stats.gauges.sentry.relay.redis.pool.idle_connections{host=~\"$host\"})",
-          "refId": "A",
+          "refId": "B",
           "legendFormat": "idle"
         },
         {
@@ -2715,7 +2715,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum(stats.gauges.sentry.relay.redis.pool.max_connections{host=~\"$host\"})",
-          "refId": "A",
+          "refId": "C",
           "legendFormat": "max"
         },
         {
@@ -2724,7 +2724,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum(stats.gauges.sentry.relay.redis.pool.waiting_for_connection{host=~\"$host\"})",
-          "refId": "A",
+          "refId": "D",
           "legendFormat": "waiting"
         }
       ],

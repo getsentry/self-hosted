@@ -133,7 +133,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum by(stage) (stats.timers.sentry.events.since_received.upper_90{host=~\"$host\"})",
-          "refId": "A",
+          "refId": "B",
           "legendFormat": "p90 {{stage}}"
         },
         {
@@ -142,7 +142,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum by(stage) (stats.timers.sentry.events.since_received.upper{host=~\"$host\"})",
-          "refId": "A",
+          "refId": "C",
           "legendFormat": "max {{stage}}"
         }
       ],
@@ -447,7 +447,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum (stats.timers.sentry.events.store.normalize.duration.upper_90{host=~\"$host\"})",
-          "refId": "A",
+          "refId": "B",
           "legendFormat": "p90"
         },
         {
@@ -456,7 +456,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum (stats.timers.sentry.events.store.normalize.duration.upper{host=~\"$host\"})",
-          "refId": "A",
+          "refId": "C",
           "legendFormat": "max"
         }
       ],
@@ -823,7 +823,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum(rate(stats.counters.sentry.events.symbolicator.response.count{host=~\"$host\"}[$__rate_interval]))",
-          "refId": "A",
+          "refId": "B",
           "legendFormat": "responses"
         },
         {
@@ -832,7 +832,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum(rate(stats.counters.sentry.events.symbolicator.request_error.count{host=~\"$host\"}[$__rate_interval]))",
-          "refId": "A",
+          "refId": "C",
           "legendFormat": "request errors"
         }
       ],
@@ -938,7 +938,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum (stats.timers.sentry.events.symbolicator.create_task.upper_90{host=~\"$host\"})",
-          "refId": "A",
+          "refId": "B",
           "legendFormat": "create_task p90"
         },
         {
@@ -947,7 +947,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum (stats.timers.sentry.events.symbolicator.query_task.median{host=~\"$host\"})",
-          "refId": "A",
+          "refId": "C",
           "legendFormat": "query_task p50"
         },
         {
@@ -956,7 +956,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum (stats.timers.sentry.events.symbolicator.query_task.upper_90{host=~\"$host\"})",
-          "refId": "A",
+          "refId": "D",
           "legendFormat": "query_task p90"
         },
         {
@@ -965,7 +965,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum (stats.timers.sentry.events.symbolicator.session.request.median{host=~\"$host\"})",
-          "refId": "A",
+          "refId": "E",
           "legendFormat": "session.request p50"
         },
         {
@@ -974,7 +974,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum (stats.timers.sentry.events.symbolicator.session.request.upper_90{host=~\"$host\"})",
-          "refId": "A",
+          "refId": "F",
           "legendFormat": "session.request p90"
         }
       ],
@@ -1341,7 +1341,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum(rate(stats.counters.snuba.consumer.insertions.item_type_count.count{host=~\"$host\"}[$__rate_interval]))",
-          "refId": "A",
+          "refId": "B",
           "legendFormat": "item types"
         }
       ],
@@ -1447,7 +1447,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum (stats.timers.snuba.consumer.insertions.batch_write_ms.upper_90{host=~\"$host\"})",
-          "refId": "A",
+          "refId": "B",
           "legendFormat": "batch_write p90"
         },
         {
@@ -1456,7 +1456,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum (stats.timers.snuba.consumer.insertions.latency_ms.median{host=~\"$host\"})",
-          "refId": "A",
+          "refId": "C",
           "legendFormat": "insert latency p50"
         },
         {
@@ -1465,7 +1465,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum (stats.timers.snuba.consumer.insertions.latency_ms.upper_90{host=~\"$host\"})",
-          "refId": "A",
+          "refId": "D",
           "legendFormat": "insert latency p90"
         }
       ],
@@ -1571,7 +1571,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum (stats.timers.snuba.consumer.insertions.end_to_end_latency_ms.upper_90{host=~\"$host\"})",
-          "refId": "A",
+          "refId": "B",
           "legendFormat": "p90"
         },
         {
@@ -1580,7 +1580,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum (stats.timers.snuba.consumer.insertions.max_end_to_end_latency_ms.median{host=~\"$host\"})",
-          "refId": "A",
+          "refId": "C",
           "legendFormat": "max p50"
         }
       ],
@@ -1699,7 +1699,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum(rate(stats.counters.snuba.replacer.arroyo.consumer.run.count.count{host=~\"$host\"}[$__rate_interval]))",
-          "refId": "A",
+          "refId": "B",
           "legendFormat": "replacer run loops"
         },
         {
@@ -1708,7 +1708,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum(rate(stats.counters.sentry.consumer.arroyo.consumer.run.count.count{host=~\"$host\"}[$__rate_interval]))",
-          "refId": "A",
+          "refId": "C",
           "legendFormat": "sentry run loops"
         }
       ],
@@ -1814,7 +1814,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum(rate(stats.counters.snuba.consumer.arroyo.strategies.run_task_in_threads.got_backpressure.count{host=~\"$host\"}[$__rate_interval]))",
-          "refId": "A",
+          "refId": "B",
           "legendFormat": "got backpressure"
         },
         {
@@ -1823,7 +1823,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum (stats.timers.snuba.consumer.arroyo.consumer.backpressure.time.upper_90{host=~\"$host\"})",
-          "refId": "A",
+          "refId": "C",
           "legendFormat": "backpressure p90"
         }
       ],
