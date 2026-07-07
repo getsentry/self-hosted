@@ -9,7 +9,7 @@ dependencies = []
 [dependency-groups]
 dev = [
     "beautifulsoup4>=4.7.1",
-    "cryptography>=43.0.3",
+    "cryptography>=48.0.1",
     "httpx>=0.25.2",
     "pytest>=9.0.3",
     "pytest-cov>=4.1.0",
