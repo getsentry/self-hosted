@@ -33,6 +33,7 @@ source install/update-docker-images.sh
 source install/turn-things-off.sh
 source install/create-docker-volumes.sh
 source install/ensure-files-from-examples.sh
+source install/update-feature-flags.sh
 source install/check-memcached-backend.sh
 source install/ensure-relay-credentials.sh
 source install/generate-secret-key.sh
