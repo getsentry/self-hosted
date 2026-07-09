@@ -21,7 +21,7 @@ if [[ "${APPLY_AUTOMATIC_CONFIG_UPDATES:-0}" == 1 ]]; then
     # Check if the user's config already has a SENTRY_FEATURES block.
     if ! grep -q '^SENTRY_FEATURES' "$SENTRY_CONFIG_PY"; then
       # No existing block, append the canonical block.
-      printf '\n%s\n' "$_example_block" >> "$SENTRY_CONFIG_PY"
+      printf '\n%s\n' "$_example_block" >>"$SENTRY_CONFIG_PY"
       echo "Added SENTRY_FEATURES block to $SENTRY_CONFIG_PY."
     else
       # Replace the existing SENTRY_FEATURES block with the canonical one.
@@ -33,7 +33,7 @@ if [[ "${APPLY_AUTOMATIC_CONFIG_UPDATES:-0}" == 1 ]]; then
 
       if [[ -z "$_end_line" ]]; then
         # No closing `)` found before EOF,  replace from start to EOF.
-        _end_line=$(wc -l < "$SENTRY_CONFIG_PY")
+        _end_line=$(wc -l <"$SENTRY_CONFIG_PY")
       fi
 
       # Build the new config: lines before the block, the canonical block, lines after.
@@ -44,7 +44,7 @@ if [[ "${APPLY_AUTOMATIC_CONFIG_UPDATES:-0}" == 1 ]]; then
         echo "$_example_block"
         # Lines after the SENTRY_FEATURES block (if any).
         tail -n +"$((_end_line + 1))" "$SENTRY_CONFIG_PY"
-      } > "$SENTRY_CONFIG_PY.tmp" && mv "$SENTRY_CONFIG_PY.tmp" "$SENTRY_CONFIG_PY"
+      } >"$SENTRY_CONFIG_PY.tmp" && mv "$SENTRY_CONFIG_PY.tmp" "$SENTRY_CONFIG_PY"
 
       echo "Updated SENTRY_FEATURES block in $SENTRY_CONFIG_PY."
     fi
