@@ -69,8 +69,12 @@ echo "Test 2 (outdated config with missing flags) passed"
 
 echo "Test 3 (outdated config with extra flags)"
 cp sentry/sentry.conf.example.py "$SENTRY_CONFIG_PY"
-# Insert an extra flag before the closing paren of SENTRY_FEATURES.update
-sed -i '/^)$/i\            "organizations:custom-extra-flag",' "$SENTRY_CONFIG_PY"
+# Insert an extra flag before the closing `)` of SENTRY_FEATURES.update.
+# The file contains multiple lone `)` lines, so we must target the first one
+# that appears after the SENTRY_FEATURES block start.
+_start_line=$(grep -n '^SENTRY_FEATURES\["projects:sample-events"\]' "$SENTRY_CONFIG_PY" | head -1 | cut -d: -f1)
+_close_line=$(awk -v start="$_start_line" 'NR > start && /^\)$/ { print NR; exit }' "$SENTRY_CONFIG_PY")
+sed -i "${_close_line}i\\            \"organizations:custom-extra-flag\"," "$SENTRY_CONFIG_PY"
 assert_contains "$SENTRY_CONFIG_PY" "organizations:custom-extra-flag"
 APPLY_AUTOMATIC_CONFIG_UPDATES=1 source install/update-feature-flags.sh
 assert_not_contains "$SENTRY_CONFIG_PY" "organizations:custom-extra-flag"
