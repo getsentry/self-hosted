@@ -447,6 +447,12 @@ SENTRY_FEATURES.update(
             "organizations:tracemetrics-stats-bytes-ui",
             "organizations:tracemetrics-pii-scrubbing-ui",
         )
+        # Transaction widgets/alerts/saved queries migration UI flags
+        + (
+            "organizations:discover-saved-queries-deprecation",
+            "organizations:expose-migrated-discover-queries",
+            "organizations:performance-transaction-deprecation-banner",
+        )
     }
 )
 
