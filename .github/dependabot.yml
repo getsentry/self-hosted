@@ -4,7 +4,6 @@ updates:
     directory: "/"
     schedule:
       interval: daily
-    open-pull-requests-limit: 0 # only security updates
     reviewers:
       - "@getsentry/dev-infra"
       - "@getsentry/security"
