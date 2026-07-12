@@ -145,7 +145,7 @@ services:
       test: echo stats | nc 127.0.0.1 11211
   redis:
     <<: *restart_policy
-    image: "redis:6.2.20-alpine"
+    image: "redis:8.8.0-alpine"
     healthcheck:
       <<: *healthcheck_defaults
       test: redis-cli ping | grep PONG
