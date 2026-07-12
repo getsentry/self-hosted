@@ -1,10 +1,9 @@
 version: 2
 updates:
-  - package-ecosystem: docker
+  - package-ecosystem: docker-compose
     directory: "/"
     schedule:
       interval: daily
-    open-pull-requests-limit: 0 # only security updates
     reviewers:
       - "@getsentry/dev-infra"
       - "@getsentry/security"
