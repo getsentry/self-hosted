@@ -196,7 +196,7 @@ services:
 
   kafka:
     <<: *restart_policy
-    image: "confluentinc/cp-kafka:7.6.6"
+    image: "confluentinc/cp-kafka:8.3.0"
     environment:
       # https://docs.confluent.io/platform/current/installation/docker/config-reference.html#cp-kakfa-example
       KAFKA_PROCESS_ROLES: "broker,controller"
