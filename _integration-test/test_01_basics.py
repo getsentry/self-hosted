@@ -118,6 +118,47 @@ def test_asset_internal_rewrite():
     assert response.headers["Content-Type"] == "text/javascript"
 
 
+def test_memcached_django_cache():
+    script = """
+from uuid import uuid4
+
+from django.core.cache import caches
+
+cache = caches["default"]
+assert cache.__class__.__module__ == "sentry.cache.backends.reconnectingmemcache"
+assert cache.__class__.__name__ == "ReconnectingMemcache"
+
+key = f"self-hosted:memcached-integration-test:{uuid4()}"
+value = {"message": "works", "payload": b"x" * 800_000}
+
+try:
+    cache.set(key, value, timeout=60)
+    assert cache.get(key) == value
+    cache.delete(key)
+    assert cache.get(key) is None
+finally:
+    cache.delete(key)
+"""
+
+    subprocess.run(
+        [
+            "docker",
+            "compose",
+            "--ansi",
+            "never",
+            "exec",
+            "-T",
+            "web",
+            "sentry",
+            "exec",
+        ],
+        input=script,
+        text=True,
+        check=True,
+        timeout=60,
+    )
+
+
 def test_login(client_login):
     client, login_response = client_login
     parser = BeautifulSoup(login_response.text, "html.parser")
