@@ -137,7 +137,7 @@ services:
       SES_REGION:
   memcached:
     <<: *restart_policy
-    image: "memcached:1.6.26-alpine"
+    image: "memcached:1.6.45-alpine"
     command: ["-I", "${SENTRY_MAX_EXTERNAL_SOURCEMAP_SIZE:-1M}"]
     healthcheck:
       <<: *healthcheck_defaults
