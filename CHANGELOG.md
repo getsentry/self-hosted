@@ -1,5 +1,48 @@
 # Changelog
 
+## 26.7.0
+
+### New Features ✨
+
+#### Taskbroker
+
+- Port subscriptions consumers to tasks by @lvthanh03 in [#4395](https://github.com/getsentry/self-hosted/pull/4395)
+- Port profiles consumer to taskbroker raw mode by @untitaker in [#4386](https://github.com/getsentry/self-hosted/pull/4386)
+
+#### Other
+
+- (deps) Bump seaweedfs to 4.29 and migrate into `weed mini` by @aldy505 in [#4345](https://github.com/getsentry/self-hosted/pull/4345)
+- Add in transactions -> spans migration flags by @nikkikapadia in [#4402](https://github.com/getsentry/self-hosted/pull/4402)
+- Enable workflow engine by @aldy505 in [#4364](https://github.com/getsentry/self-hosted/pull/4364)
+
+### Bug Fixes 🐛
+
+- (relay) Disable DNS caching by @aldy505 in [#4213](https://github.com/getsentry/self-hosted/pull/4213)
+
+### Internal Changes 🔧
+
+#### Deps
+
+- Bump memcached from 1.6.26-alpine to 1.6.45-alpine by @dependabot in [#4412](https://github.com/getsentry/self-hosted/pull/4412)
+- Bump soupsieve from 2.8 to 2.8.4 by @dependabot in [#4406](https://github.com/getsentry/self-hosted/pull/4406)
+- Bump nginx from 1.31.0-alpine to 1.31.2-alpine by @dependabot in [#4411](https://github.com/getsentry/self-hosted/pull/4411)
+- Bump astral-sh/setup-uv from 8.2.0 to 8.3.0 by @dependabot in [#4399](https://github.com/getsentry/self-hosted/pull/4399)
+- Bump actions/setup-python from 6.2.0 to 6.3.0 by @dependabot in [#4390](https://github.com/getsentry/self-hosted/pull/4390)
+- Bump j178/prek-action from 2.0.4 to 2.0.5 by @dependabot in [#4400](https://github.com/getsentry/self-hosted/pull/4400)
+- Bump actions/checkout from 6.0.3 to 7.0.0 by @dependabot in [#4383](https://github.com/getsentry/self-hosted/pull/4383)
+- Bump @opentelemetry/core and @sentry/node in /_integration-test/nodejs by @dependabot in [#4380](https://github.com/getsentry/self-hosted/pull/4380)
+
+#### Other
+
+- (deps-dev) Bump cryptography from 46.0.7 to 48.0.1 by @dependabot in [#4382](https://github.com/getsentry/self-hosted/pull/4382)
+- Add memcached integration test by @aminvakil in [#4414](https://github.com/getsentry/self-hosted/pull/4414)
+
+### Other
+
+- Upgrade docker images using dependabot by @aminvakil in [#4407](https://github.com/getsentry/self-hosted/pull/4407)
+- Increase web healthcheck start_period by @aminvakil in [#4387](https://github.com/getsentry/self-hosted/pull/4387)
+- Bump pgbouncer 1.25.2-p0 by @aminvakil in [#4384](https://github.com/getsentry/self-hosted/pull/4384)
+
 ## 26.6.0
 
 ### New Features ✨
