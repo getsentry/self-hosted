@@ -248,6 +248,8 @@ services:
     <<: *ca_snuba
   snuba-eap-items-consumer:
     <<: *ca_snuba
+  snuba-outcomes-accepted-consumer:
+    <<: *ca_snuba
   snuba-subscription-consumer-eap-items:
     <<: *ca_snuba
   vroom:
