@@ -168,7 +168,8 @@ services:
       <<: *healthcheck_defaults
       # Using default user "postgres" from sentry/sentry.conf.example.py or value of POSTGRES_USER if provided
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
-    command: ["postgres"]
+    command:
+      ["postgres"]
     environment:
       POSTGRES_HOST_AUTH_METHOD: "trust"
     volumes:
@@ -180,11 +181,7 @@ services:
     healthcheck:
       <<: *healthcheck_defaults
       # Using default user "postgres" from sentry/sentry.conf.example.py or value of POSTGRES_USER if provided
-      test:
-        [
-          "CMD-SHELL",
-          'psql -U postgres -p 5432 -h 127.0.0.1 -tA -c "select 1;" -d postgres >/dev/null',
-        ]
+      test: ["CMD-SHELL", "psql -U postgres -p 5432 -h 127.0.0.1 -tA -c \"select 1;\" -d postgres >/dev/null"]
     depends_on:
       postgres:
         <<: *depends_on-healthy
@@ -277,16 +274,16 @@ services:
     image: "chrislusf/seaweedfs:4.29_large_disk@sha256:e5ca7cc6b61cf5d89a5f85821e0cf115a9765e2d1f27223cbb7722c7837c024e"
     entrypoint: "weed"
     command: >-
-      mini
-      -dir=/data
-      -filer.defaultReplicaPlacement=000
-      -metricsPort=9091
-      -volume.dir.idx=/data/idx
-      -volume.index=leveldbLarge
-      -volume.preStopSeconds=8
-      -volume.readMode=redirect
-      -ip.bind=0.0.0.0
-      -webdav=false
+        mini
+        -dir=/data
+        -filer.defaultReplicaPlacement=000
+        -metricsPort=9091
+        -volume.dir.idx=/data/idx
+        -volume.index=leveldbLarge
+        -volume.preStopSeconds=8
+        -volume.readMode=redirect
+        -ip.bind=0.0.0.0
+        -webdav=false
     environment:
       <<: *force_no_proxy
       AWS_ACCESS_KEY_ID: sentry
@@ -300,7 +297,7 @@ services:
           # this wget does not support no_proxy. See:
           # https://github.com/getsentry/self-hosted/issues/1537
           "http_proxy='' wget -q -O- http://seaweedfs:9340/healthz http://seaweedfs:9333/cluster/healthz http://seaweedfs:8333/healthz || exit 1",
-        ]
+      ]
       interval: 30s
       timeout: 20s
       retries: 5
@@ -318,6 +315,9 @@ services:
     command: rust-consumer --storage errors --consumer-group snuba-consumers --auto-offset-reset=latest --max-batch-time-ms 750 --no-strict-offset-reset --health-check-file /tmp/health.txt --max-poll-interval-ms ${SENTRY_KAFKA_MAX_POLL_INTERVAL_MS:-300000}
     healthcheck:
       <<: *file_healthcheck_defaults
+  # Kafka consumer responsible for feeding outcomes into Clickhouse
+  # Use --auto-offset-reset=earliest to recover up to 7 days of TSDB data
+  # since we did not do a proper migration
   snuba-outcomes-consumer:
     <<: *snuba_defaults
     command: rust-consumer --storage outcomes_raw --consumer-group snuba-consumers --auto-offset-reset=earliest --max-batch-time-ms 750 --no-strict-offset-reset --health-check-file /tmp/health.txt --max-poll-interval-ms ${SENTRY_KAFKA_MAX_POLL_INTERVAL_MS:-300000}
@@ -499,14 +499,7 @@ services:
         target: /etc/symbolicator
     healthcheck:
       <<: *healthcheck_defaults
-      test:
-        [
-          "CMD",
-          "/bin/symbolicator",
-          "healthcheck",
-          "-c",
-          "/etc/symbolicator/config.yml",
-        ]
+      test: ["CMD", "/bin/symbolicator", "healthcheck", "-c", "/etc/symbolicator/config.yml"]
   symbolicator-cleanup:
     <<: *restart_policy
     image: "$SYMBOLICATOR_IMAGE"

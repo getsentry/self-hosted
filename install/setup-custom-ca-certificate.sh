@@ -204,6 +204,8 @@ services:
     <<: *ca_snuba
   snuba-outcomes-consumer:
     <<: *ca_snuba
+  snuba-outcomes-accepted-consumer:
+    <<: *ca_snuba
   snuba-outcomes-billing-consumer:
     <<: *ca_snuba
   snuba-group-attributes-consumer:
@@ -247,8 +249,6 @@ services:
   snuba-profiling-profile-chunks-consumer:
     <<: *ca_snuba
   snuba-eap-items-consumer:
-    <<: *ca_snuba
-  snuba-outcomes-accepted-consumer:
     <<: *ca_snuba
   snuba-subscription-consumer-eap-items:
     <<: *ca_snuba
