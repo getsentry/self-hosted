@@ -325,9 +325,7 @@ services:
       <<: *file_healthcheck_defaults
   snuba-outcomes-accepted-consumer:
     <<: *snuba_defaults
-    command: accepted-outcomes-consumer --storage eap_items --consumer-group accepted_outcomes --auto-offset-reset=earliest --max-batch-time-ms 750 --no-strict-offset-reset --accepted-outcomes-topic outcomes-billing --health-check-file /tmp/health.txt --max-poll-interval-ms ${SENTRY_KAFKA_MAX_POLL_INTERVAL_MS:-300000}
-    healthcheck:
-      <<: *file_healthcheck_defaults
+    command: accepted-outcomes-consumer --storage eap_items --consumer-group accepted_outcomes --auto-offset-reset=earliest --max-batch-time-ms 750 --no-strict-offset-reset --accepted-outcomes-topic outcomes-billing --max-poll-interval-ms ${SENTRY_KAFKA_MAX_POLL_INTERVAL_MS:-300000}
     profiles:
       - feature-complete
   snuba-outcomes-billing-consumer:
