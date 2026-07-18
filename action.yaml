@@ -53,13 +53,11 @@ runs:
           exit 1
         fi
 
-        # `COMPOSE_PROFILES` may only be `feature-complete` or `errors-only`
-        if [[ "$COMPOSE_PROFILES" != "" && "$COMPOSE_PROFILES" != "feature-complete" && "$COMPOSE_PROFILES" != "errors-only" ]]; then
-          echo "COMPOSE_PROFILES must be either unset, or set to either 'feature-complete' or 'errors-only'."
-          exit 1
-        else
-          echo "COMPOSE_PROFILES=$COMPOSE_PROFILES" >> ${{ github.action_path }}/.env
-        fi
+        # Compose profiles can be anything at this point
+        echo "COMPOSE_PROFILES=$COMPOSE_PROFILES" >> ${{ github.action_path }}/.env
+
+        # Cleanup compose profile string, it must not contains commas. Therefore we replace it with dashes.
+        echo "COMPOSE_PROFILES_CLEAN=${COMPOSE_PROFILES//,/-}" >> "$GITHUB_ENV"
 
     - name: Cleanup runner image
       shell: bash
@@ -123,9 +121,9 @@ runs:
       id: restore_cache_sentry
       uses: BYK/docker-volume-cache-action/restore@0efa5cf5178c9906cb46ed8d1a357df8fd6b1a06
       with:
-        key: db-volumes-sentry-v3-${{ steps.cache_key.outputs.ARCH }}-${{ inputs.compose_profiles }}-${{ steps.cache_key.outputs.SENTRY_MIGRATIONS_MD5 }}
+        key: db-volumes-sentry-v3-${{ steps.cache_key.outputs.ARCH }}-${{ env.COMPOSE_PROFILES_CLEAN }}-${{ steps.cache_key.outputs.SENTRY_MIGRATIONS_MD5 }}
         restore-keys: |
-          key: db-volumes-sentry-v3-${{ steps.cache_key.outputs.ARCH }}-${{ inputs.compose_profiles }}
+          key: db-volumes-sentry-v3-${{ steps.cache_key.outputs.ARCH }}-${{ env.COMPOSE_PROFILES_CLEAN }}
         volumes: |
           sentry-postgres
 
@@ -134,9 +132,9 @@ runs:
       id: restore_cache_snuba
       uses: BYK/docker-volume-cache-action/restore@0efa5cf5178c9906cb46ed8d1a357df8fd6b1a06
       with:
-        key: db-volumes-snuba-v3-${{ steps.cache_key.outputs.ARCH }}-${{ inputs.compose_profiles }}-${{ steps.cache_key.outputs.SNUBA_MIGRATIONS_MD5 }}
+        key: db-volumes-snuba-v3-${{ steps.cache_key.outputs.ARCH }}-${{ env.COMPOSE_PROFILES_CLEAN }}-${{ steps.cache_key.outputs.SNUBA_MIGRATIONS_MD5 }}
         restore-keys: |
-          key: db-volumes-snuba-v3-${{ steps.cache_key.outputs.ARCH }}-${{ inputs.compose_profiles }}
+          key: db-volumes-snuba-v3-${{ steps.cache_key.outputs.ARCH }}-${{ env.COMPOSE_PROFILES_CLEAN }}
         volumes: |
           sentry-clickhouse
 
@@ -145,10 +143,10 @@ runs:
       id: restore_cache_kafka
       uses: BYK/docker-volume-cache-action/restore@0efa5cf5178c9906cb46ed8d1a357df8fd6b1a06
       with:
-        key: db-volumes-kafka-v2-${{ steps.cache_key.outputs.ARCH }}-${{ inputs.compose_profiles }}-${{ steps.cache_key.outputs.SENTRY_MIGRATIONS_MD5 }}-${{ steps.cache_key.outputs.SNUBA_MIGRATIONS_MD5 }}
+        key: db-volumes-kafka-v2-${{ steps.cache_key.outputs.ARCH }}-${{ env.COMPOSE_PROFILES_CLEAN }}-${{ steps.cache_key.outputs.SENTRY_MIGRATIONS_MD5 }}-${{ steps.cache_key.outputs.SNUBA_MIGRATIONS_MD5 }}
         restore-keys: |
-          db-volumes-kafka-v2-${{ steps.cache_key.outputs.ARCH }}-${{ inputs.compose_profiles }}-${{ steps.cache_key.outputs.SENTRY_MIGRATIONS_MD5 }}
-          db-volumes-kafka-v2-${{ steps.cache_key.outputs.ARCH }}-${{ inputs.compose_profiles }}
+          db-volumes-kafka-v2-${{ steps.cache_key.outputs.ARCH }}-${{ env.COMPOSE_PROFILES_CLEAN }}-${{ steps.cache_key.outputs.SENTRY_MIGRATIONS_MD5 }}
+          db-volumes-kafka-v2-${{ steps.cache_key.outputs.ARCH }}-${{ env.COMPOSE_PROFILES_CLEAN }}
         volumes: |
           sentry-kafka
 
@@ -226,7 +224,7 @@ runs:
         npm ci
 
     - name: Setup required Emerge Tools files
-      if: inputs.compose_profiles == 'feature-complete'
+      if: contains(inputs.compose_profiles, 'feature-complete')
       shell: bash
       run: |
         set -euo pipefail
