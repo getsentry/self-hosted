@@ -204,6 +204,8 @@ services:
     <<: *ca_snuba
   snuba-outcomes-consumer:
     <<: *ca_snuba
+  snuba-outcomes-accepted-consumer:
+    <<: *ca_snuba
   snuba-outcomes-billing-consumer:
     <<: *ca_snuba
   snuba-group-attributes-consumer:
