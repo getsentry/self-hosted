@@ -122,6 +122,11 @@ x-snuba-defaults: &snuba_defaults
     # If you have statsd server, you can utilize that to monitor self-hosted Snuba containers.
     # To start, state these environment variables below on your `.env.` file and adjust the options as needed.
     SNUBA_STATSD_ADDR: "${STATSD_ADDR:-}"
+
+# Prevent podman from placing the compose stack and ad-hoc containers into pods
+x-podman:
+  in_pod: false
+
 services:
   smtp:
     <<: *restart_policy
