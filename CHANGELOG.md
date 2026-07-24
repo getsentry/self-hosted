@@ -1,5 +1,18 @@
 # Changelog
 
+## 26.7.1
+
+### Bug Fixes 🐛
+
+- Add accepted outcomes consumer by @mzglinski in [#4419](https://github.com/getsentry/self-hosted/pull/4419)
+
+### Internal Changes 🔧
+
+#### Deps
+
+- Bump astral-sh/setup-uv from 8.3.0 to 8.3.2 by @dependabot in [#4410](https://github.com/getsentry/self-hosted/pull/4410)
+- Bump nginx from 1.31.2-alpine to 1.31.3-alpine by @dependabot in [#4416](https://github.com/getsentry/self-hosted/pull/4416)
+
 ## 26.7.0
 
 ### New Features ✨
