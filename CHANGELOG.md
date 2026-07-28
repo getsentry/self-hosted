@@ -1,5 +1,20 @@
 # Changelog
 
+## 26.7.2
+
+### Internal Changes 🔧
+
+#### Deps
+
+- Bump astral-sh/setup-uv from 8.3.2 to 9.0.0 by @dependabot in [#4431](https://github.com/getsentry/self-hosted/pull/4431)
+- Bump actions/setup-node from 6.4.0 to 7.0.0 by @dependabot in [#4422](https://github.com/getsentry/self-hosted/pull/4422)
+- Bump j178/prek-action from 2.0.5 to 2.0.6 by @dependabot in [#4421](https://github.com/getsentry/self-hosted/pull/4421)
+- Bump actions/setup-python from 6.3.0 to 7.0.0 by @dependabot in [#4423](https://github.com/getsentry/self-hosted/pull/4423)
+
+#### Other
+
+- Add dependabot cooldown by @aminvakil in [#4434](https://github.com/getsentry/self-hosted/pull/4434)
+
 ## 26.7.1
 
 ### Bug Fixes 🐛
