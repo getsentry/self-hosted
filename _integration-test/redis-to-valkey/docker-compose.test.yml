@@ -1,0 +1,6 @@
+services:
+  redis:
+    image: "valkey/valkey:8.1.9-alpine"
+    healthcheck:
+      test: valkey-cli ping | grep PONG
+    command: ["valkey-server", "/usr/local/etc/redis/redis.conf"]

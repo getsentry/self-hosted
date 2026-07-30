@@ -472,6 +472,99 @@ def test_custom_certificate_authorities():
         del os.environ["COMPOSE_FILE"]
 
 
+def test_redis_to_valkey_upgrade():
+    def sentry_exec(script):
+        subprocess.run(
+            [
+                "docker",
+                "compose",
+                "--ansi",
+                "never",
+                "exec",
+                "-T",
+                "web",
+                "sentry",
+                "exec",
+            ],
+            input=script,
+            text=True,
+            check=True,
+            timeout=60,
+        )
+
+    sentry_exec(
+        """
+from sentry.utils.redis import redis_clusters
+
+client = redis_clusters.get_binary("default")
+keys = [
+    b"self-hosted:redis-to-valkey:string",
+    b"self-hosted:redis-to-valkey:hash",
+    b"self-hosted:redis-to-valkey:list",
+    b"self-hosted:redis-to-valkey:set",
+    b"self-hosted:redis-to-valkey:sorted-set",
+]
+
+client.delete(*keys)
+client.set(keys[0], b"value", ex=600)
+client.hset(keys[1], mapping={b"field": b"value"})
+client.rpush(keys[2], b"first", b"second")
+client.sadd(keys[3], b"first", b"second")
+client.zadd(keys[4], {b"first": 1, b"second": 2})
+client.save()
+"""
+    )
+
+    compose_file = os.environ.get("COMPOSE_FILE", "docker-compose.yml")
+    valkey_compose_file = (
+        "_integration-test/redis-to-valkey/docker-compose.test.yml"
+    )
+    # Later backup tests restart the service, so keep the Valkey override active.
+    os.environ["COMPOSE_FILE"] = os.pathsep.join(
+        [compose_file, valkey_compose_file]
+    )
+    subprocess.run(
+        [
+            "docker",
+            "compose",
+            "--ansi",
+            "never",
+            "up",
+            "--detach",
+            "--wait",
+            "redis",
+        ],
+        check=True,
+        timeout=120,
+    )
+
+    sentry_exec(
+        """
+from sentry.utils.redis import redis_clusters
+
+client = redis_clusters.get_binary("default")
+keys = [
+    b"self-hosted:redis-to-valkey:string",
+    b"self-hosted:redis-to-valkey:hash",
+    b"self-hosted:redis-to-valkey:list",
+    b"self-hosted:redis-to-valkey:set",
+    b"self-hosted:redis-to-valkey:sorted-set",
+]
+
+assert client.get(keys[0]) == b"value"
+assert 0 < client.ttl(keys[0]) <= 600
+assert client.hgetall(keys[1]) == {b"field": b"value"}
+assert client.lrange(keys[2], 0, -1) == [b"first", b"second"]
+assert client.smembers(keys[3]) == {b"first", b"second"}
+assert client.zrange(keys[4], 0, -1, withscores=True) == [
+    (b"first", 1.0),
+    (b"second", 2.0),
+]
+client.delete(*keys)
+"""
+    )
+
+
 @pytest.mark.skipif(os.environ.get("COMPOSE_PROFILES") != "feature-complete", reason="Only run if feature-complete")
 def test_receive_transaction_events(client_login):
     client, _ = client_login
