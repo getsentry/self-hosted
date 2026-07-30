@@ -507,7 +507,7 @@ keys = [
 
 client.delete(*keys)
 client.set(keys[0], b"value", ex=600)
-client.hset(keys[1], mapping={b"field": b"value"})
+client.hset(keys[1], b"field", b"value")
 client.rpush(keys[2], b"first", b"second")
 client.sadd(keys[3], b"first", b"second")
 client.zadd(keys[4], {b"first": 1, b"second": 2})
