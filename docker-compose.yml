@@ -145,7 +145,7 @@ services:
       test: echo stats | nc 127.0.0.1 11211
   redis:
     <<: *restart_policy
-    image: "valkey/valkey:8.1.9-alpine"
+    image: "valkey/valkey:9.1.1-alpine"
     healthcheck:
       <<: *healthcheck_defaults
       test: valkey-cli ping | grep PONG
