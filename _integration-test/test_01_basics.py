@@ -159,6 +159,43 @@ finally:
     )
 
 
+def test_valkey_sentry_cache():
+    script = """
+from uuid import uuid4
+
+from sentry.cache import default_cache
+
+key = f"self-hosted:valkey-integration-test:{uuid4()}"
+value = {"message": "works", "items": [1, 2, 3]}
+
+try:
+    default_cache.set(key, value, timeout=60)
+    assert default_cache.get(key) == value
+    default_cache.delete(key)
+    assert default_cache.get(key) is None
+finally:
+    default_cache.delete(key)
+"""
+
+    subprocess.run(
+        [
+            "docker",
+            "compose",
+            "--ansi",
+            "never",
+            "exec",
+            "-T",
+            "web",
+            "sentry",
+            "exec",
+        ],
+        input=script,
+        text=True,
+        check=True,
+        timeout=60,
+    )
+
+
 def test_login(client_login):
     client, login_response = client_login
     parser = BeautifulSoup(login_response.text, "html.parser")
