@@ -51,6 +51,10 @@ x-sentry-defaults: &sentry_defaults
     context: ./sentry
     args:
       - SENTRY_IMAGE
+      - HTTP_PROXY
+      - HTTPS_PROXY
+      - http_proxy
+      - https_proxy
   depends_on:
     redis:
       <<: *depends_on-healthy
@@ -655,6 +659,10 @@ services:
       context: ./cron
       args:
         BASE_IMAGE: sentry-self-hosted-local
+        HTTP_PROXY: "${HTTP_PROXY:-}"
+        HTTPS_PROXY: "${HTTPS_PROXY:-}"
+        http_proxy: "${http_proxy:-}"
+        https_proxy: "${https_proxy:-}"
     entrypoint: "/entrypoint.sh"
     command: '"0 0 * * * gosu sentry sentry cleanup --days $SENTRY_EVENT_RETENTION_DAYS"'
   nginx:
