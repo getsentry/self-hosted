@@ -58,3 +58,11 @@ kafka_topics:
       application: sentry
       taskname: sentry.profiles.task.process_profile_from_kafka
       processing_deadline_duration: 60
+  ingest-replay-recordings:
+    cluster: default
+    consumer_group: ingest-replay-recordings
+    raw:
+      namespace: replays.raw
+      application: sentry
+      taskname: sentry.replays.tasks.process_replay_recording
+      processing_deadline_duration: 90
