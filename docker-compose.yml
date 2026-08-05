@@ -210,7 +210,11 @@ services:
       KAFKA_INTER_BROKER_LISTENER_NAME: "PLAINTEXT"
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: "1"
       KAFKA_OFFSETS_TOPIC_NUM_PARTITIONS: "1"
-      KAFKA_LOG_RETENTION_HOURS: "24"
+      # Lower the log retention to 1 hours to avoid filling up the disk,
+      # ONLY IF you have fast processing time and/or small data volumes.
+      # Otherwise, you can set it to a higher value if you have much slower
+      # processing time and/or larger data volumes.
+      KAFKA_LOG_RETENTION_HOURS: "3"
       KAFKA_MESSAGE_MAX_BYTES: "50000000" #50MB or bust
       KAFKA_MAX_REQUEST_SIZE: "50000000" #50MB on requests apparently too
       CONFLUENT_SUPPORT_METRICS_ENABLE: "false"
