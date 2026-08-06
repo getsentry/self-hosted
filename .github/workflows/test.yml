@@ -75,6 +75,7 @@ jobs:
         with:
           compose_profiles: ${{ matrix.compose_profiles }}
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+          sentry_dsn: ${{ vars.SELF_HOSTED_INTEGRATION_DSN }}
 
   integration-test-errors-only:
     if: github.repository_owner == 'getsentry'
