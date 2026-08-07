@@ -9,6 +9,10 @@ updates:
       - "@getsentry/security"
     cooldown:
       default-days: 3
+    ignore:
+      - dependency-name: postgres
+        versions:
+          - ">=15"
 
   - package-ecosystem: "github-actions"
     directory: "/"
