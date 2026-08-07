@@ -113,8 +113,11 @@ x-snuba-defaults: &snuba_defaults
     CLICKHOUSE_HOST: clickhouse
     DEFAULT_BROKERS: "kafka:9092"
     REDIS_HOST: redis
-    UWSGI_MAX_REQUESTS: "10000"
-    UWSGI_DISABLE_LOGGING: "true"
+    # Snuba serves the API with Granian, which leaves worker recycling off
+    # unless these are set. Leaving the values empty passes through whatever
+    # is set on the host system (or in the .env file).
+    SNUBA_API_WORKERS_MAX_RSS:
+    SNUBA_API_WORKERS_LIFETIME:
     SENTRY_KAFKA_MAX_POLL_INTERVAL_MS:
     # Leaving the value empty to just pass whatever is set
     # on the host system (or in the .env file)
