@@ -7,7 +7,7 @@ echo "${_group}Migrating the SeaweedFS encryption key ..."
 migration_marker="/data/.sentry-seaweedfs-kek-migrated"
 
 migration_state=$(
-  $dc run --rm --no-deps --entrypoint sh seaweedfs -c \
+  $dcr --no-deps -T --entrypoint sh seaweedfs -c \
     "if test -d /data/filerldb2 && test ! -e $migration_marker; then printf needed; else printf skipped; fi"
 )
 
