@@ -43,6 +43,7 @@ seed_legacy_install() {
   docker volume create "$volume" >/dev/null
   "${dc[@]}" up -d --wait seaweedfs
   "${dc[@]}" exec -T seaweedfs apk add --no-cache s3cmd >/dev/null
+  "${dc[@]}" exec -T seaweedfs mkdir -p /data/idx/
   printf 'written before the upgrade' | "${dc[@]}" exec -T seaweedfs sh -c 'cat > /tmp/before-upgrade'
   "${dc[@]}" exec -T seaweedfs "${s3cmd[@]}" mb s3://nodestore
   "${dc[@]}" exec -T seaweedfs "${s3cmd[@]}" put /tmp/before-upgrade s3://nodestore/before-upgrade
