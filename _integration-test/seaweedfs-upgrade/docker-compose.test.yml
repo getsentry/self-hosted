@@ -1,0 +1,3 @@
+volumes:
+  sentry-seaweedfs:
+    name: "${SEAWEEDFS_UPGRADE_TEST_VOLUME}"
