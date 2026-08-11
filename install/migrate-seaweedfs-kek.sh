@@ -57,7 +57,7 @@ elif [[ "$migration_state" == "needed" ]]; then
     if [[ "$status_code" == "404" ]]; then
       echo "No existing filer encryption key was found."
       $CONTAINER_ENGINE exec "$migration_container" touch "$migration_marker"
-      exit 0
+      exit 0 # Exit only the migration subshell; install.sh continues.
     fi
     if [[ "$status_code" != "200" ]]; then
       echo "Failed to read the existing SeaweedFS encryption key (HTTP ${status_code:-unknown})." >&2
