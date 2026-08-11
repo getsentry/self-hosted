@@ -63,24 +63,28 @@ echo "=== RED: self-hosted 26.6.0 -> 26.7.0 must reproduce #4417 ==="
 seed_legacy_install "$red_volume" "${old_red_dc[@]}"
 export SEAWEEDFS_UPGRADE_TEST_VOLUME=$red_volume
 "${broken_dc[@]}" pull seaweedfs
-set +e
 "${broken_dc[@]}" up -d --wait seaweedfs
-broken_result=$?
+broken_container=$("${broken_dc[@]}" ps -q seaweedfs)
+[[ "$(docker inspect --format '{{.State.Health.Status}}' "$broken_container")" == "healthy" ]]
+
+"${broken_dc[@]}" exec -T seaweedfs apk add --no-cache s3cmd >/dev/null
+printf 'this write must fail' | "${broken_dc[@]}" exec -T seaweedfs sh -c 'cat > /tmp/red-write'
+set +e
+"${broken_dc[@]}" exec -T seaweedfs "${s3cmd[@]}" --max-retries=0 put /tmp/red-write s3://nodestore/red-write
+broken_s3_result=$?
 set -e
 broken_logs=$("${broken_dc[@]}" logs seaweedfs 2>&1)
 printf '%s\n' "$broken_logs"
 
-if [[ "$broken_result" == "0" ]]; then
-  echo "Expected the unpatched 26.7.0 upgrade to fail, but SeaweedFS became healthy." >&2
+if [[ "$broken_s3_result" == "0" ]]; then
+  echo "Expected the unpatched 26.7.0 upgrade to reject nodestore writes." >&2
   exit 1
 fi
 if ! grep -Fq "s3.sse.kek does not match existing /etc/s3/sse_kek" <<<"$broken_logs"; then
   echo "The 26.7.0 upgrade failed without reproducing the expected KEK mismatch." >&2
   exit 1
 fi
-broken_container=$("${broken_dc[@]}" ps -q seaweedfs)
-[[ "$(docker inspect --format '{{.State.Health.Status}}' "$broken_container")" == "unhealthy" ]]
-echo "RED asserted: 26.7.0 is unhealthy with the legacy KEK mismatch."
+echo "RED asserted: 26.7.0 reports healthy, but has a KEK mismatch and nodestore writes fail."
 "${broken_dc[@]}" down --remove-orphans
 
 echo "=== GREEN: self-hosted 26.6.0 -> current PR must fix #4417 ==="
