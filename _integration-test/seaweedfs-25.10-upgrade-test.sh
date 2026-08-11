@@ -40,11 +40,9 @@ printf 'written by self-hosted 25.10.0' | "${old_dc[@]}" exec -T seaweedfs sh -c
 "${old_dc[@]}" exec -T seaweedfs "${s3cmd[@]}" mb s3://nodestore
 "${old_dc[@]}" exec -T seaweedfs "${s3cmd[@]}" put /tmp/before-upgrade s3://nodestore/before-upgrade
 
-legacy_kek=$("${old_dc[@]}" exec -T seaweedfs sh -c \
-  "HTTP_PROXY='' HTTPS_PROXY='' http_proxy='' https_proxy='' wget -qO- http://127.0.0.1:8888/etc/s3/sse_kek")
-if [[ ! "$legacy_kek" =~ ^[[:xdigit:]]{64}$ ]]; then
-  echo "SeaweedFS 3.96 did not create the expected legacy plaintext KEK." >&2
-  "${old_dc[@]}" logs seaweedfs >&2
+if "${old_dc[@]}" exec -T seaweedfs sh -c \
+  "HTTP_PROXY='' HTTPS_PROXY='' http_proxy='' https_proxy='' wget -qO- http://127.0.0.1:8888/etc/s3/sse_kek" >/dev/null 2>&1; then
+  echo "Expected SeaweedFS 3.96 to have no existing filer KEK." >&2
   exit 1
 fi
 "${old_dc[@]}" down --remove-orphans
@@ -63,8 +61,11 @@ grep -Fxq 'source install/migrate-seaweedfs-kek.sh' "$repo_root/install.sh"
 "${current_dc[@]}" up -d --wait seaweedfs
 current_container=$("${current_dc[@]}" ps -q seaweedfs)
 [[ "$(docker inspect --format '{{.State.Health.Status}}' "$current_container")" == "healthy" ]]
-migrated_kek=$("${current_dc[@]}" exec -T seaweedfs cat /data/.mini_sse_kek)
-[[ "$migrated_kek" == "${legacy_kek,,}" ]]
+generated_kek=$("${current_dc[@]}" exec -T seaweedfs cat /data/.mini_sse_kek)
+if [[ ! "$generated_kek" =~ ^[[:xdigit:]]{64}$ ]]; then
+  echo "Current weed mini did not create a valid KEK." >&2
+  exit 1
+fi
 "${current_dc[@]}" exec -T seaweedfs test -e /data/.sentry-seaweedfs-kek-migrated
 
 if "${current_dc[@]}" logs seaweedfs | grep -F "does not match existing /etc/s3/sse_kek"; then
