@@ -67,24 +67,29 @@ export SEAWEEDFS_UPGRADE_TEST_VOLUME=$red_volume
 broken_container=$("${broken_dc[@]}" ps -q seaweedfs)
 [[ "$(docker inspect --format '{{.State.Health.Status}}' "$broken_container")" == "healthy" ]]
 
-"${broken_dc[@]}" exec -T seaweedfs apk add --no-cache s3cmd >/dev/null
-printf 'this write must fail' | "${broken_dc[@]}" exec -T seaweedfs sh -c 'cat > /tmp/red-write'
-set +e
-"${broken_dc[@]}" exec -T seaweedfs "${s3cmd[@]}" --max-retries=0 put /tmp/red-write s3://nodestore/red-write
-broken_s3_result=$?
-set -e
+generated_kek=$("${broken_dc[@]}" exec -T seaweedfs cat /data/.mini_sse_kek)
+wrapped_filer_kek=$("${broken_dc[@]}" exec -T seaweedfs sh -c \
+  "HTTP_PROXY='' HTTPS_PROXY='' http_proxy='' https_proxy='' wget -qO- http://127.0.0.1:8888/etc/s3/sse_kek")
 broken_logs=$("${broken_dc[@]}" logs seaweedfs 2>&1)
 printf '%s\n' "$broken_logs"
 
-if [[ "$broken_s3_result" == "0" ]]; then
-  echo "Expected the unpatched 26.7.0 upgrade to reject nodestore writes." >&2
+if [[ ! "$generated_kek" =~ ^[[:xdigit:]]{64}$ || "$generated_kek" == "${legacy_kek,,}" ]]; then
+  echo "Expected unpatched weed mini to generate a different valid KEK." >&2
+  exit 1
+fi
+if [[ -z "$wrapped_filer_kek" || "$wrapped_filer_kek" =~ ^[[:xdigit:]]{64}$ ]]; then
+  echo "Expected the failed 26.7.0 startup to wrap the legacy filer KEK." >&2
   exit 1
 fi
 if ! grep -Fq "s3.sse.kek does not match existing /etc/s3/sse_kek" <<<"$broken_logs"; then
-  echo "The 26.7.0 upgrade failed without reproducing the expected KEK mismatch." >&2
+  echo "The 26.7.0 upgrade did not reproduce the expected KEK mismatch." >&2
   exit 1
 fi
-echo "RED asserted: 26.7.0 reports healthy, but has a KEK mismatch and nodestore writes fail."
+if ! grep -Fq "Failed to load IAM configuration" <<<"$broken_logs"; then
+  echo "The KEK mismatch did not reproduce the expected IAM initialization failure." >&2
+  exit 1
+fi
+echo "RED asserted: 26.7.0 reports healthy, but generates a mismatched KEK and mutates the filer key."
 "${broken_dc[@]}" down --remove-orphans
 
 echo "=== GREEN: self-hosted 26.6.0 -> current PR must fix #4417 ==="
