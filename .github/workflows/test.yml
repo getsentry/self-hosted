@@ -53,8 +53,12 @@ jobs:
 
       - name: Checkout self-hosted upgrade versions
         run: |
+          git worktree add --detach "$RUNNER_TEMP/self-hosted-25.10.0" 25.10.0
           git worktree add --detach "$RUNNER_TEMP/self-hosted-26.6.0" 26.6.0
           git worktree add --detach "$RUNNER_TEMP/self-hosted-26.7.0" 26.7.0
+
+      - name: Test upgrade from self-hosted 25.10.0
+        run: ./_integration-test/seaweedfs-25.10-upgrade-test.sh "$RUNNER_TEMP/self-hosted-25.10.0"
 
       - name: Assert broken and fixed SeaweedFS upgrades
         run: |
