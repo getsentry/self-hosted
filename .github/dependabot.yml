@@ -13,6 +13,9 @@ updates:
       - dependency-name: postgres
         versions:
           - ">=15"
+      - dependency-name: confluentinc/cp-kafka
+        versions:
+          - ">=8"
 
   - package-ecosystem: "github-actions"
     directory: "/"
