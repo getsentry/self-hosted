@@ -2,7 +2,7 @@ echo "${_group}Turning things off ..."
 
 if [[ -n "$MINIMIZE_DOWNTIME" ]]; then
   # Stop everything unless databases, relay, web, and nginx
-  $dc down -fsv $($dc config --services | grep -v -E '^(nginx|web|relay|smtp|memcached|redis|postgres|pgbouncer|kafka|clickhouse|seaweedfs)$')
+  $dc down $($dc config --services | grep -v -E '^(nginx|web|relay|smtp|memcached|redis|postgres|pgbouncer|kafka|clickhouse|seaweedfs)$')
 else
   # Clean up old stuff and ensure nothing is working while we install/update
   if [ "$CONTAINER_ENGINE" = "podman" ]; then
