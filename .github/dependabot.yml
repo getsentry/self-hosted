@@ -13,6 +13,18 @@ updates:
       - dependency-name: postgres
         versions:
           - ">=15"
+      - dependency-name: valkey/valkey
+        versions:
+          - ">=9"
+      - dependency-name: memcached
+        versions:
+          - ">=2"
+      - dependency-name: edoburu/pgbouncer
+        versions:
+          - ">=2"
+      - dependency-name: chrislusf/seaweedfs
+        versions:
+          - ">=5"
 
   - package-ecosystem: "github-actions"
     directory: "/"
