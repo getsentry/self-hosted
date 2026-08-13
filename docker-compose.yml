@@ -526,13 +526,6 @@ services:
       <<: *file_healthcheck_defaults
     profiles:
       - feature-complete
-  billing-metrics-consumer:
-    <<: *sentry_defaults
-    command: run consumer billing-metrics-consumer --consumer-group billing-metrics-consumer --healthcheck-file-path /tmp/health.txt --max-poll-interval-ms ${SENTRY_KAFKA_MAX_POLL_INTERVAL_MS:-300000}
-    healthcheck:
-      <<: *file_healthcheck_defaults
-    profiles:
-      - feature-complete
   ingest-occurrences:
     <<: *sentry_defaults
     command: run consumer ingest-occurrences --consumer-group ingest-occurrences --healthcheck-file-path /tmp/health.txt --max-poll-interval-ms ${SENTRY_KAFKA_MAX_POLL_INTERVAL_MS:-300000}
