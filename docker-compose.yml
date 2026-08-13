@@ -398,20 +398,6 @@ services:
       <<: *file_healthcheck_defaults
     profiles:
       - feature-complete
-  snuba-subscription-consumer-generic-metrics-distributions:
-    <<: *snuba_defaults
-    command: subscriptions-scheduler-executor --dataset generic_metrics --entity=generic_metrics_distributions   --auto-offset-reset=latest --no-strict-offset-reset --consumer-group=snuba-generic-metrics-distributions-subscriptions-schedulers --followed-consumer-group=snuba-gen-metrics-distributions-consumers --schedule-ttl=60 --stale-threshold-seconds=900 --health-check-file /tmp/health.txt
-    healthcheck:
-      <<: *file_healthcheck_defaults
-    profiles:
-      - feature-complete
-  snuba-subscription-consumer-generic-metrics-sets:
-    <<: *snuba_defaults
-    command: subscriptions-scheduler-executor --dataset generic_metrics --entity=generic_metrics_sets --auto-offset-reset=latest --no-strict-offset-reset --consumer-group=snuba-generic-metrics-sets-subscriptions-schedulers --followed-consumer-group=snuba-gen-metrics-sets-consumers --schedule-ttl=60 --stale-threshold-seconds=900 --health-check-file /tmp/health.txt
-    healthcheck:
-      <<: *file_healthcheck_defaults
-    profiles:
-      - feature-complete
   snuba-subscription-consumer-generic-metrics-counters:
     <<: *snuba_defaults
     command: subscriptions-scheduler-executor --dataset generic_metrics --entity=generic_metrics_counters --auto-offset-reset=latest --no-strict-offset-reset --consumer-group=snuba-generic-metrics-counters-subscriptions-schedulers --followed-consumer-group=snuba-gen-metrics-counters-consumers --schedule-ttl=60 --stale-threshold-seconds=900 --health-check-file /tmp/health.txt
@@ -419,37 +405,9 @@ services:
       <<: *file_healthcheck_defaults
     profiles:
       - feature-complete
-  snuba-subscription-consumer-generic-metrics-gauges:
-    <<: *snuba_defaults
-    command: subscriptions-scheduler-executor --dataset generic_metrics --entity=generic_metrics_gauges --auto-offset-reset=latest --no-strict-offset-reset --consumer-group=snuba-generic-metrics-gauges-subscriptions-schedulers --followed-consumer-group=snuba-gen-metrics-gauges-consumers --schedule-ttl=60 --stale-threshold-seconds=900 --health-check-file /tmp/health.txt
-    healthcheck:
-      <<: *file_healthcheck_defaults
-    profiles:
-      - feature-complete
-  snuba-generic-metrics-distributions-consumer:
-    <<: *snuba_defaults
-    command: rust-consumer --storage generic_metrics_distributions_raw --consumer-group snuba-gen-metrics-distributions-consumers --auto-offset-reset=latest --max-batch-time-ms 750 --no-strict-offset-reset --health-check-file /tmp/health.txt --max-poll-interval-ms ${SENTRY_KAFKA_MAX_POLL_INTERVAL_MS:-300000}
-    healthcheck:
-      <<: *file_healthcheck_defaults
-    profiles:
-      - feature-complete
-  snuba-generic-metrics-sets-consumer:
-    <<: *snuba_defaults
-    command: rust-consumer --storage generic_metrics_sets_raw --consumer-group snuba-gen-metrics-sets-consumers --auto-offset-reset=latest --max-batch-time-ms 750 --no-strict-offset-reset --health-check-file /tmp/health.txt --max-poll-interval-ms ${SENTRY_KAFKA_MAX_POLL_INTERVAL_MS:-300000}
-    healthcheck:
-      <<: *file_healthcheck_defaults
-    profiles:
-      - feature-complete
   snuba-generic-metrics-counters-consumer:
     <<: *snuba_defaults
     command: rust-consumer --storage generic_metrics_counters_raw --consumer-group snuba-gen-metrics-counters-consumers --auto-offset-reset=latest --max-batch-time-ms 750 --no-strict-offset-reset --health-check-file /tmp/health.txt --max-poll-interval-ms ${SENTRY_KAFKA_MAX_POLL_INTERVAL_MS:-300000}
-    healthcheck:
-      <<: *file_healthcheck_defaults
-    profiles:
-      - feature-complete
-  snuba-generic-metrics-gauges-consumer:
-    <<: *snuba_defaults
-    command: rust-consumer --storage generic_metrics_gauges_raw --consumer-group snuba-gen-metrics-gauges-consumers --auto-offset-reset=latest --max-batch-time-ms 750 --no-strict-offset-reset --health-check-file /tmp/health.txt --max-poll-interval-ms ${SENTRY_KAFKA_MAX_POLL_INTERVAL_MS:-300000}
     healthcheck:
       <<: *file_healthcheck_defaults
     profiles:
