@@ -75,6 +75,8 @@ x-sentry-defaults: &sentry_defaults
     SENTRY_CONF: "/etc/sentry"
     SNUBA: "http://snuba-api:1218"
     VROOM: "http://vroom:8085"
+    # Users should leave this empty
+    SENTRY_DSN:
     # Force everything to use the system CA bundle
     # This is mostly needed to support installing custom CA certs
     # This one is used by botocore
@@ -93,6 +95,7 @@ x-sentry-defaults: &sentry_defaults
     SENTRY_SYSTEM_SECRET_KEY:
     LAUNCHPAD_RPC_SHARED_SECRET:
     SENTRY_STATSD_ADDR: "${STATSD_ADDR:-}"
+    SENTRY_TRACE_STARTUP:
   volumes:
     - "sentry-data:/data"
     - "./sentry:/etc/sentry"
@@ -116,6 +119,7 @@ x-snuba-defaults: &snuba_defaults
     UWSGI_MAX_REQUESTS: "10000"
     UWSGI_DISABLE_LOGGING: "true"
     SENTRY_KAFKA_MAX_POLL_INTERVAL_MS:
+    SENTRY_DSN:
     # Leaving the value empty to just pass whatever is set
     # on the host system (or in the .env file)
     SENTRY_EVENT_RETENTION_DAYS:
