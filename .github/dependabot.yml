@@ -27,7 +27,7 @@ updates:
           - ">=5"
       - dependency-name: confluentinc/cp-kafka
         versions:
-          - ">=8"
+          - ">=7.7"
 
   - package-ecosystem: "github-actions"
     directory: "/"
