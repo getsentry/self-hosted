@@ -25,6 +25,9 @@ updates:
       - dependency-name: chrislusf/seaweedfs
         versions:
           - ">=5"
+      - dependency-name: confluentinc/cp-kafka
+        versions:
+          - ">=8"
 
   - package-ecosystem: "github-actions"
     directory: "/"
