@@ -2,13 +2,12 @@ if [[ "$MINIMIZE_DOWNTIME" ]]; then
   echo "${_group}Waiting for Sentry to start ..."
 
   # Start the whole setup, except nginx, relay, and web.
-  start_service_and_wait_ready --remove-orphans $($dc config --services | grep -v -E '^(nginx|relay|web)$')
+  start_service_and_wait_ready --remove-orphans $($dc config --services | grep -v -E '^(nginx|relay)$')
 
   if [ -n "$($dc ps -q nginx 2>/dev/null)" ]; then
-    # relay and web will be restarted as well, if we restart relay.
-    $dc restart nginx
+    $dc exec -T nginx nginx -s reload || true
   else
-    echo "Nginx container not found, skipping restart."
+    echo "Nginx container not found, skipping reload."
   fi
 
   $CONTAINER_ENGINE run --rm --network="${COMPOSE_PROJECT_NAME}_default" alpine ash \
