@@ -93,7 +93,6 @@ x-sentry-defaults: &sentry_defaults
     SENTRY_SYSTEM_SECRET_KEY:
     LAUNCHPAD_RPC_SHARED_SECRET:
     SENTRY_STATSD_ADDR: "${STATSD_ADDR:-}"
-    SENTRY_KAFKA_MAX_POLL_INTERVAL_MS:
   volumes:
     - "sentry-data:/data"
     - "./sentry:/etc/sentry"
@@ -123,7 +122,6 @@ x-snuba-defaults: &snuba_defaults
     # If you have statsd server, you can utilize that to monitor self-hosted Snuba containers.
     # To start, state these environment variables below on your `.env.` file and adjust the options as needed.
     SNUBA_STATSD_ADDR: "${STATSD_ADDR:-}"
-    SENTRY_KAFKA_MAX_POLL_INTERVAL_MS:
 services:
   smtp:
     <<: *restart_policy
