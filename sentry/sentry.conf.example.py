@@ -305,9 +305,9 @@ SENTRY_WEB_OPTIONS = {
     # The `harakiri` option terminates requests that take longer than the
     # defined amount of time (in seconds) which can help avoid stuck workers
     # caused by GIL issues or deadlocks.
-    # Ensure nginx `proxy_read_timeout` configuration (default: 30)
+    # Ensure nginx `proxy_read_timeout` configuration (default: 90)
     # on your `nginx.conf` file to be at least 5 seconds longer than this.
-    # "harakiri": 25,
+    # "harakiri": 85,
     # Some stuff so uwsgi will cycle workers sensibly
     "max-requests": 100000,
     "max-requests-delta": 500,
@@ -379,6 +379,8 @@ SENTRY_FEATURES.update(
             "organizations:mep-rollout-flag",
             "organizations:dashboards-rh-widget",
             "organizations:dynamic-sampling",
+            "organizations:workflow-engine-ui",
+            "organizations:workflow-engine-rule-serializers",
             "projects:custom-inbound-filters",
             "projects:data-forwarding",
             "projects:discard-groups",
@@ -444,6 +446,12 @@ SENTRY_FEATURES.update(
             "organizations:tracemetrics-units-ui",
             "organizations:tracemetrics-stats-bytes-ui",
             "organizations:tracemetrics-pii-scrubbing-ui",
+        )
+        # Transaction widgets/alerts/saved queries migration UI flags
+        + (
+            "organizations:discover-saved-queries-deprecation",
+            "organizations:expose-migrated-discover-queries",
+            "organizations:performance-transaction-deprecation-banner",
         )
     }
 )

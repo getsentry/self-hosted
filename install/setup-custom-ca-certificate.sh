@@ -204,6 +204,8 @@ services:
     <<: *ca_snuba
   snuba-outcomes-consumer:
     <<: *ca_snuba
+  snuba-outcomes-accepted-consumer:
+    <<: *ca_snuba
   snuba-outcomes-billing-consumer:
     <<: *ca_snuba
   snuba-group-attributes-consumer:
@@ -224,21 +226,9 @@ services:
     <<: *ca_snuba
   snuba-subscription-consumer-metrics:
     <<: *ca_snuba
-  snuba-subscription-consumer-generic-metrics-distributions:
-    <<: *ca_snuba
-  snuba-subscription-consumer-generic-metrics-sets:
-    <<: *ca_snuba
   snuba-subscription-consumer-generic-metrics-counters:
     <<: *ca_snuba
-  snuba-subscription-consumer-generic-metrics-gauges:
-    <<: *ca_snuba
-  snuba-generic-metrics-distributions-consumer:
-    <<: *ca_snuba
-  snuba-generic-metrics-sets-consumer:
-    <<: *ca_snuba
   snuba-generic-metrics-counters-consumer:
-    <<: *ca_snuba
-  snuba-generic-metrics-gauges-consumer:
     <<: *ca_snuba
   snuba-profiling-profiles-consumer:
     <<: *ca_snuba

@@ -1,5 +1,131 @@
 # Changelog
 
+## 26.7.2
+
+### Internal Changes 🔧
+
+#### Deps
+
+- Bump astral-sh/setup-uv from 8.3.2 to 9.0.0 by @dependabot in [#4431](https://github.com/getsentry/self-hosted/pull/4431)
+- Bump actions/setup-node from 6.4.0 to 7.0.0 by @dependabot in [#4422](https://github.com/getsentry/self-hosted/pull/4422)
+- Bump j178/prek-action from 2.0.5 to 2.0.6 by @dependabot in [#4421](https://github.com/getsentry/self-hosted/pull/4421)
+- Bump actions/setup-python from 6.3.0 to 7.0.0 by @dependabot in [#4423](https://github.com/getsentry/self-hosted/pull/4423)
+
+#### Other
+
+- Add dependabot cooldown by @aminvakil in [#4434](https://github.com/getsentry/self-hosted/pull/4434)
+
+## 26.7.1
+
+### Bug Fixes 🐛
+
+- Add accepted outcomes consumer by @mzglinski in [#4419](https://github.com/getsentry/self-hosted/pull/4419)
+
+### Internal Changes 🔧
+
+#### Deps
+
+- Bump astral-sh/setup-uv from 8.3.0 to 8.3.2 by @dependabot in [#4410](https://github.com/getsentry/self-hosted/pull/4410)
+- Bump nginx from 1.31.2-alpine to 1.31.3-alpine by @dependabot in [#4416](https://github.com/getsentry/self-hosted/pull/4416)
+
+## 26.7.0
+
+### New Features ✨
+
+#### Taskbroker
+
+- Port subscriptions consumers to tasks by @lvthanh03 in [#4395](https://github.com/getsentry/self-hosted/pull/4395)
+- Port profiles consumer to taskbroker raw mode by @untitaker in [#4386](https://github.com/getsentry/self-hosted/pull/4386)
+
+#### Other
+
+- (deps) Bump seaweedfs to 4.29 and migrate into `weed mini` by @aldy505 in [#4345](https://github.com/getsentry/self-hosted/pull/4345)
+- Add in transactions -> spans migration flags by @nikkikapadia in [#4402](https://github.com/getsentry/self-hosted/pull/4402)
+- Enable workflow engine by @aldy505 in [#4364](https://github.com/getsentry/self-hosted/pull/4364)
+
+### Bug Fixes 🐛
+
+- (relay) Disable DNS caching by @aldy505 in [#4213](https://github.com/getsentry/self-hosted/pull/4213)
+
+### Internal Changes 🔧
+
+#### Deps
+
+- Bump memcached from 1.6.26-alpine to 1.6.45-alpine by @dependabot in [#4412](https://github.com/getsentry/self-hosted/pull/4412)
+- Bump soupsieve from 2.8 to 2.8.4 by @dependabot in [#4406](https://github.com/getsentry/self-hosted/pull/4406)
+- Bump nginx from 1.31.0-alpine to 1.31.2-alpine by @dependabot in [#4411](https://github.com/getsentry/self-hosted/pull/4411)
+- Bump astral-sh/setup-uv from 8.2.0 to 8.3.0 by @dependabot in [#4399](https://github.com/getsentry/self-hosted/pull/4399)
+- Bump actions/setup-python from 6.2.0 to 6.3.0 by @dependabot in [#4390](https://github.com/getsentry/self-hosted/pull/4390)
+- Bump j178/prek-action from 2.0.4 to 2.0.5 by @dependabot in [#4400](https://github.com/getsentry/self-hosted/pull/4400)
+- Bump actions/checkout from 6.0.3 to 7.0.0 by @dependabot in [#4383](https://github.com/getsentry/self-hosted/pull/4383)
+- Bump @opentelemetry/core and @sentry/node in /_integration-test/nodejs by @dependabot in [#4380](https://github.com/getsentry/self-hosted/pull/4380)
+
+#### Other
+
+- (deps-dev) Bump cryptography from 46.0.7 to 48.0.1 by @dependabot in [#4382](https://github.com/getsentry/self-hosted/pull/4382)
+- Add memcached integration test by @aminvakil in [#4414](https://github.com/getsentry/self-hosted/pull/4414)
+
+### Other
+
+- Upgrade docker images using dependabot by @aminvakil in [#4407](https://github.com/getsentry/self-hosted/pull/4407)
+- Increase web healthcheck start_period by @aminvakil in [#4387](https://github.com/getsentry/self-hosted/pull/4387)
+- Bump pgbouncer 1.25.2-p0 by @aminvakil in [#4384](https://github.com/getsentry/self-hosted/pull/4384)
+
+## 26.6.0
+
+### New Features ✨
+
+- (ci) Run tests every 6 hours on the weekdays by @aldy505 in [#4374](https://github.com/getsentry/self-hosted/pull/4374)
+- (error-handling) Collect extra tags to distinguish OS and Docker Image version by @aldy505 in [#4366](https://github.com/getsentry/self-hosted/pull/4366)
+- Set --max-poll-interval-ms flags to Sentry/Snuba consumers by @aldy505 in [#4376](https://github.com/getsentry/self-hosted/pull/4376)
+
+### Documentation 📚
+
+- (auth) Add email backend recommendation to config example by @nora-shap in [#4362](https://github.com/getsentry/self-hosted/pull/4362)
+
+### Internal Changes 🔧
+
+#### Ci
+
+- Declare 'timeout-minutes' on tests by @aldy505 in [#4375](https://github.com/getsentry/self-hosted/pull/4375)
+- Disable Linux arm64 integration tests for the time being by @aldy505 in [#4367](https://github.com/getsentry/self-hosted/pull/4367)
+
+#### Deps
+
+- Bump actions/checkout from 6.0.2 to 6.0.3 by @dependabot in [#4372](https://github.com/getsentry/self-hosted/pull/4372)
+- Bump codecov/codecov-action from 5.5.3 to 7.0.0 by @dependabot in [#4370](https://github.com/getsentry/self-hosted/pull/4370)
+- Bump astral-sh/setup-uv from 8.1.0 to 8.2.0 by @dependabot in [#4371](https://github.com/getsentry/self-hosted/pull/4371)
+- Bump actions/create-github-app-token from 3.1.1 to 3.2.0 by @dependabot in [#4336](https://github.com/getsentry/self-hosted/pull/4336)
+
+#### Other
+
+- (taskbroker) Migrate to new kafka_clusters/kafka_topics config format by @untitaker in [#4363](https://github.com/getsentry/self-hosted/pull/4363)
+
+### Other
+
+- Increase proxy_read_timeout to 90s by @aminvakil in [#4368](https://github.com/getsentry/self-hosted/pull/4368)
+- Reuse integration test login sessions by @aminvakil in [#4369](https://github.com/getsentry/self-hosted/pull/4369)
+- Adjust ClickHouse configuration to disable query_views_log by @LordSimal in [#4365](https://github.com/getsentry/self-hosted/pull/4365)
+
+## 26.5.2
+
+### New Features ✨
+
+- (snuba) Healthcheck adjustments preparing for distroless by @oioki in [#4352](https://github.com/getsentry/self-hosted/pull/4352)
+
+### Bug Fixes 🐛
+
+- Prevent argument too long error on self-hosted error reports due to breadcrumbs too long by @aldy505 in [#4348](https://github.com/getsentry/self-hosted/pull/4348)
+
+### Documentation 📚
+
+- Contributing guideline by @aldy505 in [#4347](https://github.com/getsentry/self-hosted/pull/4347)
+
+### Internal Changes 🔧
+
+- (deps) Bump j178/prek-action from 2.0.2 to 2.0.4 by @dependabot in [#4337](https://github.com/getsentry/self-hosted/pull/4337)
+- (sentry-cli) Upgrade to 3.4.3 by @szokeasaurusrex in [#4354](https://github.com/getsentry/self-hosted/pull/4354)
+
 ## 26.5.1
 
 ### Bug Fixes 🐛

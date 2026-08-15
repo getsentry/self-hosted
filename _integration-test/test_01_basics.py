@@ -69,8 +69,8 @@ def get_organization_token(client: httpx.Client, csrf_token: str, name: str) -> 
     token = json.loads(response.text)["token"]
     return token
 
-@pytest.fixture()
-def client_login():
+@pytest.fixture(scope="session")
+def authenticated_session():
     client = httpx.Client()
     response = client.get(SENTRY_TEST_HOST, follow_redirects=True)
     parser = BeautifulSoup(response.text, "html.parser")
@@ -87,7 +87,23 @@ def client_login():
         headers={"Referer": f"{SENTRY_TEST_HOST}/auth/login/sentry/"},
     )
     assert login_response.status_code == 200
+    parser = BeautifulSoup(login_response.text, "html.parser")
+    script_tag = parser.find(
+        "script", string=lambda x: x and "window.__initialData" in x
+    )
+    assert script_tag is not None
+    json_data = json.loads(script_tag.text.split("=", 1)[1].strip().rstrip(";"))
+    assert json_data["isAuthenticated"] is True
+    yield (httpx.Cookies(client.cookies), login_response)
+    client.close()
+
+
+@pytest.fixture()
+def client_login(authenticated_session):
+    cookies, login_response = authenticated_session
+    client = httpx.Client(cookies=httpx.Cookies(cookies))
     yield (client, login_response)
+    client.close()
 
 def test_initial_redirect():
     initial_auth_redirect = httpx.get(SENTRY_TEST_HOST, follow_redirects=True)
@@ -100,6 +116,84 @@ def test_asset_internal_rewrite():
     response = httpx.get(f"{SENTRY_TEST_HOST}/_assets/entrypoints/app.js")
     assert response.status_code == 200
     assert response.headers["Content-Type"] == "text/javascript"
+
+
+def test_memcached_django_cache():
+    script = """
+from uuid import uuid4
+
+from django.core.cache import caches
+
+cache = caches["default"]
+assert cache.__class__.__module__ == "sentry.cache.backends.reconnectingmemcache"
+assert cache.__class__.__name__ == "ReconnectingMemcache"
+
+key = f"self-hosted:memcached-integration-test:{uuid4()}"
+value = {"message": "works", "payload": b"x" * 800_000}
+
+try:
+    cache.set(key, value, timeout=60)
+    assert cache.get(key) == value
+    cache.delete(key)
+    assert cache.get(key) is None
+finally:
+    cache.delete(key)
+"""
+
+    subprocess.run(
+        [
+            "docker",
+            "compose",
+            "--ansi",
+            "never",
+            "exec",
+            "-T",
+            "web",
+            "sentry",
+            "exec",
+        ],
+        input=script,
+        text=True,
+        check=True,
+        timeout=60,
+    )
+
+
+def test_valkey_sentry_cache():
+    script = """
+from uuid import uuid4
+
+from sentry.cache import default_cache
+
+key = f"self-hosted:valkey-integration-test:{uuid4()}"
+value = {"message": "works", "items": [1, 2, 3]}
+
+try:
+    default_cache.set(key, value, timeout=60)
+    assert default_cache.get(key) == value
+    default_cache.delete(key)
+    assert default_cache.get(key) is None
+finally:
+    default_cache.delete(key)
+"""
+
+    subprocess.run(
+        [
+            "docker",
+            "compose",
+            "--ansi",
+            "never",
+            "exec",
+            "-T",
+            "web",
+            "sentry",
+            "exec",
+        ],
+        input=script,
+        text=True,
+        check=True,
+        timeout=60,
+    )
 
 
 def test_login(client_login):
