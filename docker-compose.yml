@@ -499,7 +499,7 @@ services:
       <<: *file_healthcheck_defaults
   post-process-forwarder-errors:
     <<: *sentry_defaults
-    command: run consumer --no-strict-offset-reset post-process-forwarder-errors --auto-offset-reset=earliest --no-strict-offset-reset --consumer-group post-process-forwarder --synchronize-commit-log-topic=snuba-commit-log --synchronize-commit-group=snuba-consumers --healthcheck-file-path /tmp/health.txt --max-poll-interval-ms ${SENTRY_KAFKA_MAX_POLL_INTERVAL_MS:-300000}
+    command: run consumer post-process-forwarder-errors --auto-offset-reset=earliest --no-strict-offset-reset --consumer-group post-process-forwarder --synchronize-commit-log-topic=snuba-commit-log --synchronize-commit-group=snuba-consumers --healthcheck-file-path /tmp/health.txt --max-poll-interval-ms ${SENTRY_KAFKA_MAX_POLL_INTERVAL_MS:-300000}
     healthcheck:
       <<: *file_healthcheck_defaults
   ##############################################
