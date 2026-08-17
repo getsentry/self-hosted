@@ -1,5 +1,44 @@
 # Changelog
 
+## 26.8.0
+
+### New Features ✨
+
+#### Tasks
+
+- Increase kafka_session_timeout_ms in taskbroker by @aminvakil in [#4464](https://github.com/getsentry/self-hosted/pull/4464)
+- Port ingest replays to taskbroker by @lvthanh03 in [#4448](https://github.com/getsentry/self-hosted/pull/4448)
+
+#### Other
+
+- Add --no-strict-offset-reset flags to sentry consumers by @aldy505 in [#4473](https://github.com/getsentry/self-hosted/pull/4473)
+- Use valkey instead of redis by @aminvakil in [#4438](https://github.com/getsentry/self-hosted/pull/4438)
+
+### Bug Fixes 🐛
+
+- (ci) Make integration tests on Linux arm64 not flaky by @aldy505 in [#4313](https://github.com/getsentry/self-hosted/pull/4313)
+- (seaweedfs) Migrate legacy KEK before starting weed mini by @aminvakil in [#4461](https://github.com/getsentry/self-hosted/pull/4461)
+
+### Internal Changes 🔧
+
+#### Deps
+
+- Bump j178/prek-action from 2.0.6 to 3.0.0 by @dependabot in [#4445](https://github.com/getsentry/self-hosted/pull/4445)
+- Bump actions/checkout from 7.0.0 to 7.0.1 by @dependabot in [#4432](https://github.com/getsentry/self-hosted/pull/4432)
+- Bump urllib3 from 2.6.3 to 2.7.0 by @dependabot in [#4429](https://github.com/getsentry/self-hosted/pull/4429)
+
+#### Other
+
+- (consumer) Remove unused billing metrics consumer by @Dav1dde in [#4468](https://github.com/getsentry/self-hosted/pull/4468)
+- Ignore kafka > 7.6 by @aminvakil in [#4470](https://github.com/getsentry/self-hosted/pull/4470)
+- Ignore multiple images major versions bump by @aminvakil in [#4466](https://github.com/getsentry/self-hosted/pull/4466)
+- Ignore kafka major versions bump by @aminvakil in [#4462](https://github.com/getsentry/self-hosted/pull/4462)
+- Remove unused generic metrics s/g/d compose services by @sentry-junior in [#4467](https://github.com/getsentry/self-hosted/pull/4467)
+- Ignore postgres major versions bump by @aminvakil in [#4457](https://github.com/getsentry/self-hosted/pull/4457)
+- Replace curl-pipe-bash with action-setup-cli for Sentry CLI setup by @oioki in [#4451](https://github.com/getsentry/self-hosted/pull/4451)
+- Decrease Kafka log retention hours by @aldy505 in [#4442](https://github.com/getsentry/self-hosted/pull/4442)
+- Remove disabled changelog-preview workflow by @oioki in [#4447](https://github.com/getsentry/self-hosted/pull/4447)
+
 ## 26.7.2
 
 ### Internal Changes 🔧
