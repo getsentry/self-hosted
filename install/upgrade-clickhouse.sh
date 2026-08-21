@@ -16,7 +16,7 @@ if $ps_command | grep -q clickhouse; then
 
   # In order to get to 25.3, we need to first upgrade go from 21.8 -> 22.8 -> 23.3 -> 23.8 -> 24.8 -> 25.3
   version=$($dc exec clickhouse clickhouse-client -q 'SELECT version()')
-  if [[ "$version" == "25.3.6.10034.altinitystable clickhouse" ]]; then
+  if [[ "$version" == "25.3.6.10034.altinitystable" ]]; then
     echo "Detected clickhouse version $version"
     start_service_and_wait_ready clickhouse
     $dc down clickhouse
