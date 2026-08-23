@@ -115,15 +115,20 @@ runs:
           echo "PODMAN_USERNS=keep-id" >> $GITHUB_ENV
         fi
 
-    - name: Check ulimit bounds
+    - name: Configure crun for rootless ulimits
       shell: bash
       run: |
-        echo "Soft limit:"
-        ulimit -n
-        echo "Hard limit:"
-        ulimit -Hn
-        echo "System max:"
-        cat /proc/sys/fs/file-max
+        mkdir -p ~/.config/containers
+        cat > ~/.config/containers/containers.conf << 'EOF'
+        [libpod]
+        runtime = "crun"
+
+        [engine]
+        default_ulimits = {
+          nofile = ["262144", "262144"],
+          nproc = ["4096", "4096"]
+        }
+        EOF
 
     - name: Compute Docker Volume Cache Keys
       if: ${{ inputs.container_engine == 'docker' }}
