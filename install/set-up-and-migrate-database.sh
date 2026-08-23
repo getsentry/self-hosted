@@ -22,6 +22,11 @@ if [[ -z "${SKIP_SENTRY_MIGRATIONS:-}" ]]; then
   else
     $dcr web upgrade --create-kafka-topics
   fi
+
+  # Delete leftover consumer groups
+  for group in "billing-metrics-consumer" "snuba-gen-metrics-distributions-consumers" "snuba-gen-metrics-gauges-consumers" "snuba-gen-metrics-sets-consumers"; do
+    $dcr kafka kafka-consumer-groups --bootstrap-server kafka:9092 --group $group --delete || true
+  done
 else
   echo "Skipped DB migrations due to SKIP_SENTRY_MIGRATIONS=$SKIP_SENTRY_MIGRATIONS"
 fi
