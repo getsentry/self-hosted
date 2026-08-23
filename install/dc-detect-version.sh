@@ -36,7 +36,7 @@ if [[ -z "$COMPOSE_VERSION" ]] || [[ -n "$STANDALONE_COMPOSE_VERSION" ]] && ! ve
 fi
 
 if [[ "$CONTAINER_ENGINE" == "podman" ]]; then
-  NO_ANSI="--no-ansi --userns=keep-id"
+  NO_ANSI="--no-ansi"
 else
   NO_ANSI="--ansi never"
 fi
@@ -54,14 +54,18 @@ if [[ "$CONTAINER_ENGINE" == "podman" ]]; then
   # Disable pod creation as these are one-off commands and creating a pod
   # prints its pod id to stdout which is messing with the output that we
   # rely on various places such as configuration generation
-  dcr="$dc --profile=feature-complete --in-pod=false run --rm"
+  dcr="$dc --userns=keep-id --profile=feature-complete --in-pod=false run --rm"
 else
   proxy_args_dc=$proxy_args
   dcr="$dc run --pull=never --rm"
 fi
 dcb="$dc build $proxy_args"
 dbuild="$CONTAINER_ENGINE build $proxy_args"
-dcx="$dc exec $exec_proxy_args"
+if [ "$CONTAINER_ENGINE" = "podman" ]; then
+  dcx="$dc exec --userns=keep-id $exec_proxy_args"
+else
+  dcx="$dc exec $exec_proxy_args"
+fi
 echo "$dcr"
 # Utility function to handle --wait with docker and podman
 function start_service_and_wait_ready() {
