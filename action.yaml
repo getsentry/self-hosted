@@ -108,6 +108,17 @@ runs:
           fi
         fi
 
+    - name: Figure out stuff for podman
+      if: ${{ inputs.container_engine == 'podman' }}
+      shell: bash
+      run: |
+        systemctl --user status podman.service || true
+        ls -l $XDG_RUNTIME_DIR/podman/podman.sock
+        podman info | grep rootless
+        cat /etc/subuid | grep $(whoami)
+        cat /etc/subgid | grep $(whoami)
+        stat -fc %T /sys/fs/cgroup/
+
     - name: Increase host-level file descriptor limit
       if: ${{ inputs.container_engine == 'podman' }}
       shell: bash
