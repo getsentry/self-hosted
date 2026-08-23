@@ -36,7 +36,7 @@ if [[ -z "$COMPOSE_VERSION" ]] || [[ -n "$STANDALONE_COMPOSE_VERSION" ]] && ! ve
 fi
 
 if [[ "$CONTAINER_ENGINE" == "podman" ]]; then
-  NO_ANSI="--no-ansi"
+  NO_ANSI="--no-ansi --userns=keep-id"
 else
   NO_ANSI="--ansi never"
 fi
