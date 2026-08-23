@@ -108,6 +108,14 @@ runs:
           fi
         fi
 
+    - name: Increase host-level file descriptor limit
+      if: ${{ inputs.container_engine == 'podman' }}
+      shell: bash
+      run: |
+        # 262144 (2^18) is the maximum number of file descriptors
+        echo "ulimit -n 262144" >> ~/.bashrc
+        source ~/.bashrc
+
     - name: Compute Docker Volume Cache Keys
       if: ${{ inputs.container_engine == 'docker' }}
       id: cache_key
