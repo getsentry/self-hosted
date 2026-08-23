@@ -92,6 +92,8 @@ runs:
 
     - name: Setup dev environment
       shell: bash
+      env:
+        CONTAINER_ENGINE: ${{ inputs.container_engine }}
       run: |
         cd ${{ github.action_path }}
 
@@ -108,13 +110,10 @@ runs:
           fi
         fi
 
-    - name: Figure out stuff for podman
-      if: ${{ inputs.container_engine == 'podman' }}
-      shell: bash
-      run: |
-        sudo systemctl status podman.service || true
-        podman info
-        sudo podman info
+        if [ "$CONTAINER_ENGINE" = "podman" ]; then
+          # See https://github.com/containers/podman-compose/issues/166
+          echo "PODMAN_USERNS=keep-id" >> $GITHUB_ENV
+        fi
 
     - name: Compute Docker Volume Cache Keys
       if: ${{ inputs.container_engine == 'docker' }}
