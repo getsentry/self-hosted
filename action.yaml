@@ -115,6 +115,16 @@ runs:
           echo "PODMAN_USERNS=keep-id" >> $GITHUB_ENV
         fi
 
+    - name: Check ulimit bounds
+      shell: bash
+      run: |
+        echo "Soft limit:"
+        ulimit -n
+        echo "Hard limit:"
+        ulimit -Hn
+        echo "System max:"
+        cat /proc/sys/fs/file-max
+
     - name: Compute Docker Volume Cache Keys
       if: ${{ inputs.container_engine == 'docker' }}
       id: cache_key
