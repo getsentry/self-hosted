@@ -21,17 +21,18 @@ if [[ "${SETUP_JS_SDK_ASSETS:-}" == "1" ]]; then
   # We want to remove everything before the first '{'.
   loader_registry=$(echo "$loader_registry" | sed '0,/{/s/[^{]*//')
 
-  #  Sentry backend provides SDK versions from v4.x up to v8.x.
+  #  Sentry backend provides SDK versions from v4.x up to v10.x.
   latest_js_v4=$(echo "$loader_registry" | $jq -r '.versions | reverse | map(select(.|any(.; startswith("4.")))) | .[0]')
   latest_js_v5=$(echo "$loader_registry" | $jq -r '.versions | reverse | map(select(.|any(.; startswith("5.")))) | .[0]')
   latest_js_v6=$(echo "$loader_registry" | $jq -r '.versions | reverse | map(select(.|any(.; startswith("6.")))) | .[0]')
   latest_js_v7=$(echo "$loader_registry" | $jq -r '.versions | reverse | map(select(.|any(.; startswith("7.")))) | .[0]')
   latest_js_v8=$(echo "$loader_registry" | $jq -r '.versions | reverse | map(select(.|any(.; startswith("8.")))) | .[0]')
   latest_js_v9=$(echo "$loader_registry" | $jq -r '.versions | reverse | map(select(.|any(.; startswith("9.")))) | .[0]')
+  latest_js_v10=$(echo "$loader_registry" | $jq -r '.versions | reverse | map(select(.|any(.; startswith("10.")))) | .[0]')
 
-  echo "Found JS SDKs: v${latest_js_v4}, v${latest_js_v5}, v${latest_js_v6}, v${latest_js_v7}, v${latest_js_v8}, v${latest_js_v9}"
+  echo "Found JS SDKs: v${latest_js_v4}, v${latest_js_v5}, v${latest_js_v6}, v${latest_js_v7}, v${latest_js_v8}, v${latest_js_v9}, v${latest_js_v10}"
 
-  versions="{$latest_js_v4,$latest_js_v5,$latest_js_v6,$latest_js_v7,$latest_js_v8,$latest_js_v9}"
+  versions="{$latest_js_v4,$latest_js_v5,$latest_js_v6,$latest_js_v7,$latest_js_v8,$latest_js_v9,$latest_js_v10}"
   variants="{bundle,bundle.tracing,bundle.tracing.replay,bundle.replay,bundle.tracing.replay.feedback,bundle.feedback}"
 
   # Download those versions & variants using curl

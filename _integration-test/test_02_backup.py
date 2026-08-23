@@ -2,6 +2,8 @@ import os
 from os.path import join
 import subprocess
 
+import pytest
+
 
 def test_sentry_admin(setup_backup_restore_env_variables):
     sentry_admin_sh = os.path.join(os.getcwd(), "sentry-admin.sh")
@@ -19,7 +21,7 @@ def test_sentry_admin(setup_backup_restore_env_variables):
     ).stdout
     assert "Usage: ./sentry-admin.sh permissions" in output
 
-
+@pytest.mark.skipif(os.environ.get("SKIP_BACKUP_RESTORE_TEST") == "true", reason="Skipping backup and restore tests as SKIP_BACKUP_RESTORE_TEST is set to true")
 def test_01_backup(setup_backup_restore_env_variables):
     # Docker was giving me permission issues when trying to create this file and write to it even after giving read + write access
     # to group and owner. Instead, try creating the empty file and then give everyone write access to the backup file
@@ -40,7 +42,7 @@ def test_01_backup(setup_backup_restore_env_variables):
     )
     assert os.path.getsize(file_path) > 0
 
-
+@pytest.mark.skipif(os.environ.get("SKIP_BACKUP_RESTORE_TEST") == "true", reason="Skipping backup and restore tests as SKIP_BACKUP_RESTORE_TEST is set to true")
 def test_02_import(setup_backup_restore_env_variables):
     # Bring postgres down and recreate the docker volume
     subprocess.run(["docker", "compose", "--ansi", "never", "down"], check=True)

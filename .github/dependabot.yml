@@ -1,13 +1,33 @@
 version: 2
 updates:
-  - package-ecosystem: docker
+  - package-ecosystem: docker-compose
     directory: "/"
     schedule:
       interval: daily
-    open-pull-requests-limit: 0 # only security updates
     reviewers:
       - "@getsentry/dev-infra"
       - "@getsentry/security"
+    cooldown:
+      default-days: 3
+    ignore:
+      - dependency-name: postgres
+        versions:
+          - ">=15"
+      - dependency-name: valkey/valkey
+        versions:
+          - ">=9"
+      - dependency-name: memcached
+        versions:
+          - ">=2"
+      - dependency-name: edoburu/pgbouncer
+        versions:
+          - ">=2"
+      - dependency-name: chrislusf/seaweedfs
+        versions:
+          - ">=5"
+      - dependency-name: confluentinc/cp-kafka
+        versions:
+          - ">=7.7"
 
   - package-ecosystem: "github-actions"
     directory: "/"

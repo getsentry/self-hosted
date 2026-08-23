@@ -4,6 +4,7 @@ import os
 import re
 import shutil
 import subprocess
+import sys
 import time
 from functools import lru_cache
 from typing import Callable
@@ -54,9 +55,22 @@ def get_sentry_dsn(client: httpx.Client) -> str:
     sentry_dsn = json.loads(response.text)[0]["dsn"]["public"]
     return sentry_dsn
 
+@lru_cache
+def get_organization_token(client: httpx.Client, csrf_token: str, name: str) -> str:
+    response = client.post(
+        f"{SENTRY_TEST_HOST}/api/0/organizations/sentry/org-auth-tokens/",
+        follow_redirects=True,
+        data={"name": name},
+        headers={
+          "Referer": f"{SENTRY_TEST_HOST}/settings/sentry/auth-tokens/new-token/",
+          "X-CSRFToken": csrf_token,
+        },
+    )
+    token = json.loads(response.text)["token"]
+    return token
 
-@pytest.fixture()
-def client_login():
+@pytest.fixture(scope="session")
+def authenticated_session():
     client = httpx.Client()
     response = client.get(SENTRY_TEST_HOST, follow_redirects=True)
     parser = BeautifulSoup(response.text, "html.parser")
@@ -73,8 +87,23 @@ def client_login():
         headers={"Referer": f"{SENTRY_TEST_HOST}/auth/login/sentry/"},
     )
     assert login_response.status_code == 200
-    yield (client, login_response)
+    parser = BeautifulSoup(login_response.text, "html.parser")
+    script_tag = parser.find(
+        "script", string=lambda x: x and "window.__initialData" in x
+    )
+    assert script_tag is not None
+    json_data = json.loads(script_tag.text.split("=", 1)[1].strip().rstrip(";"))
+    assert json_data["isAuthenticated"] is True
+    yield (httpx.Cookies(client.cookies), login_response)
+    client.close()
 
+
+@pytest.fixture()
+def client_login(authenticated_session):
+    cookies, login_response = authenticated_session
+    client = httpx.Client(cookies=httpx.Cookies(cookies))
+    yield (client, login_response)
+    client.close()
 
 def test_initial_redirect():
     initial_auth_redirect = httpx.get(SENTRY_TEST_HOST, follow_redirects=True)
@@ -87,6 +116,84 @@ def test_asset_internal_rewrite():
     response = httpx.get(f"{SENTRY_TEST_HOST}/_assets/entrypoints/app.js")
     assert response.status_code == 200
     assert response.headers["Content-Type"] == "text/javascript"
+
+
+def test_memcached_django_cache():
+    script = """
+from uuid import uuid4
+
+from django.core.cache import caches
+
+cache = caches["default"]
+assert cache.__class__.__module__ == "sentry.cache.backends.reconnectingmemcache"
+assert cache.__class__.__name__ == "ReconnectingMemcache"
+
+key = f"self-hosted:memcached-integration-test:{uuid4()}"
+value = {"message": "works", "payload": b"x" * 800_000}
+
+try:
+    cache.set(key, value, timeout=60)
+    assert cache.get(key) == value
+    cache.delete(key)
+    assert cache.get(key) is None
+finally:
+    cache.delete(key)
+"""
+
+    subprocess.run(
+        [
+            "docker",
+            "compose",
+            "--ansi",
+            "never",
+            "exec",
+            "-T",
+            "web",
+            "sentry",
+            "exec",
+        ],
+        input=script,
+        text=True,
+        check=True,
+        timeout=60,
+    )
+
+
+def test_valkey_sentry_cache():
+    script = """
+from uuid import uuid4
+
+from sentry.cache import default_cache
+
+key = f"self-hosted:valkey-integration-test:{uuid4()}"
+value = {"message": "works", "items": [1, 2, 3]}
+
+try:
+    default_cache.set(key, value, timeout=60)
+    assert default_cache.get(key) == value
+    default_cache.delete(key)
+    assert default_cache.get(key) is None
+finally:
+    default_cache.delete(key)
+"""
+
+    subprocess.run(
+        [
+            "docker",
+            "compose",
+            "--ansi",
+            "never",
+            "exec",
+            "-T",
+            "web",
+            "sentry",
+            "exec",
+        ],
+        input=script,
+        text=True,
+        check=True,
+        timeout=60,
+    )
 
 
 def test_login(client_login):
@@ -202,7 +309,11 @@ def test_custom_certificate_authorities():
         .add_extension(
             x509.NameConstraints([x509.DNSName("self.test")], None), critical=True
         )
-        .sign(private_key=ca_key, algorithm=hashes.SHA256(), backend=default_backend())
+        .add_extension(
+            x509.SubjectKeyIdentifier.from_public_key(ca_key.public_key()),
+            critical=False,
+        )
+        .sign(private_key=ca_key, algorithm=hashes.SHA256())
     )
 
     ca_key_path = f"{test_nginx_conf_path}/ca.key"
@@ -261,11 +372,23 @@ def test_custom_certificate_authorities():
         )
         .issuer_name(ca_cert.issuer)
         .serial_number(x509.random_serial_number())
-        .not_valid_before(datetime.datetime.utcnow())
-        .not_valid_after(datetime.datetime.utcnow() + datetime.timedelta(days=1))
+        .not_valid_before(datetime.datetime.now(datetime.timezone.utc))
+        .not_valid_after(
+            datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(days=1)
+        )
         .public_key(self_test_req.public_key())
         .add_extension(
             x509.SubjectAlternativeName([x509.DNSName("self.test")]), critical=False
+        )
+        .add_extension(
+            x509.SubjectKeyIdentifier.from_public_key(self_test_req.public_key()),
+            critical=False,
+        )
+        .add_extension(
+            x509.AuthorityKeyIdentifier.from_issuer_subject_key_identifier(
+                ca_cert.extensions.get_extension_for_class(x509.SubjectKeyIdentifier).value
+            ),
+            critical=False,
         )
         .sign(private_key=ca_key, algorithm=hashes.SHA256())
     )
@@ -304,11 +427,17 @@ def test_custom_certificate_authorities():
             )
         )
         .serial_number(x509.random_serial_number())
-        .not_valid_before(datetime.datetime.utcnow())
-        .not_valid_after(datetime.datetime.utcnow() + datetime.timedelta(days=1))
+        .not_valid_before(datetime.datetime.now(datetime.timezone.utc))
+        .not_valid_after(
+            datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(days=1)
+        )
         .public_key(fake_test_key.public_key())
         .add_extension(
             x509.SubjectAlternativeName([x509.DNSName("fake.test")]), critical=False
+        )
+        .add_extension(
+            x509.SubjectKeyIdentifier.from_public_key(fake_test_key.public_key()),
+            critical=False,
         )
         .sign(private_key=fake_test_key, algorithm=hashes.SHA256())
     )
@@ -407,6 +536,74 @@ def test_receive_transaction_events(client_login):
         lambda x: len(json.loads(x)["data"]) > 0,
     )
 
+@pytest.mark.skipif(os.environ.get("COMPOSE_PROFILES") != "feature-complete", reason="Only run if feature-complete")
+def test_receive_user_feedback_events(client_login):
+    client, _ = client_login
+    sentry_dsn = get_sentry_dsn(client)
+
+
+    # Execute `node --import instrument.js user-feedback.js` on the `nodejs` directory with the `SENTRY_DSN` env var set
+    env = os.environ.copy()
+    env["SENTRY_DSN"] = sentry_dsn
+    subprocess.run(
+        ["node", "--import", "./instrument.js", "./user-feedback.js"],
+        check=True,
+        shell=False,
+        env=env,
+        cwd="_integration-test/nodejs",
+        stdout=sys.stdout,
+        stderr=sys.stderr,
+        timeout=60,
+    )
+
+    poll_for_response(
+        f"{SENTRY_TEST_HOST}/api/0/organizations/sentry/issues/?query=issue.category%3Afeedback",
+        client,
+        lambda x: len(json.loads(x)) > 0,
+    )
+    poll_for_response(
+        f"{SENTRY_TEST_HOST}/api/0/organizations/sentry/events/?dataset=issuePlatform&field=message&field=title&field=timestamp&project=1&statsPeriod=1h",
+        client,
+        lambda x: len(json.loads(x)["data"]) > 0,
+    )
+
+@pytest.mark.skipif(os.environ.get("COMPOSE_PROFILES") != "feature-complete", reason="Only run if feature-complete")
+def test_receive_metrics_events(client_login):
+    client, _ = client_login
+    sentry_sdk.init(
+        dsn=get_sentry_dsn(client), profiles_sample_rate=1.0, traces_sample_rate=1.0
+    )
+
+    sentry_sdk.metrics.count(
+        "button_click",
+        5,
+        attributes={
+            "browser": "Firefox",
+            "app_version": "1.0.0"
+        },
+    )
+    sentry_sdk.metrics.distribution(
+        "page_load",
+        15.0,
+        unit="millisecond",
+        attributes={
+            "page": "/home"
+        },
+    )
+    sentry_sdk.metrics.gauge(
+        "page_load",
+        15.0,
+        unit="millisecond",
+        attributes={
+            "page": "/home"
+        },
+    )
+
+    poll_for_response(
+        f"{SENTRY_TEST_HOST}/api/0/organizations/sentry/events/?dataset=tracemetrics&field=metric.name&field=metric.type&field=count%28metric.name%29&field=max%28timestamp_precise%29&field=metric.unit&referrer=api.explore.metric-options&statsPeriod=1h",
+        client,
+        lambda x: len(json.loads(x)["data"]) > 0,
+    )
 
 @pytest.mark.skipif(os.environ.get("COMPOSE_PROFILES") != "feature-complete", reason="Only run if feature-complete")
 def test_receive_logs_events(client_login):
@@ -435,6 +632,31 @@ def test_receive_logs_events(client_login):
         f"{SENTRY_TEST_HOST}/api/0/organizations/sentry/events/?dataset=ourlogs&field=sentry.item_id&field=project.id&field=trace&field=severity_number&field=severity&field=timestamp&field=timestamp_precise&field=observed_timestamp&field=message&project=1&statsPeriod=1h",
         client,
         lambda x: len(json.loads(x)["data"]) > 0,
+    )
+
+@pytest.mark.skipif(os.environ.get("COMPOSE_PROFILES") != "feature-complete", reason="Only run if feature-complete")
+def test_upload_mobile_builds(client_login):
+    client, login_response = client_login
+    sentry_dsn = get_sentry_dsn(client)
+
+    organization_auth_token = get_organization_token(client, login_response.cookies["sc"], "preprod")
+    env = os.environ.copy()
+    env["SENTRY_DSN"] = sentry_dsn
+    subprocess.run(
+        ["sentry-cli", "--log-level", "DEBUG", "--url", SENTRY_TEST_HOST, "--auth-token", organization_auth_token, "build", "upload", "hn.aab", "--org", "sentry", "--project", "internal"],
+        check=True,
+        shell=False,
+        env=env,
+        cwd="_integration-test/emerge-tools",
+        stdout=sys.stdout,
+        stderr=sys.stderr,
+        timeout=60,
+    )
+
+    poll_for_response(
+        f"{SENTRY_TEST_HOST}/api/0/organizations/sentry/builds/?display=size&per_page=25&project=-1&query=%21size_state%3Anot_ran&statsPeriod=24h&tab=mobile-builds",
+        client,
+        lambda x: len(json.loads(x)) > 0,
     )
 
 def test_customizations():

@@ -10,10 +10,12 @@ runs:
   steps:
     - name: Get Compose
       shell: bash
+      env:
+        COMPOSE_VERSION: ${{ inputs.version }}
       run: |
         # Docker Compose v1 is installed here, remove it
         sudo rm -f "/usr/local/bin/docker-compose"
         sudo rm -f "/usr/local/lib/docker/cli-plugins/docker-compose"
         sudo mkdir -p "/usr/local/lib/docker/cli-plugins"
-        sudo curl -L https://github.com/docker/compose/releases/download/v${{ inputs.version }}/docker-compose-`uname -s`-`uname -m` -o "/usr/local/lib/docker/cli-plugins/docker-compose"
+        sudo curl -L https://github.com/docker/compose/releases/download/v"$COMPOSE_VERSION"/docker-compose-`uname -s`-`uname -m` -o "/usr/local/lib/docker/cli-plugins/docker-compose"
         sudo chmod +x "/usr/local/lib/docker/cli-plugins/docker-compose"

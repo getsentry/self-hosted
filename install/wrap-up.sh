@@ -3,8 +3,18 @@ if [[ "$MINIMIZE_DOWNTIME" ]]; then
 
   # Start the whole setup, except nginx and relay.
   start_service_and_wait_ready --remove-orphans $($dc config --services | grep -v -E '^(nginx|relay)$')
-  $dc restart relay
-  $dc exec -T nginx nginx -s reload
+
+  if [ -n "$($dc ps -q relay 2>/dev/null)" ]; then
+    $dc restart relay
+  else
+    echo "Relay container not found, skipping restart."
+  fi
+
+  if [ -n "$($dc ps -q nginx 2>/dev/null)" ]; then
+    $dc exec -T nginx nginx -s reload || true
+  else
+    echo "Nginx container not found, skipping reload."
+  fi
 
   $CONTAINER_ENGINE run --rm --network="${COMPOSE_PROJECT_NAME}_default" alpine ash \
     -c 'while [[ "$(wget -T 1 -q -O- http://web:9000/_health/)" != "ok" ]]; do sleep 0.5; done'

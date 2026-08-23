@@ -24,7 +24,9 @@ else
   #    1.x and 2.2.3+ (funny story about that ... ;). Note that the long opt
   #    --no-tty doesn't exist in Docker Compose 1.
 
-  $dc pull relay
+  # `docker compose pull relay` can be skipped when service-level pull_policy is
+  # set to `never`, so pull the configured relay image directly.
+  $CONTAINER_ENGINE pull "${RELAY_IMAGE}" || true
   creds="$dcr --no-deps -T relay credentials"
   $creds generate --stdout >"$RELAY_CREDENTIALS_JSON".tmp
   mv "$RELAY_CREDENTIALS_JSON".tmp "$RELAY_CREDENTIALS_JSON"
