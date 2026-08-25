@@ -552,13 +552,6 @@ services:
       <<: *file_healthcheck_defaults
     profiles:
       - feature-complete
-  process-segments:
-    <<: *sentry_defaults
-    command: run consumer process-segments --consumer-group process-segments --auto-offset-reset=earliest --no-strict-offset-reset --healthcheck-file-path /tmp/health.txt --max-poll-interval-ms ${SENTRY_KAFKA_MAX_POLL_INTERVAL_MS:-300000}
-    healthcheck:
-      <<: *file_healthcheck_defaults
-    profiles:
-      - feature-complete
   monitors-clock-tick:
     <<: *sentry_defaults
     command: run consumer monitors-clock-tick --consumer-group monitors-clock-tick --auto-offset-reset=earliest --no-strict-offset-reset --healthcheck-file-path /tmp/health.txt --max-poll-interval-ms ${SENTRY_KAFKA_MAX_POLL_INTERVAL_MS:-300000}
