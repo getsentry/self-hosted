@@ -48,7 +48,7 @@ compare_calver() {
 
   if [[ -z "$v1" ]] || [[ -z "$v2" ]]; then
     echo -e "ERROR: Invalid CalVer format" >&2
-    exit 1
+    return 2
   fi
 
   # Remove leading 'v' if present
@@ -61,7 +61,7 @@ compare_calver() {
 
   if [[ -z "$parsed1" ]] || [[ -z "$parsed2" ]]; then
     echo -e "ERROR: Invalid CalVer format" >&2
-    exit 1
+    return 2
   fi
 
   # Compare major.minor.patch
@@ -134,7 +134,7 @@ if [[ -z "$new_version" ]]; then
   echo "to perform a hard stop check. Assuming you know what you're doing. Good luck."
   echo "--------------------------------------------------------------------------------"
   echo "${_endgroup}"
-  exit 0 # Should not exit the entire `install` process.
+  (exit 0) # Should not exit the entire `install` process.
 fi
 
 # If the `new_version` is nightly, we emit a different warning.
@@ -146,7 +146,7 @@ if [[ "$new_version" == "nightly" ]]; then
   echo "Good luck."
   echo "--------------------------------------------------------------------------------"
   echo "${_endgroup}"
-  exit 0
+  (exit 0)
 fi
 
 # Acquire the current version. Read the file.
@@ -165,10 +165,14 @@ if [[ -n "$current_version" ]]; then
       # equal, this is correct, they're visiting a hard stop
       _write_latest_version "$new_version"
       echo "${_endgroup}"
-      exit 0
+      (exit 0)
     elif [[ "$compare_result" == 1 ]]; then
       # the current version is greater than the current hard stop loop, we continue
       continue
+    elif [[ "$compare_result" == 2 ]]; then
+      # invalid version, we exit
+      echo -e "ERROR: Invalid version in $latest_version_file"
+      exit 1
     fi
 
     # the current version is less than the current hard stop loop
@@ -187,7 +191,7 @@ if [[ -n "$current_version" ]]; then
     if [[ "$confirmation" == "y" ]]; then
       _write_latest_version "$new_version"
       echo "${_endgroup}"
-      exit 0
+      (exit 0)
     else
       echo "Canceled. 😅"
       exit 1
