@@ -519,6 +519,16 @@ CSP_REPORT_ONLY = True
 # if you're using it directly like a CDN instead of using the loader script.
 JS_SDK_LOADER_DEFAULT_SDK_URL = "https://browser.sentry-cdn.com/%s/bundle%s.min.js"
 
+#########
+# Spans #
+#########
+
+# Segments are processed by a taskworker task rather than the dedicated
+# process-segments Kafka consumer, so there is no such consumer in
+# docker-compose.yml. This is set explicitly (rather than relying on the default
+# in sentry) because self-hosted and sentry are released on different cadences.
+SENTRY_OPTIONS["spans.buffer.process-segments-task-rollout-rate"] = 1.0
+
 #####################
 # Insights Settings #
 #####################
