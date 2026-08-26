@@ -103,7 +103,7 @@ fi
 
 if [[ -z "$new_version" ]]; then
   # Check whether `git` exists as a command, and `.git` directory exists
-  if [[ -n "$(command -v git)" ]] && [[ -d "../.git" ]]; then
+  if [[ -n "$(command -v git)" ]] && [[ -d "../.git" || -d "./.git" ]]; then
     # Get the latest tag from the repository
     new_version=$(git describe --tags --abbrev=0)
   fi
@@ -118,9 +118,14 @@ if [[ -z "$new_version" ]]; then
   echo "--------------------------------------------------------------------------------"
 fi
 
-# If the `new_version` is nightly, we emit a different warning.
-# This is for fun.
-if [[ "$new_version" == "nightly" ]]; then
+# If the `new_version` is empty, we cannot perform any hard stop check.
+# This means the version detection failed across all methods. We already
+# warned the user above, so we skip the check and continue with the installation.
+if [[ -z "$new_version" ]]; then
+  echo "Skipping hard stop check: unable to determine the current version."
+elif [[ "$new_version" == "nightly" ]]; then
+  # If the `new_version` is nightly, we emit a different warning.
+  # This is for fun.
   echo "--------------------------------------------------------------------------------"
   echo "WARNING: Hello, dear brave traveler. You are installing the nightly version."
   echo "The hard stop check is skipped for this version. We wish you a safe journey."
@@ -141,11 +146,13 @@ else
   if [[ -n "$current_version" ]]; then
     # We iterate over the list of hard stops, and check whether the current
     # version is below any of them.
+    local _wrote_version=0
     for hard_stop in "${hard_stops[@]}"; do
       compare_result=$(compare_calver "$current_version" "$hard_stop")
       if [[ "$compare_result" == 0 ]]; then
         # equal, this is correct, they're visiting a hard stop
         _write_latest_version "$new_version"
+        _wrote_version=1
         break
       elif [[ "$compare_result" == 1 ]]; then
         # the current version is greater than the current hard stop loop, we continue
@@ -166,6 +173,7 @@ else
 
         if [[ "$confirmation" == "y" ]]; then
           _write_latest_version "$new_version"
+          _wrote_version=1
           break
         else
           echo "Canceled. 😅"
@@ -182,6 +190,11 @@ else
         exit 2
       fi
     done
+    # If the loop completed without writing (current_version > all hard stops),
+    # update the tracking file so the version stays current.
+    if [[ "$_wrote_version" -eq 0 ]]; then
+      _write_latest_version "$new_version"
+    fi
   else
     # If the `current_version` is empty (or the file does not exists), we assume
     # this is a new installation.
