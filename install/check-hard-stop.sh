@@ -91,7 +91,7 @@ compare_calver() {
 
 # Acquire the new version. This is done by reading `.env` / `.env.custom`
 # for Docker image tags; or by reading the Git tag for the current commit
-declare new_version
+declare new_version=""
 # if `.env.custom` exists, prioritize it over `.env`
 if [[ -f ".env.custom" ]]; then
   new_version=$(grep -E '^SENTRY_IMAGE=' .env.custom | sed 's/^.*=//' | cut -d: -f2 || true)
@@ -132,7 +132,7 @@ else
   # already informed the user.
 
   # Acquire the current version. Read the file.
-  declare current_version
+  declare current_version=""
   if [[ -f "$latest_version_file" ]]; then
     current_version=$(cat "$latest_version_file")
   fi
