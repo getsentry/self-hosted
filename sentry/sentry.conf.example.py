@@ -366,7 +366,6 @@ SENTRY_FEATURES.update(
             "organizations:discover",
             "organizations:global-views",
             "organizations:issue-views",
-            "organizations:incidents",
             "organizations:integrations-issue-basic",
             "organizations:integrations-issue-sync",
             "organizations:invite-members",
