@@ -601,11 +601,19 @@ services:
     ports:
       - "$SENTRY_BIND:80/tcp"
     image: "nginx:1.31.4-alpine"
+    environment:
+      # nginx.conf needs the container engine's DNS address, which differs per engine.
+      # The image reads it from /etc/resolv.conf into NGINX_LOCAL_RESOLVERS and substitutes
+      # it into templates, so nginx.conf is mounted as one and rendered over the image default.
+      # The filter keeps envsubst away from the nginx runtime variables in the config.
+      NGINX_ENTRYPOINT_LOCAL_RESOLVERS: 1
+      NGINX_ENVSUBST_OUTPUT_DIR: /etc/nginx
+      NGINX_ENVSUBST_FILTER: "^NGINX_LOCAL_RESOLVERS$$"
     volumes:
       - type: bind
         read_only: true
         source: ./nginx.conf
-        target: /etc/nginx/nginx.conf
+        target: /etc/nginx/templates/nginx.conf.template
       - sentry-nginx-cache:/var/cache/nginx
       - sentry-nginx-www:/var/www
     healthcheck:
