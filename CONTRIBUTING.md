@@ -84,6 +84,12 @@ Expectations:
 
 If you open an issue or PR, include enough context that someone unfamiliar with your machine can reproduce it: host OS, Docker and Compose versions, whether you used `.env.custom`, relevant `COMPOSE_PROFILES`, and the failing command or log excerpt.
 
+### AI-assisted pull requests
+
+**You must understand your pull request.** If you cannot explain what your changes do and how they interact with the rest of the system, your PR may be closed.
+
+Using AI to open pull requests is fine. Submitting AI-generated slop without understanding it is not.
+
 ## Cutting Monthly Release
 
 This section is not relevant to the general public; it provides an overview of what the release pipeline looks like. If you're an employee, refer to the [Notion doc](https://www.notion.so/sentry/Cutting-Monthly-Self-Hosted-Releases-fe5365a5f20d4ec9a530932b5931a2cf).
