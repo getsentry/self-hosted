@@ -34,7 +34,7 @@ Any other contributions beyond those listed above are welcome!
 
 To get started, install these tools:
 1. Docker Engine and Docker Compose (via Docker plugin system). Refer to [Docker Engine installation documentation](https://docs.docker.com/engine/install/). It's recommended to install via the distribution's package manager (`apt` for Debian/Ubuntu, and `dnf` or `yum` for CentOS/Fedora/RHEL).
-2. Python v3.10 or higher.
+2. Python v3.11 or higher.
 3. the `uv` package manager. Refer to [their installation documentation](https://docs.astral.sh/uv/getting-started/installation/).
 4. `prek` for Git pre-commit hooks. Refer to [their installation documentation](https://prek.j178.dev/installation/).
 
