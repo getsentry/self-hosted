@@ -6,6 +6,9 @@ nginx keeps using the old one and answers every request with 502.
 Ingest breaks silently, because `relay` serves `/api/store/`, `/api/<id>/` and `/api/0/relays/`.
 This patch makes nginx re-resolve both names.
 
+`restart: true` on nginx's `depends_on` already restarts nginx after a Compose operation recreates `web` or `relay`.
+Apply this patch only if you also need to survive address changes that no Compose operation causes, such as a crash restart or a Docker daemon restart.
+
 ## Apply
 
 Run these from the repository root, keeping the order and the `&&`.
@@ -37,5 +40,7 @@ A rejected hunk stops the sequence before anything depends on it.
 
 ## Background
 
-- https://github.com/getsentry/self-hosted/issues/3894
-- https://github.com/getsentry/self-hosted/pull/4492
+- [Report of nginx routing to a stale relay address](https://github.com/getsentry/self-hosted/issues/3894)
+- [The `depends_on` policy that covers Compose operations](https://github.com/getsentry/self-hosted/pull/3914)
+- [First attempt at re-resolution, with the discussion that led to this patch](https://github.com/getsentry/self-hosted/pull/4295)
+- [Second attempt, which changed the default configuration](https://github.com/getsentry/self-hosted/pull/4492)
