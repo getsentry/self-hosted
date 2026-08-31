@@ -1,15 +1,14 @@
 # resolve-upstreams
 
 nginx caches the addresses of `relay` and `web` until it restarts.
-A recreated container can come back on a different address.
-Every request then fails with 502.
-Ingest fails silently, because `relay` serves `/api/store/`, `/api/<id>/` and `/api/0/relays/`.
-This patch makes nginx re-resolve both names instead.
+A recreated container can return on a different address.
+nginx keeps using the old one and answers every request with 502.
+Ingest breaks silently, because `relay` serves `/api/store/`, `/api/<id>/` and `/api/0/relays/`.
+This patch makes nginx re-resolve both names.
 
 ## Apply
 
-Run from the repository root.
-Keep the order and the `&&`.
+Run these from the repository root, keeping the order and the `&&`.
 Then run `./install.sh`.
 
 ```bash
@@ -22,19 +21,19 @@ A rejected hunk stops the sequence before anything depends on it.
 
 ## Notes
 
-- `valid=10s` is the recovery time.
+- `valid=10s` sets the recovery time.
   It costs 6 DNS queries per minute per upstream.
-  Worker count and traffic do not change that.
+  Worker count and traffic do not affect that.
 - An unresolvable upstream no longer stops nginx from starting.
-  It serves 502s instead.
-  The healthcheck does not catch this.
-  It requests `/`, and `curl` without `-f` exits 0 on a 502.
-- nginx will not start if its `/etc/resolv.conf` has no `nameserver`.
-  An unpatched install is also broken in that case, with a different message.
+  nginx serves 502s instead.
+  The healthcheck misses this, because it requests `/` and `curl` without `-f` exits 0 on a 502.
+- nginx refuses to start if its `/etc/resolv.conf` lists no `nameserver`.
+  An unpatched install also breaks in that case, with a different message.
 - Do not bind-mount over `/etc/nginx/conf.d`.
-  The resolver snippet is rendered there.
-- Verified on Docker.
-  The Podman path is engine-agnostic by construction, but untested.
+  The entrypoint renders the resolver snippet there.
+- Tested on Docker.
+  The patch reads the resolver address from the container, so it should suit Podman, but nobody has
+  tested that.
 
 ## Background
 
