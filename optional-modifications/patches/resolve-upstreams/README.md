@@ -16,13 +16,16 @@ address is `127.0.0.11` on Docker but the network gateway on Podman, so it is no
 From the repository root, then run `./install.sh`:
 
 ```bash
-patch -p0 < optional-modifications/patches/resolve-upstreams/nginx-resolver.conf.template.patch
+patch -p0 < optional-modifications/patches/resolve-upstreams/docker-compose.yml.patch && \
+patch -p0 < optional-modifications/patches/resolve-upstreams/nginx-resolver.conf.template.patch && \
 patch -p0 < optional-modifications/patches/resolve-upstreams/nginx.conf.patch
-patch -p0 < optional-modifications/patches/resolve-upstreams/docker-compose.yml.patch
 ```
 
-All three belong together: `nginx.conf` will not start without the rendered snippet, and the snippet
-is only rendered with the `docker-compose.yml` changes in place.
+Keep the order and the `&&`. All three belong together — `nginx.conf` will not start without the
+rendered snippet, and the snippet is only rendered with the `docker-compose.yml` changes in place —
+so `nginx.conf` is patched last, after the parts it depends on have succeeded. If one of these files
+has moved upstream and its patch no longer applies, stopping there leaves a working install rather
+than an `nginx.conf` that requires a snippet nothing renders.
 
 ## Tradeoffs
 
