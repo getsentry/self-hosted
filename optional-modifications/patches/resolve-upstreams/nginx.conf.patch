@@ -1,11 +1,10 @@
---- nginx.conf	2026-08-31 09:58:28.827732343 +0200
-+++ nginx.resolve-upstreams.conf	2026-08-31 09:59:13.197674745 +0200
-@@ -65,13 +65,18 @@
+--- nginx.conf
++++ nginx.resolve-upstreams.conf
+@@ -65,13 +65,17 @@
  	proxy_read_timeout 90s;
  	proxy_send_timeout 5s;
  
-+	# See optional-modifications/patches/resolve-upstreams/README.md
-+	include /etc/nginx/conf.d/nginx-resolver.conf;
++	include /etc/nginx/conf.d/nginx-resolver.conf; # see optional-modifications/patches/resolve-upstreams
 +
  	upstream relay {
 -		server relay:3000;
