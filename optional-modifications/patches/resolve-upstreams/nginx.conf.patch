@@ -1,0 +1,22 @@
+--- nginx.conf
++++ nginx.resolve-upstreams.conf
+@@ -65,13 +65,17 @@
+ 	proxy_read_timeout 90s;
+ 	proxy_send_timeout 5s;
+ 
++	include /etc/nginx/conf.d/nginx-resolver.conf; # see optional-modifications/patches/resolve-upstreams
++
+ 	upstream relay {
+-		server relay:3000;
++		zone relay 512k;
++		server relay:3000 resolve;
+ 		keepalive 2;
+ 	}
+ 
+ 	upstream sentry {
+-		server web:9000;
++		zone sentry 512k;
++		server web:9000 resolve;
+ 		keepalive 2;
+ 	}
+ 
