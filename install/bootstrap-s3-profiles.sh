@@ -21,55 +21,57 @@ if [[ "$COMPOSE_PROFILES" == "feature-complete" ]]; then
 
   if ! echo "$bucket_list" | grep -q "s3://profiles"; then
     apply_config_changes_profiles=0
-    # Only touch if no existing profiles config is found
-    if ! grep -q "filestore.profiles-backend" $SENTRY_CONFIG_YML; then
-      if [[ -z "${APPLY_AUTOMATIC_CONFIG_UPDATES:-}" ]]; then
-        echo
-        echo "We are migrating the Profiles data directory from the 'sentry-vroom' volume to SeaweedFS."
-        echo "This migration will ensure profiles ingestion works correctly with the new 'vroomrs'"
-        echo "and allows both 'sentry' and 'vroom' to transition smoothly."
-        echo "To complete this, your sentry/config.yml file needs to be modified."
-        echo "Would you like us to perform this modification automatically?"
-        echo
+    # Ensure `$SENTRY_CONFIG_YML` file exists
+    if [[ -f "$SENTRY_CONFIG_YML" ]]; then
+      # Only touch if no existing profiles config is found
+      if ! grep -q "filestore.profiles-backend" $SENTRY_CONFIG_YML; then
+        if [[ -z "${APPLY_AUTOMATIC_CONFIG_UPDATES:-}" ]]; then
+          echo
+          echo "We are migrating the Profiles data directory from the 'sentry-vroom' volume to SeaweedFS."
+          echo "This migration will ensure profiles ingestion works correctly with the new 'vroomrs'"
+          echo "and allows both 'sentry' and 'vroom' to transition smoothly."
+          echo "To complete this, your sentry/config.yml file needs to be modified."
+          echo "Would you like us to perform this modification automatically?"
+          echo
 
-        yn=""
-        until [ ! -z "$yn" ]; do
-          read -p "y or n? " yn
-          case $yn in
-          y | yes | 1)
-            export apply_config_changes_profiles=1
-            echo
-            echo -n "Thank you."
-            ;;
-          n | no | 0)
-            export apply_config_changes_profiles=0
-            echo
-            echo -n "Alright, you will need to update your sentry/config.yml file manually before running 'docker compose up'."
-            ;;
-          *) yn="" ;;
-          esac
-        done
+          yn=""
+          until [ ! -z "$yn" ]; do
+            read -p "y or n? " yn
+            case $yn in
+            y | yes | 1)
+              export apply_config_changes_profiles=1
+              echo
+              echo -n "Thank you."
+              ;;
+            n | no | 0)
+              export apply_config_changes_profiles=0
+              echo
+              echo -n "Alright, you will need to update your sentry/config.yml file manually before running 'docker compose up'."
+              ;;
+            *) yn="" ;;
+            esac
+          done
 
-        echo
-        echo "To avoid this prompt in the future, use one of these flags:"
-        echo
-        echo "  --apply-automatic-config-updates"
-        echo "  --no-apply-automatic-config-updates"
-        echo
-        echo "or set the APPLY_AUTOMATIC_CONFIG_UPDATES environment variable:"
-        echo
-        echo "  APPLY_AUTOMATIC_CONFIG_UPDATES=1 to apply automatic updates"
-        echo "  APPLY_AUTOMATIC_CONFIG_UPDATES=0 to not apply automatic updates"
-        echo
-        sleep 5
-      fi
+          echo
+          echo "To avoid this prompt in the future, use one of these flags:"
+          echo
+          echo "  --apply-automatic-config-updates"
+          echo "  --no-apply-automatic-config-updates"
+          echo
+          echo "or set the APPLY_AUTOMATIC_CONFIG_UPDATES environment variable:"
+          echo
+          echo "  APPLY_AUTOMATIC_CONFIG_UPDATES=1 to apply automatic updates"
+          echo "  APPLY_AUTOMATIC_CONFIG_UPDATES=0 to not apply automatic updates"
+          echo
+          sleep 5
+        fi
 
-      if [[ "$APPLY_AUTOMATIC_CONFIG_UPDATES" == 1 || "$apply_config_changes_profiles" == 1 ]]; then
-        profiles_config=$(sed -n '/filestore.profiles-backend/,/s3v4"/{p}' sentry/config.example.yml)
-        echo "$profiles_config" >>$SENTRY_CONFIG_YML
+        if [[ "$APPLY_AUTOMATIC_CONFIG_UPDATES" == 1 || "$apply_config_changes_profiles" == 1 ]]; then
+          profiles_config=$(sed -n '/filestore.profiles-backend/,/s3v4"/{p}' sentry/config.example.yml)
+          echo "$profiles_config" >>$SENTRY_CONFIG_YML
+        fi
       fi
     fi
-
     $s3cmd --access_key=sentry --secret_key=sentry --no-ssl --region=us-east-1 --host=localhost:8333 --host-bucket='localhost:8333/%(bucket)' mb s3://profiles
 
     # Check if there are files in the sentry-vroom volume
@@ -109,10 +111,27 @@ EOF
     )
 
     $dc exec seaweedfs sh -c "printf '%s' '$lifecycle_policy' > /tmp/profiles-lifecycle-policy.xml"
-    $s3cmd --access_key=sentry --secret_key=sentry --no-ssl --region=us-east-1 --host=localhost:8333 --host-bucket='localhost:8333/%(bucket)' setlifecycle /tmp/profiles-lifecycle-policy.xml s3://profiles
+    setlifecycle_cmd="$s3cmd --access_key=sentry --secret_key=sentry --no-ssl --region=us-east-1 --host=localhost:8333 --host-bucket='localhost:8333/%(bucket)' setlifecycle /tmp/profiles-lifecycle-policy.xml s3://profiles"
+    if ! timeout 60s sh -c "$setlifecycle_cmd"; then
+      echo
+      echo
+      echo "====== WARNING ======"
+      echo
+      echo "Applying the lifecycle policy for the 'profiles' bucket took too long or failed."
+      echo "This policy is important to ensure that old profiles are automatically deleted after $SENTRY_EVENT_RETENTION_DAYS days, which helps manage storage usage."
+      echo "Please run this command manually as soon as possible to set the lifecycle policy for the 'profiles' bucket:"
+      echo
+      echo "  $dc up --wait seaweedfs"
+      echo "  $dc exec seaweedfs apk add --no-cache s3cmd"
+      echo "  $dc exec -T seaweedfs sh -c 'cat > /tmp/profiles-lifecycle-policy.xml' <<'EOF'"
+      echo "$lifecycle_policy"
+      echo "EOF"
+      echo "  $setlifecycle_cmd"
+      echo
+      sleep 5
 
-    echo "Making sure the bucket lifecycle policy is all set up correctly..."
-    $s3cmd --access_key=sentry --secret_key=sentry --no-ssl --region=us-east-1 --host=localhost:8333 --host-bucket='localhost:8333/%(bucket)' getlifecycle s3://profiles
+    fi
+    timeout 30s $s3cmd --access_key=sentry --secret_key=sentry --no-ssl --region=us-east-1 --host=localhost:8333 --host-bucket='localhost:8333/%(bucket)' getlifecycle s3://profiles >/dev/null 2>&1 || true
   fi
   echo "${_endgroup}"
 fi
