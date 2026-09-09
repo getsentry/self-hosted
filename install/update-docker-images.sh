@@ -24,4 +24,8 @@ $CONTAINER_ENGINE pull ${VROOM_IMAGE} || true
 $CONTAINER_ENGINE pull ${UPTIME_CHECKER_IMAGE} || true
 $CONTAINER_ENGINE pull ${LAUNCHPAD_IMAGE} || true
 
+if [[ "$COMPOSE_PROFILES" == *"chartcuterie"* ]]; then
+  $CONTAINER_ENGINE pull ${CHARTCUTERIE_IMAGE} || true
+fi
+
 echo "${_endgroup}"
