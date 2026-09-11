@@ -38,7 +38,22 @@ if [[ -n "$($CONTAINER_ENGINE volume ls -q --filter name=sentry-postgres)" && "$
     $dc exec postgres psql -qAt -U postgres -d ${db} -c "reindex database ${db};"
   done
 
+  $dc exec postgres sh -c 'touch "$PGDATA/.sentry-reindexed-trixie"'
   $dc stop postgres
+else
+  # Reindex existing PostgreSQL 14 data once for the glibc 2.36 (Bookworm) -> 2.41 (Trixie) change.
+  needs_reindex=$($dcr --no-deps -T --entrypoint sh postgres -c '
+    if [ -f "$PGDATA/PG_VERSION" ] && [ ! -f "$PGDATA/.sentry-reindexed-trixie" ]; then
+      echo yes
+    fi
+  ')
+
+  start_service_and_wait_ready postgres
+  if [[ "$needs_reindex" == "yes" ]]; then
+    echo "Re-indexing due to glibc change, this may take a while..."
+    $dc exec postgres psql -U postgres -v ON_ERROR_STOP=1 -c "REINDEX DATABASE postgres;"
+  fi
+  $dc exec postgres sh -c 'touch "$PGDATA/.sentry-reindexed-trixie"'
 fi
 
 echo "${_endgroup}"
