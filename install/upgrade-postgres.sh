@@ -38,7 +38,6 @@ if [[ -n "$($CONTAINER_ENGINE volume ls -q --filter name=sentry-postgres)" && "$
     $dc exec postgres psql -qAt -U postgres -d ${db} -c "reindex database ${db};"
   done
 
-  $dc exec postgres sh -c 'touch "$PGDATA/.sentry-reindexed-trixie"'
   $dc stop postgres
 else
   # Reindex existing PostgreSQL 14 data once for the glibc 2.36 (Bookworm) -> 2.41 (Trixie) change.
