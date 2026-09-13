@@ -20,7 +20,7 @@ echo "${_group}Checking for hard stop ... "
 latest_version_file=${HARD_STOP_FILE:-".sentry-hard-stop"}
 # This should be a bash array string, and should be equivalent with the list
 # on https://develop.sentry.dev/self-hosted/releases/#hard-stops
-hard_stops=("9.1.2" "21.5.0" "21.6.3" "23.6.2" "23.11.0" "24.8.0" "25.5.1" "26.5.0" "26.7.0")
+mapfile -t hard_stops < <(cat hard-stop.json | $jq -r '.hard_stops[]')
 
 _write_latest_version() {
   echo "$1" >"$latest_version_file"
