@@ -18,7 +18,7 @@ This repository is Sentry's self-hosted packaging. It bundles upstream Sentry im
 
 ## Local Setup and Safety
 
-The tools below are needed to run installs and tests, but are not hard requirements for every pull request. Do NOT install anything without the user's explicit agreement, even if you are currently within a YOLO session.
+The tools below are needed to run installs and tests, but are not hard requirements for every pull request.
 
 - **Docker Engine + Docker Compose** (via the Docker plugin system). Install via your distribution's package manager (`apt` for Debian/Ubuntu, `dnf`/`yum` for CentOS/Fedora/RHEL).
 - **Python >=3.11**
