@@ -26,6 +26,20 @@ _write_latest_version() {
   echo "$1" >"$latest_version_file"
 }
 
+_show_warning() {
+  # this is for fun, yet also to seriously warn people about something serious
+  # only show this if `ENABLE_WARNING_BIG_ENOUGH` is set to `true` or `1` or `yes`
+  if [[ "${ENABLE_WARNING_BIG_ENOUGH:-}" == "true" || "${ENABLE_WARNING_BIG_ENOUGH:-}" == "1" || "${ENABLE_WARNING_BIG_ENOUGH:-}" == "yes" ]]; then
+    echo "░██       ░██    ░███    ░█████████  ░███    ░██ ░██████░███    ░██   ░██████  "
+    echo "░██       ░██   ░██░██   ░██     ░██ ░████   ░██   ░██  ░████   ░██  ░██   ░██ "
+    echo "░██  ░██  ░██  ░██  ░██  ░██     ░██ ░██░██  ░██   ░██  ░██░██  ░██ ░██        "
+    echo "░██ ░████ ░██ ░█████████ ░█████████  ░██ ░██ ░██   ░██  ░██ ░██ ░██ ░██  █████ "
+    echo "░██░██ ░██░██ ░██    ░██ ░██   ░██   ░██  ░██░██   ░██  ░██  ░██░██ ░██     ██ "
+    echo "░████   ░████ ░██    ░██ ░██    ░██  ░██   ░████   ░██  ░██   ░████  ░██  ░███ "
+    echo "░███     ░███ ░██    ░██ ░██     ░██ ░██    ░███ ░██████░██    ░███   ░█████░█ "
+  fi
+}
+
 # Helper function to parse version components
 # BASH_REMATCH requires Bash 3.0+
 _parse_version_components() {
@@ -113,6 +127,7 @@ fi
 # they're on their own
 if [[ -z "$new_version" ]]; then
   echo "--------------------------------------------------------------------------------"
+  _show_warning
   echo "WARNING: Could not determine the current version of the self-hosted Sentry"
   echo "to perform a hard stop check. Assuming you know what you're doing. Good luck."
   echo "--------------------------------------------------------------------------------"
@@ -127,6 +142,7 @@ elif [[ "$new_version" == "nightly" ]]; then
   # If the `new_version` is nightly, we emit a different warning.
   # This is for fun.
   echo "--------------------------------------------------------------------------------"
+  _show_warning
   echo "WARNING: Hello, dear brave traveler. You are installing the nightly version."
   echo "The hard stop check is skipped for this version. We wish you a safe journey."
   echo "Good luck."
@@ -161,7 +177,7 @@ else
         # the current version is less than the current hard stop loop
         # we alert the user and provide a confirmation
         echo "--------------------------------------------------------------------------------"
-        echo
+        _show_warning
         echo "WARNING: Your new version ($new_version) will skip a required hard stop of $hard_stop."
         echo "It is recommended to stop the current installation, and go through the hard stop first."
         echo "Otherwise, you may encounter unexpected behaviors, such as migration failures, or data loss."
