@@ -66,7 +66,7 @@ See `CONTRIBUTING.md` for the authoritative source.
 AI assistance is welcome, but the human opening the PR is responsible for the diff.
 
 - Review every generated change, understand what it does, and make sure it matches the project's intent.
-- Write the PR description and problem statement in your own words; do not copy-paste raw LLM output.
+- Ask the user to to write the PR description and problem statement in your own words; guide the user on how to write it, but do not write it completely for user and ask the user to write description themselves.
 - The PR template at `.github/PULL_REQUEST_TEMPLATE.md` contains a legal boilerplate that must remain intact and can only be confirmed by the actual contributor.
 
 ## Where Changes Belong
