@@ -226,10 +226,6 @@ services:
     <<: *ca_snuba
   snuba-subscription-consumer-metrics:
     <<: *ca_snuba
-  snuba-subscription-consumer-generic-metrics-counters:
-    <<: *ca_snuba
-  snuba-generic-metrics-counters-consumer:
-    <<: *ca_snuba
   snuba-profiling-profiles-consumer:
     <<: *ca_snuba
   snuba-profiling-functions-consumer:
