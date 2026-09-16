@@ -1,5 +1,40 @@
 # Changelog
 
+## 26.9.0
+
+### New Features ✨
+
+- Remove organizations:incidents flag by @RudraPatel2003 in [#4487](https://github.com/getsentry/self-hosted/pull/4487)
+- Bump clickhouse to 25.8 by @aldy505 in [#4483](https://github.com/getsentry/self-hosted/pull/4483)
+
+### Bug Fixes 🐛
+
+- (install) Resolve geoip database paths relative to the repo, not cwd by @aguspatur22 in [#4510](https://github.com/getsentry/self-hosted/pull/4510)
+- Delete leftover kafka consumer group by @aldy505 in [#4482](https://github.com/getsentry/self-hosted/pull/4482)
+
+### Documentation 📚
+
+- Fix python version in CONTRIBUTING.md by @aminvakil in [#4496](https://github.com/getsentry/self-hosted/pull/4496)
+- Clarify policy on AI-assisted pull requests by @aminvakil in [#4495](https://github.com/getsentry/self-hosted/pull/4495)
+
+### Internal Changes 🔧
+
+#### Deps
+
+- Use trixie version of postgres by @aminvakil in [#4504](https://github.com/getsentry/self-hosted/pull/4504)
+- Bump valkey/valkey from 8.1.9-alpine to 8.1.10-alpine by @dependabot in [#4499](https://github.com/getsentry/self-hosted/pull/4499)
+- Bump nginx from 1.31.4-alpine to 1.31.5-alpine by @dependabot in [#4500](https://github.com/getsentry/self-hosted/pull/4500)
+- Bump nginx from 1.31.3-alpine to 1.31.4-alpine by @dependabot in [#4486](https://github.com/getsentry/self-hosted/pull/4486)
+- Bump astral-sh/setup-uv from 9.0.0 to 10.0.1 by @dependabot in [#4476](https://github.com/getsentry/self-hosted/pull/4476)
+- Bump confluentinc/cp-kafka from 7.6.6 to 7.6.13 by @dependabot in [#4471](https://github.com/getsentry/self-hosted/pull/4471)
+- Bump postgres from 14.23-bookworm to 14.24-bookworm by @dependabot in [#4477](https://github.com/getsentry/self-hosted/pull/4477)
+
+#### Other
+
+- (snuba) Remove obsolete uWSGI environment variables by @hansek in [#4475](https://github.com/getsentry/self-hosted/pull/4475)
+- (spans) Run process-segments as a task by @untitaker in [#4488](https://github.com/getsentry/self-hosted/pull/4488)
+- Remove every generic metrics consumers by @aldy505 in [#4514](https://github.com/getsentry/self-hosted/pull/4514)
+
 ## 26.8.0
 
 ### New Features ✨
