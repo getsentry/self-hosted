@@ -1,0 +1,17 @@
+--- docker-compose.yml	2026-08-31 09:58:28.827732343 +0200
++++ docker-compose.resolve-upstreams.yml	2026-08-31 10:21:46.281494103 +0200
+@@ -606,8 +606,14 @@
+         read_only: true
+         source: ./nginx.conf
+         target: /etc/nginx/nginx.conf
++      - type: bind
++        read_only: true
++        source: ./nginx-resolver.conf.template
++        target: /etc/nginx/templates/nginx-resolver.conf.template
+       - sentry-nginx-cache:/var/cache/nginx
+       - sentry-nginx-www:/var/www
++    environment:
++      NGINX_ENTRYPOINT_LOCAL_RESOLVERS: 1
+     healthcheck:
+       <<: *healthcheck_defaults
+       test:
