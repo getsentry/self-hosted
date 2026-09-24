@@ -31,8 +31,8 @@ jobs:
     timeout-minutes: 30
     strategy:
       matrix:
-        os: [ubuntu-24.04, ubuntu-24.04-arm]
-    name: ${{ matrix.os == 'ubuntu-24.04-arm' && 'unit tests (arm64)' || 'unit tests' }}
+        os: [ubuntu-26.04, ubuntu-26.04-arm]
+    name: ${{ matrix.os == 'ubuntu-26.04-arm' && 'unit tests (arm64)' || 'unit tests' }}
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -47,7 +47,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-24.04, ubuntu-26.04-arm]
+        os: [ubuntu-26.04, ubuntu-26.04-arm]
         container_engine: ['docker'] # TODO: add 'podman' into the list
         compose_profiles: ['feature-complete']
     name: ${{ format('integration test{0}{1}{2}', matrix.os == 'ubuntu-26.04-arm' && ' (arm64)' || '', matrix.container_engine == 'podman' && ' (podman)' || '', matrix.compose_profiles == 'errors-only' && ' (errors-only)' || '') }}
@@ -63,10 +63,7 @@ jobs:
         if: matrix.container_engine == 'podman'
         run: |
           sudo apt-get update
-          sudo apt-get install -y --no-install-recommends podman
-          # TODO: Replace below with podman-compose
-          #       We need this commit to be able to work: https://github.com/containers/podman-compose/commit/8206cc3ea277eee6c2e87d4cd66eba8eae3d44eb
-          pip3 install --user https://github.com/containers/podman-compose/archive/main.tar.gz
+          sudo apt-get install -y --no-install-recommends podman podman-compose
           echo "PODMAN_COMPOSE_PROVIDER=podman-compose" >> $GITHUB_ENV
           echo "PODMAN_COMPOSE_WARNING_LOGS=false" >> $GITHUB_ENV
 
@@ -83,10 +80,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-24.04, ubuntu-24.04-arm]
-        container_engine: ['docker'] # TODO: add 'podman' into the list
+        os: [ubuntu-26.04, ubuntu-26.04-arm]
+        container_engine: ['docker', 'podman']
         compose_profiles: ['errors-only']
-    name: ${{ format('integration test{0}{1}{2}', matrix.os == 'ubuntu-24.04-arm' && ' (arm64)' || '', matrix.container_engine == 'podman' && ' (podman)' || '', matrix.compose_profiles == 'errors-only' && ' (errors-only)' || '') }}
+    name: ${{ format('integration test{0}{1}{2}', matrix.os == 'ubuntu-26.04-arm' && ' (arm64)' || '', matrix.container_engine == 'podman' && ' (podman)' || '', matrix.compose_profiles == 'errors-only' && ' (errors-only)' || '') }}
     env:
       REPORT_SELF_HOSTED_ISSUES: 0
       SELF_HOSTED_TESTING_DSN: ${{ vars.SELF_HOSTED_TESTING_DSN }}
@@ -99,10 +96,7 @@ jobs:
         if: matrix.container_engine == 'podman'
         run: |
           sudo apt-get update
-          sudo apt-get install -y --no-install-recommends podman
-          # TODO: Replace below with podman-compose
-          #       We need this commit to be able to work: https://github.com/containers/podman-compose/commit/8206cc3ea277eee6c2e87d4cd66eba8eae3d44eb
-          pip3 install --user https://github.com/containers/podman-compose/archive/main.tar.gz
+          sudo apt-get install -y --no-install-recommends podman podman-compose
           echo "PODMAN_COMPOSE_PROVIDER=podman-compose" >> $GITHUB_ENV
           echo "PODMAN_COMPOSE_WARNING_LOGS=false" >> $GITHUB_ENV
 
@@ -110,4 +104,5 @@ jobs:
         uses: './'
         with:
           compose_profiles: ${{ matrix.compose_profiles }}
+          container_engine: ${{ matrix.container_engine }}
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
