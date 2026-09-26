@@ -68,12 +68,18 @@ compare_calver() {
   local arr1=($parsed1)
   local arr2=($parsed2)
 
-  if   ((arr1[0] > arr2[0])); then echo 1
-  elif ((arr1[0] < arr2[0])); then echo -1
-  elif ((arr1[1] > arr2[1])); then echo 1
-  elif ((arr1[1] < arr2[1])); then echo -1
-  elif ((arr1[2] > arr2[2])); then echo 1
-  elif ((arr1[2] < arr2[2])); then echo -1
+  if ((arr1[0] > arr2[0])); then
+    echo 1
+  elif ((arr1[0] < arr2[0])); then
+    echo -1
+  elif ((arr1[1] > arr2[1])); then
+    echo 1
+  elif ((arr1[1] < arr2[1])); then
+    echo -1
+  elif ((arr1[2] > arr2[2])); then
+    echo 1
+  elif ((arr1[2] < arr2[2])); then
+    echo -1
   else
     echo 0
   fi
