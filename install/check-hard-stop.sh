@@ -38,10 +38,9 @@ _parse_version_components() {
 }
 
 # Compare two calver versions
-# Usage: compare_calver "1.2.3" "1.2.4"
-# Returns: -1 if first < second, 0 if equal, 1 if first > second
-#
-# This bit is written by Claude Haiku 4.5.
+# Usage: result=$(compare_calver "1.2.3" "1.2.4"); status=$?
+# Prints: -1 if first < second, 0 if equal, 1 if first > second
+# Returns (exit status): 0 on success, 2 on invalid input/format
 compare_calver() {
   local v1="$1"
   local v2="$2"
@@ -56,8 +55,9 @@ compare_calver() {
   v2="${v2#v}"
 
   # Extract components
-  local parsed1=$(_parse_version_components "$v1")
-  local parsed2=$(_parse_version_components "$v2")
+  local parsed1 parsed2
+  parsed1=$(_parse_version_components "$v1")
+  parsed2=$(_parse_version_components "$v2")
 
   if [[ -z "$parsed1" ]] || [[ -z "$parsed2" ]]; then
     echo -e "ERROR: Invalid CalVer format" >&2
@@ -68,25 +68,17 @@ compare_calver() {
   local arr1=($parsed1)
   local arr2=($parsed2)
 
-  if ((arr1[0] > arr2[0])); then
-    return 1
-  elif ((arr1[0] < arr2[0])); then
-    return -1
+  if   ((arr1[0] > arr2[0])); then echo 1
+  elif ((arr1[0] < arr2[0])); then echo -1
+  elif ((arr1[1] > arr2[1])); then echo 1
+  elif ((arr1[1] < arr2[1])); then echo -1
+  elif ((arr1[2] > arr2[2])); then echo 1
+  elif ((arr1[2] < arr2[2])); then echo -1
+  else
+    echo 0
   fi
 
-  if ((arr1[1] > arr2[1])); then
-    return 1
-  elif ((arr1[1] < arr2[1])); then
-    return -1
-  fi
-
-  if ((arr1[2] > arr2[2])); then
-    return 1
-  elif ((arr1[2] < arr2[2])); then
-    return -1
-  fi
-
-  return 0 # Equal
+  return 0
 }
 
 # Acquire the new version. This is done by reading `.env` / `.env.custom`
@@ -148,16 +140,17 @@ else
     # version is below any of them.
     local _wrote_version=0
     for hard_stop in "${hard_stops[@]}"; do
-      compare_result=$(compare_calver "$current_version" "$hard_stop")
-      if [[ "$compare_result" == 0 ]]; then
-        # equal, this is correct, they're visiting a hard stop
-        _write_latest_version "$new_version"
-        _wrote_version=1
-        break
-      elif [[ "$compare_result" == 1 ]]; then
+      cmp_current_hard_stop=$(compare_calver "$current_version" "$hard_stop")
+      if [[ "$cmp_current_hard_stop" -ge 0 ]]; then
         # the current version is greater than the current hard stop loop, we continue
         continue
-      elif [[ "$compare_result" == -1 ]]; then
+      elif [[ "$cmp_current_hard_stop" == -1 ]]; then
+        cmp_new_hard_stop=$(compare_calver "$new_version" "$hard_stop")
+        if [[ "$cmp_new_hard_stop" -le 0 ]]; then
+          # The upgrade doesn't reach this hard stop yet — nothing to warn about.
+          continue
+        fi
+
         # the current version is less than the current hard stop loop
         # we alert the user and provide a confirmation
         echo "--------------------------------------------------------------------------------"
@@ -179,14 +172,14 @@ else
           echo "Canceled. 😅"
           exit 1
         fi
-      elif [[ "$compare_result" == 2 ]]; then
+      elif [[ "$cmp_current_hard_stop" == 2 ]]; then
         # invalid version, we exit
         echo "ERROR: Invalid version in $latest_version_file"
         exit 1
       else
-        # a bug on our end, the `compare_result` returns unexpected value
+        # a bug on our end, the `cmp_current_hard_stop` returns unexpected value
         echo 'ERROR: Unexpected return value from `compare_calver` function. This is a bug on our end.'
-        echo "The 'compare_result' value is: $compare_result"
+        echo "The 'cmp_current_hard_stop' value is: $cmp_current_hard_stop"
         exit 2
       fi
     done
