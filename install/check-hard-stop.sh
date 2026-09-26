@@ -140,63 +140,56 @@ else
     current_version=$(cat "$latest_version_file")
   fi
 
-  # We perform some checks if the `current_version` is not empty.
   if [[ -n "$current_version" ]]; then
-    # We iterate over the list of hard stops, and check whether the current
-    # version is below any of them.
-    local _wrote_version=0
     for hard_stop in "${hard_stops[@]}"; do
-      cmp_current_hard_stop=$(compare_calver "$current_version" "$hard_stop")
-      if [[ "$cmp_current_hard_stop" -ge 0 ]]; then
-        # the current version is greater than the current hard stop loop, we continue
-        continue
-      elif [[ "$cmp_current_hard_stop" == -1 ]]; then
-        cmp_new_hard_stop=$(compare_calver "$new_version" "$hard_stop")
-        if [[ "$cmp_new_hard_stop" -le 0 ]]; then
-          # The upgrade doesn't reach this hard stop yet — nothing to warn about.
-          continue
-        fi
-
-        # the current version is less than the current hard stop loop
-        # we alert the user and provide a confirmation
-        echo "--------------------------------------------------------------------------------"
-        echo
-        echo "WARNING: Your new version ($new_version) will skip a required hard stop of $hard_stop."
-        echo "It is recommended to stop the current installation, and go through the hard stop first."
-        echo "Otherwise, you may encounter unexpected behaviors, such as migration failures, or data loss."
-        echo
-        echo "For future reference, please visit https://develop.sentry.dev/self-hosted/releases/#hard-stops"
-        echo
-        echo "Do you wish to continue? [y/N]"
-        read -r confirmation
-
-        if [[ "$confirmation" == "y" ]]; then
-          _write_latest_version "$new_version"
-          _wrote_version=1
-          break
-        else
-          echo "Canceled. 😅"
-          exit 1
-        fi
-      elif [[ "$cmp_current_hard_stop" == 2 ]]; then
-        # invalid version, we exit
-        echo "ERROR: Invalid version in $latest_version_file"
+      cmp_current_hs=$(compare_calver "$current_version" "$hard_stop")
+      status=$?
+      if (( status != 0 )); then
+        echo "ERROR: Invalid version in $latest_version_file or hard stop list"
         exit 1
-      else
-        # a bug on our end, the `cmp_current_hard_stop` returns unexpected value
-        echo 'ERROR: Unexpected return value from `compare_calver` function. This is a bug on our end.'
-        echo "The 'cmp_current_hard_stop' value is: $cmp_current_hard_stop"
-        exit 2
       fi
+
+      if (( cmp_current_hs >= 0 )); then
+        # Already at or past this hard stop, skip it
+        continue
+      fi
+
+      cmp_new_hs=$(compare_calver "$new_version" "$hard_stop")
+      status=$?
+      if (( status != 0 )); then
+        echo "ERROR: Invalid version in $new_version or hard stop list"
+        exit 1
+      fi
+
+      if (( cmp_new_hs <= 0 )); then
+        # The upgrade doesn't go past this hard stop, nothing to warn about
+        continue
+      fi
+
+      # current < hard_stop < new_version: warn and ask
+      echo "--------------------------------------------------------------------------------"
+      echo
+      echo "WARNING: Your new version ($new_version) will skip a required hard stop of $hard_stop."
+      echo "It is recommended to stop the current installation, and go through the hard stop first."
+      echo "Otherwise, you may encounter unexpected behaviors, such as migration failures, or data loss."
+      echo
+      echo "For future reference, please visit https://develop.sentry.dev/self-hosted/releases/#hard-stops"
+      echo
+      echo "Do you wish to continue? [y/N]"
+      read -r confirmation
+
+      if [[ "$confirmation" != "y" ]]; then
+        echo "Canceled. 😅"
+        exit 1
+      fi
+      # NO BREAK HERE — keep looping to check remaining hard stops
     done
-    # If the loop completed without writing (current_version > all hard stops),
-    # update the tracking file so the version stays current.
-    if [[ "$_wrote_version" -eq 0 ]]; then
-      _write_latest_version "$new_version"
-    fi
+
+    # Write the final target version only after ALL hard stops have been checked
+    _write_latest_version "$new_version"
   else
-    # If the `current_version` is empty (or the file does not exists), we assume
-    # this is a new installation.
+      # If the `current_version` is empty (or the file does not exists), we assume
+      # this is a new installation.
     echo "Self-hosted Sentry version tracking file not found. No hard stop check is needed."
     _write_latest_version "$new_version"
   fi
