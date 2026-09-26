@@ -20,6 +20,9 @@ concurrency:
 
 permissions:
   contents: read
+  pull-requests: write
+  statuses: write
+  actions: read
 
 defaults:
   run:
@@ -74,7 +77,7 @@ jobs:
         uses: './'
         with:
           compose_profiles: ${{ matrix.compose_profiles }}
-          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+          identifier: "${{ matrix.compose_profiles }}-${{ matrix.container_engine }}-${{ matrix.os }}"
 
   integration-test-errors-only:
     if: github.repository_owner == 'getsentry'
@@ -110,4 +113,4 @@ jobs:
         uses: './'
         with:
           compose_profiles: ${{ matrix.compose_profiles }}
-          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+          identifier: "${{ matrix.compose_profiles }}-${{ matrix.container_engine }}-${{ matrix.os }}"

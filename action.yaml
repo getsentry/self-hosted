@@ -16,9 +16,9 @@ inputs:
   skip_backup_restore_test:
     required: false
     description: "Whether to skip backup and restore test. Defaults to false."
-  CODECOV_TOKEN:
+  identifier:
     required: false
-    description: "The Codecov token to upload coverage."
+    description: "Identifier for code coverage purposes (ex. 'Docker amd64', 'Docker arm64', 'Podman amd64', etc)"
 
 runs:
   using: "composite"
@@ -249,24 +249,17 @@ runs:
           /var/lib/docker/volumes/sentry-kafka \
           "$RUNNER_TEMP/volumes/"
         cd ${{ github.action_path }}
-        pytest -x --cov --junitxml=junit.xml _integration-test/
+        pytest -x --cov --cov-report lcov:coverage.lcov --junitxml=coverage.junit.xml _integration-test/
 
     - name: Upload coverage to Codecov
-      if: inputs.CODECOV_TOKEN
       continue-on-error: true
-      uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
+      uses: getsentry/coverage-action@a006c445d3aa57b4d347da1986c79cd06faa7a30 # v0.4.2
       with:
-        directory: ${{ github.action_path }}
-        token: ${{ inputs.CODECOV_TOKEN }}
-        slug: getsentry/self-hosted
-
-    - name: Upload test results to Codecov
-      if: inputs.CODECOV_TOKEN && !cancelled()
-      continue-on-error: true
-      uses: codecov/test-results-action@0fa95f0e1eeaafde2c782583b36b28ad0d8c77d3 # v1.2.1
-      with:
-        directory: ${{ github.action_path }}
-        token: ${{ inputs.CODECOV_TOKEN }}
+        token: ${{ github.token }}
+        post-pr-comment: ${{ github.repository == 'getsentry/self-hosted' }}
+        target-patch: 50
+        fail-on-error: false
+        name: ${{ inputs.identifier }}
 
     - name: Inspect failure
       if: failure()
