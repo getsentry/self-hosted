@@ -434,6 +434,7 @@ services:
     image: "$SYMBOLICATOR_IMAGE"
     environment:
       SYMBOLICATOR_STATSD_ADDR: ${STATSD_ADDR:-127.0.0.1:8125}
+      SYMBOLICATOR_LOG_LEVEL: ${SYMBOLICATOR_LOG_LEVEL:-warn}
     command: run -c /etc/symbolicator/config.yml
     volumes:
       - "sentry-symbolicator:/data"
@@ -449,6 +450,7 @@ services:
     image: "$SYMBOLICATOR_IMAGE"
     environment:
       SYMBOLICATOR_STATSD_ADDR: ${STATSD_ADDR:-127.0.0.1:8125}
+      SYMBOLICATOR_LOG_LEVEL: ${SYMBOLICATOR_LOG_LEVEL:-warn}
     command: "cleanup -c /etc/symbolicator/config.yml --repeat 1h"
     volumes:
       - "sentry-symbolicator:/data"
@@ -605,6 +607,7 @@ services:
     image: "$RELAY_IMAGE"
     environment:
       RELAY_STATSD_ADDR: ${STATSD_ADDR:-127.0.0.1:8125}
+      RELAY_LOG_LEVEL: ${RELAY_LOG_LEVEL:-WARN}
     volumes:
       - type: bind
         read_only: true
