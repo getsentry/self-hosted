@@ -25,10 +25,17 @@ import urllib.request
 URL = os.environ.get("SNUBA_API_HEALTHCHECK_URL") or "http://127.0.0.1:1218/health"
 TIMEOUT = float(os.environ.get("SNUBA_API_HEALTHCHECK_TIMEOUT") or 2)
 
+# This is a local, in-container request. urllib's NO_PROXY matching doesn't
+# support CIDR ranges (e.g. 127.0.0.0/8), only exact hosts/domain suffixes,
+# so a NO_PROXY set up for other tools (curl, wget) can still leave this
+# request routed through HTTP(S)_PROXY. Force no proxy explicitly instead
+# of relying on NO_PROXY parsing.
+_NO_PROXY_OPENER = urllib.request.build_opener(urllib.request.ProxyHandler({}))
+
 
 def main() -> int:
     try:
-        body = urllib.request.urlopen(URL, timeout=TIMEOUT).read().decode()
+        body = _NO_PROXY_OPENER.open(URL, timeout=TIMEOUT).read().decode()
     except urllib.error.HTTPError as exc:
         print(f"snuba api returned HTTP {exc.code} from {URL}", file=sys.stderr)
         return 1
