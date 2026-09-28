@@ -7,10 +7,9 @@ source install/ensure-files-from-examples.sh
 export COMPOSE_PROFILES="feature-complete"
 # `docker compose pull vroom` can be skipped when pull_policy is set to `never`.
 $CONTAINER_ENGINE pull "${VROOM_IMAGE}"
-source install/ensure-correct-permissions-profiles-dir.sh
 
 # Generate some random files on `sentry-vroom` volume for testing
-$dc run --rm --no-deps -v sentry-vroom:/var/vroom/sentry-profiles --entrypoint /bin/bash vroom -c '
+$dc run --rm --no-deps -v "${COMPOSE_PROJECT_NAME}_sentry-vroom:/var/vroom/sentry-profiles" --entrypoint /bin/sh seaweedfs -c '
   for i in $(seq 1 1000); do
     echo This is test file $i > /var/vroom/sentry-profiles/test_file_$i.txt
   done

@@ -72,16 +72,20 @@ if [[ "$COMPOSE_PROFILES" == "feature-complete" ]]; then
 
     $s3cmd --access_key=sentry --secret_key=sentry --no-ssl --region=us-east-1 --host=localhost:8333 --host-bucket='localhost:8333/%(bucket)' mb s3://profiles
 
-    # Check if there are files in the sentry-vroom volume
-    start_service_and_wait_ready vroom
-    vroom_files_count=$($dc exec vroom sh -c "find /var/vroom/sentry-profiles -type f | wc -l")
+    # Check if there are files in the sentry-vroom volume.
+    # The vroom image has no shell, so inspect and migrate the volume from a
+    # one-off seaweedfs container (which has one) with the volume mounted read-only.
+    # `run -v` does not prefix the project name, so spell out the real volume name.
+    vroom_volume="${COMPOSE_PROJECT_NAME}_sentry-vroom"
+    vroom_files_count=0
+    if $CONTAINER_ENGINE volume inspect "$vroom_volume" >/dev/null 2>&1; then
+      vroom_volume_run="$dcr --no-deps -T -v $vroom_volume:/var/vroom/sentry-profiles:ro --entrypoint /bin/sh seaweedfs -c"
+      vroom_files_count=$($vroom_volume_run "find /var/vroom/sentry-profiles -type f | wc -l")
+    fi
     if [[ "$vroom_files_count" -gt 0 ]]; then
       echo "Migrating $vroom_files_count files from 'sentry-vroom' volume to 'profiles' bucket on SeaweedFS..."
 
-      # Use a temporary container to copy files from the volume to SeaweedFS
-
-      $dcx -u root vroom sh -c 'mkdir -p /var/lib/apt/lists/partial && apt-get update && apt-get install -y --no-install-recommends s3cmd'
-      $dc exec vroom sh -c 's3cmd --access_key=sentry --secret_key=sentry --no-ssl --region=us-east-1 --host=seaweedfs:8333 --host-bucket="seaweedfs:8333/%(bucket)" sync /var/vroom/sentry-profiles/ s3://profiles/'
+      $vroom_volume_run 'apk add --no-cache s3cmd >/dev/null && s3cmd --access_key=sentry --secret_key=sentry --no-ssl --region=us-east-1 --host=seaweedfs:8333 --host-bucket="seaweedfs:8333/%(bucket)" sync /var/vroom/sentry-profiles/ s3://profiles/'
 
       echo "Migration completed."
     else
