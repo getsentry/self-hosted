@@ -9,9 +9,14 @@ import os
 
 SENTRY_UID = 999
 
+
+def fail(error):
+    raise error
+
+
 os.makedirs("/data/files", exist_ok=True)
 if any(os.stat(p).st_uid != SENTRY_UID for p in ("/data", "/data/files")):
-    for root, dirs, files in os.walk("/data", topdown=False):
+    for root, dirs, files in os.walk("/data", topdown=False, onerror=fail):
         for path in (*(os.path.join(root, name) for name in dirs + files), root):
             if os.lstat(path).st_uid != SENTRY_UID:
                 os.lchown(path, SENTRY_UID, -1)
