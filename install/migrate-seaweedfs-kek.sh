@@ -78,7 +78,7 @@ elif [[ "$migration_state" == "needed" ]]; then
         printf '%s' "$stored_kek" | $CONTAINER_ENGINE run --rm -i \
           --entrypoint python3 \
           -v "$(pwd)/scripts/recover_seaweedfs_kek.py:/recover_seaweedfs_kek.py:ro" \
-          -v sentry-seaweedfs:/data:ro \
+          --volumes-from "${migration_container}:ro" \
           sentry-self-hosted-local \
           /recover_seaweedfs_kek.py /data/.mini_kek_passphrase
       )
