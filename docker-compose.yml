@@ -68,7 +68,6 @@ x-sentry-defaults: &sentry_defaults
       <<: *depends_on-default
     symbolicator:
       <<: *depends_on-default
-  entrypoint: "/etc/sentry/entrypoint.sh"
   command: ["run", "web"]
   environment:
     PYTHONUSERBASE: "/data/custom-packages"
@@ -568,7 +567,7 @@ services:
     build:
       context: ./cron
       args:
-        BASE_IMAGE: sentry-self-hosted-local
+        BASE_IMAGE: ghcr.io/getsentry/sentry:nightly
     entrypoint: "/entrypoint.sh"
     command: '"0 0 * * * gosu sentry sentry cleanup --days $SENTRY_EVENT_RETENTION_DAYS"'
   nginx:

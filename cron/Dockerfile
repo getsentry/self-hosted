@@ -7,5 +7,6 @@ RUN if [ -n "${http_proxy}" ]; then echo "Acquire::http::proxy \"${http_proxy}\"
 RUN if [ -n "${https_proxy}" ]; then echo "Acquire::https::proxy \"${https_proxy}\";" >> /etc/apt/apt.conf; fi
 RUN apt-get update && apt-get install -y --no-install-recommends cron gosu && \
     rm -r /var/lib/apt/lists/*
+RUN pip install --no-cache-dir https://github.com/getsentry/sentry-nodestore-s3/archive/main.zip
 COPY entrypoint.sh /entrypoint.sh
 ENTRYPOINT ["/entrypoint.sh"]
