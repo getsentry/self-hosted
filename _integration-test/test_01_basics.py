@@ -669,9 +669,9 @@ def test_customizations():
             "run",
             "--no-deps",
             "web",
-            "bash",
+            "python",
             "-c",
-            "if [ ! -e /created-by-enhance-image ]; then exit 1; fi",
+            "import os; assert os.path.exists('/created-by-enhance-image')",
         ],
         [
             "docker",
@@ -682,9 +682,9 @@ def test_customizations():
             "--no-deps",
             "--entrypoint=/etc/sentry/entrypoint.sh",
             "sentry-cleanup",
-            "bash",
+            "python",
             "-c",
-            "if [ ! -e /created-by-enhance-image ]; then exit 1; fi",
+            "import os; assert os.path.exists('/created-by-enhance-image')",
         ],
         [
             "docker",
