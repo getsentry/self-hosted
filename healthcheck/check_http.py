@@ -22,7 +22,10 @@ TIMEOUT = 2  # seconds
 
 def main(url: str) -> int:
     try:
-        body = urllib.request.urlopen(url, timeout=TIMEOUT).read().decode()
+        # Ignore HTTP(S)_PROXY, which Docker may inject into containers: the
+        # target is always the container itself.
+        opener = urllib.request.build_opener(urllib.request.ProxyHandler({}))
+        body = opener.open(url, timeout=TIMEOUT).read().decode()
     except urllib.error.HTTPError as exc:
         print(f"HTTP {exc.code} from {url}", file=sys.stderr)
         return 1
