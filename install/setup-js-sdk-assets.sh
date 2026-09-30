@@ -16,9 +16,8 @@ if [[ "${SETUP_JS_SDK_ASSETS:-}" == "1" ]]; then
 
   jq="$CONTAINER_ENGINE run --rm -i sentry-self-hosted-jq-local"
 
-  # Read the file with python3 rather than `cat`, which the sentry image may not have.
-  loader_registry=$($dcr --no-deps --rm -T web python3 -c 'import sys; print(open(sys.argv[1]).read())' /usr/src/sentry/src/sentry/loader/_registry.json)
-  # The `loader_registry` may start with "Updating certificates...", we want to delete that and the subsequent ca-certificates related lines.
+  loader_registry=$($dcr --no-deps --rm -T web python3 -c 'print(open("/usr/src/sentry/src/sentry/loader/_registry.json").read())')
+  # The `loader_registry` should start with "Updating certificates...", we want to delete that and the subsequent ca-certificates related lines.
   # We want to remove everything before the first '{'.
   loader_registry=$(echo "$loader_registry" | sed '0,/{/s/[^{]*//')
 
