@@ -311,7 +311,7 @@ services:
       - "./healthcheck:/healthcheck:ro"
     healthcheck:
       <<: *healthcheck_defaults
-      test: ["CMD", "python3", "/healthcheck/http.py", "http://127.0.0.1:1218/health"]
+      test: ["CMD", "python3", "/healthcheck/check_http.py", "http://127.0.0.1:1218/health"]
   # Kafka consumer responsible for feeding events into Clickhouse
   snuba-errors-consumer:
     <<: *snuba_defaults
@@ -466,7 +466,7 @@ services:
     healthcheck:
       <<: *healthcheck_defaults
       start_period: 5m
-      test: ["CMD", "python3", "/healthcheck/http.py", "http://127.0.0.1:9000/_health/"]
+      test: ["CMD", "python3", "/healthcheck/check_http.py", "http://127.0.0.1:9000/_health/"]
   events-consumer:
     <<: *sentry_defaults
     command: run consumer ingest-events --consumer-group ingest-consumer --auto-offset-reset=earliest --no-strict-offset-reset --healthcheck-file-path /tmp/health.txt --max-poll-interval-ms ${SENTRY_KAFKA_MAX_POLL_INTERVAL_MS:-300000}

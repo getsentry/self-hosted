@@ -2,7 +2,7 @@
 """
 HTTP healthcheck for self-hosted services.
 
-Usage: python3 /healthcheck/http.py <url>
+Usage: python3 /healthcheck/check_http.py <url>
 
 GETs the URL and exits 0 if the response body contains "ok", else 1. On
 failure, prints a one-line description to stderr rather than a full Python
@@ -50,6 +50,6 @@ def main(url: str) -> int:
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
-        print("usage: http.py <url>", file=sys.stderr)
+        print("usage: check_http.py <url>", file=sys.stderr)
         sys.exit(2)
     sys.exit(main(sys.argv[1]))
