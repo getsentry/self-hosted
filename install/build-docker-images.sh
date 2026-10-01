@@ -12,7 +12,7 @@ if [ "$CONTAINER_ENGINE" = "docker" ]; then
 fi
 
 # Build any service that provides the image sentry-self-hosted-local first,
-# as it is used as the base image for sentry-cleanup-self-hosted-local.
+# as most other services share it.
 $dcb web
 # Build each other service individually to localize potential failures better.
 for service in $($dc config --services); do
