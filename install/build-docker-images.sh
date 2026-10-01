@@ -18,6 +18,9 @@ $dcb web
 for service in $($dc config --services); do
   $dcb "$service"
 done
+# sentry-cleanup used to have its own image; remove it so it doesn't keep an
+# old sentry image's layers around.
+$CONTAINER_ENGINE image rm sentry-cleanup-self-hosted-local &>/dev/null || true
 echo ""
 echo "Docker images built."
 
