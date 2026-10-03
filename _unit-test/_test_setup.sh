@@ -33,6 +33,9 @@ setup() {
     # $line here is something like `M some-script.sh`.
 
     local filepath="$(cut -f2 -d' ' <(echo $line))"
+    # Untracked directories are reported as `dir/`; the trailing slash makes `ln`
+    # treat the link target as a directory that must already exist.
+    filepath="${filepath%/}"
     local filestatus="$(cut -f1 -d' ' <(echo $line))"
 
     case $filestatus in
