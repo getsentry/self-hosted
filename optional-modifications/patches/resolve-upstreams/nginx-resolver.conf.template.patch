@@ -1,0 +1,4 @@
+--- /dev/null	2026-08-27 11:01:02.392055778 +0200
++++ nginx-resolver.conf.template	2026-08-31 09:59:17.962753633 +0200
+@@ -0,0 +1 @@
++resolver ${NGINX_LOCAL_RESOLVERS} ipv6=off valid=10s;
