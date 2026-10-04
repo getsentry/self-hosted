@@ -17,6 +17,10 @@
 
 echo "${_group}Checking for hard stop ... "
 
+# This should be a bash array string, and should be equivalent with the list
+# on https://develop.sentry.dev/self-hosted/releases/#hard-stops
+mapfile -t hard_stops < <(cat hard-stop.json | $jq -r '.hard_stops[]')
+
 # Acquire the new version. This is done by reading `.env` / `.env.custom`
 # for Docker image tags; or by reading the Git tag for the current commit
 declare new_version=""
