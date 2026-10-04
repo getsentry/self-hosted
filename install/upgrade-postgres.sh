@@ -49,35 +49,37 @@ if $CONTAINER_ENGINE volume inspect sentry-postgres-new >/dev/null 2>&1; then
 fi
 
 if [[ "$postgres_version" == "14" ]]; then
+  # Reindex once under PostgreSQL 14 Trixie before upgrading the major version.
   if ! $CONTAINER_ENGINE run --rm -v sentry-postgres:/db:ro busybox test -f /db/14-trixie-reindexed; then
-    echo "Sentry 26.9.0 is a required hard stop. Upgrade to 26.9.0 and complete its PostgreSQL 14 Trixie migration before upgrading to PostgreSQL 18."
-    exit 1
+    echo "[1/2] PostgreSQL 14 Bookworm -> 14 Trixie: reindexing for the glibc change, this may take a while..."
+    $CONTAINER_ENGINE run --rm --user postgres --network none --shm-size=256m \
+      -v sentry-postgres:/var/lib/postgresql/data \
+      postgres:14.24-trixie bash -ec '
+        trap "pg_ctl -m fast -w stop" EXIT
+        pg_ctl -w start
+        psql -U postgres -v ON_ERROR_STOP=1 -c "REINDEX DATABASE postgres;"
+        touch "$PGDATA/14-trixie-reindexed"
+      '
+    echo "[1/2] PostgreSQL 14 Trixie reindex completed and database stopped."
+  else
+    echo "[1/2] PostgreSQL 14 Trixie reindex already completed; skipping."
   fi
 
+  echo "[2/2] PostgreSQL 14 Trixie -> 18 Trixie: upgrading..."
   $CONTAINER_ENGINE run --rm \
     -e POSTGRES_INITDB_ARGS=--no-data-checksums \
     -v sentry-postgres:/var/lib/postgresql/14/data \
     -v sentry-postgres-new:/var/lib/postgresql/18/docker \
     tianon/postgres-upgrade:14-to-18
 
+  echo "[2/2] pg_upgrade completed. Replacing the PostgreSQL 14 volume with PostgreSQL 18 data..."
   $CONTAINER_ENGINE volume rm sentry-postgres
   $CONTAINER_ENGINE volume create --name sentry-postgres
   $CONTAINER_ENGINE run --rm -v sentry-postgres-new:/from -v sentry-postgres:/to alpine ash -ec \
     "mkdir -p /to/18/docker; cp -av /from/. /to/18/docker; echo 'host all all all trust' >> /to/18/docker/pg_hba.conf"
   $CONTAINER_ENGINE volume rm sentry-postgres-new
   postgres_version=18
-fi
-
-# Reindex existing PostgreSQL 14 data once for the glibc 2.36 (Bookworm) -> 2.41 (Trixie) change.
-if [[ "$postgres_version" == "14" || -z "$postgres_version" ]]; then
-  needs_reindex=$($CONTAINER_ENGINE run --rm -v sentry-postgres:/db busybox sh -c 'if [ -f /db/PG_VERSION ] && [ ! -f /db/14-trixie-reindexed ]; then echo yes; fi')
-
-  start_service_and_wait_ready postgres
-  if [[ "$needs_reindex" == "yes" ]]; then
-    echo "Re-indexing due to glibc change, this may take a while..."
-    $dc exec postgres psql -U postgres -v ON_ERROR_STOP=1 -c "REINDEX DATABASE postgres;"
-  fi
-  $dc exec postgres sh -c 'touch "$PGDATA/14-trixie-reindexed"'
+  echo "[2/2] PostgreSQL 18 Trixie upgrade completed."
 fi
 
 echo "${_endgroup}"
