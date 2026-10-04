@@ -17,76 +17,6 @@
 
 echo "${_group}Checking for hard stop ... "
 
-latest_version_file=${HARD_STOP_FILE:-".sentry-hard-stop"}
-# This should be a bash array string, and should be equivalent with the list
-# on https://develop.sentry.dev/self-hosted/releases/#hard-stops
-mapfile -t hard_stops < <(cat hard-stop.json | $jq -r '.hard_stops[]')
-
-_write_latest_version() {
-  echo "$1" >"$latest_version_file"
-}
-
-# Helper function to parse version components
-# BASH_REMATCH requires Bash 3.0+
-_parse_version_components() {
-  local ver="$1"
-  if [[ $ver =~ ^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(-[0-9A-Za-z.-]*)?(\+[0-9A-Za-z.-]*)?$ ]]; then
-    echo "${BASH_REMATCH[1]} ${BASH_REMATCH[2]} ${BASH_REMATCH[3]} ${BASH_REMATCH[4]#-} ${BASH_REMATCH[5]#+}"
-  else
-    echo ""
-  fi
-}
-
-# Compare two calver versions
-# Usage: result=$(compare_calver "1.2.3" "1.2.4"); status=$?
-# Prints: -1 if first < second, 0 if equal, 1 if first > second
-# Returns (exit status): 0 on success, 2 on invalid input/format
-compare_calver() {
-  local v1="$1"
-  local v2="$2"
-
-  if [[ -z "$v1" ]] || [[ -z "$v2" ]]; then
-    echo -e "ERROR: Invalid CalVer format" >&2
-    return 2
-  fi
-
-  # Remove leading 'v' if present
-  v1="${v1#v}"
-  v2="${v2#v}"
-
-  # Extract components
-  local parsed1 parsed2
-  parsed1=$(_parse_version_components "$v1")
-  parsed2=$(_parse_version_components "$v2")
-
-  if [[ -z "$parsed1" ]] || [[ -z "$parsed2" ]]; then
-    echo -e "ERROR: Invalid CalVer format" >&2
-    return 2
-  fi
-
-  # Compare major.minor.patch
-  local arr1=($parsed1)
-  local arr2=($parsed2)
-
-  if ((arr1[0] > arr2[0])); then
-    echo 1
-  elif ((arr1[0] < arr2[0])); then
-    echo -1
-  elif ((arr1[1] > arr2[1])); then
-    echo 1
-  elif ((arr1[1] < arr2[1])); then
-    echo -1
-  elif ((arr1[2] > arr2[2])); then
-    echo 1
-  elif ((arr1[2] < arr2[2])); then
-    echo -1
-  else
-    echo 0
-  fi
-
-  return 0
-}
-
 # Acquire the new version. This is done by reading `.env` / `.env.custom`
 # for Docker image tags; or by reading the Git tag for the current commit
 declare new_version=""
@@ -111,8 +41,10 @@ fi
 # they're on their own
 if [[ -z "$new_version" ]]; then
   echo "--------------------------------------------------------------------------------"
-  echo "WARNING: Could not determine the current version of the self-hosted Sentry"
+  echo
+  echo "WARNING: Could not determine the new version of the self-hosted Sentry"
   echo "to perform a hard stop check. Assuming you know what you're doing. Good luck."
+  echo
   echo "--------------------------------------------------------------------------------"
 fi
 
@@ -120,79 +52,51 @@ fi
 # This means the version detection failed across all methods. We already
 # warned the user above, so we skip the check and continue with the installation.
 if [[ -z "$new_version" ]]; then
-  echo "Skipping hard stop check: unable to determine the current version."
+  echo "Skipping hard stop check: unable to determine the new version."
 elif [[ "$new_version" == "nightly" ]]; then
   # If the `new_version` is nightly, we emit a different warning.
   # This is for fun.
   echo "--------------------------------------------------------------------------------"
+  echo
   echo "WARNING: Hello, dear brave traveler. You are installing the nightly version."
   echo "The hard stop check is skipped for this version. We wish you a safe journey."
   echo "Good luck."
+  echo
+  echo "--------------------------------------------------------------------------------"
+elif [[ "${#new_version}" -gt 7 ]]; then
+  # Invalid CalVer format. This might be an e2e test, or a user-provided version.
+  echo "--------------------------------------------------------------------------------"
+  echo
+  echo "WARNING: Could not determine the new version of the self-hosted Sentry"
+  echo "to perform a hard stop check due to invalid CalVer format."
+  echo "Assuming you know what you're doing. Good luck."
+  echo
   echo "--------------------------------------------------------------------------------"
 else
-  # Only perform the hard stop check when we have a parseable semver version.
-  # Skip for empty or non-semver versions (e.g. "nightly") — the warnings above
-  # already informed the user.
+  for hard_stop in "${hard_stops[@]}"; do
+    # If hard stop >= current version, skip it
+    if vergte "$hard_stop" "$new_version"; then
+      continue
+    fi
 
-  # Acquire the current version. Read the file.
-  declare current_version=""
-  if [[ -f "$latest_version_file" ]]; then
-    current_version=$(cat "$latest_version_file")
-  fi
+    # If current version >= hard stop, warn and ask
+    echo "--------------------------------------------------------------------------------"
+    echo
+    echo "WARNING: Your new version ($new_version) will skip a required hard stop of $hard_stop."
+    echo "It is recommended to stop the current installation, and go through the hard stop first."
+    echo "Otherwise, you may encounter unexpected behaviors, such as migration failures, or data loss."
+    echo
+    echo "For future reference, please visit https://develop.sentry.dev/self-hosted/releases/#hard-stops"
+    echo
+    echo "Do you wish to continue? [y/N]"
+    read -r confirmation
 
-  if [[ -n "$current_version" ]]; then
-    for hard_stop in "${hard_stops[@]}"; do
-      cmp_current_hs=$(compare_calver "$current_version" "$hard_stop")
-      status=$?
-      if (( status != 0 )); then
-        echo "ERROR: Invalid version in $latest_version_file or hard stop list"
-        exit 1
-      fi
-
-      if (( cmp_current_hs >= 0 )); then
-        # Already at or past this hard stop, skip it
-        continue
-      fi
-
-      cmp_new_hs=$(compare_calver "$new_version" "$hard_stop")
-      status=$?
-      if (( status != 0 )); then
-        echo "ERROR: Invalid version in $new_version or hard stop list"
-        exit 1
-      fi
-
-      if (( cmp_new_hs <= 0 )); then
-        # The upgrade doesn't go past this hard stop, nothing to warn about
-        continue
-      fi
-
-      # current < hard_stop < new_version: warn and ask
-      echo "--------------------------------------------------------------------------------"
-      echo
-      echo "WARNING: Your new version ($new_version) will skip a required hard stop of $hard_stop."
-      echo "It is recommended to stop the current installation, and go through the hard stop first."
-      echo "Otherwise, you may encounter unexpected behaviors, such as migration failures, or data loss."
-      echo
-      echo "For future reference, please visit https://develop.sentry.dev/self-hosted/releases/#hard-stops"
-      echo
-      echo "Do you wish to continue? [y/N]"
-      read -r confirmation
-
-      if [[ "$confirmation" != "y" ]]; then
-        echo "Canceled. 😅"
-        exit 1
-      fi
-      # NO BREAK HERE — keep looping to check remaining hard stops
-    done
-
-    # Write the final target version only after ALL hard stops have been checked
-    _write_latest_version "$new_version"
-  else
-      # If the `current_version` is empty (or the file does not exists), we assume
-      # this is a new installation.
-    echo "Self-hosted Sentry version tracking file not found. No hard stop check is needed."
-    _write_latest_version "$new_version"
-  fi
+    if [[ "$confirmation" != "y" ]]; then
+      echo "Canceled. 😅"
+      exit 1
+    fi
+    # NO BREAK HERE — keep looping to check remaining hard stops
+  done
 fi
 
 echo "${_endgroup}"
