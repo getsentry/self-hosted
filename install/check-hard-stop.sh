@@ -77,28 +77,51 @@ elif [[ "${#new_version}" -gt 7 ]]; then
   echo
   echo "--------------------------------------------------------------------------------"
 else
+  # We use snuba image because we don't rebuild the image, and it preserves
+  current_version=$($dc images --format json | $jq -r 'first(.[] | select(.Repository == "ghcr.io/getsentry/snuba")) | .Tag')
+
   for hard_stop in "${hard_stops[@]}"; do
-    # If hard stop >= current version, skip it
-    if vergte "$hard_stop" "$new_version"; then
-      continue
+    # Let's say we have 3 variables in play here:
+    #   current_version: 24.8.0
+    #   new_version: 26.8.0
+    #   hard_stop: 25.5.1
+    # We don't want to allow the installation to continue if the hard stop is
+    # greater than the new version. So the comparison logic here is:
+    #
+    #   if hard_stop > current_version:
+    #     Check if new_version > hard_stop
+    #     if new_version > hard_stop:
+    #       User is NOT on the right track, they're skipping a hard stop.
+    #       We should give them the warning prompt.
+    #     else:
+    #       User is on the right track.
+    #       continue
+
+    # the version in the image tag.
+    # We also need to handle if those 3 variables are the same, because we
+    # don't want to skip the hard stop if the new version is the same as the
+    # hard stop.
+    if [[ "$current_version" == "$new_version" ]]; then
+      break
+    elif vergte "$hard_stop" "$current_version"; then
+      if vergte "$new_version" "$hard_stop"; then
+        echo "--------------------------------------------------------------------------------"
+        echo
+        echo "WARNING: Your new version ($new_version) will skip a required hard stop of $hard_stop."
+        echo "It is recommended to stop the current installation, and go through the hard stop first."
+        echo "Otherwise, you may encounter unexpected behaviors, such as migration failures, or data loss."
+        echo
+        echo "For future reference, please visit https://develop.sentry.dev/self-hosted/releases/#hard-stops"
+        echo
+        echo "Do you wish to continue? [y/N]"
+        read -r confirmation
+
+        if [[ "$confirmation" != "y" ]]; then
+          echo "Canceled. 😅"
+          exit 1
+        fi
     fi
 
-    # If current version >= hard stop, warn and ask
-    echo "--------------------------------------------------------------------------------"
-    echo
-    echo "WARNING: Your new version ($new_version) will skip a required hard stop of $hard_stop."
-    echo "It is recommended to stop the current installation, and go through the hard stop first."
-    echo "Otherwise, you may encounter unexpected behaviors, such as migration failures, or data loss."
-    echo
-    echo "For future reference, please visit https://develop.sentry.dev/self-hosted/releases/#hard-stops"
-    echo
-    echo "Do you wish to continue? [y/N]"
-    read -r confirmation
-
-    if [[ "$confirmation" != "y" ]]; then
-      echo "Canceled. 😅"
-      exit 1
-    fi
     # NO BREAK HERE — keep looping to check remaining hard stops
   done
 fi
