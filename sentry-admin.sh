@@ -35,8 +35,6 @@ rename_sentry_bin_in_help_output() {
   local help_prefix="$2"
   local usage_seen=false
 
-  output=$(invocation "$@")
-
   echo -e "\n\n"
 
   while IFS= read -r line; do

@@ -4,6 +4,7 @@ echo "${_group}Setting up GeoIP integration ..."
 # to update the geoip database as written on the documentation.
 # Therefore we need to `source _detect-container-engine.sh` to detect the container engine.
 script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd -P)
+repo_root=$(cd "$script_dir/.." &>/dev/null && pwd -P)
 if [[ -z "$CONTAINER_ENGINE" ]]; then
   if [[ -f "$script_dir/_detect-container-engine.sh" ]]; then
     source $script_dir/_detect-container-engine.sh
@@ -14,8 +15,8 @@ if [[ -z "$CONTAINER_ENGINE" ]]; then
 fi
 
 install_geoip() {
-  local mmdb=geoip/GeoLite2-City.mmdb
-  local conf=geoip/GeoIP.conf
+  local mmdb="$repo_root/geoip/GeoLite2-City.mmdb"
+  local conf="$repo_root/geoip/GeoIP.conf"
   local result='Done'
 
   echo "Setting up IP address geolocation ..."
@@ -34,7 +35,7 @@ install_geoip() {
   else
     echo "IP address geolocation is configured for updates."
     echo "Updating IP address geolocation database ... "
-    if ! $CONTAINER_ENGINE run --rm -v "./geoip:/sentry" --entrypoint '/usr/bin/geoipupdate' "ghcr.io/maxmind/geoipupdate:v6.1.0" "-d" "/sentry" "-f" "/sentry/GeoIP.conf"; then
+    if ! $CONTAINER_ENGINE run --rm -v "$repo_root/geoip:/sentry" --entrypoint '/usr/bin/geoipupdate' "ghcr.io/maxmind/geoipupdate:v6.1.0" "-d" "/sentry" "-f" "/sentry/GeoIP.conf"; then
       result='Error'
     fi
     echo "$result updating IP address geolocation database."

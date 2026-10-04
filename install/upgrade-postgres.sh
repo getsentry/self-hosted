@@ -1,5 +1,7 @@
 echo "${_group}Ensuring proper PostgreSQL version ..."
 
+postgres_version=$($CONTAINER_ENGINE run --rm -v sentry-postgres:/db busybox sh -c 'if [ -f /db/PG_VERSION ]; then cat /db/PG_VERSION; fi')
+
 if [[ -n "$($CONTAINER_ENGINE volume ls -q --filter name=sentry-postgres)" && "$($CONTAINER_ENGINE run --rm -v sentry-postgres:/db busybox cat /db/PG_VERSION 2>/dev/null)" == "9.6" ]]; then
   $CONTAINER_ENGINE volume rm sentry-postgres-new || true
   # If this is Postgres 9.6 data, start upgrading it to 14.0 in a new volume
@@ -39,6 +41,18 @@ if [[ -n "$($CONTAINER_ENGINE volume ls -q --filter name=sentry-postgres)" && "$
   done
 
   $dc stop postgres
+fi
+
+# Reindex existing PostgreSQL 14 data once for the glibc 2.36 (Bookworm) -> 2.41 (Trixie) change.
+if [[ "$postgres_version" == "14" || -z "$postgres_version" ]]; then
+  needs_reindex=$($CONTAINER_ENGINE run --rm -v sentry-postgres:/db busybox sh -c 'if [ -f /db/PG_VERSION ] && [ ! -f /db/14-trixie-reindexed ]; then echo yes; fi')
+
+  start_service_and_wait_ready postgres
+  if [[ "$needs_reindex" == "yes" ]]; then
+    echo "Re-indexing due to glibc change, this may take a while..."
+    $dc exec postgres psql -U postgres -v ON_ERROR_STOP=1 -c "REINDEX DATABASE postgres;"
+  fi
+  $dc exec postgres sh -c 'touch "$PGDATA/14-trixie-reindexed"'
 fi
 
 echo "${_endgroup}"
