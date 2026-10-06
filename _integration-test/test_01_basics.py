@@ -72,9 +72,8 @@ def get_organization_token(client: httpx.Client, csrf_token: str, name: str) -> 
 @pytest.fixture(scope="session")
 def authenticated_session():
     client = httpx.Client()
-    response = client.get(SENTRY_TEST_HOST, follow_redirects=True)
-    parser = BeautifulSoup(response.text, "html.parser")
-    login_csrf_token = parser.find("input", {"name": "csrfmiddlewaretoken"})["value"]
+    client.get(SENTRY_TEST_HOST, follow_redirects=True)
+    login_csrf_token = client.cookies["sc"]
     login_response = client.post(
         f"{SENTRY_TEST_HOST}/auth/login/sentry/",
         follow_redirects=True,
@@ -107,7 +106,7 @@ def client_login(authenticated_session):
 
 def test_initial_redirect():
     initial_auth_redirect = httpx.get(SENTRY_TEST_HOST, follow_redirects=True)
-    assert initial_auth_redirect.url == f"{SENTRY_TEST_HOST}/auth/login/sentry/"
+    assert initial_auth_redirect.url == f"{SENTRY_TEST_HOST}/auth/login/"
 
 
 def test_asset_internal_rewrite():
