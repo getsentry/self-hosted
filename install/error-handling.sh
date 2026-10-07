@@ -7,6 +7,7 @@ fi
 $dbuild -t sentry-self-hosted-jq-local --platform="$DOCKER_PLATFORM" jq
 
 jq="$CONTAINER_ENGINE run --rm -i sentry-self-hosted-jq-local"
+gh="$CONTAINER_ENGINE run --rm -i docker.io/serversideup/github-cli:alpine"
 sentry_cli="$CONTAINER_ENGINE run --rm -v /tmp:/work -e SENTRY_DSN=$SENTRY_DSN getsentry/sentry-cli"
 DEFAULT_BREADCRUMB_LINE_LIMIT=200
 
