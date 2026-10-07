@@ -48,17 +48,16 @@ echo "Pass: invalid certificate causes a non-zero exit"
 # -----------------------------------------------------------------------
 # Test 4: Happy path — valid cert, flag set.
 #
-# We override all image vars to sentry-self-hosted-jq-local (guaranteed
-# present after _test_setup.sh) so the test runs without pulling large
+# We override all image vars to busybox so the test runs without pulling large
 # upstream images. The jq image has no /etc/ssl/certs, so the script uses
 # an empty baseline and overlays our custom cert on top.
 # -----------------------------------------------------------------------
-export RELAY_IMAGE=sentry-self-hosted-jq-local
-export SYMBOLICATOR_IMAGE=sentry-self-hosted-jq-local
-export SNUBA_IMAGE=sentry-self-hosted-jq-local
-export VROOM_IMAGE=sentry-self-hosted-jq-local
-export TASKBROKER_IMAGE=sentry-self-hosted-jq-local
-export UPTIME_CHECKER_IMAGE=sentry-self-hosted-jq-local
+export RELAY_IMAGE=busybox
+export SYMBOLICATOR_IMAGE=busybox
+export SNUBA_IMAGE=busybox
+export VROOM_IMAGE=busybox
+export TASKBROKER_IMAGE=busybox
+export UPTIME_CHECKER_IMAGE=busybox
 
 export SETUP_CUSTOM_CA_CERTIFICATE=1
 source install/setup-custom-ca-certificate.sh
