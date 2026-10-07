@@ -4,10 +4,9 @@
 # but at the time of this writing, it's not possible because the `sentry-vroom` volume has ownership set to `vroom:vroom`.
 # This prevents the `sentry`-based containers from performing read/write operations on that volume.
 #
-# Therefore, this script should do the following:
-# 1. Check if there are any files inside the `sentry-vroom` volume.
-# 2. If (1) finds files, copy those files into a "profiles" bucket on SeaweedFS.
-# 3. Point `filestore-profiles` and vroom to the SeaweedFS "profiles" bucket.
+# Therefore, this script creates a "profiles" bucket on SeaweedFS and points `filestore-profiles`
+# and vroom to it. Copying files over from the `sentry-vroom` volume happened up to the 26.5.0
+# hard stop, so every supported upgrade has already done it.
 
 # Should only run when `$COMPOSE_PROFILES` is set to `feature-complete`
 if [[ "$COMPOSE_PROFILES" == "feature-complete" ]]; then
@@ -71,22 +70,6 @@ if [[ "$COMPOSE_PROFILES" == "feature-complete" ]]; then
     fi
 
     $s3cmd --access_key=sentry --secret_key=sentry --no-ssl --region=us-east-1 --host=localhost:8333 --host-bucket='localhost:8333/%(bucket)' mb s3://profiles
-
-    # Check if there are files in the sentry-vroom volume
-    start_service_and_wait_ready vroom
-    vroom_files_count=$($dc exec vroom sh -c "find /var/vroom/sentry-profiles -type f | wc -l")
-    if [[ "$vroom_files_count" -gt 0 ]]; then
-      echo "Migrating $vroom_files_count files from 'sentry-vroom' volume to 'profiles' bucket on SeaweedFS..."
-
-      # Use a temporary container to copy files from the volume to SeaweedFS
-
-      $dcx -u root vroom sh -c 'mkdir -p /var/lib/apt/lists/partial && apt-get update && apt-get install -y --no-install-recommends s3cmd'
-      $dc exec vroom sh -c 's3cmd --access_key=sentry --secret_key=sentry --no-ssl --region=us-east-1 --host=seaweedfs:8333 --host-bucket="seaweedfs:8333/%(bucket)" sync /var/vroom/sentry-profiles/ s3://profiles/'
-
-      echo "Migration completed."
-    else
-      echo "No files found in 'sentry-vroom' volume. Skipping files migration."
-    fi
   else
     echo "'profiles' bucket already exists on SeaweedFS. Skipping creation."
   fi
