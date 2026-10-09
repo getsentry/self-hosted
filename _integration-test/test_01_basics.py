@@ -27,6 +27,17 @@ TEST_PASS = "test123TEST"
 TIMEOUT_SECONDS = 120
 
 
+def setup_sentry_trust_store():
+    subprocess.run(
+        [
+            "bash",
+            "-c",
+            "source install/_lib.sh && source install/dc-detect-version.sh && source install/setup-sentry-trust-store.sh",
+        ],
+        check=True,
+    )
+
+
 def poll_for_response(
     request: str, client: httpx.Client, validator: Callable = None
 ) -> httpx.Response:
@@ -333,6 +344,7 @@ def test_custom_certificate_authorities():
     # Create custom certs path and copy ca.crt
     os.makedirs(custom_certs_path, exist_ok=True)
     shutil.copyfile(ca_crt_path, f"{custom_certs_path}/test-custom-ca-roots.crt")
+    setup_sentry_trust_store()
     # Generate server key and certificate
 
     self_test_key_path = os.path.join(test_nginx_conf_path, "self.test.key")
@@ -502,6 +514,7 @@ def test_custom_certificate_authorities():
     # Remove files
     os.remove(f"{custom_certs_path}/test-custom-ca-roots.crt")
     os.remove("sentry/test-custom-ca-roots.py")
+    setup_sentry_trust_store()
 
     # Unset environment variable
     if "COMPOSE_FILE" in os.environ:
@@ -679,9 +692,8 @@ def test_customizations():
             "never",
             "run",
             "--no-deps",
-            "--entrypoint=/etc/sentry/entrypoint.sh",
+            "--entrypoint=python3",
             "sentry-cleanup",
-            "python",
             "-c",
             "import os; assert os.path.exists('/created-by-enhance-image')",
         ],
@@ -704,9 +716,8 @@ def test_customizations():
             "never",
             "run",
             "--no-deps",
-            "--entrypoint=/etc/sentry/entrypoint.sh",
+            "--entrypoint=python3",
             "sentry-cleanup",
-            "python",
             "-c",
             "import ldap",
         ],

@@ -18,9 +18,4 @@ RUN if [ -s /usr/src/sentry/requirements.txt ]; then \
     pip install -r /usr/src/sentry/requirements.txt; \
     fi
 
-# Let the non-root sentry user run update-ca-certificates (sentry/entrypoint.sh)
-# for custom CAs mounted from ./certificates. It only needs to create symlinks
-# and replace the bundle in this directory.
-RUN chown sentry:sentry /etc/ssl/certs
-
 USER sentry
