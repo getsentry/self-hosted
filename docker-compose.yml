@@ -99,6 +99,7 @@ x-sentry-defaults: &sentry_defaults
     - "./geoip:/geoip:ro"
     - "./certificates:/usr/local/share/ca-certificates:ro"
     - "./healthcheck:/healthcheck:ro"
+    - "./cron:/cron:ro"
 x-snuba-defaults: &snuba_defaults
   <<: [*restart_policy, *pull_policy]
   depends_on:
@@ -563,13 +564,7 @@ services:
       - feature-complete
   sentry-cleanup:
     <<: *sentry_defaults
-    image: sentry-cleanup-self-hosted-local
-    build:
-      context: ./cron
-      args:
-        BASE_IMAGE: sentry-self-hosted-local
-    entrypoint: "/entrypoint.sh"
-    command: '"0 0 * * * gosu sentry sentry cleanup --days $SENTRY_EVENT_RETENTION_DAYS"'
+    command: ["tini", "-g", "--", "python3", "/cron/run_daily.py", "sentry", "cleanup", "--days", "$SENTRY_EVENT_RETENTION_DAYS"]
   nginx:
     <<: *restart_policy
     ports:
