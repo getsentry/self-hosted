@@ -76,6 +76,13 @@ def authenticated_session():
     login_csrf_token = client.cookies["sc"]
     # Password login goes through the auth API used by the React login page;
     # the legacy HTML login form was removed in getsentry/sentry#126712.
+    # Like the React page, fetch the auth config first: it sets the session
+    # test cookie that the login endpoint requires.
+    auth_config_response = client.get(
+        f"{SENTRY_TEST_HOST}/api/0/auth/config/",
+        headers={"Referer": f"{SENTRY_TEST_HOST}/auth/login/"},
+    )
+    assert auth_config_response.status_code == 200, auth_config_response.text
     api_login_response = client.post(
         f"{SENTRY_TEST_HOST}/api/0/auth/login/",
         json={"username": TEST_USER, "password": TEST_PASS},
