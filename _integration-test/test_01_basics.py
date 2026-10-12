@@ -74,16 +74,21 @@ def authenticated_session():
     client = httpx.Client()
     client.get(SENTRY_TEST_HOST, follow_redirects=True)
     login_csrf_token = client.cookies["sc"]
-    login_response = client.post(
-        f"{SENTRY_TEST_HOST}/auth/login/sentry/",
-        follow_redirects=True,
-        data={
-            "op": "login",
-            "username": TEST_USER,
-            "password": TEST_PASS,
-            "csrfmiddlewaretoken": login_csrf_token,
+    # Password login goes through the auth API used by the React login page;
+    # the legacy HTML login form was removed in getsentry/sentry#126712.
+    api_login_response = client.post(
+        f"{SENTRY_TEST_HOST}/api/0/auth/login/",
+        json={"username": TEST_USER, "password": TEST_PASS},
+        headers={
+            "Referer": f"{SENTRY_TEST_HOST}/auth/login/",
+            "X-CSRFToken": login_csrf_token,
         },
-        headers={"Referer": f"{SENTRY_TEST_HOST}/auth/login/sentry/"},
+    )
+    assert api_login_response.status_code == 200, api_login_response.text
+    login_response = client.get(
+        SENTRY_TEST_HOST,
+        follow_redirects=True,
+        headers={"Referer": SENTRY_TEST_HOST},
     )
     assert login_response.status_code == 200
     parser = BeautifulSoup(login_response.text, "html.parser")
