@@ -584,7 +584,6 @@ services:
       - sentry-nginx-www:/var/www
     healthcheck:
       <<: *healthcheck_defaults
-      # A reload looks up relay and web again after their addresses changed
       test:
         - "CMD-SHELL"
         - "curl --fail --silent --output /dev/null http://localhost/api/0/relays/live/ && curl --fail --silent --output /dev/null http://localhost/_health/ || { nginx -s reload; exit 1; }"
