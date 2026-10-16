@@ -1,14 +1,8 @@
 if [[ "$MINIMIZE_DOWNTIME" ]]; then
   echo "${_group}Waiting for Sentry to start ..."
 
-  # Start the whole setup, except nginx and relay.
+  # Start the whole setup, except nginx, relay, and web.
   start_service_and_wait_ready --remove-orphans $($dc config --services | grep -v -E '^(nginx|relay)$')
-
-  if [ -n "$($dc ps -q relay 2>/dev/null)" ]; then
-    $dc restart relay
-  else
-    echo "Relay container not found, skipping restart."
-  fi
 
   if [ -n "$($dc ps -q nginx 2>/dev/null)" ]; then
     $dc exec -T nginx nginx -s reload || true
