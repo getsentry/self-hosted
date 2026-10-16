@@ -1,5 +1,60 @@
 # Changelog
 
+## 26.10.0
+
+### New Features ✨
+
+- (ci) Replace Codecov with Coverage Action by @aldy505 in [#4530](https://github.com/getsentry/self-hosted/pull/4530)
+- Use prebuilt jqlang/jq image by @aldy505 in [#4547](https://github.com/getsentry/self-hosted/pull/4547)
+
+### Bug Fixes 🐛
+
+#### Vroom
+
+- Breaking change on SENTRY_BUCKET_PROFILES by @aldy505 in [#4555](https://github.com/getsentry/self-hosted/pull/4555)
+- Run the healthcheck without a shell by @oioki in [#4534](https://github.com/getsentry/self-hosted/pull/4534)
+
+#### Other
+
+- (external-kafka) Refresh patches so they apply to master again by @oioki in [#4553](https://github.com/getsentry/self-hosted/pull/4553)
+- (healthcheck) Let Docker enforce HEALTHCHECK_TIMEOUT in check_http.py by @oioki in [#4546](https://github.com/getsentry/self-hosted/pull/4546)
+- (seaweedfs) Use compose mounts in migrate by @aminvakil in [#4531](https://github.com/getsentry/self-hosted/pull/4531)
+- (tests) Expect React login page in integration tests by @oioki in [#4551](https://github.com/getsentry/self-hosted/pull/4551)
+
+### Documentation 📚
+
+- Create AGENTS.md by @aldy505 in [#4494](https://github.com/getsentry/self-hosted/pull/4494)
+
+### Internal Changes 🔧
+
+#### Deps
+
+- Bump edoburu/pgbouncer from v1.25.2-p0 to v1.26.0-p0 by @dependabot in [#4549](https://github.com/getsentry/self-hosted/pull/4549)
+- Bump postgres 18 by @aminvakil in [#4538](https://github.com/getsentry/self-hosted/pull/4538)
+- Bump astral-sh/setup-uv from 10.1.0 to 10.2.0 by @dependabot in [#4533](https://github.com/getsentry/self-hosted/pull/4533)
+- Bump astral-sh/setup-uv from 10.0.1 to 10.1.0 by @dependabot in [#4509](https://github.com/getsentry/self-hosted/pull/4509)
+- Bump anyio from 4.11.0 to 4.14.2 by @dependabot in [#4523](https://github.com/getsentry/self-hosted/pull/4523)
+- Bump soupsieve from 2.8.4 to 2.9 by @dependabot in [#4522](https://github.com/getsentry/self-hosted/pull/4522)
+- Bump confluentinc/cp-kafka from 7.6.13 to 7.6.14 by @dependabot in [#4519](https://github.com/getsentry/self-hosted/pull/4519)
+- Bump nginx from 1.31.5-alpine to 1.31.6-alpine by @dependabot in [#4517](https://github.com/getsentry/self-hosted/pull/4517)
+
+#### Sentry
+
+- Exec the sentry image's Python entrypoint by @oioki in [#4536](https://github.com/getsentry/self-hosted/pull/4536)
+- Prepare for a non-root sentry image by @oioki in [#4535](https://github.com/getsentry/self-hosted/pull/4535)
+
+#### Other
+
+- (healthcheck) Share one python3 HTTP healthcheck for sentry web and snuba api by @oioki in [#4539](https://github.com/getsentry/self-hosted/pull/4539)
+- (install) Read the JS SDK loader registry with json.tool instead of cat by @oioki in [#4540](https://github.com/getsentry/self-hosted/pull/4540)
+- (integration) Check the enhance-image marker with python instead of bash by @oioki in [#4541](https://github.com/getsentry/self-hosted/pull/4541)
+- (profiles) Drop the sentry-vroom volume migration by @oioki in [#4552](https://github.com/getsentry/self-hosted/pull/4552)
+- (vroom) Remove ensure-correct-permissions-profiles-dir.sh by @oioki in [#4554](https://github.com/getsentry/self-hosted/pull/4554)
+
+### Other
+
+- Migrate fast-revert workflow to GitHub App token by @joshuarli in [#4497](https://github.com/getsentry/self-hosted/pull/4497)
+
 ## 26.9.0
 
 ### New Features ✨
