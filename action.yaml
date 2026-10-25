@@ -253,7 +253,7 @@ runs:
 
     - name: Upload coverage to Codecov
       continue-on-error: true
-      uses: getsentry/coverage-action@a006c445d3aa57b4d347da1986c79cd06faa7a30 # v0.4.2
+      uses: getsentry/coverage-action@b3db4e382bd9859c913a96093a3d369b67f59177 # v0.4.4
       with:
         token: ${{ github.token }}
         post-pr-comment: ${{ github.repository == 'getsentry/self-hosted' }}
