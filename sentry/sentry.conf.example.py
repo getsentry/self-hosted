@@ -455,6 +455,27 @@ SENTRY_FEATURES.update(
     }
 )
 
+##########
+# Uptime #
+##########
+
+# The uptime-checker container exposes an HTTP API (port 12345) that Sentry
+# calls to run "Test Monitor" previews and to validate assertions when a
+# monitor is created or updated. Sentry's default region has no API endpoint,
+# so on self-hosted those calls are silently skipped: "Test Monitor" fails
+# with an empty HTTP 400 and invalid assertions are saved without validation.
+# Scheduled uptime checks do not use this endpoint.
+from sentry.conf.types.uptime import UptimeRegionConfig
+
+UPTIME_REGIONS = [
+    UptimeRegionConfig(
+        slug="default",
+        name="Default Region",
+        config_redis_cluster=SENTRY_UPTIME_DETECTOR_CLUSTER,
+        api_endpoint="uptime-checker:12345",
+    ),
+]
+
 #######################
 # MaxMind Integration #
 #######################
