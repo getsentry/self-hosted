@@ -273,12 +273,13 @@ services:
       retries: 30
   seaweedfs:
     <<: *restart_policy
-    image: "chrislusf/seaweedfs:4.40_large_disk@sha256:d07aa1dae03c687e0737b86130ded1b18474211a09e85d737fbe5508b8805139"
+    image: "chrislusf/seaweedfs:4.51_large_disk@sha256:f44a1d38dd2da974a16ccb26f9f9447152fd1c101ca03032e88819c6318d7bf6"
     entrypoint: "weed"
     command: >-
         mini
         -dir=/data
         -filer.defaultReplicaPlacement=000
+        -master.telemetry=false
         -metricsPort=9091
         -volume.dir.idx=/data/idx
         -volume.index=leveldbLarge
