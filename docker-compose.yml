@@ -82,7 +82,7 @@ x-sentry-defaults: &sentry_defaults
     # This one is used by requests
     REQUESTS_CA_BUNDLE: *ca_bundle
     # This one is used by grpc/google modules
-    GRPC_DEFAULT_SSL_ROOTS_FILE_PATH_ENV_VAR: *ca_bundle
+    GRPC_DEFAULT_SSL_ROOTS_FILE_PATH: *ca_bundle
     # Leaving the value empty to just pass whatever is set
     # on the host system (or in the .env file)
     COMPOSE_PROFILES:
