@@ -279,6 +279,7 @@ services:
         mini
         -dir=/data
         -filer.defaultReplicaPlacement=000
+        -master.telemetry=false
         -metricsPort=9091
         -volume.dir.idx=/data/idx
         -volume.index=leveldbLarge

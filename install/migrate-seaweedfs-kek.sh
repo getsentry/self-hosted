@@ -23,6 +23,7 @@ elif [[ "$migration_state" == "needed" ]]; then
       -dir=/data \
       -master=true \
       -master.port=9333 \
+      -master.telemetry=false \
       -volume=false \
       -filer=true \
       -filer.port=8888 \
