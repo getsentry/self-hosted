@@ -1,5 +1,37 @@
 # Changelog
 
+## 26.10.1
+
+### Bug Fixes 🐛
+
+- (scripts) Backup never shut down the compose stack by @aldy505 in [#4565](https://github.com/getsentry/self-hosted/pull/4565)
+- (sentry) Use the env var name gRPC reads for the CA bundle by @geoffg-sentry with @sentry-junior in [#4596](https://github.com/getsentry/self-hosted/pull/4596)
+- (uptime) Configure uptime-checker API endpoint for Test Monitor and assertion validation by @ayoubjemai in [#4583](https://github.com/getsentry/self-hosted/pull/4583)
+- (vroom) Add the scheme to the SeaweedFS endpoint in SENTRY_BUCKET_PROFILES by @oioki in [#4573](https://github.com/getsentry/self-hosted/pull/4573)
+
+### Internal Changes 🔧
+
+#### Deps
+
+- Bump j178/prek-action from 3.0.1 to 3.1.0 by @dependabot in [#4588](https://github.com/getsentry/self-hosted/pull/4588)
+- Bump uv to 0.13.5 by @geoffg-sentry with @sentry-junior in [#4598](https://github.com/getsentry/self-hosted/pull/4598)
+- Bump seaweedfs to 4.51 by @geoffg-sentry with @sentry-junior in [#4595](https://github.com/getsentry/self-hosted/pull/4595)
+- Bump valkey to 8.1.11-alpine by @geoffg-sentry with @sentry-junior in [#4594](https://github.com/getsentry/self-hosted/pull/4594)
+- Bump getsentry/craft from 2 to 3 by @dependabot in [#4590](https://github.com/getsentry/self-hosted/pull/4590)
+- Bump actions/create-github-app-token from 3.2.0 to 3.3.0 by @dependabot in [#4572](https://github.com/getsentry/self-hosted/pull/4572)
+- Bump astral-sh/setup-uv from 10.3.0 to 10.3.2 by @dependabot in [#4587](https://github.com/getsentry/self-hosted/pull/4587)
+- Bump actions/setup-python from 7.0.0 to 7.1.0 by @dependabot in [#4589](https://github.com/getsentry/self-hosted/pull/4589)
+- Bump urllib3 from 2.7.0 to 2.8.0 by @dependabot in [#4550](https://github.com/getsentry/self-hosted/pull/4550)
+- Bump nginx from 1.31.7-alpine to 1.31.8-alpine by @dependabot in [#4591](https://github.com/getsentry/self-hosted/pull/4591)
+- Bump getsentry/coverage-action from 0.4.2 to 0.4.4 by @dependabot in [#4571](https://github.com/getsentry/self-hosted/pull/4571)
+- Bump edoburu/pgbouncer from v1.26.0-p0 to v1.26.1-p0 by @dependabot in [#4584](https://github.com/getsentry/self-hosted/pull/4584)
+- Bump nginx from 1.31.6-alpine to 1.31.7-alpine by @dependabot in [#4570](https://github.com/getsentry/self-hosted/pull/4570)
+- Bump uv to 0.13.4 by @geoffg-sentry with @sentry-junior in [#4579](https://github.com/getsentry/self-hosted/pull/4579)
+- Bump certifi to 2026.10.19 by @geoffg-sentry with @sentry-junior in [#4574](https://github.com/getsentry/self-hosted/pull/4574)
+- Bump astral-sh/setup-uv from 10.2.0 to 10.3.0 by @dependabot in [#4558](https://github.com/getsentry/self-hosted/pull/4558)
+- Bump j178/prek-action from 3.0.0 to 3.0.1 by @dependabot in [#4559](https://github.com/getsentry/self-hosted/pull/4559)
+- Bump actions/setup-node from 7.0.0 to 7.1.0 by @dependabot in [#4560](https://github.com/getsentry/self-hosted/pull/4560)
+
 ## 26.10.0
 
 ### New Features ✨
