@@ -21,7 +21,7 @@ if $ps_command | grep -q clickhouse; then
     $dc down clickhouse
 
     echo "Upgrading clickhouse to 25.8"
-    $dcb $build_arg BASE_IMAGE=altinity/clickhouse-server:25.8.28.10001.altinitystable clickhouse
+    $dcb $build_arg BASE_IMAGE=altinity/clickhouse-server:25.8.33.10002.altinitystable clickhouse
     start_service_and_wait_ready clickhouse
   else
     echo "Detected clickhouse version $version. Skipping upgrades!"
