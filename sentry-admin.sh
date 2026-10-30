@@ -29,7 +29,8 @@ invocation() {
   $dcr --no-deps -v "$VOLUME_MAPPING" -T -e SENTRY_LOG_LEVEL=CRITICAL web "$@" 2>&1
 }
 
-# Function to modify lines starting with `Usage: sentry` to say `Usage: ./sentry-admin.sh` instead.
+# Function to modify lines starting with `Usage: sentry-server` (or the legacy `Usage: sentry`) to say
+# `Usage: ./sentry-admin.sh` instead.
 rename_sentry_bin_in_help_output() {
   local output="$1"
   local help_prefix="$2"
@@ -40,7 +41,8 @@ rename_sentry_bin_in_help_output() {
   while IFS= read -r line; do
     if [[ $line == "Usage: sentry"* ]] && [ "$usage_seen" = false ]; then
       echo -e "\n\n"
-      echo "${line/sentry/./sentry-admin.sh}"
+      line="${line/#Usage: sentry-server/Usage: sentry}"
+      echo "${line/#Usage: sentry/Usage: ./sentry-admin.sh}"
       echo "$help_prefix"
       usage_seen=true
     else

@@ -79,7 +79,8 @@ SENTRY_OPTIONS["system.event-retention-days"] = int(
 #
 # If the key ever becomes compromised, it's important to generate a new key.
 # Changing this value will result in all current sessions being invalidated.
-# A new key can be generated with `$ sentry config generate-secret-key`
+# A new key can be generated with `sentry-server config generate-secret-key`
+# inside the container, e.g. `docker compose run --rm web config generate-secret-key`
 if env("SENTRY_SYSTEM_SECRET_KEY"):
     SENTRY_OPTIONS["system.secret-key"] = env("SENTRY_SYSTEM_SECRET_KEY", "")
 
