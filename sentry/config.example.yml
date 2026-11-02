@@ -113,6 +113,21 @@ filestore.profiles-options:
   addressing_style: "path"
   signature_version: "s3v4"
 
+# Session Replay recordings are stored in their own SeaweedFS bucket. The
+# bucket's lifecycle policy deletes recordings once they pass the retention
+# period, because Sentry does not delete them on its own.
+replay.storage.backend: 's3'
+replay.storage.options:
+  bucket_acl: "private"
+  default_acl: "private"
+  access_key: "sentry"
+  secret_key: "sentry"
+  bucket_name: "replays"
+  region_name: "us-east-1"
+  endpoint_url: "http://seaweedfs:8333"
+  addressing_style: "path"
+  signature_version: "s3v4"
+
 symbolicator.enabled: true
 symbolicator.options:
   url: "http://symbolicator:3021"
