@@ -1,7 +1,8 @@
-minVersion: 2.21.6
+minVersion: 3.7.0
 changelogPolicy: auto
 preReleaseCommand: bash scripts/bump-version.sh
-postReleaseCommand: bash scripts/post-release.sh
+postReleaseBump:
+  version: nightly
 artifactProvider:
   name: none
 targets:

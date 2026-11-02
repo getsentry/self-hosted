@@ -97,7 +97,7 @@ AI assistance is welcome, but the human opening the PR is responsible for the di
 ## Downstream Consumers and Release Tooling
 
 - `action.yaml` / `get-compose-action/` define the GitHub Action that other Sentry repos use to run self-hosted E2E tests against their own images (relay, snuba, symbolicator, taskbroker, uptime-checker, vroom). Its inputs (`project_name`, `image_url`, `compose_profiles`, `skip_backup_restore_test`, …) are a public interface — do not rename or remove inputs without coordinating with those consumers, and keep default behavior backward compatible.
-- Releases are driven by [Craft](https://github.com/getsentry/craft) via `.craft.yml` (calver versioning): Craft runs `scripts/bump-version.sh` pre-release and `scripts/post-release.sh` post-release, and generates `CHANGELOG.md`. Do NOT hand-edit `CHANGELOG.md`, invoke those scripts manually, or hand-bump the `*_IMAGE` tags in `.env` — versioning belongs to the release pipeline.
+- Releases are driven by [Craft](https://github.com/getsentry/craft) via `.craft.yml` (calver versioning): Craft runs `scripts/bump-version.sh` to set the release version, runs it again after publishing to set `master` back to `nightly` (`postReleaseBump`), and generates `CHANGELOG.md`. Do NOT hand-edit `CHANGELOG.md`, invoke that script manually, or hand-bump the `*_IMAGE` tags in `.env` — versioning belongs to the release pipeline.
 
 ## Where Changes Belong
 
