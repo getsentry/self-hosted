@@ -2,7 +2,7 @@
 set -eu
 
 # Craft passes versions via env vars (preferred) with positional args as fallback
-# for manual invocation (e.g. post-release.sh calls this with positional args).
+# for manual invocation.
 OLD_VERSION="${CRAFT_OLD_VERSION:-${1:-}}"
 NEW_VERSION="${CRAFT_NEW_VERSION:-${2:-}}"
 
