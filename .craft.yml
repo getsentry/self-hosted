@@ -1,5 +1,6 @@
-minVersion: 3.7.0
-changelogPolicy: auto
+minVersion: 3.9.0
+changelog:
+  policy: auto
 preReleaseCommand: bash scripts/bump-version.sh
 postReleaseBump:
   version: nightly
