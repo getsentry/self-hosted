@@ -12,7 +12,7 @@ if [[ -n "$($CONTAINER_ENGINE volume ls -q --filter name=sentry-postgres)" && "$
 
   # Get rid of the old volume as we'll rename the new one to that
   $CONTAINER_ENGINE volume rm sentry-postgres
-  $CONTAINER_ENGINE volume create --name sentry-postgres
+  $CONTAINER_ENGINE volume create sentry-postgres
   # There's no rename volume in Docker so copy the contents from old to new name
   # Also append the `host all all all trust` line as `tianon/postgres-upgrade:9.6-to-14`
   # doesn't do that automatically.
@@ -74,7 +74,7 @@ if [[ "$postgres_version" == "14" ]]; then
 
   echo "[2/2] pg_upgrade completed. Replacing the PostgreSQL 14 volume with PostgreSQL 18 data..."
   $CONTAINER_ENGINE volume rm sentry-postgres
-  $CONTAINER_ENGINE volume create --name sentry-postgres
+  $CONTAINER_ENGINE volume create sentry-postgres
   $CONTAINER_ENGINE run --rm -v sentry-postgres-new:/from -v sentry-postgres:/to alpine ash -ec \
     "mkdir -p /to/18/docker; cp -av /from/. /to/18/docker; echo 'host all all all trust' >> /to/18/docker/pg_hba.conf"
   $CONTAINER_ENGINE volume rm sentry-postgres-new
