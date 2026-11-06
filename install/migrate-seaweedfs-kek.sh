@@ -77,6 +77,7 @@ elif [[ "$migration_state" == "needed" ]]; then
     else
       recovered_kek=$(
         printf '%s' "$stored_kek" | $CONTAINER_ENGINE run --rm -i \
+          --user 0 \
           --entrypoint python3 \
           -v "$(pwd)/scripts/recover_seaweedfs_kek.py:/recover_seaweedfs_kek.py:ro" \
           --volumes-from "${migration_container}:ro" \
