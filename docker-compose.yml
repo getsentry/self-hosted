@@ -239,7 +239,7 @@ services:
     build:
       context: ./clickhouse
       args:
-        BASE_IMAGE: "altinity/clickhouse-server:25.8.33.10002.altinitystable"
+        BASE_IMAGE: "clickhouse/clickhouse-server:26.8.36.3@sha256:d426d2f612e1e189c90f9a3f8dcd85a03c6851273833817a296bb327e63aa7a7"
     ulimits:
       nofile:
         soft: 262144
