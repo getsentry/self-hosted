@@ -25,7 +25,7 @@ def configure_self_hosted_environment(request):
             "exec",
             "-T",
             "web",
-            "sentry",
+            "sentry-server",
             "createuser",
             "--force-update",
             "--superuser",

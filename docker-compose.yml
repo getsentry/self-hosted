@@ -570,7 +570,7 @@ services:
       args:
         BASE_IMAGE: sentry-self-hosted-local
     entrypoint: "/entrypoint.sh"
-    command: '"0 0 * * * gosu sentry sentry cleanup --days $SENTRY_EVENT_RETENTION_DAYS"'
+    command: '"0 0 * * * gosu sentry sentry-server cleanup --days $SENTRY_EVENT_RETENTION_DAYS"'
   nginx:
     <<: *restart_policy
     ports:

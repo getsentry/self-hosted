@@ -66,7 +66,8 @@ system.internal-url-prefix: 'http://web:9000'
 
 # If this file ever becomes compromised, it's important to generate a new key.
 # Changing this value will result in all current sessions being invalidated.
-# A new key can be generated with `$ sentry config generate-secret-key`
+# A new key can be generated with `sentry-server config generate-secret-key`
+# inside the container, e.g. `docker compose run --rm web config generate-secret-key`
 #
 # If you are using SENTRY_SYSTEM_SECRET_KEY that is being set on your `.env` or `.env.custom` file,
 # you should remove this line below as it won't be used anyway.
