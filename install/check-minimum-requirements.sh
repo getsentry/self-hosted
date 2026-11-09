@@ -42,14 +42,14 @@ if [[ "$RAM_AVAILABLE_IN_DOCKER" -lt "$MIN_RAM_HARD" ]]; then
   exit 1
 fi
 
-#SSE4.2 required by Clickhouse (https://clickhouse.yandex/docs/en/operations/requirements/)
-# On KVM, cpuinfo could falsely not report SSE 4.2 support, so skip the check. https://github.com/ClickHouse/ClickHouse/issues/20#issuecomment-226849297
-# This may also happen on other virtualization software such as on VMWare ESXi hosts.
+# ClickHouse requires AVX2. See this: https://github.com/ClickHouse/ClickHouse/issues/40459
+# On KVM, cpuinfo could falsely emit reports, so skip the check. https://github.com/ClickHouse/ClickHouse/issues/20#issuecomment-226849297
+# This may also happen on other virtualization software.
 IS_KVM=$($CONTAINER_ENGINE run --rm busybox grep -c 'Common KVM processor' /proc/cpuinfo || :)
 if [[ ! "$SKIP_SSE42_REQUIREMENTS" -eq 1 && "$IS_KVM" -eq 0 && "$DOCKER_ARCH" = "x86_64" ]]; then
-  SUPPORTS_SSE42=$($CONTAINER_ENGINE run --rm busybox grep -c sse4_2 /proc/cpuinfo || :)
-  if [[ "$SUPPORTS_SSE42" -eq 0 ]]; then
-    echo "FAIL: The CPU your machine is running on does not support the SSE 4.2 instruction set, which is required for one of the services Sentry uses (Clickhouse). See https://github.com/getsentry/self-hosted/issues/340 for more info."
+  SUPPORTS_AVX2=$($CONTAINER_ENGINE run --rm busybox grep -c avx2 /proc/cpuinfo || :)
+  if [[ "$SUPPORTS_AVX2" -eq 0 ]]; then
+    echo "FAIL: The CPU your machine is running on does not support the AVX2 instruction set, which is required for one of the services Sentry uses (Clickhouse). See https://github.com/ClickHouse/ClickHouse/issues/40459 and https://hub.docker.com/r/clickhouse/clickhouse-server#compatibility for more info."
     exit 1
   fi
 fi

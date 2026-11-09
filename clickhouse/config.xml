@@ -21,7 +21,6 @@
     <error_log remove="remove"/>
     <latency_log remove="remove"/>
 
-    <allow_nullable_key>1</allow_nullable_key>
 
     <profiles>
         <default>
@@ -30,6 +29,7 @@
         </default>
     </profiles>
     <merge_tree>
+        <allow_nullable_key>1</allow_nullable_key>
         <enable_mixed_granularity_parts>1</enable_mixed_granularity_parts>
          <!-- Increase "max_suspicious_broken_parts" in case of errors with Clickhouse like "Suspiciously many broken parts to remove".
               see: https://github.com/getsentry/self-hosted/issues/2832 -->
