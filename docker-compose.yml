@@ -68,7 +68,6 @@ x-sentry-defaults: &sentry_defaults
       <<: *depends_on-default
     symbolicator:
       <<: *depends_on-default
-  entrypoint: "/etc/sentry/entrypoint.sh"
   command: ["run", "web"]
   environment:
     PYTHONUSERBASE: "/data/custom-packages"
@@ -97,7 +96,7 @@ x-sentry-defaults: &sentry_defaults
     - "sentry-data:/data"
     - "./sentry:/etc/sentry"
     - "./geoip:/geoip:ro"
-    - "./certificates:/usr/local/share/ca-certificates:ro"
+    - "./certificates/.generated/sentry/etc/ssl/certs:/etc/ssl/certs:ro"
     - "./healthcheck:/healthcheck:ro"
 x-snuba-defaults: &snuba_defaults
   <<: [*restart_policy, *pull_policy]
