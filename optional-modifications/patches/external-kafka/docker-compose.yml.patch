@@ -48,56 +48,12 @@
      REDIS_HOST: redis
      SENTRY_KAFKA_MAX_POLL_INTERVAL_MS:
      # Leaving the value empty to just pass whatever is set
-@@ -192,47 +203,7 @@
-       ADMIN_USERS: postgres,sentry
-       MAX_CLIENT_CONN: 10000
+@@ -194,3 +205,3 @@
  
 -  kafka:
--    <<: *restart_policy
--    image: "confluentinc/cp-kafka:7.6.14"
--    environment:
--      # https://docs.confluent.io/platform/current/installation/docker/config-reference.html#cp-kakfa-example
--      KAFKA_PROCESS_ROLES: "broker,controller"
--      KAFKA_CONTROLLER_QUORUM_VOTERS: "1001@127.0.0.1:29093"
--      KAFKA_CONTROLLER_LISTENER_NAMES: "CONTROLLER"
--      KAFKA_NODE_ID: "1001"
--      CLUSTER_ID: "MkU3OEVBNTcwNTJENDM2Qk"
--      KAFKA_LISTENERS: "PLAINTEXT://0.0.0.0:29092,INTERNAL://0.0.0.0:9093,EXTERNAL://0.0.0.0:9092,CONTROLLER://0.0.0.0:29093"
--      KAFKA_ADVERTISED_LISTENERS: "PLAINTEXT://127.0.0.1:29092,INTERNAL://kafka:9093,EXTERNAL://kafka:9092"
--      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: "PLAINTEXT:PLAINTEXT,INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT,CONTROLLER:PLAINTEXT"
--      KAFKA_INTER_BROKER_LISTENER_NAME: "PLAINTEXT"
--      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: "1"
--      KAFKA_OFFSETS_TOPIC_NUM_PARTITIONS: "1"
--      # Lower the log retention to 1 hours to avoid filling up the disk,
--      # ONLY IF you have fast processing time and/or small data volumes.
--      # Otherwise, you can set it to a higher value if you have much slower
--      # processing time and/or larger data volumes.
--      KAFKA_LOG_RETENTION_HOURS: "3"
--      KAFKA_MESSAGE_MAX_BYTES: "50000000" #50MB or bust
--      KAFKA_MAX_REQUEST_SIZE: "50000000" #50MB on requests apparently too
--      CONFLUENT_SUPPORT_METRICS_ENABLE: "false"
--      KAFKA_LOG4J_LOGGERS: "kafka.cluster=WARN,kafka.controller=WARN,kafka.coordinator=WARN,kafka.log=WARN,kafka.server=WARN,state.change.logger=WARN"
--      KAFKA_LOG4J_ROOT_LOGLEVEL: "WARN"
--      KAFKA_TOOLS_LOG4J_LOGLEVEL: "WARN"
--    ulimits:
--      nofile:
--        soft: 100000
--        hard: 100000
--    volumes:
--      - "sentry-kafka:/var/lib/kafka/data"
--      - "sentry-kafka-log:/var/lib/kafka/log"
--      - "sentry-secrets:/etc/kafka/secrets"
--    healthcheck:
--      <<: *healthcheck_defaults
--      test: ["CMD-SHELL", "nc -z localhost 9092"]
--      interval: 10s
--      timeout: 10s
--      retries: 30
-+  kafka: !reset null
-   clickhouse:
-     <<: [*restart_policy, *pull_policy]
-     image: clickhouse-self-hosted-local
-@@ -609,9 +580,8 @@
++  kafka: !reset
+     <<: *restart_policy
+@@ -609,9 +620,8 @@
          read_only: true
          source: ./geoip
          target: /geoip
@@ -108,7 +64,7 @@
        redis:
          <<: *depends_on-healthy
        web:
-@@ -620,11 +590,18 @@
+@@ -620,11 +630,18 @@
      <<: [*restart_policy, *pull_policy]
      image: "$TASKBROKER_IMAGE"
      environment:
@@ -132,7 +88,7 @@
        TASKBROKER_DB_PATH: "/opt/sqlite/taskbroker-activations.sqlite"
        TASKBROKER_STATSD_ADDR: ${STATSD_ADDR:-127.0.0.1:8125}
      command: /opt/taskbroker -c /etc/taskbroker/config.yml
-@@ -634,9 +611,6 @@
+@@ -634,9 +651,6 @@
          read_only: true
          source: ./taskbroker
          target: /etc/taskbroker
@@ -142,7 +98,7 @@
    taskscheduler:
      <<: *sentry_defaults
      command: run taskworker-scheduler
-@@ -653,15 +627,13 @@
+@@ -653,15 +667,13 @@
        LAUNCHPAD_WORKER_RPC_HOST: "taskbroker:50051"
        LAUNCHPAD_WORKER_CONCURRENCY: "${LAUNCHPAD_TASKWORKER_CONCURRENCY:-4}"
        LAUNCHPAD_WORKER_HEALTH_CHECK_FILE_PATH: "/tmp/health.txt"
@@ -159,7 +115,7 @@
        taskbroker:
          <<: *depends_on-default
        web:
-@@ -672,20 +644,26 @@
+@@ -672,20 +684,26 @@
      <<: [*restart_policy, *pull_policy]
      image: "$VROOM_IMAGE"
      environment:
@@ -191,7 +147,7 @@
      profiles:
        - feature-complete
    uptime-checker:
-@@ -693,7 +671,14 @@
+@@ -693,7 +711,14 @@
      image: "$UPTIME_CHECKER_IMAGE"
      command: run
      environment:
@@ -207,7 +163,7 @@
        UPTIME_CHECKER_REDIS_HOST: redis://redis:6379
        # Set to `true` will allow uptime checks against private IP addresses
        UPTIME_CHECKER_ALLOW_INTERNAL_IPS: "false"
-@@ -705,8 +690,6 @@
+@@ -705,8 +730,6 @@
        #UPTIME_CHECKER_HTTP_CHECKER_DNS_NAMESERVERS: "8.8.8.8,8.8.4.4"
        UPTIME_CHECKER_STATSD_ADDR: ${STATSD_ADDR:-127.0.0.1:8125}
      depends_on:
@@ -216,7 +172,7 @@
        redis:
          <<: *depends_on-healthy
      profiles:
-@@ -720,8 +703,6 @@
+@@ -720,8 +743,6 @@
      external: true
    sentry-redis:
      external: true
