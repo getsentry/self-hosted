@@ -575,7 +575,7 @@ services:
     <<: *restart_policy
     ports:
       - "$SENTRY_BIND:80/tcp"
-    image: "nginx:1.31.8-alpine"
+    image: "nginx:1.31.9-alpine"
     volumes:
       - type: bind
         read_only: true
