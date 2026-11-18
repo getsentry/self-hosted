@@ -1,5 +1,26 @@
 # Changelog
 
+## 26.11.0
+
+### Bug Fixes 🐛
+
+#### Install
+
+- Run SeaweedFS KEK recovery container as root by @pcbeingused333 and @claude in [#4612](https://github.com/getsentry/self-hosted/pull/4612)
+- Create the PostgreSQL volume without --name by @pcbeingused333 and @claude in [#4613](https://github.com/getsentry/self-hosted/pull/4613)
+
+#### Other
+
+- (external-kafka) Decouple patch from compose config by @aminvakil in [#4618](https://github.com/getsentry/self-hosted/pull/4618)
+
+### Internal Changes 🔧
+
+- (deps) Bump ClickHouse to 25.8.33.10002.altinitystable by @cleptric with @sentry-junior in [#4601](https://github.com/getsentry/self-hosted/pull/4601)
+- (release) Update .craft.yml for craft 3.9.0 by @BYK with @sentry-junior in [#4609](https://github.com/getsentry/self-hosted/pull/4609)
+- (sentry) Use SnubaTSDB in the example config by @Starrao123 in [#4603](https://github.com/getsentry/self-hosted/pull/4603)
+- Bump ClickHouse to 26.8 by @aldy505 in [#4614](https://github.com/getsentry/self-hosted/pull/4614)
+- Use Craft's built-in post-release version bump by @BYK with @sentry-junior in [#4605](https://github.com/getsentry/self-hosted/pull/4605)
+
 ## 26.10.1
 
 ### Bug Fixes 🐛
