@@ -10,7 +10,9 @@ else
   build_arg="--build-arg"
 fi
 
-if $ps_command | grep -q clickhouse; then
+# Not `grep -q`: it exits on first match, and the SIGPIPE to `ps` fails the
+# pipeline under `set -o pipefail`.
+if $ps_command | grep clickhouse >/dev/null; then
   # Start clickhouse if it is not already running
   start_service_and_wait_ready clickhouse
 
