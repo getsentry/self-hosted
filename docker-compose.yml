@@ -161,7 +161,7 @@ services:
     command: ["valkey-server", "/usr/local/etc/redis/redis.conf"]
   postgres:
     <<: *restart_policy
-    image: "postgres:18.6-trixie"
+    image: "postgres:18.7-trixie"
     healthcheck:
       <<: *healthcheck_defaults
       # Using default user "postgres" from sentry/sentry.conf.example.py or value of POSTGRES_USER if provided
