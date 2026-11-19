@@ -37,6 +37,7 @@ source install/check-memcached-backend.sh
 source install/ensure-relay-credentials.sh
 source install/generate-secret-key.sh
 source install/build-docker-images.sh
+source install/setup-sentry-trust-store.sh
 source install/ensure-sentry-data-ownership.sh
 source install/migrate-seaweedfs-kek.sh
 source install/upgrade-postgres.sh

@@ -53,8 +53,6 @@ if [[ "${SETUP_CUSTOM_CA_CERTIFICATE:-}" == "1" ]]; then
     done
     echo ""
 
-    # Wipe and recreate the generated directory for idempotency.
-    rm -rf "$GENERATED_DIR"
     mkdir -p "$GENERATED_DIR"
 
     # Pairs of service nickname and the env var that holds the image reference.
@@ -83,6 +81,9 @@ if [[ "${SETUP_CUSTOM_CA_CERTIFICATE:-}" == "1" ]]; then
       fi
 
       cert_out_dir="${GENERATED_DIR}/${nickname}/etc/ssl/certs"
+      # Wipe and recreate this service's directory for idempotency. Other
+      # directories in GENERATED_DIR (e.g. sentry's) belong to other steps.
+      rm -rf "${GENERATED_DIR:?}/${nickname}"
       mkdir -p "$cert_out_dir"
 
       echo "Generating trust store for ${nickname} (${image}) ..."
