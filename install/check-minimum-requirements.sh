@@ -42,6 +42,14 @@ if [[ "$RAM_AVAILABLE_IN_DOCKER" -lt "$MIN_RAM_HARD" ]]; then
   exit 1
 fi
 
+# Fail early if Docker cannot create networks (e.g. default-address-pools exhausted), instead of after pulling all images. See #4576
+if ! $CONTAINER_ENGINE network create sentry-network-check >/dev/null 2>&1; then
+  echo "FAIL: $CONTAINER_ENGINE cannot create a new network. Its address pools may be exhausted."
+  echo "Remove unused networks ($CONTAINER_ENGINE network prune) or increase default-address-pools in /etc/docker/daemon.json."
+  exit 1
+fi
+$CONTAINER_ENGINE network rm sentry-network-check >/dev/null
+
 # ClickHouse requires AVX2. See this: https://github.com/ClickHouse/ClickHouse/issues/40459
 # On KVM, cpuinfo could falsely emit reports, so skip the check. https://github.com/ClickHouse/ClickHouse/issues/20#issuecomment-226849297
 # This may also happen on other virtualization software.
