@@ -7,9 +7,14 @@ echo "${_group}Migrating Session Replay recordings storage ..."
 # They now live in `/data/replays`, which the `sentry-cleanup` container prunes after
 # `SENTRY_EVENT_RETENTION_DAYS`. On upgrade, this points `replay.storage.*` there and moves
 # existing recordings over so they keep playing back and expire like new ones.
+#
+# Only installs whose default filestore is the local filesystem are migrated. When the
+# filestore is S3 or GCS, recordings already live in that bucket and keep going there;
+# pointing them at local disk would break playback of existing recordings.
 
 move_replay_recordings=0
-if ! grep -q "replay.storage.backend" $SENTRY_CONFIG_YML; then
+if ! grep -q "replay.storage.backend" $SENTRY_CONFIG_YML &&
+  grep -Eq "^filestore\.backend:[[:space:]]*['\"]?filesystem['\"]?[[:space:]]*$" $SENTRY_CONFIG_YML; then
   apply_config_changes_replays=0
   if [[ -z "$APPLY_AUTOMATIC_CONFIG_UPDATES" ]]; then
     echo
