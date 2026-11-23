@@ -12,7 +12,6 @@ echo "${_group}Migrating Session Replay recordings storage ..."
 # filestore is S3 or GCS, recordings already live in that bucket and keep going there;
 # pointing them at local disk would break playback of existing recordings.
 
-move_replay_recordings=0
 if ! grep -q "replay.storage.backend" $SENTRY_CONFIG_YML &&
   grep -Eq "^filestore\.backend:[[:space:]]*['\"]?filesystem['\"]?[[:space:]]*$" $SENTRY_CONFIG_YML; then
   apply_config_changes_replays=0
@@ -60,8 +59,15 @@ if ! grep -q "replay.storage.backend" $SENTRY_CONFIG_YML &&
   if [[ "$APPLY_AUTOMATIC_CONFIG_UPDATES" == 1 || "$apply_config_changes_replays" == 1 ]]; then
     replays_config=$(sed -n "/^replay.storage.backend/,/location: '\/data\/replays'/{p}" sentry/config.example.yml)
     echo "$replays_config" >>$SENTRY_CONFIG_YML
-    move_replay_recordings=1
   fi
+fi
+
+# Move on every run while recordings are configured to live in `/data/replays`, not only on
+# the run that adds the config, so a rerun finishes a move that was interrupted. Once
+# everything is moved this only scans `/data/files` and finds nothing to do.
+move_replay_recordings=0
+if grep -Eq "^[[:space:]]+location:[[:space:]]*['\"]?/data/replays['\"]?[[:space:]]*$" $SENTRY_CONFIG_YML; then
+  move_replay_recordings=1
 fi
 
 # Recordings in `/data/files` are stored as <retention_days>/<project_id>/<replay_id>/<segment_id>.
