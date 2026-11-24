@@ -96,6 +96,12 @@ EOF
 
     echo "Making sure the bucket lifecycle policy is all set up correctly..."
     $s3cmd --access_key=sentry --secret_key=sentry --no-ssl --region=us-east-1 --host=localhost:8333 --host-bucket='localhost:8333/%(bucket)' getlifecycle s3://profiles
+
+    # SeaweedFS only stamps the lifecycle expiration as a volume TTL on new objects
+    # when the per-bucket lifecycle TTL fast path is enabled, off by default since
+    # SeaweedFS 4.32 (seaweedfs/seaweedfs#9825).
+    echo "Making sure the lifecycle TTL fast path is enabled..."
+    echo "s3.bucket.lifecycle.fastpath -name=profiles -enable" | $dc exec -T seaweedfs weed shell
   fi
   echo "${_endgroup}"
 fi

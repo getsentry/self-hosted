@@ -20,6 +20,13 @@ if ! $dc exec seaweedfs s3cmd --access_key=sentry --secret_key=sentry --no-ssl -
   exit 1
 fi
 
+# Ensure that the lifecycle TTL fast path is enabled, otherwise new objects never expire
+fastpath_status=$(echo "s3.bucket.lifecycle.fastpath -name=profiles" | $dc exec -T seaweedfs weed shell)
+if ! echo "$fastpath_status" | grep -q "Lifecycle TTL fast path: enabled"; then
+  echo "Error: Expected the lifecycle TTL fast path to be enabled on the 'profiles' bucket"
+  exit 1
+fi
+
 # Manual cleanup, otherwise `create-docker-volumes.sh` will fail
 $dc down -v --remove-orphans
 
