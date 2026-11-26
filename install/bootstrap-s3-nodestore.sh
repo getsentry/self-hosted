@@ -88,6 +88,12 @@ EOF
   $dc exec seaweedfs sh -c "printf '%s' '$lifecycle_policy' > /tmp/nodestore-lifecycle-policy.xml"
   $s3cmd --access_key=sentry --secret_key=sentry --no-ssl --region=us-east-1 --host=localhost:8333 --host-bucket='localhost:8333/%(bucket)' setlifecycle /tmp/nodestore-lifecycle-policy.xml s3://nodestore
   $s3cmd --access_key=sentry --secret_key=sentry --no-ssl --region=us-east-1 --host=localhost:8333 --host-bucket='localhost:8333/%(bucket)' getlifecycle s3://nodestore
+
+  # SeaweedFS only stamps the lifecycle expiration as a volume TTL on new objects
+  # when the per-bucket lifecycle TTL fast path is enabled, off by default since
+  # SeaweedFS 4.32 (seaweedfs/seaweedfs#9825).
+  echo "Making sure the lifecycle TTL fast path is enabled..."
+  echo "s3.bucket.lifecycle.fastpath -name=nodestore -enable" | $dc exec -T seaweedfs weed shell
 fi
 
 echo "${_endgroup}"

@@ -13,4 +13,11 @@ for i in $(seq 1 5); do
   source install/bootstrap-s3-nodestore.sh
 done
 
+# Ensure that the lifecycle TTL fast path is enabled, otherwise new objects never expire
+fastpath_status=$(echo "s3.bucket.lifecycle.fastpath -name=nodestore" | $dc exec -T seaweedfs weed shell)
+if ! echo "$fastpath_status" | grep -q "Lifecycle TTL fast path: enabled"; then
+  echo "Error: Expected the lifecycle TTL fast path to be enabled on the 'nodestore' bucket"
+  exit 1
+fi
+
 report_success
