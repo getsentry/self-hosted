@@ -29,7 +29,7 @@ TRUNCATE TABLE IF EXISTS system.query_views_log;
 "
 }
 
-if $ps_command | grep -q clickhouse; then
+if $ps_command | grep clickhouse >/dev/null; then
   start_service_and_wait_ready clickhouse
   drop_clickhouse_system_table_if_exists query_log_0
   drop_clickhouse_system_table_if_exists query_views_log_0
