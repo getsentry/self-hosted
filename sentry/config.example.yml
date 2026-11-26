@@ -113,6 +113,13 @@ filestore.profiles-options:
   addressing_style: "path"
   signature_version: "s3v4"
 
+# Session Replay recordings are kept in their own directory so the
+# `sentry-cleanup` cron job can delete them after the retention period.
+# Sentry does not delete them on its own.
+replay.storage.backend: 'filesystem'
+replay.storage.options:
+  location: '/data/replays'
+
 symbolicator.enabled: true
 symbolicator.options:
   url: "http://symbolicator:3021"
