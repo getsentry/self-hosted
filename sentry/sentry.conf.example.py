@@ -317,7 +317,6 @@ SENTRY_OPTIONS["mail.from"] = f"sentry@{SENTRY_OPTIONS['mail.list-namespace']}"
 # The features listed here are stable and generally available on SaaS.
 # To enable preview features, see https://develop.sentry.dev/self-hosted/configuration/#enabling-preview-features
 
-SENTRY_FEATURES["projects:sample-events"] = False
 SENTRY_FEATURES.update(
     {
         feature: True
@@ -333,12 +332,7 @@ SENTRY_FEATURES.update(
             "organizations:advanced-search",
             "organizations:issue-platform",
             "organizations:monitors",
-            "organizations:dashboards-mep",
-            "organizations:mep-rollout-flag",
-            "organizations:dashboards-rh-widget",
             "organizations:dynamic-sampling",
-            "organizations:workflow-engine-ui",
-            "organizations:workflow-engine-rule-serializers",
             "projects:custom-inbound-filters",
             "projects:data-forwarding",
             "projects:discard-groups",
@@ -354,11 +348,7 @@ SENTRY_FEATURES.update(
             "organizations:visibility-explore-range-high",
             "organizations:transaction-metrics-extraction",
             "organizations:indexed-spans-extraction",
-            "organizations:insights-entry-points",
-            "organizations:insights-initial-modules",
-            "organizations:insights-addon-modules",
             "organizations:insights-modules-use-eap",
-            "organizations:starfish-mobile-appstart",
             "organizations:on-demand-metrics-extraction",
             "projects:span-metrics-extraction",
             "projects:span-metrics-extraction-addons",
@@ -390,24 +380,18 @@ SENTRY_FEATURES.update(
         + (
             "organizations:ourlogs-enabled",
             "organizations:ourlogs-ingestion",
-            "organizations:ourlogs-stats",
-            "organizations:ourlogs-replay-ui",
+            "organizations:ourlogs-regex-searches",
         )
         # Metrics related flags
         + (
             "organizations:tracemetrics-enabled",
-            "organizations:tracemetrics-alerts",
             "organizations:tracemetrics-ingestion",
-            "organizations:tracemetrics-equations-in-alerts",
-            "organizations:tracemetrics-equations-in-explore",
-            "organizations:tracemetrics-multi-metric-selection-in-dashboards",
-            "organizations:tracemetrics-units-ui",
-            "organizations:tracemetrics-stats-bytes-ui",
             "organizations:tracemetrics-pii-scrubbing-ui",
+            "organizations:tracemetrics-dashboard-table",
+            "organizations:tracemetrics-otlp-histograms",
         )
         # Transaction widgets/alerts/saved queries migration UI flags
         + (
-            "organizations:discover-saved-queries-deprecation",
             "organizations:expose-migrated-discover-queries",
             "organizations:performance-transaction-deprecation-banner",
         )
